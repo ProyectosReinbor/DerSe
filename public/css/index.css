@@ -1,0 +1,18 @@
+body {
+    background-color: #82B1FF;
+    margin: 0;
+}
+
+#canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background-color: #bbd8ff;
+}
+
+@font-face {
+    font-family: "Dungeon";
+    src: url("./resources/dungeon.ttf");
+}
