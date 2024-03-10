@@ -1,10 +1,10 @@
 export class Images {
-  wait: boolean = false;
-  images: {
-    [key: string]: HTMLImageElement;
-  } = {};
+  constructor() {
+    this.wait = false;
+    this.images = {};
+  }
 
-  get(route: string): Promise<HTMLImageElement | false> {
+  get(route) {
     return new Promise((resolve, reject) => {
       if (this.wait === true) resolve(false);
       else {

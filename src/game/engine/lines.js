@@ -1,67 +1,52 @@
-import { Canvas } from "./canvas.js";
 import { Line } from "./lines/line.js";
 
 export class Lines {
-
-  canvas: Canvas;
-  lines: Line[] = [];
-  fillStyle: string;
-  strokeStyle: string;
-  lineWidth: number;
-
   constructor(
-    canvas: Canvas,
-    lines: {
-      x: number,
-      y: number,
-    }[],
-    fillStyle: string,
-    strokeStyle: string,
-    lineWidth: number,
+    canvas,
+    fillStyle = false,
+    strokeStyle = false,
+    lineWidth = false,
+    lines = false,
   ) {
+    this.lines = [];
     this.canvas = canvas;
     this.fillStyle = fillStyle;
     this.strokeStyle = strokeStyle;
     this.lineWidth = lineWidth;
-
-    lines.forEach((line, index) => {
-      this.setLine(
-        index,
-        line,
-      );
-    });
+    if (lines !== false) {
+      lines.forEach((initial, index) => {
+        this.setLine(
+          index,
+          initial,
+        );
+      });
+    }
   }
 
   setLine(
-    index: number,
-    initial: {
-      x: number;
-      y: number;
-    }
+    index,
+    initial,
   ) {
     this.lines[index] = new Line(
       initial,
-      {
-        width: 0,
-        height: 0,
-      },
       this.canvas,
     );
   }
 
   drawLines() {
-    if (this.fillStyle === "" && this.strokeStyle === "") return;
+    if (this.fillStyle === false && this.strokeStyle === false)
+      throw new Error("fillStyle and strokeStyle are both false");
 
     this.canvas.context.beginPath();
     this.lines.forEach(line => line.drawLine());
 
-    if (this.strokeStyle !== "" && this.lineWidth > 0) {
+    if (this.strokeStyle !== false && this.lineWidth !== false) {
       this.canvas.context.lineWidth = this.lineWidth;
       this.canvas.context.strokeStyle = this.strokeStyle;
       this.canvas.context.stroke();
     }
 
-    if (this.fillStyle !== "") {
+    if (this.fillStyle !== false) {
       this.canvas.context.fillStyle = this.fillStyle;
       this.canvas.context.fill();
     }

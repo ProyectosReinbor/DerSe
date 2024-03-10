@@ -1,24 +1,11 @@
-import { Canvas } from "../canvas.js";
 import { Position } from "../position.js";
 
 export class Line extends Position {
-  canvas: Canvas;
-
   constructor(
-    initial: {
-      x: number;
-      y: number;
-    },
-    size: {
-      width: number;
-      height: number;
-    },
-    canvas: Canvas,
+    initial,
+    canvas,
   ) {
-    super(
-      initial,
-      size
-    );
+    super(initial);
     this.canvas = canvas;
   }
 

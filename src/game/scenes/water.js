@@ -2,9 +2,9 @@ import { Canvas, ImageBoxes } from "../engine.js";
 export class Water extends ImageBoxes {
 
     constructor(
-        x: number,
-        y: number,
-        canvas: Canvas,
+        x,
+        y,
+        canvas,
         boxes: {
             width: number;
             height: number;

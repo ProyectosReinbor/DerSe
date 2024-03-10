@@ -6,25 +6,10 @@ import { Finish } from "./keyboard/finish.js";
 import { Keys } from "./keyboard/keys.js";
 import { Shift } from "./keyboard/shift.js";
 import { Space } from "./keyboard/space.js";
-import { Input } from "./input.js";
-import { Canvas } from "./canvas.js";
 import { Position } from "./position.js";
 
 export class Keyboard extends Rect {
-
-  target: Input | null = null;
-  shiftKeys: Keys[];
-  keys: Keys[];
-  shift: Shift;
-  enter: Enter;
-  space: Space;
-  delete: Delete;
-  closeQuestion: CloseQuestion;
-  finish: Finish;
-
-  constructor(
-    canvas: Canvas,
-  ) {
+  constructor(canvas) {
     super(
       {
         x: 5,
@@ -36,10 +21,8 @@ export class Keyboard extends Rect {
       },
       canvas,
       "#21618C",
-      "",
-      0.5,
     );
-
+    this.target = false;
     this.shiftKeys = this.getKeys([
       "1234567890",
       "QWERTYUIOP",
@@ -83,10 +66,10 @@ export class Keyboard extends Rect {
     );
   }
 
-  private getKeys(keys: string[]): Keys[] {
+  getKeys(keys) {
     const width = (this.size.width * 0.97);
     const height = (this.size.height * 0.8) / keys.length;
-    return keys.map((characters: string, index: number) => {
+    return keys.map((characters, index) => {
       const widthIndex = (width * 0.01) * index;
       const heightIndex = height * (index + 1);
       return new Keys(

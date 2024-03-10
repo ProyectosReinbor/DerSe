@@ -1,23 +1,11 @@
-import { Canvas } from "./canvas.js";
-import { Images } from "./images.js";
 import { Position } from "./position.js";
 
 export class Image extends Position {
-
-  route: string;
-  canvas: Canvas;
-
   constructor(
-    initial: {
-      x: number;
-      y: number;
-    },
-    size: {
-      width: number;
-      height: number;
-    },
-    canvas: Canvas,
-    route: string,
+    initial,
+    size,
+    canvas,
+    route,
   ) {
     super(
       initial,

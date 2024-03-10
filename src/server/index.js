@@ -1,25 +1,14 @@
 import express from 'express';
 import http from 'http';
-import { Server } from 'socket.io';
+import socketIO from 'socket.io';
 import { WebcastPushConnection } from 'tiktok-live-connector';
-import {
-    ClientToServerEvents,
-    InterServerEvents,
-    ServerToClientEvents,
-    SocketData
-} from './server.js';
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server<
-    ClientToServerEvents,
-    ServerToClientEvents,
-    InterServerEvents,
-    SocketData
->(server);
+const io = socketIO(server);
 
 app.use(express.static('public'));
-app.use(express.static('dist'));
+app.use(express.static('src'));
 
 io.on('connection', (socket) => {
     console.log('A user connected!');
@@ -27,10 +16,11 @@ io.on('connection', (socket) => {
     socket.on('live', (username) => {
         const tiktokLiveConnection = new WebcastPushConnection(username);
         tiktokLiveConnection.connect()
-            .then(state => {
+            .then(() => {
                 socket.emit('live', true);
             })
             .catch(err => {
+                console.error(err);
                 socket.emit('live', false);
             });
         tiktokLiveConnection.on('chat', (data) => {

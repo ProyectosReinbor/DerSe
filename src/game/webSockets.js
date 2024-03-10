@@ -1,11 +1,7 @@
-import { io, Socket } from "socket.io-client";
-import { ClientToServerEvents, ServerToClientEvents } from "../server/server";
+import { io } from "socket.io-client";
 
 const account = "dilanfinoochoa";
-const socket: Socket<
-    ServerToClientEvents,
-    ClientToServerEvents
-> = io();
+const socket = io();
 
 socket.on("connect", () => {
     console.log("connected");

@@ -2,36 +2,15 @@ import { Canvas } from "./canvas.js";
 import { Position } from "./position.js";
 
 export class Text extends Position {
-
-    canvas: Canvas;
-    value: string;
-    fillStyle: string;
-    strokeStyle: string;
-
     constructor(
-        initial: {
-            x: number;
-            y: number;
-        },
-        size: {
-            width: number,
-            height: number,
-        },
-        canvas: Canvas,
-        value: string,
-        fillStyle: string,
-        strokeStyle: string,
+        initial,
+        size,
+        canvas,
+        value,
+        fillStyle = false,
+        strokeStyle = false
     ) {
-        super(
-            {
-                x: initial.x,
-                y: initial.y,
-            },
-            {
-                width: size.width,
-                height: size.height,
-            }
-        );
+        super(initial, size);
         this.canvas = canvas;
         this.value = value;
         this.fillStyle = fillStyle;
@@ -43,7 +22,9 @@ export class Text extends Position {
     }
 
     drawText() {
-        if (this.fillStyle === "" && this.strokeStyle === "") return;
+        if (this.fillStyle === false && this.strokeStyle === false)
+            throw new Error("fillStyle and strokeStyle are both false");
+
         if (this.value.length === 0) return;
 
         const positionOnCanvas = this.canvas.positionOnCanvas(this);
@@ -57,7 +38,7 @@ export class Text extends Position {
         positionOnCanvas.initial.x += this.size.width / 2;
         positionOnCanvas.initial.x -= positionOnCanvas.size.width / 2;
 
-        if (this.fillStyle !== "") {
+        if (this.fillStyle !== false) {
             this.canvas.context.fillStyle = this.fillStyle;
             this.canvas.context.fillText(
                 this.value,
@@ -66,7 +47,7 @@ export class Text extends Position {
             );
         }
 
-        if (this.strokeStyle !== "") {
+        if (this.strokeStyle !== false) {
             this.canvas.context.strokeStyle = this.strokeStyle;
             this.canvas.context.strokeText(
                 this.value,

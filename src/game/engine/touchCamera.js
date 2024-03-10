@@ -1,30 +1,22 @@
-import { Canvas } from "./canvas.js";
-import { Coordinate } from "./coordinate.js";
-
 export class TouchCanvas {
-
-  canvas: Canvas;
-  touch: Coordinate | false = false;
-  horizontal: boolean;
-  vertical: boolean;
-  moved: boolean = false;
-
   constructor(
-    canvas: Canvas,
-    horizontal: boolean,
-    vertical: boolean,
+    canvas,
+    horizontal = false,
+    vertical = false,
   ) {
     this.canvas = canvas;
+    this.touch = false;
     this.horizontal = horizontal;
     this.vertical = vertical;
+    this.moved = false;
   }
 
-  touchstartTouchCamera(touch: Coordinate): void {
+  touchstartTouchCamera(touch) {
     this.moved = false;
     this.touch = touch;
   }
 
-  touchmoveTouchCamera(touch: Coordinate): boolean {
+  touchmoveTouchCamera(touch) {
     if (this.touch === false) return false;
 
     let moved = false;
@@ -53,7 +45,7 @@ export class TouchCanvas {
     return this.moved;
   }
 
-  touchendTouchCamera(): boolean {
+  touchendTouchCamera() {
     this.touch = false;
     return this.moved;
   }
