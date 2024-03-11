@@ -4,58 +4,75 @@ import { Position } from "./position.js";
 export class Camera extends Position {
 
     constructor(
-        initial: {
-            x: number;
-            y: number;
-        }
+        initialX,
+        initialY,
     ) {
         super(
-            {
-                x: initial.x,
-                y: initial.y,
-            },
-            {
-                width: 100,
-                height: 100,
-            }
+            initialX,
+            initialY,
+            100,
+            100
         );
     }
 
-    insideCamera(position: Position): boolean {
+    insideCamera(
+        initialX,
+        initialY,
+        sizeWidth,
+        sizeHeight,
+        endX,
+        endY
+    ) {
         const vision = new Position(
-            {
-                x: this.initial.x - position.size.width,
-                y: this.initial.y - position.size.height,
-            },
-            {
-                width: this.size.width + (position.size.width * 2),
-                height: this.size.height + (position.size.height * 2),
-            }
+            this.initial.x - sizeWidth,
+            this.initial.y - sizeHeight,
+            this.size.width + (sizeWidth * 2),
+            this.size.height + (sizeHeight * 2),
         );
-        return vision.inside(position);
+        return vision.inside(
+            initialX,
+            initialY,
+            endX,
+            endY
+        );
     }
 
-    positionOnCamera(position: Position): Position | false {
-        const appearsInCamera = this.insideCamera(position);
+    positionOnCamera(
+        initialX,
+        initialY,
+        sizeWidth,
+        sizeHeight,
+        endX,
+        endY
+    ) {
+        const appearsInCamera = this.insideCamera(
+            sizeWidth,
+            sizeHeight,
+            initialX,
+            initialY,
+            endX,
+            endY
+        );
         if (appearsInCamera === false) return false;
         return new Position(
-            {
-                x: position.initial.x - this.initial.x,
-                y: position.initial.y - this.initial.y,
-            },
-            position.size
+            initialX - this.initial.x,
+            initialY - this.initial.y,
+            sizeWidth,
+            sizeHeight
         );
     }
 
     focusPosition(
-        initial: { x: number, y: number },
-        size: { width: number, height: number }
+        initialX,
+        initialY,
+        sizeWidth,
+        sizeHeight
     ) {
-        let x = initial.x - (this.size.width / 2);
-        x += size.width / 2;
+        let x = initialX - (this.size.width / 2);
+        x += sizeWidth / 2;
 
-        let y = initial.y - (this.size.height / 2);
-        y += size.height / 2;
+        let y = initialY - (this.size.height / 2);
+        y += sizeHeight / 2;
 
         this.initial.x = x;
         this.initial.y = y;

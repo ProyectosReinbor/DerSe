@@ -1,36 +1,25 @@
 import { Camera } from "./camera.js";
+import { Coordinate } from "./coordinate.js";
 import { Images } from "./images.js";
 import { Position } from "./position.js";
 
 export class Canvas extends Camera {
-
-  images: Images;
-
-  timeBetweenFrames: number = 0;
-  time: number = 0;
-  framesPerSecond: number;
-  intervalBetweenFrames: number;
-
-  element: HTMLCanvasElement;
-  context: CanvasRenderingContext2D;
-  onePercentOfWidth: number = 0;
-  onePercentOfHeight: number = 0;
-  marginWidth: number = 0;
-  marginHeight: number = 0;
-
   constructor(
-    framesPerSecond: number,
-    initial: {
-      x: number,
-      y: number,
-    }
+    framesPerSecond,
+    initialX,
+    initialY,
   ) {
-    super(initial);
+    super(initialX, initialY);
+    this.onePercentOfWidth = 0;
+    this.onePercentOfHeight = 0;
+    this.marginWidth = 0;
+    this.marginHeight = 0;
+
     this.images = new Images();
     this.framesPerSecond = framesPerSecond;
     this.intervalBetweenFrames = 1000 / this.framesPerSecond;
-    this.element = document.querySelector("canvas") as HTMLCanvasElement;
-    this.context = this.element.getContext("2d") as CanvasRenderingContext2D;
+    this.element = document.querySelector("canvas");
+    this.context = this.element.getContext("2d");
 
     this.aspectRatio();
     window.addEventListener(
@@ -54,7 +43,7 @@ export class Canvas extends Camera {
     this.nextFrame();
   }
 
-  nextFrame(time: number = 0): void {
+  nextFrame(time = 0) {
     const difference = time - this.time;
     if (difference < this.intervalBetweenFrames) {
       requestAnimationFrame((time) => this.nextFrame(time));
@@ -67,11 +56,11 @@ export class Canvas extends Camera {
   }
 
   start(
-    drawScene: () => void,
-    touchstartScene: (touch: Position) => void,
-    touchmoveScene: (touch: Position) => void,
-    touchendScene: (touch: Position) => void,
-  ): void {
+    drawScene,
+    touchstartScene,
+    touchmoveScene,
+    touchendScene,
+  ) {
     this.drawScene = drawScene;
     this.touchstartScene = touchstartScene;
     this.touchmoveScene = touchmoveScene;
@@ -86,56 +75,6 @@ export class Canvas extends Camera {
     );
     this.drawScene();
   }
-
-  getTouchCoordiante(touch: Touch): Position {
-    const left = this.marginWidth / 2;
-    const top = this.marginHeight / 2;
-    return new Position(
-      {
-        x: touch.pageX - left,
-        y: touch.pageY - top
-      },
-      {
-        width: 0,
-        height: 0
-      }
-    );
-  }
-
-  touchstartCanvas(
-    event: TouchEvent,
-  ) {
-    event.preventDefault();
-    for (const touch of event.changedTouches) {
-      const coordiante = this.getTouchCoordiante(touch);
-      this.touchstartScene(coordiante);
-    }
-  }
-
-  touchmoveCanvas(
-    event: TouchEvent,
-  ) {
-    event.preventDefault();
-    for (const touch of event.changedTouches) {
-      const coordiante = this.getTouchCoordiante(touch);
-      this.touchmoveScene(coordiante);
-    }
-  }
-
-  touchendCanvas(
-    event: TouchEvent,
-  ) {
-    event.preventDefault();
-    for (const touch of event.changedTouches) {
-      const coordiante = this.getTouchCoordiante(touch);
-      this.touchendScene(coordiante);
-    }
-  }
-
-  drawScene(): void { }
-  touchstartScene(touch: Position): void { }
-  touchmoveScene(touch: Position): void { }
-  touchendScene(touch: Position): void { }
 
   aspectRatio() {
     const width = window.innerWidth;
@@ -161,34 +100,83 @@ export class Canvas extends Camera {
     this.onePercentOfHeight = this.element.height / 100;
   }
 
-  positionOnCanvas(position: Position): Position | false {
-    const positionOnCamera = this.positionOnCamera(position);
-    if (positionOnCamera === false) return false;
-    return new Position(
-      {
-        x: this.getWidthPixels(positionOnCamera.initial.x),
-        y: this.getHeightPixels(positionOnCamera.initial.y)
-      },
-      {
-        width: this.getWidthPixels(positionOnCamera.size.width),
-        height: this.getHeightPixels(positionOnCamera.size.height)
-      }
+  getTouchCoordiante(pageX, pageY) {
+    const left = this.marginWidth / 2;
+    const top = this.marginHeight / 2;
+    return new Coordinate(
+      pageX - left,
+      pageY - top
     );
   }
 
-  getWidthPercentage(pixels: number) {
+  touchstartCanvas(event) {
+    event.preventDefault();
+    for (const { pageX, pageY } of event.changedTouches) {
+      const touch = this.getTouchCoordiante(pageX, pageY);
+      this.touchstartScene(touch.x, touch.y);
+    }
+  }
+
+  touchmoveCanvas(event) {
+    event.preventDefault();
+    for (const { pageX, pageY } of event.changedTouches) {
+      const touch = this.getTouchCoordiante(pageX, pageY);
+      this.touchmoveScene(touch.x, touch.y);
+    }
+  }
+
+  touchendCanvas(event) {
+    event.preventDefault();
+    for (const { pageX, pageY } of event.changedTouches) {
+      const touch = this.getTouchCoordiante(pageX, pageY);
+      this.touchendScene(touch.x, touch.y);
+    }
+  }
+
+  drawScene() { }
+  touchstartScene() { }
+  touchmoveScene() { }
+  touchendScene() { }
+
+
+  positionOnCanvas(
+    initialX,
+    initialY,
+    sizeWidth,
+    sizeHeight,
+    endX,
+    endY
+  ) {
+    const positionOnCamera = this.positionOnCamera(
+      initialX,
+      initialY,
+      sizeWidth,
+      sizeHeight,
+      endX,
+      endY
+    );
+    if (positionOnCamera === false) return false;
+    return new Position(
+      this.getWidthPixels(positionOnCamera.initial.x),
+      this.getHeightPixels(positionOnCamera.initial.y),
+      this.getWidthPixels(positionOnCamera.size.width),
+      this.getHeightPixels(positionOnCamera.size.height)
+    );
+  }
+
+  getWidthPercentage(pixels) {
     return pixels / this.onePercentOfWidth;
   }
 
-  getWidthPixels(percentage: number) {
+  getWidthPixels(percentage) {
     return percentage * this.onePercentOfWidth;
   }
 
-  getHeightPercentage(pixels: number) {
+  getHeightPercentage(pixels) {
     return pixels / this.onePercentOfHeight;
   }
 
-  getHeightPixels(percentage: number) {
+  getHeightPixels(percentage) {
     return percentage * this.onePercentOfHeight;
   }
 }

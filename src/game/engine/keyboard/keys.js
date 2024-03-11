@@ -1,68 +1,48 @@
 
-import { Canvas } from "../canvas.js";
 import { Position } from "../position.js";
+import { Size } from "../size.js";
 import { Key } from "./key.js";
 
+export const Factory = (
+  sizeWidth,
+  sizeHeight,
+  textSizeWidth,
+  textSizeHeight,
+) => ({
+  size: new Size(sizeWidth, sizeHeight),
+  text: {
+    size: new Size(textSizeWidth, textSizeHeight),
+  }
+});
+
 export class Keys extends Position {
-
-  canvas: Canvas;
-  factory: {
-    size: {
-      width: number;
-      height: number;
-    };
-    text: {
-      size: {
-        height: number;
-      }
-    };
-  };
-  keyPress: (character: string) => void;
-  keys: Key[] = [];
-
   constructor(
-    initial: {
-      x: number;
-      y: number;
-    },
-    size: {
-      width: number;
-      height: number;
-    },
-    canvas: Canvas,
-    characters: string,
-    factory: {
-      text: {
-        size: {
-          height: number;
-        }
-      }
-    },
-    keyPress: (character: string) => void
+    initialX,
+    initialY,
+    sizeWidth,
+    sizeHeight,
+    canvas,
+    characters,
+    factorySizeWidth,
+    factorySizeHeight,
+    factoryTextSizeHeight,
+    keyPress
   ) {
     super(
-      {
-        x: initial.x,
-        y: initial.y,
-      },
-      {
-        width: size.width,
-        height: size.height,
-      }
+      initialX,
+      initialY,
+      sizeWidth,
+      sizeHeight
     );
+    this.keys = [];
     this.canvas = canvas;
-    this.factory = {
-      size: {
-        width: this.size.width / characters.length,
-        height: this.size.height,
-      },
-      text: {
-        size: factory.text.size
-      }
-    };
-
+    this.factory = Factory(
+      factorySizeWidth,
+      factorySizeHeight,
+      this.size.width / characters.length,
+      factoryTextSizeHeight
+    );
     this.keyPress = keyPress;
-
     for (let index = 0; index < characters.length; index++) {
       const character = characters[index];
       this.setKey(
@@ -83,47 +63,43 @@ export class Keys extends Position {
     }
   }
 
-  touchendKeys(touch: Position): boolean {
+  touchendKeys(touch) {
     return this.keys.some(key => key.touchendKey(touch));
   }
 
   setKey(
-    index: number,
-    box: {
-      x: number;
-      y: number;
-    },
-    fillStyle: string,
-    strokeStyle: string,
-    lineWidth: number,
-    text: {
-      value: string;
-      fillStyle: string;
-      strokeStyle: string;
-    }
-  ): Key {
+    index,
+    boxX,
+    boxY,
+    fillStyle,
+    strokeStyle,
+    lineWidth,
+    textValue,
+    textFillStyle,
+    textStrokeStyle,
+  ) {
     const key = new Key(
-      this.initial,
-      this.factory.size,
+      this.initial.x,
+      this.initial.y,
+      this.factory.size.width,
+      this.factory.size.height,
       this.canvas,
       fillStyle,
       strokeStyle,
       lineWidth,
-      {
-        size: this.factory.text.size,
-        value: text.value,
-        fillStyle: text.fillStyle,
-        strokeStyle: text.strokeStyle,
-      },
+      this.factory.text.size.height,
+      textValue,
+      textFillStyle,
+      textStrokeStyle,
       this.keyPress
     );
-    key.initial.x += key.size.width * box.x;
-    key.initial.y += key.size.height * box.y;
+    key.initial.x += key.size.width * boxX;
+    key.initial.y += key.size.height * boxY;
     this.keys[index] = key;
     return key;
   }
 
-  drawKeys(): void {
+  drawKeys() {
     this.keys.forEach(key => key.drawButton());
   }
 }

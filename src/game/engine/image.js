@@ -2,14 +2,18 @@ import { Position } from "./position.js";
 
 export class Image extends Position {
   constructor(
-    initial,
-    size,
+    initialX,
+    initialY,
+    sizeWidth,
+    sizeHeight,
     canvas,
     route,
   ) {
     super(
-      initial,
-      size
+      initialX,
+      initialY,
+      sizeWidth,
+      sizeHeight
     );
     this.canvas = canvas;
     this.route = route;
@@ -24,7 +28,14 @@ export class Image extends Position {
     if (image === false) return;
     if (image.width === 0) return;
 
-    const positionOnCanvas = this.canvas.positionOnCanvas(this);
+    const positionOnCanvas = this.canvas.positionOnCanvas(
+      this.initial.x,
+      this.initial.y,
+      this.size.width,
+      this.size.height,
+      this.end.x,
+      this.end.y
+    );
     if (positionOnCanvas === false) return;
 
     this.canvas.context.imageSmoothingEnabled = false;

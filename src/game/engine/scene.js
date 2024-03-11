@@ -6,9 +6,9 @@ export class Scene {
     start() {
         this.canvas.start(
             () => this.draw(),
-            (touch) => this.touchstart(touch),
-            (touch) => this.touchmove(touch),
-            (touch) => this.touchend(touch),
+            (x, y) => this.touchstart(x, y),
+            (x, y) => this.touchmove(x, y),
+            (x, y) => this.touchend(x, y),
         );
     }
 

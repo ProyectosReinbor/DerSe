@@ -1,5 +1,6 @@
 
 import { Canvas, Position } from "../engine.js";
+import { Size } from "../engine/size.js";
 import { Castles } from "./castles.js";
 import { Elevations } from "./elevations.js";
 import { FlatsYellow } from "./flatsYellow.js";
@@ -7,33 +8,21 @@ import { Foams } from "./foams.js";
 import { Water } from "./water.js";
 
 export class Map extends Position {
-
-    boxes: {
-        width: number;
-        height: number;
-    };
-    water: Water;
-    foams: Foams;
-    flatsYellow: FlatsYellow;
-    elevations: Elevations;
-    castles: Castles;
-
     constructor(
-        canvas: Canvas,
-        lengthHorizontal: number,
-        lengthVertical: number,
+        canvas,
+        lengthHorizontal,
+        lengthVertical,
     ) {
         super(
-            { x: 0, y: 0 },
-            {
-                width: 100,
-                height: 100,
-            },
+            0,
+            0,
+            100,
+            100
         );
-        this.boxes = {
-            width: this.size.width / lengthHorizontal,
-            height: this.size.height / lengthVertical,
-        };
+        this.boxes = new Size(
+            this.size.width / lengthHorizontal,
+            this.size.height / lengthVertical,
+        )
         this.water = new Water(
             this.initial.x,
             this.initial.y,

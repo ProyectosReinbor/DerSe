@@ -1,11 +1,15 @@
-import { Position } from "../position.js";
+import { Coordinate } from "../coordinate.js";
 
-export class Line extends Position {
+export class Line extends Coordinate {
   constructor(
-    initial,
+    initialX,
+    initialY,
     canvas,
   ) {
-    super(initial);
+    super(
+      initialX,
+      initialY,
+    );
     this.canvas = canvas;
   }
 

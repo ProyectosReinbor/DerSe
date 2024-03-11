@@ -1,51 +1,38 @@
 import { Coordinate } from "./coordinate.js";
-import { Canvas } from "./canvas.js";
-
-const Size = ({
-    width, // number
-    height  // number
-}) => {
-    return {
-        width, // number
-        height, // number
-    }
-}
-
-export const Factory = ({
-    size,
-    boxesHorizontal, // number
-    boxesVertical, // number
-    occupiedBoxes, // boolean[][] | true
-}) => {
-    return {
-        size: Size(size),
-        boxesHorizontal, // number
-        boxesVertical, // number
-        occupiedBoxes, // boolean[][] | true
-    }
-}
+import { Size } from "./size.js";
 
 export class Boxes extends Coordinate {
-
     constructor(
-        x,
-        y,
+        initialX,
+        initialY,
         canvas,
-        factory,
+        factorySizeWidth,
+        factorySizeHeight,
+        factoryBoxesHorizontal,
+        factoryBoxesVertical,
+        factoryOccupiedBoxes
     ) {
-        super(x, y);
+        super(initialX, initialY);
         this.canvas = canvas;
-        this.factory = Factory(factory);
+        this.factory = {
+            size: new Size(
+                factorySizeWidth,
+                factorySizeHeight
+            ),
+            boxesHorizontal: factoryBoxesHorizontal,
+            boxesVertical: factoryBoxesVertical,
+            occupiedBoxes: factoryOccupiedBoxes
+        }
         this.boxes = {};
     }
 
-    getBoxesOfCoordinate(coordinate) {
-        const boxX = Math.floor(coordinate.x / this.factory.size.width);
-        const boxY = Math.floor(coordinate.y / this.factory.size.height);
-        return {
-            x: boxX,
-            y: boxY,
-        };
+    getBoxesOfCoordinate(x, y) {
+        const boxX = Math.floor(x / this.factory.size.width);
+        const boxY = Math.floor(y / this.factory.size.height);
+        return new Coordinate(
+            boxX,
+            boxY
+        );
     }
 
     getCoordinateOfBoxes(boxX, boxY) {
@@ -64,9 +51,9 @@ export class Boxes extends Coordinate {
     }
 
     setBoxIndex(
+        index,
         boxX,
         boxY,
-        index,
     ) {
         if (this.factory.occupiedBoxes === true) {
             for (let y = 0; y < this.factory.boxesVertical; y++) {

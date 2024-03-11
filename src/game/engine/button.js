@@ -1,51 +1,40 @@
-import { Canvas } from "../engine/canvas.js";
 import { Rect } from "./rect.js";
 import { Text } from "./text.js";
 
 export class Button extends Rect {
-
-  text: Text;
-
   constructor(
-    initial: {
-      x: number,
-      y: number,
-    },
-    size: {
-      width: number,
-      height: number,
-    },
-    canvas: Canvas,
-    fillStyle: string,
-    strokeStyle: string,
-    lineWidth: number,
-    text: {
-      size: {
-        height: number;
-      };
-      value: string;
-      fillStyle: string;
-      strokeStyle: string;
-    }
+    initialX,
+    initialY,
+    sizeWidth,
+    sizeHeight,
+    canvas,
+    fillStyle,
+    strokeStyle,
+    lineWidth,
+    textSizeHeight,
+    textValue,
+    textFillStyle,
+    textStrokeStyle,
   ) {
     super(
-      initial,
-      size,
       canvas,
+      initialX,
+      initialY,
+      sizeWidth,
+      sizeHeight,
       fillStyle,
       strokeStyle,
       lineWidth
     );
     this.text = new Text(
-      initial,
-      {
-        width: this.size.width,
-        height: text.size.height,
-      },
       canvas,
-      text.value,
-      text.fillStyle,
-      text.strokeStyle
+      0,
+      0,
+      sizeWidth,
+      textSizeHeight,
+      textValue,
+      textFillStyle,
+      textStrokeStyle
     );
     this.text.initial = this.initial;
   }

@@ -11,18 +11,13 @@ import { Position } from "./position.js";
 export class Keyboard extends Rect {
   constructor(canvas) {
     super(
-      {
-        x: 5,
-        y: 35
-      },
-      {
-        width: 90,
-        height: 60
-      },
+      5,
+      35,
+      90,
+      60,
       canvas,
       "#21618C",
     );
-    this.target = false;
     this.shiftKeys = this.getKeys([
       "1234567890",
       "QWERTYUIOP",
@@ -35,12 +30,10 @@ export class Keyboard extends Rect {
       "asdfghjkl_",
       "zxcvbnm@.,"
     ]);
-
     this.shift = new Shift(
       canvas,
-      this,
+      this
     );
-
     this.enter = new Enter(
       canvas,
       this,
@@ -49,7 +42,6 @@ export class Keyboard extends Rect {
       canvas,
       this,
     );
-
     this.delete = new Delete(
       canvas,
       this,
@@ -90,7 +82,7 @@ export class Keyboard extends Rect {
             }
           }
         },
-        (character: string) => {
+        (character) => {
           if (this.target === null) return;
           this.target.addChar(character);
         }
@@ -98,13 +90,14 @@ export class Keyboard extends Rect {
     });
   }
 
-  touchstartKeyboard(touch: Position): void {
-    if (this.target === null) return;
+  touchstartKeyboard(
+    initialX,
+    initialY,
+  ) {
     this.delete.touchstartDelete(touch);
   }
 
-  touchmoveKeyboard(touch: Position): void {
-    if (this.target === null) return;
+  touchmoveKeyboard(initialX, initialY) {
     this.delete.touchmoveDelete(touch);
   }
 

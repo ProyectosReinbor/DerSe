@@ -1,38 +1,35 @@
 import { Image } from "./image.js";
 import { Boxes } from "./boxes.js";
-import { Canvas } from "./canvas.js";
 
 export class ImageBoxes extends Boxes {
-
-    images: Image[] = [];
-
     constructor(
-        x: number,
-        y: number,
-        canvas: Canvas,
-        factory: {
-            size: {
-                width: number;
-                height: number;
-            };
-            boxesHorizontal: number;
-            boxesVertical: number;
-            occupiedBoxes: boolean[][] | true;
-        },
+        x,
+        y,
+        canvas,
+        factorySizeWidth,
+        factorySizeHeight,
+        factoryBoxesHorizontal,
+        factoryBoxesVertical,
+        factoryOccupiedBoxes
     ) {
         super(
             x,
             y,
             canvas,
-            factory
+            factorySizeWidth,
+            factorySizeHeight,
+            factoryBoxesHorizontal,
+            factoryBoxesVertical,
+            factoryOccupiedBoxes
         );
+        this.images = [];
     }
 
     setImage(
-        boxX: number,
-        boxY: number,
-        route: string
-    ): number {
+        boxX,
+        boxY,
+        route
+    ) {
         const index = this.boxIndex(boxX, boxY);
         if (index !== false) return index;
         const coordinateOfBoxes = this.getCoordinateOfBoxes(boxX, boxY);

@@ -3,11 +3,7 @@ import { Map } from "./map.js";
 import { Pawn } from "./pawn.js";
 
 export class Game extends Scene {
-
-    map: Map;
-    pawn: Pawn;
-
-    constructor(canvas: Canvas) {
+    constructor(canvas) {
         super(canvas);
         this.map = new Map(this.canvas, 15, 15);
         this.pawn = new Pawn(

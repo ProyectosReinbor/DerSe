@@ -2,14 +2,21 @@ import { Position } from "./position.js";
 
 export class Rect extends Position {
   constructor(
-    initial,
-    size,
+    initialX,
+    initialY,
+    sizeWidth,
+    sizeHeight,
     canvas,
-    fillStyle = false,
-    strokeStyle = false,
-    lineWidth = false,
+    fillStyle,
+    strokeStyle,
+    lineWidth,
   ) {
-    super(initial, size);
+    super(
+      initialX,
+      initialY,
+      sizeWidth,
+      sizeHeight
+    );
     this.canvas = canvas;
     this.fillStyle = fillStyle;
     this.strokeStyle = strokeStyle;
@@ -17,12 +24,10 @@ export class Rect extends Position {
   }
 
   drawRect() {
-    if (this.fillStyle === false && this.strokeStyle === false) return;
-
     const positionOnCanvas = this.canvas.positionOnCanvas(this);
     if (positionOnCanvas === false) return;
 
-    if (this.fillStyle !== false) {
+    if (this.fillStyle !== undefined) {
       this.canvas.context.fillStyle = this.fillStyle;
       this.canvas.context.fillRect(
         positionOnCanvas.initial.x,
@@ -32,7 +37,7 @@ export class Rect extends Position {
       );
     }
 
-    if (this.strokeStyle !== false && this.lineWidth !== false) {
+    if (this.strokeStyle !== undefined) {
       this.canvas.context.lineWidth = this.lineWidth;
       this.canvas.context.strokeStyle = this.strokeStyle;
       this.canvas.context.strokeRect(

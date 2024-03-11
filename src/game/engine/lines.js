@@ -3,50 +3,41 @@ import { Line } from "./lines/line.js";
 export class Lines {
   constructor(
     canvas,
-    fillStyle = false,
-    strokeStyle = false,
-    lineWidth = false,
-    lines = false,
+    fillStyle,
+    strokeStyle,
+    lineWidth,
   ) {
     this.lines = [];
     this.canvas = canvas;
     this.fillStyle = fillStyle;
     this.strokeStyle = strokeStyle;
     this.lineWidth = lineWidth;
-    if (lines !== false) {
-      lines.forEach((initial, index) => {
-        this.setLine(
-          index,
-          initial,
-        );
-      });
-    }
   }
 
-  setLine(
-    index,
-    initial,
+  addLine(
+    initialX,
+    initialY,
   ) {
-    this.lines[index] = new Line(
-      initial,
-      this.canvas,
+    this.lines.push(
+      new Line(
+        initialX,
+        initialY,
+        this.canvas,
+      )
     );
   }
 
   drawLines() {
-    if (this.fillStyle === false && this.strokeStyle === false)
-      throw new Error("fillStyle and strokeStyle are both false");
-
     this.canvas.context.beginPath();
     this.lines.forEach(line => line.drawLine());
 
-    if (this.strokeStyle !== false && this.lineWidth !== false) {
+    if (this.strokeStyle !== undefined) {
       this.canvas.context.lineWidth = this.lineWidth;
       this.canvas.context.strokeStyle = this.strokeStyle;
       this.canvas.context.stroke();
     }
 
-    if (this.fillStyle !== false) {
+    if (this.fillStyle !== undefined) {
       this.canvas.context.fillStyle = this.fillStyle;
       this.canvas.context.fill();
     }
