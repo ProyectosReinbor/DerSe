@@ -1,29 +1,20 @@
 import { io } from "./socketIO.js";
 
-export class Tiktok {
-    constructor(username) {
-        this.username = username;
-        this.socket = io();
-        this.connected = false;
+export const Tiktok = (
+    giftCallback,
+    chatCallback
+) => {
+    const socket = io();
 
-        this.socket.on("connect", () => {
-            console.log("connected");
-            this.connected = false;
-            this.socket.emit("live", this.username);
-        });
+    socket.on("disconnect", () => {
+        console.log("disconnected");
+    });
 
-        this.socket.on("live", connected => {
-            this.connected = connected;
-            console.log("tiktok live", connected);
-        });
+    socket.on("gift", data => giftCallback(
+        JSON.parse(data)
+    ));
 
-        this.socket.on("chat", data => {
-            console.log(JSON.parse(data));
-        });
-
-        this.socket.on("disconnect", () => {
-            this.connected = false;
-            console.log("disconnected");
-        });
-    }
+    socket.on("chat", data => chatCallback(
+        JSON.parse(data)
+    ));
 }
