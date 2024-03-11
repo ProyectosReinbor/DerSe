@@ -12,7 +12,7 @@ export class Boxes extends Coordinate {
         factoryOccupiedBoxes
     ) {
         super(x, y);
-        this.boxes = {};
+        this.boxes = [];
         this.canvas = canvas;
         this.factory = {
             size: new Size(
@@ -41,7 +41,10 @@ export class Boxes extends Coordinate {
     }
 
     boxIndex(boxX, boxY) {
-        const index = this.boxes[`x${boxX}y${boxY}`];
+        if (this.boxes[boxY] === undefined)
+            this.boxes[boxY] = [];
+
+        const index = this.boxes[boxY][boxX];
         if (index === undefined) return false;
         return index;
     }
@@ -54,7 +57,9 @@ export class Boxes extends Coordinate {
         if (this.factory.occupiedBoxes === true) {
             for (let y = 0; y < this.factory.boxesVertical; y++) {
                 for (let x = 0; x < this.factory.boxesHorizontal; x++) {
-                    this.boxes[`x${boxX + x}y${boxY + y}`] = index;
+                    if (this.boxes[boxY + y] === undefined)
+                        this.boxes[boxY + y] = [];
+                    this.boxes[boxY + y][boxX + x] = index;
                 }
             }
             return;
@@ -62,7 +67,9 @@ export class Boxes extends Coordinate {
         this.factory.occupiedBoxes.forEach((row, y) => {
             row.forEach((value, x) => {
                 if (value === false) return;
-                this.boxes[`x${boxX + x}y${boxY + y}`] = index;
+                if (this.boxes[boxY + y] === undefined)
+                    this.boxes[boxY + y] = [];
+                this.boxes[boxY + y][boxX + x] = index;
             });
         });
     }

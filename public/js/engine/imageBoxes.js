@@ -41,7 +41,7 @@ export class ImageBoxes extends Boxes {
         );
         this.images.push(newImage);
         const newIndex = this.images.length - 1;
-        this.setBoxIndex(boxX, boxY, newIndex);
+        this.setBoxIndex(newIndex, boxX, boxY);
         return newIndex;
     }
 

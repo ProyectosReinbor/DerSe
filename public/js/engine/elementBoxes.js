@@ -56,7 +56,7 @@ export class ElementBoxes extends Boxes {
         );
         this.groupElements.push(newElements);
         const newIndex = this.groupElements.length - 1;
-        this.setBoxIndex(boxX, boxY, newIndex);
+        this.setBoxIndex(newIndex, boxX, boxY);
         return newIndex;
     }
 

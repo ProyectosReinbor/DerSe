@@ -67,7 +67,7 @@ export class AnimationBoxes extends Boxes {
         );
         this.animationGroup.push(newAnimations);
         const newIndex = this.animationGroup.length - 1;
-        this.setBoxIndex(boxX, boxY, newIndex);
+        this.setBoxIndex(newIndex, boxX, boxY);
         return newIndex;
     }
 
