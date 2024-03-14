@@ -9,6 +9,8 @@ import { Water } from "./water.js";
 import { MapMatrix } from "./mapMatrix.js";
 import { WallElevations } from "./wallElevations.js";
 import { StairsElevations } from "./stairsElevations.js";
+import { Shadows } from "./shadows.js";
+import { FlatElevations } from "./flatElevations.js";
 
 export class Map extends Position {
     constructor(canvas) {
@@ -41,6 +43,12 @@ export class Map extends Position {
             canvas,
             this,
         );
+        this.shadows = new Shadows(
+            this.initial.x,
+            this.initial.y,
+            canvas,
+            this
+        );
         this.elevations = new Elevations(
             this.initial.x,
             this.initial.y,
@@ -53,6 +61,12 @@ export class Map extends Position {
             canvas,
             this,
             this.elevations
+        );
+        this.flatElevations = new FlatElevations(
+            this.initial.x,
+            this.initial.y,
+            canvas,
+            this,
         );
         this.stairsElevation = new StairsElevations(
             this.initial.x,
@@ -75,25 +89,38 @@ export class Map extends Position {
                     if (layer === "water")
                         this.water.setWater(x, y);
 
-                    if (layer === "foam")
+                    if (layer === "foam") {
                         this.foams.setFoam(x, y);
-
-                    if (layer === "flatYellow")
-                        this.flatsYellow.setFlat(x, y);
-
-                    if (layer === "elevation")
-                        this.elevations.setElevation(x, y);
-
-                    if (layer === "wallElevation") {
-                        this.wallElevations.setWallElevations(x, y);
+                        if (parameters.flatYellow === true)
+                            this.flatsYellow.setFlat(x, y);
                     }
 
-                    if (layer === "stairElevation")
+                    if (layer === "elevation") {
+                        if (parameters.shadow === true)
+                            this.shadows.setShadow(x, y);
+                        this.elevations.setElevation(x, y);
+                    }
+
+                    if (layer === "wallElevation") {
+                        if (parameters.shadow === true)
+                            this.shadows.setShadow(x, y);
+                        this.wallElevations.setWallElevations(x, y);
+                        if (parameters.flatElevation !== undefined)
+                            this.flatElevations.setFlatElevation(x, y, parameters.flatElevation);
+                    }
+
+                    if (layer === "stairElevation") {
+                        if (parameters.shadow === true)
+                            this.shadows.setShadow(x, y);
                         this.stairsElevation.setStairsElevations(x, y);
+                    }
 
                     if (layer === "castle") {
-                        const { color, state } = parameters;
-                        this.castles.setCastle(x, y, color, state);
+                        this.castles.setCastle(
+                            x, y,
+                            parameters.color,
+                            parameters.state
+                        );
                     }
                 });
             });
@@ -104,6 +131,7 @@ export class Map extends Position {
         await this.water.drawWaters();
         await this.foams.drawFoams();
         await this.flatsYellow.drawFlatsYellow();
+        await this.shadows.drawShadows();
         await this.elevations.drawElevations();
         await this.stairsElevation.drawStairsElevations();
         await this.wallElevations.drawWallElevations();
