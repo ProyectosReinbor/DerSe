@@ -4,14 +4,13 @@ export class Foams extends AnimationBoxes {
     constructor(
         x, y,
         canvas,
-        boxesWidth,
-        boxesHeight
+        map
     ) {
         super(
             x, y,
             canvas,
-            boxesWidth,
-            boxesHeight,
+            map.boxes.width,
+            map.boxes.height,
             3,
             3,
             [
@@ -25,13 +24,6 @@ export class Foams extends AnimationBoxes {
             8,
             8,
         );
-        const rows = 100 / this.factory.size.height;
-        const columns = 100 / this.factory.size.width;
-        for (let y = 1; y < rows - 1; y++) {
-            for (let x = 1; x < columns - 1; x++) {
-                this.setFoam(x, y);
-            }
-        }
     }
 
     setFoam(boxX, boxY) {
@@ -47,7 +39,7 @@ export class Foams extends AnimationBoxes {
         foam.initial.y -= this.factory.size.height;
     }
 
-    drawFoams() {
-        this.drawAnimations();
+    async drawFoams() {
+        await this.drawAnimations();
     }
 }

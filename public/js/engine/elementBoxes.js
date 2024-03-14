@@ -60,9 +60,9 @@ export class ElementBoxes extends Boxes {
         return newIndex;
     }
 
-    drawElements() {
-        this.groupElements.forEach((elements) => {
-            elements.drawElement();
-        });
+    async drawElements() {
+        for (const elements of this.groupElements) {
+            await elements.drawElement();
+        }
     }
 }

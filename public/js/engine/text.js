@@ -9,7 +9,8 @@ export class Text extends Position {
         canvas,
         value,
         fillStyle,
-        strokeStyle
+        strokeStyle,
+        dungeonFont
     ) {
         super(
             initialX,
@@ -21,10 +22,13 @@ export class Text extends Position {
         this.value = value;
         this.fillStyle = fillStyle;
         this.strokeStyle = strokeStyle;
+        this.dungeonFont = true;
     }
 
     get font() {
-        return `${this.size.height}px "Dungeon", sans-serif`;
+        let font = `${this.size.height}px`;
+        if (this.dungeonFont === true) font.concat(" Dungeon,");
+        return font.concat("sans - serif, arial");
     }
 
     drawText() {

@@ -5,30 +5,30 @@ export class Water extends ImageBoxes {
         x,
         y,
         canvas,
-        boxesWidth,
-        boxesHeight
+        map
     ) {
         super(
             x,
             y,
             canvas,
-            boxesWidth,
-            boxesHeight,
+            map.boxes.width,
+            map.boxes.height,
             1,
             1,
             true
         );
-        const route = "images/terrain/water/water.png";
-        const rows = 100 / this.factory.size.height;
-        const columns = 100 / this.factory.size.width;
-        for (let y = 0; y < rows; y++) {
-            for (let x = 0; x < columns; x++) {
-                this.setImage(x, y, route);
-            }
-        }
     }
 
-    drawWaters() {
-        this.drawImages();
+    setWater(boxX, boxY) {
+        const route = "images/terrain/water/water.png";
+        this.setImage(
+            boxX,
+            boxY,
+            route
+        );
+    }
+
+    async drawWaters() {
+        await this.drawImages();
     }
 }   

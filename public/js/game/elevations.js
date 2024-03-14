@@ -1,18 +1,16 @@
 import { Grounds } from "./grounds.js";
 
 export class Elevations extends Grounds {
-
     constructor(
         x, y,
         canvas,
-        boxesWidth,
-        boxesHeight
+        map,
     ) {
         super(
             x, y,
             canvas,
-            boxesWidth,
-            boxesHeight,
+            map.boxes.width,
+            map.boxes.height,
             0, 0,
             1, 0,
             2, 0,
@@ -40,7 +38,7 @@ export class Elevations extends Grounds {
         );
     }
 
-    drawElevations() {
-        this.drawGrounds();
+    async drawElevations() {
+        await this.drawGrounds();
     }
 }

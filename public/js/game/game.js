@@ -36,8 +36,10 @@ export class Game extends Scene {
         const profilePictureUrl = chat.profilePictureUrl;
     }
 
-    draw() {
-        this.map.drawMap();
-        this.pawns.forEach(pawn => pawn.drawPawn());
+    async draw() {
+        await this.map.drawMap();
+        for (const pawn of this.pawns) {
+            await pawn.drawPawn();
+        }
     }
 }

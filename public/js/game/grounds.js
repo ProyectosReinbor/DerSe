@@ -199,7 +199,7 @@ export class Grounds extends ElementBoxes {
         return this.elements.only;
     }
 
-    drawGrounds() {
-        this.drawElements();
+    async drawGrounds() {
+        await this.drawElements();
     }
 }  

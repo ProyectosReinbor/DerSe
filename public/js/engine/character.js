@@ -50,8 +50,8 @@ export class Character extends Animations {
         return true;
     }
 
-    drawCharacter() {
+    async drawCharacter() {
         this.move();
-        this.drawAnimation();
+        await this.drawAnimation();
     }
 }

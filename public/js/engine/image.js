@@ -25,8 +25,6 @@ export class Image extends Position {
 
   async drawImage() {
     const image = await this.image();
-    if (image === false) return;
-    if (image.width === 0) return;
 
     const positionOnCanvas = this.canvas.positionOnCanvas(
       this.initial.x,

@@ -34,13 +34,14 @@ export class Pawn extends Character {
             map.boxes.width,
             map.boxes.height / 2,
             canvas,
-            userBarPhotoRoute
+            userBarPhotoRoute,
+            this.nickname
         );
     }
 
-    drawPawn() {
-        this.drawCharacter();
-        this.userBar.drawUserBar(
+    async drawPawn() {
+        await this.drawCharacter();
+        await this.userBar.drawUserBar(
             this.initial.x + this.map.boxes.width,
             this.initial.y + this.map.boxes.height
         );

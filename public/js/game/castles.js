@@ -5,14 +5,13 @@ export class Castles extends ImageBoxes {
     constructor(
         x, y,
         canvas,
-        boxesWidth,
-        boxesHeight
+        map
     ) {
         super(
             x, y,
             canvas,
-            boxesWidth,
-            boxesHeight,
+            map.boxes.width,
+            map.boxes.height,
             4, 3,
             true
         );
@@ -21,30 +20,34 @@ export class Castles extends ImageBoxes {
     setCastle(
         boxX,
         boxY,
-        colorIndex,
-        stateIndex,
+        color,
+        state,
     ) {
+        const route = this.routeCastle(color, state);
+        if (route === false) throw new Error("invalid route");
         return this.setImage(
             boxX,
             boxY,
-            this.routeCastle(colorIndex, stateIndex)
+            route
         );
     }
 
     routeCastle(
-        colorIndex,
-        stateIndex,
+        color,
+        state,
     ) {
-        const colors = ["blue", "purple", "red", "yellow"];
         const states = ["construction", "ready", "destroyed"];
-        const color = colors[colorIndex];
-        const state = states[stateIndex];
+        if (states.includes(state) === false) return false;
         let file = state;
-        if (state === "ready") file = color;
+        if (state === "ready") {
+            const colors = ["blue", "purple", "red", "yellow"];
+            if (colors.includes(color) === false) return false;
+            file = color;
+        }
         return `images/factions/knights/buildings/castle/${file}.png`;
     }
 
-    drawCastles() {
-        this.drawImages();
+    async drawCastles() {
+        await this.drawImages();
     }
 }

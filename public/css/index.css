@@ -14,5 +14,5 @@ body {
 
 @font-face {
     font-family: "Dungeon";
-    src: url("./resources/dungeon.ttf");
+    src: url("resources/dungeon.ttf");
 }

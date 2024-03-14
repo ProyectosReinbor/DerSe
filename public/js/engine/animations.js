@@ -42,8 +42,8 @@ export class Animations extends Elements {
     this.element.nextFrame(this.animation.frames);
   }
 
-  drawAnimation() {
+  async drawAnimation() {
     this.nextFrame();
-    this.drawElement();
+    await this.drawElement();
   }
 }
