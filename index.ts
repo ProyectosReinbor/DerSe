@@ -1,6 +1,11 @@
 import express from 'express';
 import { WebcastPushConnection } from 'tiktok-live-connector';
 
+await Bun.build({
+    entrypoints: ['./public/tsc/index.ts'],
+    outdir: './public/js',
+});
+
 const app = express();
 const port = 3000;
 app.use(express.static("public"));

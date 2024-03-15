@@ -42,10 +42,10 @@ export class Boxes extends Coordinate {
     }
 
     boxIndex(boxes: Coordinate) {
-        // if (this.boxes[boxes.y] === undefined)
-        //     this.boxes[boxes.y] = [];
+        if (this.boxes[boxes.y] === undefined)
+            this.boxes[boxes.y] = [];
 
-        const index = this.boxes[boxes.y][boxes.y];
+        const index = this.boxes[boxes.y][boxes.x];
         if (index === undefined) return false;
         return index;
     }
