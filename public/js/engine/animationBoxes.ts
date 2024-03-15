@@ -22,8 +22,7 @@ export class AnimationBoxes extends Boxes {
         canvas: Canvas,
         boxesParameters: {
             size: Size;
-            boxesHorizontal: number;
-            boxesVertical: number;
+            length: Plane;
             occupiedBoxes: true | boolean[][];
         },
         animationsParameters: {
@@ -56,8 +55,8 @@ export class AnimationBoxes extends Boxes {
         const newAnimations = new Animations(
             coordinateOfBoxes,
             new Size(
-                this.boxesParameters.size.width * this.boxesParameters.boxesHorizontal,
-                this.boxesParameters.size.height * this.boxesParameters.boxesVertical,
+                this.boxParameters.size.width * this.boxParameters.length.horizontal,
+                this.boxParameters.size.height * this.boxParameters.length.vertical,
             ),
             this.canvas,
             route,

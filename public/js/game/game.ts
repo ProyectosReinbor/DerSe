@@ -1,39 +1,50 @@
+import type { Canvas } from "../engine/canvas.js";
+import { Coordinate } from "../engine/coordinate.js";
 import { Scene } from "../engine/scene.js";
 import { Map } from "./map.js";
 import { Pawn } from "./pawn.js";
 
 export class Game extends Scene {
-    constructor(canvas) {
+    map: Map;
+    pawns: Pawn[] = [];
+    constructor(
+        canvas: Canvas
+    ) {
         super(canvas);
-        this.map = new Map(this.canvas, 15, 15);
-        this.pawns = [];
+        this.map = new Map(this.canvas);
     }
 
-    tiktokGift(gift) {
-        const name = gift.giftName;
-        const pictureUrl = gift.giftPictureUrl;
-        const repeatCount = gift.repeatCount;
-        const nickname = gift.nickname;
-        const profilePictureUrl = gift.profilePictureUrl;
-        const exist = this.pawns.some((pawn) => pawn.nickname === nickname);
+    tiktokGift(gift: {
+        giftName: string;
+        giftPictureUrl: string;
+        repeatCount: number;
+        nickname: string;
+        profilePictureUrl: string;
+    }) {
+        const exist = this.pawns.some((pawn) => pawn.nickname === gift.nickname);
         if (exist === true) return;
         this.pawns.push(
             new Pawn(
-                Math.floor(Math.random() * this.map.size.width),
-                Math.floor(Math.random() * this.map.size.height),
+                new Coordinate(
+                    Math.floor(Math.random() * this.map.size.width),
+                    Math.floor(Math.random() * this.map.size.height),
+                ),
                 this.map,
                 this.canvas,
-                0,
-                nickname,
-                profilePictureUrl,
+                "blue",
+                gift.nickname,
+                {
+                    photoRoute: gift.profilePictureUrl
+                }
             )
         );
     }
 
-    tiktokChat(chat) {
-        const message = chat.message;
-        const nickname = chat.nickname;
-        const profilePictureUrl = chat.profilePictureUrl;
+    tiktokChat(chat: {
+        message: string;
+        nickname: string;
+        profilePictureUrl: string;
+    }) {
     }
 
     async draw() {

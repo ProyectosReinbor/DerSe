@@ -1,41 +1,40 @@
 import type { Canvas } from "./canvas.js";
 import { Coordinate } from "./coordinate.js";
+import type { Plane } from "./plane.js";
 import { Size } from "./size.js";
 
 export class Boxes extends Coordinate {
     boxes: number[][] = [];
     canvas: Canvas;
-    boxesParameters: {
+    boxParameters: {
         size: Size;
-        boxesHorizontal: number;
-        boxesVertical: number;
+        length: Plane;
         occupiedBoxes: true | boolean[][];
     };
     constructor(
         x: number,
         y: number,
         canvas: Canvas,
-        boxesParameters: {
+        boxParameters: {
             size: Size;
-            boxesHorizontal: number;
-            boxesVertical: number;
+            length: Plane;
             occupiedBoxes: true | boolean[][];
         }
     ) {
         super(x, y);
         this.canvas = canvas;
-        this.boxesParameters = boxesParameters;
+        this.boxParameters = boxParameters;
     }
 
     getBoxesOfCoordinate(coordinate: Coordinate) {
-        const boxX = Math.floor(coordinate.x / this.boxesParameters.size.width);
-        const boxY = Math.floor(coordinate.y / this.boxesParameters.size.height);
+        const boxX = Math.floor(coordinate.x / this.boxParameters.size.width);
+        const boxY = Math.floor(coordinate.y / this.boxParameters.size.height);
         return new Coordinate(boxX, boxY);
     }
 
     getCoordinateOfBoxes(boxes: Coordinate) {
-        const distanceBoxX = boxes.x * this.boxesParameters.size.width;
-        const distanceBoxY = boxes.y * this.boxesParameters.size.height;
+        const distanceBoxX = boxes.x * this.boxParameters.size.width;
+        const distanceBoxY = boxes.y * this.boxParameters.size.height;
         return new Coordinate(
             this.x + distanceBoxX,
             this.y + distanceBoxY,
@@ -67,9 +66,9 @@ export class Boxes extends Coordinate {
         index: number,
         boxes: Coordinate,
     ) {
-        if (this.boxesParameters.occupiedBoxes === true) {
-            for (let y = 0; y < this.boxesParameters.boxesVertical; y++) {
-                for (let x = 0; x < this.boxesParameters.boxesHorizontal; x++) {
+        if (this.boxParameters.occupiedBoxes === true) {
+            for (let y = 0; y < this.boxParameters.length.vertical; y++) {
+                for (let x = 0; x < this.boxParameters.length.horizontal; x++) {
                     this.setOccupiedBox(
                         boxes,
                         new Coordinate(x, y),
@@ -79,7 +78,7 @@ export class Boxes extends Coordinate {
             }
             return;
         }
-        this.boxesParameters.occupiedBoxes.forEach((row, y) => {
+        this.boxParameters.occupiedBoxes.forEach((row, y) => {
             row.forEach((value, x) => {
                 if (value === false) return;
                 this.setOccupiedBox(

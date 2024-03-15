@@ -3,6 +3,7 @@ import { Boxes } from "./boxes.js";
 import type { Canvas } from "./canvas.js";
 import { Size } from "./size.js";
 import type { Coordinate } from "./coordinate.js";
+import type { Plane } from "./plane.js";
 
 export class ImageBoxes extends Boxes {
     images: Image[] = [];
@@ -12,8 +13,7 @@ export class ImageBoxes extends Boxes {
         canvas: Canvas,
         boxesParameters: {
             size: Size;
-            boxesHorizontal: number;
-            boxesVertical: number;
+            length: Plane;
             occupiedBoxes: true | boolean[][];
         }
     ) {
@@ -35,8 +35,8 @@ export class ImageBoxes extends Boxes {
         const newImage = new Image(
             coordinateOfBoxes,
             new Size(
-                this.boxesParameters.size.width * this.boxesParameters.boxesHorizontal,
-                this.boxesParameters.size.height * this.boxesParameters.boxesVertical,
+                this.boxParameters.size.width * this.boxParameters.length.horizontal,
+                this.boxParameters.size.height * this.boxParameters.length.vertical,
             ),
             this.canvas,
             route,

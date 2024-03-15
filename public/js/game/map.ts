@@ -6,24 +6,31 @@ import { Elevations } from "./elevations.js";
 import { FlatsYellow } from "./flatsYellow.js";
 import { Foams } from "./foams.js";
 import { Water } from "./water.js";
-import { MapMatrix } from "./mapMatrix.js";
+import { MapMatrix, type Box, MapMatrixLength } from "./mapMatrix.js";
 import { WallElevations } from "./wallElevations.js";
 import { StairsElevations } from "./stairsElevations.js";
 import { Shadows } from "./shadows.js";
 import { FlatElevations } from "./flatElevations.js";
+import type { Canvas } from "../engine/canvas.js";
+import { Coordinate } from "../engine/coordinate.js";
 
 export class Map extends Position {
-    constructor(canvas) {
-        super(
-            0,
-            0,
-            100,
-            100
-        );
-        this.matrix = MapMatrix();
+    matrix: Box[][] = MapMatrix();
+    boxes: Size;
+    water: Water;
+    foams: Foams;
+    flatsYellow: FlatsYellow;
+    shadows: Shadows;
+    elevations: Elevations;
+    wallElevations: WallElevations;
+    flatElevations: FlatElevations;
+    stairsElevation: StairsElevations;
+    castles: Castles;
+    constructor(canvas: Canvas) {
+        super(new Coordinate, new Size(100, 100));
         this.boxes = new Size(
-            this.size.width / this.matrix[0].length,
-            this.size.height / this.matrix.length,
+            this.size.width / MapMatrixLength.horizontal,
+            this.size.height / MapMatrixLength.vertical,
         )
         this.water = new Water(
             this.initial.x,
@@ -84,45 +91,51 @@ export class Map extends Position {
 
         this.matrix.forEach((row, y) => {
             row.forEach((box, x) => {
-                box.forEach((parameters) => {
-                    const { layer } = parameters;
-                    if (layer === "water")
-                        this.water.setWater(x, y);
+                const boxes = new Coordinate(x, y);
+                if (box.water === true)
+                    this.water.setWater(boxes);
 
-                    if (layer === "foam") {
-                        this.foams.setFoam(x, y);
-                        if (parameters.flatYellow === true)
-                            this.flatsYellow.setFlat(x, y);
-                    }
+                if (box.foam !== false) {
+                    this.foams.setFoam(boxes);
+                    if (box.foam.flatSand === true)
+                        this.flatsYellow.setFlat(boxes);
+                }
 
-                    if (layer === "elevation") {
-                        if (parameters.shadow === true)
-                            this.shadows.setShadow(x, y);
-                        this.elevations.setElevation(x, y);
-                    }
+                if (box.elevation !== false) {
+                    if (box.elevation.shadow === true)
+                        this.shadows.setShadow(boxes);
 
-                    if (layer === "wallElevation") {
-                        if (parameters.shadow === true)
-                            this.shadows.setShadow(x, y);
-                        this.wallElevations.setWallElevations(x, y);
-                        if (parameters.flatElevation !== undefined)
-                            this.flatElevations.setFlatElevation(x, y, parameters.flatElevation);
-                    }
+                    // if (box.elevation.flatGrass === true)
+                    //     this.flatsGrass.setFlat(boxes);
 
-                    if (layer === "stairElevation") {
-                        if (parameters.shadow === true)
-                            this.shadows.setShadow(x, y);
-                        this.stairsElevation.setStairsElevations(x, y);
-                    }
+                    this.elevations.setElevation(boxes);
+                }
 
-                    if (layer === "castle") {
-                        this.castles.setCastle(
-                            x, y,
-                            parameters.color,
-                            parameters.state
+                if (box.wallElevation !== false) {
+                    if (box.wallElevation.shadow === true)
+                        this.shadows.setShadow(boxes);
+
+                    this.wallElevations.setWallElevations(boxes);
+                    if (box.wallElevation.flatElevation !== false)
+                        this.flatElevations.setFlatElevation(
+                            boxes,
+                            box.wallElevation.flatElevation
                         );
-                    }
-                });
+                }
+
+                if (box.stairElevation !== false) {
+                    if (box.stairElevation.shadow === true)
+                        this.shadows.setShadow(boxes);
+                    this.stairsElevation.setStairsElevations(boxes);
+                }
+
+                if (box.castle !== false) {
+                    this.castles.setCastle(
+                        boxes,
+                        box.castle.color,
+                        box.castle.state
+                    );
+                }
             });
         });
     }
