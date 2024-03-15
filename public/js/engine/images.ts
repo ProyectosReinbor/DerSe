@@ -1,9 +1,12 @@
 export class Images {
+  images: {
+    [key: string]: HTMLImageElement;
+  };
   constructor() {
     this.images = {};
   }
 
-  get(route) {
+  get(route: string): Promise<HTMLImageElement> {
     return new Promise((resolve, reject) => {
       if (this.images[route] !== undefined)
         return resolve(this.images[route]);
@@ -15,7 +18,8 @@ export class Images {
       );
       this.images[route].addEventListener(
         "error",
-        () => {
+        (err) => {
+          reject(err);
           throw new Error(`image ${route} is not found`);
         }
       );

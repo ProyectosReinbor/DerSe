@@ -1,16 +1,27 @@
+import type { Canvas } from "../canvas.js";
+import { Coordinate } from "../coordinate.js";
+import type { Keyboard } from "../keyboard.js";
 import { Lines } from "../lines.js";
 import { Rect } from "../rect.js";
+import { Size } from "../size.js";
 
 export class Enter extends Rect {
+  triangle: Lines;
+  lines: Lines;
+  keyboard: Keyboard;
   constructor(
-    canvas,
-    keyboard,
+    canvas: Canvas,
+    keyboard: Keyboard,
   ) {
     super(
-      keyboard.initial.x + (keyboard.size.width * 0.13),
-      keyboard.initial.y + (keyboard.size.height * 0.03),
-      keyboard.size.width * 0.12,
-      keyboard.size.height * 0.14,
+      new Coordinate(
+        keyboard.initial.x + (keyboard.size.width * 0.13),
+        keyboard.initial.y + (keyboard.size.height * 0.03),
+      ),
+      new Size(
+        keyboard.size.width * 0.12,
+        keyboard.size.height * 0.14,
+      ),
       canvas,
       "#21618C",
       "#fff",
@@ -20,45 +31,46 @@ export class Enter extends Rect {
       canvas,
       "#fff",
     );
-    this.triangle.addLine(
+    this.triangle.addLine(new Coordinate(
       this.initial.x + (this.size.width * 0.1),
       this.initial.y + (this.size.height * 0.6),
-    );
-    this.triangle.addLine(
+    ));
+    this.triangle.addLine(new Coordinate(
       this.initial.x + (this.size.width * 0.3),
       this.initial.y + (this.size.height * 0.4),
-    );
-    this.triangle.addLine(
+    ));
+    this.triangle.addLine(new Coordinate(
       this.initial.x + (this.size.width * 0.3),
       this.initial.y + (this.size.height * 0.8),
-    );
-    this.triangle.addLine(
+    ));
+    this.triangle.addLine(new Coordinate(
       this.initial.x + (this.size.width * 0.1),
       this.initial.y + (this.size.height * 0.6),
-    );
+    ));
     this.lines = new Lines(
       canvas,
       undefined,
       "#fff",
       0.5,
     );
-    this.lines.addLine(
+    this.lines.addLine(new Coordinate(
       this.initial.x + (this.size.width * 0.2),
       this.initial.y + (this.size.height * 0.6),
-    );
-    this.lines.addLine(
+    ));
+    this.lines.addLine(new Coordinate(
       this.initial.x + (this.size.width * 0.8),
       this.initial.y + (this.size.height * 0.6),
-    );
-    this.lines.addLine(
+    ));
+    this.lines.addLine(new Coordinate(
       this.initial.x + (this.size.width * 0.8),
       this.initial.y + (this.size.height * 0.2),
-    );
+    ));
     this.keyboard = keyboard;
   }
 
-  touchendEnter(x, y) {
-    if (this.inside(x, y, x, y) === false) return false;
+  touchendEnter(touch: Coordinate) {
+    if (this.insideCoordinate(touch) === false) return false;
+    if (this.keyboard.target === null) return false;
     this.keyboard.target.addLineBreak();
     return true;
   }

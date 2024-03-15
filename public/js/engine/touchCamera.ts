@@ -4,18 +4,18 @@ export class TouchCanvas {
   touch: null | Coordinate;
   moved: boolean;
   canvas: Canvas;
-  horizontal: boolean;
-  vertical: boolean;
+  canHorizontal: boolean;
+  canVertical: boolean;
   constructor(
     canvas: Canvas,
-    horizontal: boolean,
-    vertical: boolean,
+    canHorizontal: boolean = false,
+    canVertical: boolean = false,
   ) {
     this.touch = null;
     this.moved = false;
     this.canvas = canvas;
-    this.horizontal = horizontal;
-    this.vertical = vertical;
+    this.canHorizontal = canHorizontal;
+    this.canVertical = canVertical;
   }
 
   touchstartTouchCamera(touch: Coordinate) {
@@ -28,7 +28,7 @@ export class TouchCanvas {
 
     let moved = false;
 
-    if (this.horizontal === true) {
+    if (this.canHorizontal === true) {
       const distance = this.touch.x - touch.x;
       if (distance > 5 || distance < -5) {
         this.canvas.initial.x += distance;
@@ -37,7 +37,7 @@ export class TouchCanvas {
       }
     }
 
-    if (this.vertical === true) {
+    if (this.canVertical === true) {
       const distance = this.touch.y - touch.y;
       if (distance > 5 || distance < -5) {
         this.canvas.initial.y += distance;

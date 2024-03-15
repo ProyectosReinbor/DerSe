@@ -10,9 +10,9 @@ export class Lines {
   lineWidth: number;
   constructor(
     canvas: Canvas,
-    fillStyle: string,
-    strokeStyle: string,
-    lineWidth: number,
+    fillStyle: string = "",
+    strokeStyle: string = "",
+    lineWidth: number = 0,
   ) {
     this.lines = [];
     this.canvas = canvas;

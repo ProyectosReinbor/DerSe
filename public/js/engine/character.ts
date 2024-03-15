@@ -1,43 +1,41 @@
 import { Animations } from "./animations.js";
+import type { Canvas } from "./canvas.js";
 import { Coordinate } from "./coordinate.js";
+import type { Plane } from "./plane.js";
+import type { Size } from "./size.js";
 
 export class Character extends Animations {
+    speed: Coordinate;
+    address: Coordinate;
     constructor(
-        initialX,
-        initialY,
-        sizeWidth,
-        sizeHeight,
-        canvas,
-        route,
-        elementSizeWidth,
-        elementSizeHeight,
-        elementHorizontal,
-        elementVertical,
-        animationFrames,
-        animationFramesPerSecond,
-        speedX,
-        speedY
+        initial: Coordinate,
+        size: Size,
+        canvas: Canvas,
+        route: string,
+        elementParameters: {
+            size: Size;
+            plane: Plane;
+        },
+        animation: {
+            frames: number;
+            framesPerSecond: number;
+        },
+        speed: Coordinate
     ) {
         super(
-            initialX,
-            initialY,
-            sizeWidth,
-            sizeHeight,
+            initial,
+            size,
             canvas,
             route,
-            elementSizeWidth,
-            elementSizeHeight,
-            elementHorizontal,
-            elementVertical,
-            animationFrames,
-            animationFramesPerSecond,
+            elementParameters,
+            animation
         );
-        this.speed = new Coordinate(speedX, speedY);
-        this.address = new Coordinate(0, 0);
+        this.speed = speed;
+        this.address = new Coordinate;
     }
 
     move() {
-        if (this.address.equals(0, 0)) return false;
+        if (this.address.equals(new Coordinate)) return false;
         const secondsBetweenFrames = this.canvas.timeBetweenFrames / 1000;
         const speedX = this.speed.x * secondsBetweenFrames;
         const speedY = this.speed.y * secondsBetweenFrames;

@@ -72,22 +72,27 @@ export class Keyboard extends Rect {
   }
 
   getKeys(keys: string[]) {
-    const width = (this.size.width * 0.97);
-    const height = (this.size.height * 0.8) / keys.length;
+    const size = new Size(
+      this.size.width * 0.97,
+      (this.size.height * 0.8) / keys.length
+    );
     return keys.map((characters, index) => {
-      const leftIndex = (width * 0.01) * index;
-      const topIndex = height * (index + 1);
+      const leftIndex = (size.width * 0.01) * index;
+      const topIndex = size.height * (index + 1);
       return new Keys(
         this.initial.x + leftIndex,
         this.initial.y + topIndex,
-        width,
-        height,
         this.canvas,
         characters,
-        10,
+        {
+          size,
+          text: {
+            size: new Size(0, 10),
+          }
+        },
         (character: string) => {
           if (this.target === null) return;
-          this.target.addChar(character)
+          this.target.addChar(character);
         }
       );
     });

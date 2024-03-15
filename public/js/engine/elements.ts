@@ -1,53 +1,45 @@
+import type { Canvas } from "./canvas.js";
+import type { Coordinate } from "./coordinate.js";
 import { Element } from "./elements/element.js";
 import { Image } from "./image.js";
+import type { Plane } from "./plane.js";
+import type { Size } from "./size.js";
 
 export class Elements extends Image {
+  element: Element;
   constructor(
-    initialX,
-    initialY,
-    sizeWidth,
-    sizeHeight,
-    canvas,
-    route,
-    elementSizeWidth,
-    elementSizeHeight,
-    elementHorizontal,
-    elementVertical,
+    initial: Coordinate,
+    size: Size,
+    canvas: Canvas,
+    route: string,
+    elementParameters: {
+      size: Size;
+      plane: Plane;
+    }
   ) {
     super(
-      initialX,
-      initialY,
-      sizeWidth,
-      sizeHeight,
+      initial,
+      size,
       canvas,
       route,
     );
     this.element = new Element(
-      elementSizeWidth,
-      elementSizeHeight,
-      elementHorizontal,
-      elementVertical,
+      elementParameters.size,
+      elementParameters.plane,
     );
   }
 
   async drawElement() {
     const image = await this.image();
 
-    const positionOnCanvas = this.canvas.positionOnCanvas(
-      this.initial.x,
-      this.initial.y,
-      this.size.width,
-      this.size.height,
-      this.end.x,
-      this.end.y
-    );
+    const positionOnCanvas = this.canvas.positionOnCanvas(this);
     if (positionOnCanvas === false) return;
 
     this.canvas.context.imageSmoothingEnabled = false;
     this.canvas.context.drawImage(
       image,
-      this.element.x,
-      this.element.y,
+      this.element.initial.x,
+      this.element.initial.y,
       this.element.size.width,
       this.element.size.height,
       positionOnCanvas.initial.x,

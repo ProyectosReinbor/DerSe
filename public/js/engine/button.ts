@@ -4,13 +4,6 @@ import { Rect } from "./rect.js";
 import { Size } from "./size.js";
 import { Text } from "./text.js";
 
-export type TextParameters = {
-  size: Size;
-  value: string;
-  fillStyle: string;
-  strokeStyle: string;
-};
-
 export class Button extends Rect {
   text: Text;
   constructor(
@@ -20,7 +13,12 @@ export class Button extends Rect {
     fillStyle: string = "",
     strokeStyle: string = "",
     lineWidth: number = 0,
-    textParameters: TextParameters,
+    textParameters: {
+      size: Size;
+      value: string;
+      fillStyle: string;
+      strokeStyle: string;
+    },
   ) {
     super(
       initial,

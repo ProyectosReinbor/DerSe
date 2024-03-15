@@ -1,20 +1,18 @@
+import type { Canvas } from "./canvas.js";
+import type { Coordinate } from "./coordinate.js";
 import { Position } from "./position.js";
+import type { Size } from "./size.js";
 
 export class Image extends Position {
+  canvas: Canvas;
+  route: string;
   constructor(
-    initialX,
-    initialY,
-    sizeWidth,
-    sizeHeight,
-    canvas,
-    route,
+    initial: Coordinate,
+    size: Size,
+    canvas: Canvas,
+    route: string,
   ) {
-    super(
-      initialX,
-      initialY,
-      sizeWidth,
-      sizeHeight
-    );
+    super(initial, size);
     this.canvas = canvas;
     this.route = route;
   }
@@ -26,14 +24,7 @@ export class Image extends Position {
   async drawImage() {
     const image = await this.image();
 
-    const positionOnCanvas = this.canvas.positionOnCanvas(
-      this.initial.x,
-      this.initial.y,
-      this.size.width,
-      this.size.height,
-      this.end.x,
-      this.end.y
-    );
+    const positionOnCanvas = this.canvas.positionOnCanvas(this);
     if (positionOnCanvas === false) return;
 
     this.canvas.context.imageSmoothingEnabled = false;

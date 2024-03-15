@@ -1,31 +1,33 @@
 
 import type { Canvas } from "../canvas.js";
-import type { Coordinate } from "../coordinate.js";
-import { Position } from "../position.js";
+import { Coordinate } from "../coordinate.js";
 import { Size } from "../size.js";
 import { Key } from "./key.js";
 
-type KeyParameters = {
-  size: Size;
-  text: {
+export class Keys extends Coordinate {
+  keyParameters: {
     size: Size;
-  }
-};
-
-export class Keys extends Position {
-  keyParameters: KeyParameters;
+    text: {
+      size: Size;
+    }
+  };
   keys: Key[];
   canvas: Canvas;
   keyPress: (character: string) => void;
   constructor(
-    initial: Coordinate,
-    size: Size,
+    x: number,
+    y: number,
     canvas: Canvas,
     characters: string,
-    keyParameters: KeyParameters,
+    keyParameters: {
+      size: Size;
+      text: {
+        size: Size;
+      }
+    },
     keyPress: (character: string) => void,
   ) {
-    super(initial, size);
+    super(x, y);
     this.keys = [];
     this.canvas = canvas;
     this.keyPress = keyPress;
@@ -35,13 +37,15 @@ export class Keys extends Position {
       const character = characters[index];
       this.setKey(
         index,
-        index,
-        0,
+        new Coordinate(index),
         "#0F6097",
         "#fff",
         0.5,
-        character,
-        "#fff",
+        {
+          value: character,
+          fillStyle: "#fff",
+          strokeStyle: "",
+        }
       );
     }
   }
@@ -51,33 +55,40 @@ export class Keys extends Position {
   }
 
   setKey(
-    index,
-    boxX,
-    boxY,
-    fillStyle,
-    strokeStyle,
-    lineWidth,
-    textValue,
-    textFillStyle,
-    textStrokeStyle,
+    index: number,
+    boxes: Coordinate,
+    fillStyle: string,
+    strokeStyle: string,
+    lineWidth: number,
+    textParameters: {
+      value: string;
+      fillStyle: string;
+      strokeStyle: string;
+    },
   ) {
     const key = new Key(
-      this.initial.x,
-      this.initial.y,
-      this.factory.size.width,
-      this.factory.size.height,
+      new Coordinate(
+        this.x,
+        this.y,
+      ),
+      new Size(
+        this.keyParameters.size.width,
+        this.keyParameters.size.height,
+      ),
       this.canvas,
       fillStyle,
       strokeStyle,
       lineWidth,
-      this.factory.text.size.height,
-      textValue,
-      textFillStyle,
-      textStrokeStyle,
+      {
+        size: this.keyParameters.text.size,
+        value: textParameters.value,
+        fillStyle: textParameters.fillStyle,
+        strokeStyle: textParameters.strokeStyle,
+      },
       this.keyPress
     );
-    const top = key.size.width * boxX;
-    const left = key.size.height * boxY;
+    const top = key.size.width * boxes.x;
+    const left = key.size.height * boxes.y;
     key.initial.x += top;
     key.initial.y += left;
     this.keys[index] = key;

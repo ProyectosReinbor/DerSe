@@ -1,4 +1,4 @@
-import { Button, type TextParameters } from "../button.js";
+import { Button } from "../button.js";
 import type { Canvas } from "../canvas.js";
 import type { Coordinate } from "../coordinate.js";
 import type { Size } from "../size.js";
@@ -12,7 +12,12 @@ export class Key extends Button {
         fillStyle: string = "",
         strokeStyle: string = "",
         lineWidth: number = 0,
-        textParameters: TextParameters,
+        textParameters: {
+            size: Size;
+            value: string;
+            fillStyle: string;
+            strokeStyle: string;
+        },
         keyPress: (character: string) => void,
     ) {
         super(
