@@ -1,24 +1,30 @@
+import type { Canvas } from "./canvas.js";
+import type { Coordinate } from "./coordinate.js";
 import { Position } from "./position.js";
+import type { Size } from "./size.js";
 
 export class Circle extends Position {
+  canvas: Canvas;
+  startingDegrees: number;
+  finalDegrees: number;
+  counterclockwise: boolean;
+  fillStyle: string;
+  strokeStyle: string;
+  lineWidth: number;
   constructor(
-    initialX,
-    initialY,
-    sizeWidth,
-    sizeHeight,
-    canvas,
-    startingDegrees,
-    finalDegrees,
-    counterclockwise,
-    fillStyle,
-    strokeStyle,
-    lineWidth,
+    initial: Coordinate,
+    size: Size,
+    canvas: Canvas,
+    startingDegrees: number = 0,
+    finalDegrees: number = 360,
+    counterclockwise: boolean = false,
+    fillStyle: string = "",
+    strokeStyle: string = "",
+    lineWidth: number = 0,
   ) {
     super(
-      initialX,
-      initialY,
-      sizeWidth,
-      sizeHeight
+      initial,
+      size,
     );
     this.canvas = canvas;
     this.startingDegrees = startingDegrees;
@@ -38,14 +44,7 @@ export class Circle extends Position {
   }
 
   drawCircle() {
-    const positionOnCanvas = this.canvas.positionOnCanvas(
-      this.initial.x,
-      this.initial.y,
-      this.size.width,
-      this.size.height,
-      this.end.x,
-      this.end.y
-    );
+    const positionOnCanvas = this.canvas.positionOnCanvas(this);
     if (positionOnCanvas === false) return;
 
     this.canvas.context.beginPath();
@@ -64,12 +63,12 @@ export class Circle extends Position {
       this.counterclockwise,
     );
 
-    if (this.fillStyle !== undefined) {
+    if (this.fillStyle.length > 0) {
       this.canvas.context.fillStyle = this.fillStyle;
       this.canvas.context.fill();
     }
 
-    if (this.strokeStyle !== undefined) {
+    if (this.strokeStyle.length > 0) {
       this.canvas.context.strokeStyle = this.strokeStyle;
       this.canvas.context.lineWidth = this.lineWidth;
       this.canvas.context.stroke();

@@ -7,14 +7,27 @@ import { Keys } from "./keyboard/keys.js";
 import { Shift } from "./keyboard/shift.js";
 import { Space } from "./keyboard/space.js";
 import { Position } from "./position.js";
+import type { Canvas } from "./canvas.js";
+import { Coordinate } from "./coordinate.js";
+import { Size } from "./size.js";
+import type { Input } from "./input.js";
 
 export class Keyboard extends Rect {
-  constructor(canvas) {
+  target: Input | null = null;
+  shiftKeys: Keys[];
+  keys: Keys[];
+  shift: Shift;
+  enter: Enter;
+  space: Space;
+  delete: Delete;
+  closeQuestion: CloseQuestion;
+  finish: Finish;
+  constructor(
+    canvas: Canvas,
+  ) {
     super(
-      5,
-      35,
-      90,
-      60,
+      new Coordinate(5, 35),
+      new Size(90, 60),
       canvas,
       "#21618C",
     );
@@ -58,7 +71,7 @@ export class Keyboard extends Rect {
     );
   }
 
-  getKeys(keys) {
+  getKeys(keys: string[]) {
     const width = (this.size.width * 0.97);
     const height = (this.size.height * 0.8) / keys.length;
     return keys.map((characters, index) => {
@@ -72,35 +85,37 @@ export class Keyboard extends Rect {
         this.canvas,
         characters,
         10,
-        (character) =>
+        (character: string) => {
+          if (this.target === null) return;
           this.target.addChar(character)
+        }
       );
     });
   }
 
-  touchstartKeyboard(x, y) {
-    this.delete.touchstartDelete(x, y);
+  touchstartKeyboard(touch: Coordinate) {
+    this.delete.touchstartDelete(touch);
   }
 
-  touchmoveKeyboard(x, y) {
-    this.delete.touchmoveDelete(x, y);
+  touchmoveKeyboard(touch: Coordinate) {
+    this.delete.touchmoveDelete(touch);
   }
 
-  touchendKeyboard(x, y) {
+  touchendKeyboard(touch: Coordinate) {
     if (this.target === null) return;
     if (this.delete.touchendDelete() === true) return;
-    if (this.space.touchendSpace(x, y) === true) return;
-    if (this.shift.touchendShift(x, y) === true) return;
-    if (this.closeQuestion.touchendCloseQuestion(x, y) === true) return;
-    if (this.finish.touchendFinish(x, y) === true) return;
-    if (this.enter.touchendEnter(x, y) === true) return;
+    if (this.space.touchendSpace(touch) === true) return;
+    if (this.shift.touchendShift(touch) === true) return;
+    if (this.closeQuestion.touchendCloseQuestion(touch) === true) return;
+    if (this.finish.touchendFinish(touch) === true) return;
+    if (this.enter.touchendEnter(touch) === true) return;
 
     if (this.shift.uppercase === true) {
-      const touchendKeys = this.shiftKeys.some(keys => keys.touchendKeys(x, y));
+      const touchendKeys = this.shiftKeys.some(keys => keys.touchendKeys(touch));
       if (touchendKeys === true) return;
     }
     else if (this.shift.uppercase === false) {
-      const touchendKeys = this.keys.some(keys => keys.touchendKeys(x, y));
+      const touchendKeys = this.keys.some(keys => keys.touchendKeys(touch));
       if (touchendKeys === true) return;
     }
   }

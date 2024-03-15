@@ -1,11 +1,18 @@
+import type { Canvas } from "./canvas.js";
+import type { Coordinate } from "./coordinate.js";
 import { Line } from "./lines/line.js";
 
 export class Lines {
+  lines: Line[];
+  canvas: Canvas;
+  fillStyle: string;
+  strokeStyle: string;
+  lineWidth: number;
   constructor(
-    canvas,
-    fillStyle,
-    strokeStyle,
-    lineWidth,
+    canvas: Canvas,
+    fillStyle: string,
+    strokeStyle: string,
+    lineWidth: number,
   ) {
     this.lines = [];
     this.canvas = canvas;
@@ -14,27 +21,27 @@ export class Lines {
     this.lineWidth = lineWidth;
   }
 
-  addLine(x, y) {
+  addLine(initial: Coordinate) {
     this.lines.push(
       new Line(
-        x,
-        y,
+        initial,
         this.canvas,
       )
     );
   }
 
   drawLines() {
+    if (this.lines.length === 0) return;
     this.canvas.context.beginPath();
     this.lines.forEach(line => line.drawLine());
 
-    if (this.strokeStyle !== undefined) {
+    if (this.strokeStyle.length > 0) {
       this.canvas.context.lineWidth = this.lineWidth;
       this.canvas.context.strokeStyle = this.strokeStyle;
       this.canvas.context.stroke();
     }
 
-    if (this.fillStyle !== undefined) {
+    if (this.fillStyle.length > 0) {
       this.canvas.context.fillStyle = this.fillStyle;
       this.canvas.context.fill();
     }

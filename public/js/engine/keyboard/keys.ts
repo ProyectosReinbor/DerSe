@@ -1,40 +1,36 @@
 
+import type { Canvas } from "../canvas.js";
+import type { Coordinate } from "../coordinate.js";
 import { Position } from "../position.js";
 import { Size } from "../size.js";
 import { Key } from "./key.js";
 
+type KeyParameters = {
+  size: Size;
+  text: {
+    size: Size;
+  }
+};
+
 export class Keys extends Position {
+  keyParameters: KeyParameters;
+  keys: Key[];
+  canvas: Canvas;
+  keyPress: (character: string) => void;
   constructor(
-    initialX,
-    initialY,
-    sizeWidth,
-    sizeHeight,
-    canvas,
-    characters,
-    factoryTextSizeHeight,
-    keyPress
+    initial: Coordinate,
+    size: Size,
+    canvas: Canvas,
+    characters: string,
+    keyParameters: KeyParameters,
+    keyPress: (character: string) => void,
   ) {
-    super(
-      initialX,
-      initialY,
-      sizeWidth,
-      sizeHeight
-    );
+    super(initial, size);
     this.keys = [];
     this.canvas = canvas;
     this.keyPress = keyPress;
-    this.factory = {
-      size: new Size(
-        sizeWidth / characters.length,
-        sizeHeight
-      ),
-      text: {
-        size: new Size(
-          0,
-          factoryTextSizeHeight
-        ),
-      }
-    };
+    this.keyParameters = keyParameters;
+    this.keyParameters.size.width /= characters.length;
     for (let index = 0; index < characters.length; index++) {
       const character = characters[index];
       this.setKey(
@@ -50,8 +46,8 @@ export class Keys extends Position {
     }
   }
 
-  touchendKeys(x, y) {
-    return this.keys.some(key => key.touchendKey(x, y));
+  touchendKeys(touch: Coordinate) {
+    return this.keys.some(key => key.touchendKey(touch));
   }
 
   setKey(
