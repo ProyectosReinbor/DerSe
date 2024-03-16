@@ -4,7 +4,6 @@ import { Coordinate } from "./engine/coordinate.js";
 import { Game } from "./game/game.js";
 // import { Tiktok } from "./tiktok.js";
 window.addEventListener("load", () => {
-    console.log(document.getElementById("canvas"));
     const canvas = new Canvas(new Coordinate, 24);
     const game = new Game(canvas);
     game.start();

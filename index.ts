@@ -1,15 +1,23 @@
-import express from 'express';
 import { WebcastPushConnection } from 'tiktok-live-connector';
 
-await Bun.build({
-    entrypoints: ['./public/tsc/index.ts'],
-    outdir: './public/js',
+Bun.serve({
+    port: 3000,
+    async fetch(request, response) {
+        const url = new URL(request.url);
+        if (url.pathname === "/") {
+            await Bun.build({
+                entrypoints: ['./public/tsc/index.ts'],
+                outdir: './public/js',
+            });
+            return new Response(
+                Bun.file(`public/index.html`)
+            );
+        }
+        return new Response(
+            Bun.file(`public${url.pathname}`)
+        );
+    },
 });
-
-const app = express();
-const port = 3000;
-app.use(express.static("public"));
-app.listen(port, () => console.log("Listen on port: ", port));
 
 // const tiktokLiveConnection = new WebcastPushConnection(username.toString());
 // const connect = await tiktokLiveConnection.connect();

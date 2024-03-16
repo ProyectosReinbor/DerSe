@@ -54,7 +54,7 @@ export class FlatElevations extends ElementBoxes {
         );
     }
 
-    async drawStainsForWalls() {
+    async drawFlatElevations() {
         await this.drawElements();
     }
 }           

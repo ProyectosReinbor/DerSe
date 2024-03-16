@@ -13,6 +13,7 @@ type WallElevation = {
 };
 type StairElevation = {
     shadow: true,
+    flatElevation: "sand" | "grass" | false
 };
 type Castle = {
     color: "blue" | "purple" | "red" | "yellow";
@@ -25,6 +26,9 @@ export type Box = {
     elevation: false | Elevation;
     wallElevation: false | WallElevation;
     stairElevation: false | StairElevation;
+    secondElevation: false | Elevation;
+    secondWallElevation: false | WallElevation;
+    secondStairElevation: false | StairElevation;
     castle: false | Castle;
 }
 
@@ -42,6 +46,9 @@ export const MapMatrix = () => {
                 elevation: false,
                 wallElevation: false,
                 stairElevation: false,
+                secondElevation: false,
+                secondWallElevation: false,
+                secondStairElevation: false,
                 castle: false,
             };
             box.water = true;
@@ -50,22 +57,49 @@ export const MapMatrix = () => {
                     flatSand: true
                 };
 
-            if (x >= 4 && x <= 16) {
-                if (y > 0 && y < 15)
-                    box.elevation = {
+            if (x >= 4 && x <= 16 && y > 0 && y < 15)
+                box.elevation = {
+                    shadow: true,
+                    flatGrass: true
+                };
+
+            if (x >= 4 && x <= 16 && y > 0 && y < 8)
+                box.secondElevation = {
+                    shadow: true,
+                    flatGrass: true
+                };
+
+            if (y === 7 && x >= 9 && x <= 11)
+                box.secondStairElevation = {
+                    shadow: true,
+                    flatElevation: (x === 9) ? "grass" : false
+                };
+
+            if (y === 8)
+                if ((x >= 4 && x <= 8) || (x >= 12 && x <= 16))
+                    box.secondWallElevation = {
                         shadow: true,
-                        flatGrass: true
+                        flatElevation: "sand"
                     };
-                if (y === 15) {
-                    if (x >= 9 && x <= 11)
-                        box.stairElevation = {
-                            shadow: true,
-                        };
-                    else
-                        box.wallElevation = {
-                            shadow: true,
-                            flatElevation: "sand"
-                        };
+
+            if (y === 14 && x >= 9 && x <= 11)
+                box.stairElevation = {
+                    shadow: true,
+                    flatElevation: (x === 11) ? "sand" : false
+                };
+
+            else if (y === 15 && x >= 9 && x <= 11)
+                box.foam = {
+                    flatSand: true
+                };
+
+            if (y === 15) {
+                if ((x >= 4 && x <= 8) || (x >= 12 && x <= 16)) {
+                    const flatElevationRandom = Math.round(Math.random());
+                    box.wallElevation = {
+                        shadow: true,
+                        flatElevation: (flatElevationRandom === 0) ? "sand" : false
+                    };
                 }
             }
 

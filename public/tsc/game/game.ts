@@ -48,7 +48,7 @@ export class Game extends Scene {
         console.log(chat);
     }
 
-    async draw() {
+    override async draw() {
         await this.map.drawMap();
         for (const pawn of this.pawns) {
             await pawn.drawPawn();

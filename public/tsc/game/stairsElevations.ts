@@ -3,7 +3,6 @@ import { Coordinate } from "../engine/coordinate.js";
 import { ElementBoxes } from "../engine/elementBoxes.js";
 import { Plane } from "../engine/plane.js";
 import { Size } from "../engine/size.js";
-import type { Elevations } from "./elevations.js";
 import type { Map } from "./map.js";
 
 export class StairsElevations extends ElementBoxes {
@@ -13,13 +12,11 @@ export class StairsElevations extends ElementBoxes {
         right: Plane;
         only: Plane;
     };
-    elevations: Elevations;
     constructor(
         x: number,
         y: number,
         canvas: Canvas,
         map: Map,
-        elevations: Elevations
     ) {
         super(
             x, y,
@@ -41,41 +38,43 @@ export class StairsElevations extends ElementBoxes {
             right: new Plane(2, 7),
             only: new Plane(3, 7)
         };
-        this.elevations = elevations;
     }
 
     getElementFromBox(boxes: Coordinate) {
-        const leftUpBoxes = new Coordinate(
+        const leftBoxes = new Coordinate(
             boxes.x - 1,
-            boxes.y - 1,
+            boxes.y,
         );
-        const upBoxes = new Coordinate(
-            boxes.x,
-            boxes.y - 1,
-        );
-        const rightUpBoxes = new Coordinate(
+        const rightBoxes = new Coordinate(
             boxes.x + 1,
-            boxes.y - 1,
+            boxes.y,
         );
 
-        const center = this.elevations.boxIndex(boxes) !== false;
-        const leftUp = this.elevations.boxIndex(leftUpBoxes) !== false;
-        const up = this.elevations.boxIndex(upBoxes) !== false;
-        const rightUp = this.elevations.boxIndex(rightUpBoxes) !== false;
+        const left = this.boxIndex(leftBoxes) !== false;
+        const right = this.boxIndex(rightBoxes) !== false;
 
-        const isLeft = !center && !leftUp && up && rightUp;
+        const isLeft = !left && right;
         if (isLeft) return this.elementPlanes.left;
 
-        const isCenter = !center && leftUp && up && rightUp;
+        const isCenter = left && right;
         if (isCenter) return this.elementPlanes.center;
 
-        const isRight = !center && leftUp && up && !rightUp;
+        const isRight = left && !right;
         if (isRight) return this.elementPlanes.right;
 
-        const isOnly = !center && !leftUp && up && !rightUp;
+        const isOnly = !left && !right;
         if (isOnly) return this.elementPlanes.only;
 
         throw new Error("invalid element");
+    }
+
+    refreshElements() {
+        this.groupElements.forEach(elements => {
+            const boxes = this.getBoxesOfCoordinate(elements.initial);
+            const element = this.getElementFromBox(boxes);
+            elements.element.horizontal = element.horizontal;
+            elements.element.vertical = element.vertical;
+        });
     }
 
     setStairsElevations(boxes: Coordinate) {
@@ -90,6 +89,7 @@ export class StairsElevations extends ElementBoxes {
                 }
             }
         );
+        this.refreshElements();
     }
 
     async drawStairsElevations() {

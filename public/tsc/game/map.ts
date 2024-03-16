@@ -21,12 +21,21 @@ export class Map extends Position {
     water: Water;
     foams: Foams;
     flatsSand: FlatsSand;
+
     shadows: Shadows;
     elevations: Elevations;
     flatsGrass: FlatsGrass;
     wallElevations: WallElevations;
     flatElevations: FlatElevations;
     stairsElevation: StairsElevations;
+
+    secondShadows: Shadows;
+    secondElevations: Elevations;
+    secondFlatsGrass: FlatsGrass;
+    secondWallElevations: WallElevations;
+    secondFlatElevations: FlatElevations;
+    secondStairsElevations: StairsElevations;
+
     castles: Castles;
     constructor(canvas: Canvas) {
         super(new Coordinate, new Size(100, 100));
@@ -75,7 +84,6 @@ export class Map extends Position {
             this.initial.y,
             canvas,
             this,
-            this.elevations
         );
         this.flatElevations = new FlatElevations(
             this.initial.x,
@@ -88,7 +96,42 @@ export class Map extends Position {
             this.initial.y,
             canvas,
             this,
-            this.elevations
+        );
+        this.secondShadows = new Shadows(
+            this.initial.x,
+            this.initial.y,
+            canvas,
+            this
+        );
+        this.secondElevations = new Elevations(
+            this.initial.x,
+            this.initial.y,
+            canvas,
+            this
+        );
+        this.secondFlatsGrass = new FlatsGrass(
+            this.initial.x,
+            this.initial.y,
+            canvas,
+            this
+        );
+        this.secondWallElevations = new WallElevations(
+            this.initial.x,
+            this.initial.y,
+            canvas,
+            this,
+        );
+        this.secondFlatElevations = new FlatElevations(
+            this.initial.x,
+            this.initial.y,
+            canvas,
+            this,
+        );
+        this.secondStairsElevations = new StairsElevations(
+            this.initial.x,
+            this.initial.y,
+            canvas,
+            this,
         );
         this.castles = new Castles(
             this.initial.x,
@@ -134,7 +177,48 @@ export class Map extends Position {
                 if (box.stairElevation !== false) {
                     if (box.stairElevation.shadow === true)
                         this.shadows.setShadow(boxes);
+
                     this.stairsElevation.setStairsElevations(boxes);
+
+                    if (box.stairElevation.flatElevation !== false)
+                        this.flatElevations.setFlatElevation(
+                            boxes,
+                            box.stairElevation.flatElevation
+                        );
+                }
+
+                if (box.secondElevation !== false) {
+                    if (box.secondElevation.shadow === true)
+                        this.secondShadows.setShadow(boxes);
+
+                    this.secondElevations.setElevation(boxes);
+                    if (box.secondElevation.flatGrass === true)
+                        this.secondFlatsGrass.setFlatGrass(boxes);
+                }
+
+                if (box.secondWallElevation !== false) {
+                    if (box.secondWallElevation.shadow === true)
+                        this.secondShadows.setShadow(boxes);
+
+                    this.secondWallElevations.setWallElevations(boxes);
+                    if (box.secondWallElevation.flatElevation !== false)
+                        this.secondFlatElevations.setFlatElevation(
+                            boxes,
+                            box.secondWallElevation.flatElevation
+                        );
+                }
+
+                if (box.secondStairElevation !== false) {
+                    if (box.secondStairElevation.shadow === true)
+                        this.secondShadows.setShadow(boxes);
+
+                    this.secondStairsElevations.setStairsElevations(boxes);
+
+                    if (box.secondStairElevation.flatElevation !== false)
+                        this.secondFlatElevations.setFlatElevation(
+                            boxes,
+                            box.secondStairElevation.flatElevation
+                        );
                 }
 
                 if (box.castle !== false) {
@@ -150,13 +234,25 @@ export class Map extends Position {
 
     async drawMap() {
         await this.water.drawWaters();
+
         await this.foams.drawFoams();
         await this.flatsSand.drawFlatsSand();
+
         await this.shadows.drawShadows();
         await this.elevations.drawElevations();
         await this.flatsGrass.drawFlatsGrass();
-        await this.stairsElevation.drawStairsElevations();
+
         await this.wallElevations.drawWallElevations();
+        await this.stairsElevation.drawStairsElevations();
+        await this.flatElevations.drawFlatElevations();
+
+        await this.secondElevations.drawElevations();
+        await this.secondFlatsGrass.drawFlatsGrass();
+
+        await this.secondWallElevations.drawWallElevations();
+        await this.secondStairsElevations.drawStairsElevations();
+        await this.secondFlatElevations.drawFlatElevations();
+
         await this.castles.drawCastles();
     }
 }   

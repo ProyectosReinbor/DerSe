@@ -99,18 +99,18 @@ class Canvas extends Camera {
   timeBetweenFrames = 0;
   drawScene() {
   }
-  touchstartScene(touch) {
-  }
-  touchmoveScene(touch) {
-  }
-  touchendScene(touch) {
-  }
+  touchstartScene = () => {
+  };
+  touchmoveScene = () => {
+  };
+  touchendScene = () => {
+  };
   constructor(initial, framesPerSecond) {
     super(initial);
     this.images = new Images;
     this.framesPerSecond = framesPerSecond;
     this.intervalBetweenFrames = 1000 / this.framesPerSecond;
-    this.element = window.document.querySelector("canvas");
+    this.element = window.document.getElementById("canvas");
     this.context = this.element.getContext("2d");
     this.aspectRatio();
     window.addEventListener("resize", () => this.aspectRatio());
@@ -211,12 +211,12 @@ class Scene {
   canvas;
   draw() {
   }
-  touchstart(touch) {
-  }
-  touchmove(touch) {
-  }
-  touchend(touch) {
-  }
+  touchstart = () => {
+  };
+  touchmove = () => {
+  };
+  touchend = () => {
+  };
   constructor(canvas) {
     this.canvas = canvas;
   }
@@ -555,8 +555,8 @@ class Elevations extends Grounds {
   }
 }
 
-// public/tsc/game/flatsYellow.ts
-class FlatsYellow extends Grounds {
+// public/tsc/game/flatsSand.ts
+class FlatsSand extends Grounds {
   constructor(x, y, canvas, map) {
     super(x, y, canvas, map, {
       leftUp: new Plane(5, 0),
@@ -577,11 +577,11 @@ class FlatsYellow extends Grounds {
       only: new Plane(8, 3)
     });
   }
-  setFlat(boxes3) {
+  setFlatSand(boxes3) {
     const route = `images/terrain/ground/flat.png`;
     this.setGround(boxes3, route);
   }
-  async drawFlatsYellow() {
+  async drawFlatsSand() {
     await this.drawGrounds();
   }
 }
@@ -700,7 +700,7 @@ class Water extends ImageBoxes {
 }
 
 // public/tsc/game/mapMatrix.ts
-var MapMatrixLength = new Plane(20, 20);
+var MapMatrixLength = new Plane(21, 21);
 var MapMatrix = () => {
   const matrix = [];
   for (let y = 0;y < MapMatrixLength.vertical; y++) {
@@ -712,24 +712,55 @@ var MapMatrix = () => {
         elevation: false,
         wallElevation: false,
         stairElevation: false,
+        secondElevation: false,
+        secondWallElevation: false,
+        secondStairElevation: false,
         castle: false
       };
       box.water = true;
-      if (y > 0 && y < 19 && x > 0 && x < 19)
+      if (y > 0 && y < 19 && x >= 1 && x <= 19)
         box.foam = {
           flatSand: true
         };
-      if (x > 3 && x < 16) {
-        if (y > 0 && y < 18)
-          box.elevation = {
-            shadow: true,
-            flatGrass: true
-          };
-        if (y === 18)
-          box.wallElevation = {
+      if (x >= 4 && x <= 16 && y > 0 && y < 15)
+        box.elevation = {
+          shadow: true,
+          flatGrass: true
+        };
+      if (x >= 4 && x <= 16 && y > 0 && y < 8)
+        box.secondElevation = {
+          shadow: true,
+          flatGrass: true
+        };
+      if (y === 7 && x >= 9 && x <= 11)
+        box.secondStairElevation = {
+          shadow: true,
+          flatElevation: x === 9 ? "grass" : false
+        };
+      if (y === 8) {
+        if (x >= 4 && x <= 8 || x >= 12 && x <= 16)
+          box.secondWallElevation = {
             shadow: true,
             flatElevation: "sand"
           };
+      }
+      if (y === 14 && x >= 9 && x <= 11)
+        box.stairElevation = {
+          shadow: true,
+          flatElevation: x === 11 ? "sand" : false
+        };
+      else if (y === 15 && x >= 9 && x <= 11)
+        box.foam = {
+          flatSand: true
+        };
+      if (y === 15) {
+        if (x >= 4 && x <= 8 || x >= 12 && x <= 16) {
+          const flatElevationRandom = Math.round(Math.random());
+          box.wallElevation = {
+            shadow: true,
+            flatElevation: flatElevationRandom === 0 ? "sand" : false
+          };
+        }
       }
       if (y === 4 && x === 8)
         box.castle = {
@@ -745,8 +776,7 @@ var MapMatrix = () => {
 // public/tsc/game/wallElevations.ts
 class WallElevations extends ElementBoxes {
   elementPlanes;
-  elevations;
-  constructor(x, y, canvas, map, elevations) {
+  constructor(x, y, canvas, map) {
     super(x, y, canvas, {
       size: new Size(map.boxes.width, map.boxes.height),
       length: new Plane(1, 1),
@@ -766,50 +796,28 @@ class WallElevations extends ElementBoxes {
       horizontalRight: new Plane(2, 5),
       only: new Plane(3, 5)
     };
-    this.elevations = elevations;
   }
   getElementFromBox(boxes4) {
-    const leftUpBoxes = new Coordinate(boxes4.x - 1, boxes4.y - 1);
-    const leftDoubleUpBoxes = new Coordinate(boxes4.x - 1, boxes4.y - 2);
-    const upBoxes = new Coordinate(boxes4.x, boxes4.y - 1);
-    const doubleUpBoxes = new Coordinate(boxes4.x, boxes4.y - 2);
-    const rightUpBoxes = new Coordinate(boxes4.x + 1, boxes4.y - 1);
-    const rightDoubleUpBoxes = new Coordinate(boxes4.x + 1, boxes4.y - 2);
-    const center = this.elevations.boxIndex(boxes4) !== false;
-    const leftUp = this.elevations.boxIndex(leftUpBoxes) !== false;
-    const leftDoubleUp = this.elevations.boxIndex(leftDoubleUpBoxes) !== false;
-    const up = this.elevations.boxIndex(upBoxes) !== false;
-    const doubleUp = this.elevations.boxIndex(doubleUpBoxes) !== false;
-    const rightUp = this.elevations.boxIndex(rightUpBoxes) !== false;
-    const rightDoubleUp = this.elevations.boxIndex(rightDoubleUpBoxes) !== false;
-    const isLeft = !center && !leftUp && !leftDoubleUp && up && doubleUp && rightUp && rightDoubleUp;
+    const leftBoxes = new Coordinate(boxes4.x - 1, boxes4.y);
+    const rightBoxes = new Coordinate(boxes4.x + 1, boxes4.y);
+    const left = this.boxIndex(leftBoxes) !== false;
+    const right = this.boxIndex(rightBoxes) !== false;
+    const isLeft = !left && right;
     if (isLeft)
       return this.elementPlanes.left;
-    const isCenter = !center && leftUp && leftDoubleUp && up && doubleUp && rightUp && rightDoubleUp;
+    const isCenter = left && right;
     if (isCenter)
       return this.elementPlanes.center;
-    const isRight = !center && leftUp && leftDoubleUp && up && doubleUp && !rightUp && !rightDoubleUp;
+    const isRight = left && !right;
     if (isRight)
       return this.elementPlanes.right;
-    const isVertical = !center && !leftUp && !leftDoubleUp && up && doubleUp && !rightUp && !rightDoubleUp;
+    const isVertical = !left && !right;
     if (isVertical)
-      return this.elementPlanes.vertical;
-    const isHorizontalLeft = !center && !leftUp && up && rightUp;
-    if (isHorizontalLeft)
-      return this.elementPlanes.horizontalLeft;
-    const isHorizontalCenter = !center && leftUp && up && rightUp;
-    if (isHorizontalCenter)
-      return this.elementPlanes.horizontalCenter;
-    const isHorizontalRight = !center && leftUp && up && !rightUp;
-    if (isHorizontalRight)
-      return this.elementPlanes.horizontalRight;
-    const isOnly = !center && !leftUp && up && !rightUp;
-    if (isOnly)
       return this.elementPlanes.only;
     throw new Error("invalid element");
   }
   refreshElements() {
-    this.groupElements.forEach((elements3, index) => {
+    this.groupElements.forEach((elements3) => {
       const boxes4 = this.getBoxesOfCoordinate(elements3.initial);
       const element2 = this.getElementFromBox(boxes4);
       elements3.element.horizontal = element2.horizontal;
@@ -834,8 +842,7 @@ class WallElevations extends ElementBoxes {
 // public/tsc/game/stairsElevations.ts
 class StairsElevations extends ElementBoxes {
   elementPlanes;
-  elevations;
-  constructor(x, y, canvas, map, elevations) {
+  constructor(x, y, canvas, map) {
     super(x, y, canvas, {
       size: new Size(map.boxes.width, map.boxes.height),
       length: new Plane(1, 1),
@@ -851,29 +858,33 @@ class StairsElevations extends ElementBoxes {
       right: new Plane(2, 7),
       only: new Plane(3, 7)
     };
-    this.elevations = elevations;
   }
   getElementFromBox(boxes4) {
-    const leftUpBoxes = new Coordinate(boxes4.x - 1, boxes4.y - 1);
-    const upBoxes = new Coordinate(boxes4.x, boxes4.y - 1);
-    const rightUpBoxes = new Coordinate(boxes4.x + 1, boxes4.y - 1);
-    const center = this.elevations.boxIndex(boxes4) !== false;
-    const leftUp = this.elevations.boxIndex(leftUpBoxes) !== false;
-    const up = this.elevations.boxIndex(upBoxes) !== false;
-    const rightUp = this.elevations.boxIndex(rightUpBoxes) !== false;
-    const isLeft = !center && !leftUp && up && rightUp;
+    const leftBoxes = new Coordinate(boxes4.x - 1, boxes4.y);
+    const rightBoxes = new Coordinate(boxes4.x + 1, boxes4.y);
+    const left = this.boxIndex(leftBoxes) !== false;
+    const right = this.boxIndex(rightBoxes) !== false;
+    const isLeft = !left && right;
     if (isLeft)
       return this.elementPlanes.left;
-    const isCenter = !center && leftUp && up && rightUp;
+    const isCenter = left && right;
     if (isCenter)
       return this.elementPlanes.center;
-    const isRight = !center && leftUp && up && !rightUp;
+    const isRight = left && !right;
     if (isRight)
       return this.elementPlanes.right;
-    const isOnly = !center && !leftUp && up && !rightUp;
+    const isOnly = !left && !right;
     if (isOnly)
       return this.elementPlanes.only;
     throw new Error("invalid element");
+  }
+  refreshElements() {
+    this.groupElements.forEach((elements3) => {
+      const boxes4 = this.getBoxesOfCoordinate(elements3.initial);
+      const element2 = this.getElementFromBox(boxes4);
+      elements3.element.horizontal = element2.horizontal;
+      elements3.element.vertical = element2.vertical;
+    });
   }
   setStairsElevations(boxes4) {
     const element2 = this.getElementFromBox(boxes4);
@@ -883,6 +894,7 @@ class StairsElevations extends ElementBoxes {
         plane: element2
       }
     });
+    this.refreshElements();
   }
   async drawStairsElevations() {
     await this.drawElements();
@@ -941,8 +953,39 @@ class FlatElevations extends ElementBoxes {
       }
     });
   }
-  async drawStainsForWalls() {
+  async drawFlatElevations() {
     await this.drawElements();
+  }
+}
+
+// public/tsc/game/flatsGrass.ts
+class FlatsGrass extends Grounds {
+  constructor(x, y, canvas, map) {
+    super(x, y, canvas, map, {
+      leftUp: new Plane(0, 0),
+      up: new Plane(1, 0),
+      rightUp: new Plane(2, 0),
+      left: new Plane(0, 1),
+      center: new Plane(1, 1),
+      right: new Plane(2, 1),
+      leftDown: new Plane(0, 2),
+      down: new Plane(1, 2),
+      rightDown: new Plane(2, 2),
+      horizontalLeft: new Plane(0, 3),
+      horizontalCenter: new Plane(1, 3),
+      horizontalRight: new Plane(2, 3),
+      verticalUp: new Plane(3, 0),
+      verticalCenter: new Plane(3, 1),
+      verticalDown: new Plane(3, 2),
+      only: new Plane(3, 3)
+    });
+  }
+  setFlatGrass(boxes4) {
+    const route = `images/terrain/ground/flat.png`;
+    this.setGround(boxes4, route);
+  }
+  async drawFlatsGrass() {
+    await this.drawGrounds();
   }
 }
 
@@ -952,24 +995,38 @@ class Map extends Position {
   boxes;
   water;
   foams;
-  flatsYellow;
+  flatsSand;
   shadows;
   elevations;
+  flatsGrass;
   wallElevations;
   flatElevations;
   stairsElevation;
+  secondShadows;
+  secondElevations;
+  secondFlatsGrass;
+  secondWallElevations;
+  secondFlatElevations;
+  secondStairsElevations;
   castles;
   constructor(canvas) {
     super(new Coordinate, new Size(100, 100));
     this.boxes = new Size(this.size.width / MapMatrixLength.horizontal, this.size.height / MapMatrixLength.vertical);
     this.water = new Water(this.initial.x, this.initial.y, canvas, this);
     this.foams = new Foams(this.initial.x, this.initial.y, canvas, this);
-    this.flatsYellow = new FlatsYellow(this.initial.x, this.initial.y, canvas, this);
+    this.flatsSand = new FlatsSand(this.initial.x, this.initial.y, canvas, this);
     this.shadows = new Shadows(this.initial.x, this.initial.y, canvas, this);
     this.elevations = new Elevations(this.initial.x, this.initial.y, canvas, this);
-    this.wallElevations = new WallElevations(this.initial.x, this.initial.y, canvas, this, this.elevations);
+    this.flatsGrass = new FlatsGrass(this.initial.x, this.initial.y, canvas, this);
+    this.wallElevations = new WallElevations(this.initial.x, this.initial.y, canvas, this);
     this.flatElevations = new FlatElevations(this.initial.x, this.initial.y, canvas, this);
-    this.stairsElevation = new StairsElevations(this.initial.x, this.initial.y, canvas, this, this.elevations);
+    this.stairsElevation = new StairsElevations(this.initial.x, this.initial.y, canvas, this);
+    this.secondShadows = new Shadows(this.initial.x, this.initial.y, canvas, this);
+    this.secondElevations = new Elevations(this.initial.x, this.initial.y, canvas, this);
+    this.secondFlatsGrass = new FlatsGrass(this.initial.x, this.initial.y, canvas, this);
+    this.secondWallElevations = new WallElevations(this.initial.x, this.initial.y, canvas, this);
+    this.secondFlatElevations = new FlatElevations(this.initial.x, this.initial.y, canvas, this);
+    this.secondStairsElevations = new StairsElevations(this.initial.x, this.initial.y, canvas, this);
     this.castles = new Castles(this.initial.x, this.initial.y, canvas, this);
     this.matrix.forEach((row, y) => {
       row.forEach((box, x) => {
@@ -979,11 +1036,13 @@ class Map extends Position {
         if (box.foam !== false) {
           this.foams.setFoam(boxes4);
           if (box.foam.flatSand === true)
-            this.flatsYellow.setFlat(boxes4);
+            this.flatsSand.setFlatSand(boxes4);
         }
         if (box.elevation !== false) {
           if (box.elevation.shadow === true)
             this.shadows.setShadow(boxes4);
+          if (box.elevation.flatGrass === true)
+            this.flatsGrass.setFlatGrass(boxes4);
           this.elevations.setElevation(boxes4);
         }
         if (box.wallElevation !== false) {
@@ -997,6 +1056,29 @@ class Map extends Position {
           if (box.stairElevation.shadow === true)
             this.shadows.setShadow(boxes4);
           this.stairsElevation.setStairsElevations(boxes4);
+          if (box.stairElevation.flatElevation !== false)
+            this.flatElevations.setFlatElevation(boxes4, box.stairElevation.flatElevation);
+        }
+        if (box.secondElevation !== false) {
+          if (box.secondElevation.shadow === true)
+            this.secondShadows.setShadow(boxes4);
+          this.secondElevations.setElevation(boxes4);
+          if (box.secondElevation.flatGrass === true)
+            this.secondFlatsGrass.setFlatGrass(boxes4);
+        }
+        if (box.secondWallElevation !== false) {
+          if (box.secondWallElevation.shadow === true)
+            this.secondShadows.setShadow(boxes4);
+          this.secondWallElevations.setWallElevations(boxes4);
+          if (box.secondWallElevation.flatElevation !== false)
+            this.secondFlatElevations.setFlatElevation(boxes4, box.secondWallElevation.flatElevation);
+        }
+        if (box.secondStairElevation !== false) {
+          if (box.secondStairElevation.shadow === true)
+            this.secondShadows.setShadow(boxes4);
+          this.secondStairsElevations.setStairsElevations(boxes4);
+          if (box.secondStairElevation.flatElevation !== false)
+            this.secondFlatElevations.setFlatElevation(boxes4, box.secondStairElevation.flatElevation);
         }
         if (box.castle !== false) {
           this.castles.setCastle(boxes4, box.castle.color, box.castle.state);
@@ -1007,11 +1089,18 @@ class Map extends Position {
   async drawMap() {
     await this.water.drawWaters();
     await this.foams.drawFoams();
-    await this.flatsYellow.drawFlatsYellow();
+    await this.flatsSand.drawFlatsSand();
     await this.shadows.drawShadows();
     await this.elevations.drawElevations();
-    await this.stairsElevation.drawStairsElevations();
+    await this.flatsGrass.drawFlatsGrass();
     await this.wallElevations.drawWallElevations();
+    await this.stairsElevation.drawStairsElevations();
+    await this.flatElevations.drawFlatElevations();
+    await this.secondElevations.drawElevations();
+    await this.secondFlatsGrass.drawFlatsGrass();
+    await this.secondWallElevations.drawWallElevations();
+    await this.secondStairsElevations.drawStairsElevations();
+    await this.secondFlatElevations.drawFlatElevations();
     await this.castles.drawCastles();
   }
 }
@@ -1180,6 +1269,7 @@ class Game extends Scene {
     }));
   }
   tiktokChat(chat) {
+    console.log(chat);
   }
   async draw() {
     await this.map.drawMap();
@@ -1190,7 +1280,7 @@ class Game extends Scene {
 }
 
 // public/tsc/index.ts
-globalThis.addEventListener("load", () => {
+window.addEventListener("load", () => {
   const canvas2 = new Canvas(new Coordinate, 24);
   const game2 = new Game(canvas2);
   game2.start();

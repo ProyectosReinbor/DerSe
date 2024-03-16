@@ -17,13 +17,11 @@ export class WallElevations extends ElementBoxes {
         horizontalRight: Plane;
         only: Plane;
     };
-    elevations: Elevations;
     constructor(
         x: number,
         y: number,
         canvas: Canvas,
         map: Map,
-        elevations: Elevations
     ) {
         super(
             x,
@@ -50,67 +48,32 @@ export class WallElevations extends ElementBoxes {
             horizontalRight: new Plane(2, 5),
             only: new Plane(3, 5)
         };
-        this.elevations = elevations;
     }
 
     getElementFromBox(boxes: Coordinate) {
-        const leftUpBoxes = new Coordinate(
+        const leftBoxes = new Coordinate(
             boxes.x - 1,
-            boxes.y - 1,
+            boxes.y,
         );
-        const leftDoubleUpBoxes = new Coordinate(
-            boxes.x - 1,
-            boxes.y - 2,
-        );
-        const upBoxes = new Coordinate(
-            boxes.x,
-            boxes.y - 1,
-        );
-        const doubleUpBoxes = new Coordinate(
-            boxes.x,
-            boxes.y - 2,
-        );
-        const rightUpBoxes = new Coordinate(
+        const rightBoxes = new Coordinate(
             boxes.x + 1,
-            boxes.y - 1,
-        );
-        const rightDoubleUpBoxes = new Coordinate(
-            boxes.x + 1,
-            boxes.y - 2,
+            boxes.y,
         );
 
-        const center = this.elevations.boxIndex(boxes) !== false;
-        const leftUp = this.elevations.boxIndex(leftUpBoxes) !== false;
-        const leftDoubleUp = this.elevations.boxIndex(leftDoubleUpBoxes) !== false;
-        const up = this.elevations.boxIndex(upBoxes) !== false;
-        const doubleUp = this.elevations.boxIndex(doubleUpBoxes) !== false;
-        const rightUp = this.elevations.boxIndex(rightUpBoxes) !== false;
-        const rightDoubleUp = this.elevations.boxIndex(rightDoubleUpBoxes) !== false;
+        const left = this.boxIndex(leftBoxes) !== false;
+        const right = this.boxIndex(rightBoxes) !== false;
 
-        const isLeft = !center && !leftUp && !leftDoubleUp && up && doubleUp && rightUp && rightDoubleUp;
+        const isLeft = !left && right;
         if (isLeft) return this.elementPlanes.left;
 
-        const isCenter = !center && leftUp && leftDoubleUp && up && doubleUp && rightUp && rightDoubleUp;
+        const isCenter = left && right;
         if (isCenter) return this.elementPlanes.center;
 
-
-        const isRight = !center && leftUp && leftDoubleUp && up && doubleUp && !rightUp && !rightDoubleUp;
+        const isRight = left && !right;
         if (isRight) return this.elementPlanes.right;
 
-        const isVertical = !center && !leftUp && !leftDoubleUp && up && doubleUp && !rightUp && !rightDoubleUp;
-        if (isVertical) return this.elementPlanes.vertical;
-
-        const isHorizontalLeft = !center && !leftUp && up && rightUp;
-        if (isHorizontalLeft) return this.elementPlanes.horizontalLeft;
-
-        const isHorizontalCenter = !center && leftUp && up && rightUp;
-        if (isHorizontalCenter) return this.elementPlanes.horizontalCenter;
-
-        const isHorizontalRight = !center && leftUp && up && !rightUp;
-        if (isHorizontalRight) return this.elementPlanes.horizontalRight;
-
-        const isOnly = !center && !leftUp && up && !rightUp;
-        if (isOnly) return this.elementPlanes.only;
+        const isVertical = !left && !right;
+        if (isVertical) return this.elementPlanes.only;
 
         throw new Error("invalid element");
     }

@@ -2,17 +2,17 @@
   "name": "derse",
   "module": "index.ts",
   "type": "module",
+  "scripts": {
+    "start": "bun run index.ts",
+    "build": "bun build ./public/tsc/index.ts --outdir ./public/js"
+  },
   "devDependencies": {
-    "@types/bun": "latest",
-    "@types/express": "^4.17.21"
+    "@types/bun": "latest"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "express": "^4.18.3",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
     "tiktok-live-connector": "^1.1.4"
   }
 }
