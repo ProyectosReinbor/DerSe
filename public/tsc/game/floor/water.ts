@@ -1,11 +1,10 @@
-import {
-    Canvas,
-    Coordinate,
-    Plane,
-    Size,
-    ImageBoxes
-} from "../../engine/exports.js";
+import type { Canvas } from "../../engine/canvas.js";
+import { ImageBoxes } from "../../engine/imageBoxes.js";
+import { Plane } from "../../engine/plane.js";
+import { Size } from "../../engine/size.js";
+import { Coordinate } from "../../engine/coordinate.js";
 import type { Map } from "../map.js";
+
 export class Water extends ImageBoxes {
 
     constructor(

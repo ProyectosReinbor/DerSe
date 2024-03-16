@@ -1,10 +1,8 @@
-import {
-  Coordinate,
-  Size,
-  Camera,
-  Images,
-  Position
-} from "./exports.js";
+import { Camera } from "./camera";
+import { Coordinate } from "./coordinate";
+import { Images } from "./images";
+import { Position } from "./position";
+import { Size } from "./size";
 
 export class Canvas extends Camera {
   onePercentage: Size = new Size;

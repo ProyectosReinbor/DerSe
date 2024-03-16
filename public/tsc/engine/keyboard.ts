@@ -1,20 +1,15 @@
-import {
-  CloseQuestion,
-  Delete,
-  Enter,
-  Finish,
-  Keys,
-  Shift,
-  Space
-} from "./keyboard/exports.js";
-
-import {
-  type Canvas,
-  type Input,
-  Rect,
-  Coordinate,
-  Size,
-} from "./exports.js";
+import type { Canvas } from "./canvas";
+import { Coordinate } from "./coordinate";
+import { Size } from "./size";
+import { Rect } from "./rect";
+import type { Input } from "./input";
+import { Keys } from "./keyboard/keys";
+import { Shift } from "./keyboard/shift";
+import { Enter } from "./keyboard/enter";
+import { Space } from "./keyboard/space";
+import { Delete } from "./keyboard/delete";
+import { CloseQuestion } from "./keyboard/closeQuestion";
+import { Finish } from "./keyboard/finish";
 
 export class Keyboard extends Rect {
   target: Input | null = null;

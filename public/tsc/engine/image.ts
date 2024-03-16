@@ -1,9 +1,7 @@
-import {
-  type Canvas,
-  type Coordinate,
-  type Size,
-  Position,
-} from "./exports.js";
+import type { Canvas } from "./canvas";
+import type { Coordinate } from "./coordinate";
+import { Position } from "./position";
+import type { Size } from "./size";
 
 export class Image extends Position {
   canvas: Canvas;

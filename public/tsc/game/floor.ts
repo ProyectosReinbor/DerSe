@@ -1,18 +1,18 @@
-import { Coordinate, type Canvas } from "../engine/exports";
+import { type Canvas } from "../engine/canvas.js";
 import type { Map } from "./map.js";
-import {
-    Water,
-    Foams,
-    FlatsSand,
-    Elevations,
-    FlatsGrass,
-    Shadows,
-    WallElevations,
-    StairsElevations,
-    FlatElevations,
-    Castles,
-} from "./floor/exports.js";
+import { Water } from "./floor/water.js";
+import { Foams } from "./floor/foams.js";
+import { FlatsSand } from "./floor/flatsSand.js";
+import { Elevations } from "./floor/elevations.js";
+import { FlatsGrass } from "./floor/flatsGrass.js";
+import { Shadows } from "./floor/shadows.js";
+import { WallElevations } from "./floor/wallElevations.js";
+import { StairsElevations } from "./floor/stairsElevations.js";
+import { FlatElevations } from "./floor/flatElevations.js";
+import { Castles } from "./floor/castles.js";
 import type { MapFloor } from "./mapMatrix.js";
+import { Coordinate } from "../engine/coordinate.js";
+
 export class Floor {
     canvas: Canvas;
     map: Map;

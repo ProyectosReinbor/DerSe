@@ -1,4 +1,5 @@
-import type { Canvas, Coordinate } from "./exports.js";
+import type { Canvas } from "./canvas";
+import type { Coordinate } from "./coordinate";
 
 export class Scene {
     canvas: Canvas;

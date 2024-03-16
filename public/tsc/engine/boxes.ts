@@ -1,9 +1,7 @@
-import {
-    type Canvas,
-    Coordinate,
-    type Size,
-    type Plane
-} from "./exports.js";
+import type { Canvas } from "./canvas";
+import { Coordinate } from "./coordinate";
+import type { Plane } from "./plane";
+import type { Size } from "./size";
 
 export class Boxes extends Coordinate {
     boxes: number[][] = [];

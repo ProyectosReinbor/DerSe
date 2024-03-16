@@ -1,8 +1,7 @@
-import {
-    Canvas,
-    Coordinate,
-    Plane,
-} from "../../engine/exports.js";
+
+import type { Canvas } from "../../engine/canvas.js";
+import { Coordinate } from "../../engine/coordinate.js";
+import { Plane } from "../../engine/plane.js";
 import { Grounds } from "./grounds";
 import type { Map } from "../map";
 

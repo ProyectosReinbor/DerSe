@@ -1,11 +1,8 @@
-
-import {
-  type Canvas,
-  type Keyboard,
-  Coordinate,
-  Size,
-  Button
-} from "../exports.js";
+import { Button } from "../button";
+import type { Canvas } from "../canvas";
+import { Coordinate } from "../coordinate";
+import type { Keyboard } from "../keyboard";
+import { Size } from "../size";
 
 export class CloseQuestion extends Button {
   keyboard: Keyboard;

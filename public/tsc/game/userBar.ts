@@ -1,11 +1,9 @@
-import {
-    Canvas,
-    Coordinate,
-    Rect,
-    Text,
-    Size,
-    Image
-} from "../engine/exports.js";
+import { Canvas } from "../engine/canvas";
+import { Coordinate } from "../engine/coordinate";
+import { Image } from "../engine/image";
+import { Rect } from "../engine/rect";
+import { Size } from "../engine/size";
+import { Text } from "../engine/text";
 
 export class UserBar extends Rect {
     photo: Image;

@@ -1,4 +1,5 @@
-import { Coordinate, Size } from "./exports.js";
+import { Coordinate } from "./coordinate";
+import { Size } from "./size";
 
 export class Position {
   initial: Coordinate;

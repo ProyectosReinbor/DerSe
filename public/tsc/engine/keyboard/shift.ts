@@ -1,11 +1,10 @@
-import {
-  type Canvas,
-  type Keyboard,
-  Coordinate,
-  Lines,
-  Rect,
-  Size
-} from "../exports.js";
+import type { Canvas } from "../canvas";
+import { Coordinate } from "../coordinate";
+import type { Keyboard } from "../keyboard";
+import { Lines } from "../lines";
+import { Rect } from "../rect";
+import { Size } from "../size";
+
 
 export class Shift extends Rect {
   uppercase: boolean;

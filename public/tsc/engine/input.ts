@@ -1,12 +1,10 @@
-import {
-    type Canvas,
-    type Coordinate,
-    Rect,
-    Size,
-    Text
-} from "./exports.js";
 
+import type { Canvas } from "./canvas.js";
+import type { Coordinate } from "./coordinate.js";
 import { Hide } from "./input/hide.js";
+import { Rect } from "./rect.js";
+import { Size } from "./size.js";
+import { Text } from "./text.js";
 
 type TextParameters = {
     size: Size;

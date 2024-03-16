@@ -1,11 +1,10 @@
-import {
-    type Canvas,
-    type Coordinate,
-    type Plane,
-    Size,
-    Boxes,
-    Elements
-} from "./exports.js";
+import { Boxes } from "./boxes";
+import type { Canvas } from "./canvas";
+import type { Coordinate } from "./coordinate";
+import { Elements } from "./elements";
+import type { Plane } from "./plane";
+import { Size } from "./size";
+
 
 export class ElementBoxes extends Boxes {
     groupElements: Elements[];

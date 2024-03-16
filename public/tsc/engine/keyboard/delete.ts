@@ -1,13 +1,11 @@
+import type { Canvas } from "../canvas";
+import { Coordinate } from "../coordinate";
+import type { Keyboard } from "../keyboard";
+import { Lines } from "../lines";
+import { Position } from "../position";
+import { Size } from "../size";
+import { Text } from "../text";
 
-import {
-  type Canvas,
-  type Keyboard,
-  Coordinate,
-  Size,
-  Lines,
-  Position,
-  Text
-} from "../exports.js";
 
 export class Delete extends Position {
   startTouch: number | null = null;

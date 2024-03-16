@@ -1,11 +1,9 @@
-import {
-    Canvas,
-    Coordinate,
-    Plane,
-    Size,
-    ElementBoxes
-} from "../../engine/exports.js";
+import { ElementBoxes } from "../../engine/elementBoxes.js";
 import type { Map } from "../map.js";
+import { Plane } from "../../engine/plane.js";
+import { Size } from "../../engine/size.js";
+import { Coordinate } from "../../engine/coordinate.js";
+import type { Canvas } from "../../engine/canvas.js";
 
 export class WallElevations extends ElementBoxes {
     elementPlanes: {

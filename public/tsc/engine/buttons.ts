@@ -1,10 +1,9 @@
-import {
-  type Canvas,
-  Button,
-  Coordinate,
-  Size,
-  Position
-} from "./exports.js";
+import { Button } from "./button";
+import type { Canvas } from "./canvas";
+import { Coordinate } from "./coordinate";
+import { Position } from "./position";
+import { Size } from "./size";
+
 
 export class Buttons extends Position {
   buttons: Button[] = [];

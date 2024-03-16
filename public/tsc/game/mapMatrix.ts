@@ -1,4 +1,4 @@
-import { Plane } from "../engine/exports.js";
+import { Plane } from "../engine/plane.js";
 
 type Foam = {
     flatSand: boolean;

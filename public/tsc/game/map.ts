@@ -1,17 +1,13 @@
-
-import {
-    Position,
-    Size,
-    type Canvas,
-    Coordinate
-} from "../engine/exports.js";
 import { Floor } from "./floor.js";
 import {
     MapMatrix,
-    type Box,
     FloorLength,
     type MapFloor
 } from "./mapMatrix.js";
+import { Position } from "../engine/position.js";
+import { Size } from "../engine/size.js";
+import type { Canvas } from "../engine/canvas.js";
+import { Coordinate } from "../engine/coordinate.js";
 
 export class Map extends Position {
     matrix: MapFloor[] = MapMatrix();

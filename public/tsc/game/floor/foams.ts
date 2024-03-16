@@ -1,10 +1,9 @@
-import {
-    Canvas,
-    Coordinate,
-    Plane,
-    Size,
-    AnimationBoxes
-} from "../../engine/exports.js";
+
+import { AnimationBoxes } from "../../engine/animationBoxes.js";
+import type { Canvas } from "../../engine/canvas.js";
+import { Coordinate } from "../../engine/coordinate.js";
+import { Plane } from "../../engine/plane.js";
+import { Size } from "../../engine/size.js";
 import type { Map } from "../map.js";
 
 export class Foams extends AnimationBoxes {
