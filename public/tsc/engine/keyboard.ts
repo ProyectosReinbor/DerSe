@@ -6,7 +6,6 @@ import { Finish } from "./keyboard/finish.js";
 import { Keys } from "./keyboard/keys.js";
 import { Shift } from "./keyboard/shift.js";
 import { Space } from "./keyboard/space.js";
-import { Position } from "./position.js";
 import type { Canvas } from "./canvas.js";
 import { Coordinate } from "./coordinate.js";
 import { Size } from "./size.js";

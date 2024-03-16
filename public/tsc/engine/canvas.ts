@@ -15,9 +15,9 @@ export class Canvas extends Camera {
   time: number = 0;
   timeBetweenFrames: number = 0;
   drawScene() { }
-  touchstartScene(touch: Coordinate) { }
-  touchmoveScene(touch: Coordinate) { }
-  touchendScene(touch: Coordinate) { }
+  touchstartScene: (touch: Coordinate) => void = () => { }
+  touchmoveScene: (touch: Coordinate) => void = () => { };
+  touchendScene: (touch: Coordinate) => void = () => { };
   constructor(
     initial: Coordinate,
     framesPerSecond: number,
@@ -26,7 +26,7 @@ export class Canvas extends Camera {
     this.images = new Images();
     this.framesPerSecond = framesPerSecond;
     this.intervalBetweenFrames = 1000 / this.framesPerSecond;
-    this.element = window.document.querySelector("canvas") as HTMLCanvasElement;
+    this.element = window.document.getElementById("canvas") as HTMLCanvasElement;
     this.context = this.element.getContext("2d") as CanvasRenderingContext2D;
 
     this.aspectRatio();

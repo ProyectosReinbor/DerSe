@@ -45,6 +45,7 @@ export class Game extends Scene {
         nickname: string;
         profilePictureUrl: string;
     }) {
+        console.log(chat);
     }
 
     async draw() {

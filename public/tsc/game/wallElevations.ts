@@ -116,7 +116,7 @@ export class WallElevations extends ElementBoxes {
     }
 
     refreshElements() {
-        this.groupElements.forEach((elements, index) => {
+        this.groupElements.forEach(elements => {
             const boxes = this.getBoxesOfCoordinate(elements.initial);
             const element = this.getElementFromBox(boxes);
             elements.element.horizontal = element.horizontal;

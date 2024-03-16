@@ -3,7 +3,7 @@ import { Position } from "../engine/position.js";
 import { Size } from "../engine/size.js";
 import { Castles } from "./castles.js";
 import { Elevations } from "./elevations.js";
-import { FlatsYellow } from "./flatsYellow.js";
+import { FlatsSand } from "./flatsSand.js";
 import { Foams } from "./foams.js";
 import { Water } from "./water.js";
 import { MapMatrix, type Box, MapMatrixLength } from "./mapMatrix.js";
@@ -13,15 +13,17 @@ import { Shadows } from "./shadows.js";
 import { FlatElevations } from "./flatElevations.js";
 import type { Canvas } from "../engine/canvas.js";
 import { Coordinate } from "../engine/coordinate.js";
+import { FlatsGrass } from "./flatsGrass.js";
 
 export class Map extends Position {
     matrix: Box[][] = MapMatrix();
     boxes: Size;
     water: Water;
     foams: Foams;
-    flatsYellow: FlatsYellow;
+    flatsSand: FlatsSand;
     shadows: Shadows;
     elevations: Elevations;
+    flatsGrass: FlatsGrass;
     wallElevations: WallElevations;
     flatElevations: FlatElevations;
     stairsElevation: StairsElevations;
@@ -44,7 +46,7 @@ export class Map extends Position {
             canvas,
             this
         );
-        this.flatsYellow = new FlatsYellow(
+        this.flatsSand = new FlatsSand(
             this.initial.x,
             this.initial.y,
             canvas,
@@ -57,6 +59,12 @@ export class Map extends Position {
             this
         );
         this.elevations = new Elevations(
+            this.initial.x,
+            this.initial.y,
+            canvas,
+            this
+        );
+        this.flatsGrass = new FlatsGrass(
             this.initial.x,
             this.initial.y,
             canvas,
@@ -98,15 +106,15 @@ export class Map extends Position {
                 if (box.foam !== false) {
                     this.foams.setFoam(boxes);
                     if (box.foam.flatSand === true)
-                        this.flatsYellow.setFlat(boxes);
+                        this.flatsSand.setFlatSand(boxes);
                 }
 
                 if (box.elevation !== false) {
                     if (box.elevation.shadow === true)
                         this.shadows.setShadow(boxes);
 
-                    // if (box.elevation.flatGrass === true)
-                    //     this.flatsGrass.setFlat(boxes);
+                    if (box.elevation.flatGrass === true)
+                        this.flatsGrass.setFlatGrass(boxes);
 
                     this.elevations.setElevation(boxes);
                 }
@@ -143,9 +151,10 @@ export class Map extends Position {
     async drawMap() {
         await this.water.drawWaters();
         await this.foams.drawFoams();
-        await this.flatsYellow.drawFlatsYellow();
+        await this.flatsSand.drawFlatsSand();
         await this.shadows.drawShadows();
         await this.elevations.drawElevations();
+        await this.flatsGrass.drawFlatsGrass();
         await this.stairsElevation.drawStairsElevations();
         await this.wallElevations.drawWallElevations();
         await this.castles.drawCastles();

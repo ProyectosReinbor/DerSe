@@ -4,9 +4,9 @@ import type { Coordinate } from "./coordinate";
 export class Scene {
     canvas: Canvas;
     draw() { }
-    touchstart(touch: Coordinate) { }
-    touchmove(touch: Coordinate) { }
-    touchend(touch: Coordinate) { }
+    touchstart: (touch: Coordinate) => void = () => { }
+    touchmove: (touch: Coordinate) => void = () => { }
+    touchend: (touch: Coordinate) => void = () => { }
     constructor(
         canvas: Canvas
     ) {

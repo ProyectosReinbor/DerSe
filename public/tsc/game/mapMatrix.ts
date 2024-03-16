@@ -28,7 +28,7 @@ export type Box = {
     castle: false | Castle;
 }
 
-export const MapMatrixLength = new Plane(20, 20);
+export const MapMatrixLength = new Plane(21, 21);
 
 export const MapMatrix = () => {
     const matrix: Box[][] = [];
@@ -45,23 +45,28 @@ export const MapMatrix = () => {
                 castle: false,
             };
             box.water = true;
-            if (y > 0 && y < 19 && x > 0 && x < 19)
+            if (y > 0 && y < 19 && x >= 1 && x <= 19)
                 box.foam = {
                     flatSand: true
                 };
 
-            if (x > 3 && x < 16) {
-                if (y > 0 && y < 18)
+            if (x >= 4 && x <= 16) {
+                if (y > 0 && y < 15)
                     box.elevation = {
                         shadow: true,
                         flatGrass: true
                     };
-
-                if (y === 18)
-                    box.wallElevation = {
-                        shadow: true,
-                        flatElevation: "sand"
-                    };
+                if (y === 15) {
+                    if (x >= 9 && x <= 11)
+                        box.stairElevation = {
+                            shadow: true,
+                        };
+                    else
+                        box.wallElevation = {
+                            shadow: true,
+                            flatElevation: "sand"
+                        };
+                }
             }
 
             if (y === 4 && x === 8)

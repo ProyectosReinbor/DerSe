@@ -3,8 +3,8 @@ import { Canvas } from "./engine/canvas.js";
 import { Coordinate } from "./engine/coordinate.js";
 import { Game } from "./game/game.js";
 // import { Tiktok } from "./tiktok.js";
-
-globalThis.addEventListener("load", () => {
+window.addEventListener("load", () => {
+    console.log(document.getElementById("canvas"));
     const canvas = new Canvas(new Coordinate, 24);
     const game = new Game(canvas);
     game.start();
