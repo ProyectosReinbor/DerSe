@@ -1,7 +1,9 @@
-import { Coordinate } from "../coordinate.js";
-import type { Plane } from "../plane.js";
-import { Position } from "../position.js";
-import { Size } from "../size.js";
+import {
+    type Plane,
+    Coordinate,
+    Position,
+    type Size
+} from "../exports.js";
 
 export class Element extends Position {
     constructor(

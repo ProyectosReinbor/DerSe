@@ -1,9 +1,11 @@
-import type { Canvas } from "../engine/canvas.js";
-import type { Coordinate } from "../engine/coordinate.js";
-import { ImageBoxes } from "../engine/imageBoxes.js";
-import { Plane } from "../engine/plane.js";
-import { Size } from "../engine/size.js";
-import type { Map } from "./map.js";
+import {
+    Canvas,
+    Coordinate,
+    ImageBoxes,
+    Plane,
+    Size
+} from "../../engine/exports.js";
+import type { Map } from "../map.js";
 
 export class Castles extends ImageBoxes {
 

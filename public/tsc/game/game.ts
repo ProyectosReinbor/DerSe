@@ -1,6 +1,4 @@
-import type { Canvas } from "../engine/canvas.js";
-import { Coordinate } from "../engine/coordinate.js";
-import { Scene } from "../engine/scene.js";
+import { Canvas, Coordinate, Scene } from "../engine/exports.js";
 import { Map } from "./map.js";
 import { Pawn } from "./pawn.js";
 

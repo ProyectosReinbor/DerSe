@@ -1,7 +1,9 @@
-import { Button } from "../button.js";
-import type { Canvas } from "../canvas.js";
-import type { Coordinate } from "../coordinate.js";
-import type { Size } from "../size.js";
+import {
+    type Canvas,
+    type Coordinate,
+    type Size,
+    Button
+} from "../exports.js";
 
 export class Key extends Button {
     keyPress: (character: string) => void;

@@ -1,8 +1,10 @@
-import type { Canvas } from "./canvas.js";
-import { Coordinate } from "./coordinate.js";
-import { Rect } from "./rect.js";
-import { Size } from "./size.js";
-import { Text } from "./text.js";
+import {
+  type Canvas,
+  type Coordinate,
+  Size,
+  Rect,
+  Text
+} from "./exports.js";
 
 export class Button extends Rect {
   text: Text;

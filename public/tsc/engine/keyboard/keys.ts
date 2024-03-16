@@ -1,8 +1,9 @@
-
-import type { Canvas } from "../canvas.js";
-import { Coordinate } from "../coordinate.js";
-import { Size } from "../size.js";
-import { Key } from "./key.js";
+import {
+  type Canvas,
+  Coordinate,
+  Size,
+} from "../exports.js";
+import { Key } from "./exports.js";
 
 export class Keys extends Coordinate {
   keyParameters: {

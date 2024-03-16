@@ -1,7 +1,9 @@
-import type { Canvas } from "./canvas.js";
-import type { Coordinate } from "./coordinate.js";
-import { Position } from "./position.js";
-import type { Size } from "./size.js";
+import {
+  type Canvas,
+  type Coordinate,
+  Position,
+  type Size
+} from "./exports.js";
 
 export class Circle extends Position {
   canvas: Canvas;

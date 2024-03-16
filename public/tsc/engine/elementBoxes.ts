@@ -1,9 +1,11 @@
-import { Elements } from "./elements.js";
-import { Boxes } from "./boxes.js";
-import { Size } from "./size.js";
-import type { Canvas } from "./canvas.js";
-import type { Plane } from "./plane.js";
-import type { Coordinate } from "./coordinate.js";
+import {
+    type Canvas,
+    type Coordinate,
+    type Plane,
+    Size,
+    Boxes,
+    Elements
+} from "./exports.js";
 
 export class ElementBoxes extends Boxes {
     groupElements: Elements[];

@@ -1,9 +1,11 @@
-import { Animations } from "./animations.js";
-import { Boxes } from "./boxes.js";
-import type { Canvas } from "./canvas.js";
-import type { Coordinate } from "./coordinate.js";
-import { Plane } from "./plane.js";
-import { Size } from "./size.js";
+import {
+    type Canvas,
+    type Coordinate,
+    Size,
+    Plane,
+    Animations,
+    Boxes,
+} from "./exports.js";
 
 export class AnimationBoxes extends Boxes {
     animationGroup: Animations[] = [];

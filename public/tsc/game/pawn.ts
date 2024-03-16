@@ -1,9 +1,10 @@
-
-import type { Canvas } from "../engine/canvas.js";
-import { Character } from "../engine/character.js";
-import { Coordinate } from "../engine/coordinate.js";
-import { Plane } from "../engine/plane.js";
-import { Size } from "../engine/size.js";
+import {
+    Canvas,
+    Coordinate,
+    Plane,
+    Size,
+    Character
+} from "../engine/exports.js";
 import type { Map } from "./map.js";
 import { UserBar } from "./userBar.js";
 

@@ -1,8 +1,10 @@
-import { Camera } from "./camera.js";
-import { Coordinate } from "./coordinate.js";
-import { Images } from "./images.js";
-import { Position } from "./position.js";
-import { Size } from "./size.js";
+import {
+  Coordinate,
+  Size,
+  Camera,
+  Images,
+  Position
+} from "./exports.js";
 
 export class Canvas extends Camera {
   onePercentage: Size = new Size;
@@ -37,11 +39,17 @@ export class Canvas extends Camera {
 
     this.element.addEventListener(
       "touchstart",
-      (event) => this.touchstartCanvas(event)
+      (event) => this.touchstartCanvas(event),
+      {
+        passive: false
+      }
     );
     this.element.addEventListener(
       "touchmove",
-      (event) => this.touchmoveCanvas(event)
+      (event) => this.touchmoveCanvas(event),
+      // {
+      //   passive: false
+      // }
     );
     this.element.addEventListener(
       "touchend",

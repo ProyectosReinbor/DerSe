@@ -1,9 +1,11 @@
-import type { Canvas } from "../canvas.js";
-import { Coordinate } from "../coordinate.js";
-import type { Keyboard } from "../keyboard.js";
-import { Lines } from "../lines.js";
-import { Rect } from "../rect.js";
-import { Size } from "../size.js";
+import {
+  type Canvas,
+  type Keyboard,
+  Coordinate,
+  Lines,
+  Rect,
+  Size
+} from "../exports.js";
 
 export class Enter extends Rect {
   triangle: Lines;

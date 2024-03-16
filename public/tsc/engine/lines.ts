@@ -1,5 +1,7 @@
-import type { Canvas } from "./canvas.js";
-import type { Coordinate } from "./coordinate.js";
+import {
+  type Canvas,
+  type Coordinate,
+} from "./exports.js";
 import { Line } from "./lines/line.js";
 
 export class Lines {

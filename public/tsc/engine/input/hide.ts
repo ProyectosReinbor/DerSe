@@ -1,10 +1,12 @@
-import type { Canvas } from "../canvas.js";
-import { Circle } from "../circle.js";
-import { Coordinate } from "../coordinate.js";
-import { Curves } from "../curves.js";
-import type { Input } from "../input.js";
-import { Rect } from "../rect.js";
-import { Size } from "../size.js";
+import {
+  type Canvas,
+  Coordinate,
+  type Input,
+  Rect,
+  Size,
+  Circle,
+  Curves
+} from "../exports.js";
 
 export class Hide extends Rect {
   value: string = "";

@@ -1,5 +1,5 @@
-import type { Canvas } from "./canvas.js";
-import { Coordinate } from "./coordinate.js";
+import { type Canvas, Coordinate } from "./exports.js";
+
 export class TouchCanvas {
   touch: null | Coordinate;
   moved: boolean;

@@ -1,8 +1,10 @@
-import { Animations } from "./animations.js";
-import type { Canvas } from "./canvas.js";
-import { Coordinate } from "./coordinate.js";
-import type { Plane } from "./plane.js";
-import type { Size } from "./size.js";
+import {
+    type Canvas,
+    Coordinate,
+    type Size,
+    type Plane,
+    Animations
+} from "./exports.js";
 
 export class Character extends Animations {
     speed: Coordinate;

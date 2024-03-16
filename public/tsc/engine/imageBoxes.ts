@@ -1,9 +1,11 @@
-import { Image } from "./image.js";
-import { Boxes } from "./boxes.js";
-import type { Canvas } from "./canvas.js";
-import { Size } from "./size.js";
-import type { Coordinate } from "./coordinate.js";
-import type { Plane } from "./plane.js";
+import {
+    type Canvas,
+    type Coordinate,
+    type Plane,
+    Size,
+    Boxes,
+    Image
+} from "./exports.js";
 
 export class ImageBoxes extends Boxes {
     images: Image[] = [];

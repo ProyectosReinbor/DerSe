@@ -1,9 +1,12 @@
-import { Elements } from "./elements.js";
 import { Animation } from "./animations/animation.js";
-import type { Coordinate } from "./coordinate.js";
-import type { Size } from "./size.js";
-import type { Canvas } from "./canvas.js";
-import type { Plane } from "./plane.js";
+
+import {
+  type Canvas,
+  type Coordinate,
+  type Size,
+  type Plane,
+  Elements,
+} from "./exports.js";
 
 export class Animations extends Elements {
   timerNextFrame: number = 0;

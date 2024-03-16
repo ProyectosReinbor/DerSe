@@ -1,20 +1,22 @@
-import type { Canvas } from "./canvas.js";
-import type { Coordinate } from "./coordinate.js";
-import { Position } from "./position.js";
-import type { Size } from "./size.js";
+import {
+  type Canvas,
+  type Coordinate,
+  Position,
+  type Size
+} from "./exports.js";
 
 export class Rect extends Position {
-  canvas:Canvas;
-  fillStyle:string;
-  strokeStyle:string;
-  lineWidth:number;
+  canvas: Canvas;
+  fillStyle: string;
+  strokeStyle: string;
+  lineWidth: number;
   constructor(
-    initial:Coordinate,
-    size:Size,
-    canvas:Canvas,
-    fillStyle:string = "",
-    strokeStyle:string = "",
-    lineWidth:number = 0,
+    initial: Coordinate,
+    size: Size,
+    canvas: Canvas,
+    fillStyle: string = "",
+    strokeStyle: string = "",
+    lineWidth: number = 0,
   ) {
     super(initial, size);
     this.canvas = canvas;

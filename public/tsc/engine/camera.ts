@@ -1,6 +1,8 @@
-import { Coordinate } from "./coordinate.js";
-import { Position } from "./position.js";
-import { Size } from "./size.js";
+import {
+    Coordinate,
+    Size,
+    Position
+} from "./exports.js";
 
 export class Camera extends Position {
     constructor(initial: Coordinate) {

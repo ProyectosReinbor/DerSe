@@ -1,6 +1,5 @@
 
-import { Canvas } from "./engine/canvas.js";
-import { Coordinate } from "./engine/coordinate.js";
+import { Canvas, Coordinate } from "./engine/exports.js";
 import { Game } from "./game/game.js";
 // import { Tiktok } from "./tiktok.js";
 window.addEventListener("load", () => {

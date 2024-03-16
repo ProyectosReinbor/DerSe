@@ -1,8 +1,10 @@
-import type { Canvas } from "../engine/canvas.js";
-import type { Coordinate } from "../engine/coordinate.js";
-import { Plane } from "../engine/plane.js";
+import {
+    Canvas,
+    Coordinate,
+    Plane
+} from "../../engine/exports.js";
 import { Grounds } from "./grounds.js";
-import type { Map } from "./map.js";
+import type { Map } from "../map.js";
 
 export class Elevations extends Grounds {
     constructor(
