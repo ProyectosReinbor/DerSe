@@ -95,8 +95,8 @@ export class Floor {
                 if (box.castle !== false) {
                     this.castles.setCastle(
                         boxes,
+                        box.castle.state,
                         box.castle.color,
-                        box.castle.state
                     );
                 }
             });

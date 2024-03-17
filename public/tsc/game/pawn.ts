@@ -1,7 +1,9 @@
 
+import { Animation } from "../engine/animations/animation.js";
 import type { Canvas } from "../engine/canvas.js";
 import { Character } from "../engine/character.js";
 import { Coordinate } from "../engine/coordinate.js";
+import { Element } from "../engine/elements/element.js";
 import { Plane } from "../engine/plane.js";
 import { Size } from "../engine/size.js";
 import type { Map } from "./map.js";
@@ -29,14 +31,11 @@ export class Pawn extends Character {
             ),
             canvas,
             `images/factions/knights/troops/pawn/${color}.png`,
-            {
-                size: new Size(192, 192),
-                plane: new Plane(6, 6),
-            },
-            {
-                frames: 6,
-                framesPerSecond: 6
-            },
+            new Element(
+                new Size(192, 192),
+                new Plane(6, 6)
+            ),
+            new Animation(6, 6),
             new Coordinate(2, 2),
         );
         this.map = map;

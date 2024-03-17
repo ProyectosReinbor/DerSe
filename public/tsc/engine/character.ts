@@ -1,7 +1,8 @@
 import { Animations } from "./animations";
+import type { Animation } from "./animations/animation";
 import type { Canvas } from "./canvas";
 import { Coordinate } from "./coordinate";
-import type { Plane } from "./plane";
+import type { Element } from "./elements/element";
 import type { Size } from "./size";
 
 export class Character extends Animations {
@@ -12,14 +13,8 @@ export class Character extends Animations {
         size: Size,
         canvas: Canvas,
         route: string,
-        elementParameters: {
-            size: Size;
-            plane: Plane;
-        },
-        animation: {
-            frames: number;
-            framesPerSecond: number;
-        },
+        element: Element,
+        animation: Animation,
         speed: Coordinate
     ) {
         super(
@@ -27,7 +22,7 @@ export class Character extends Animations {
             size,
             canvas,
             route,
-            elementParameters,
+            element,
             animation
         );
         this.speed = speed;

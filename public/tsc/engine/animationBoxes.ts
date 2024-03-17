@@ -28,7 +28,7 @@ export class AnimationBoxes extends Boxes {
         animationsDefault: Animations
     ) {
         const index = this.boxIndex(boxes);
-        if (index !== false) return index;
+        if (index !== false) return false;
         const coordinateOfBoxes = this.getCoordinateOfBoxes(boxes);
         const newAnimations = new Animations(
             coordinateOfBoxes,

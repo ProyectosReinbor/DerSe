@@ -11,7 +11,7 @@ import { Map } from "../map";
 
 export class Trees extends AnimationBoxes {
     treesDefault: {
-        quitle: Animations,
+        idle: Animations,
         motion: Animations,
         felled: Animations,
     }
@@ -27,59 +27,33 @@ export class Trees extends AnimationBoxes {
                 new Size(map.boxes.width, map.boxes.height),
                 new Plane(1, 1),
                 true,
-            ),
-            new Animations(
-                new Coordinate,
-                new Size,
-                canvas,
-                "images/terrain/ground/trees.png",
-                new Element(
-                    new Size(64, 64),
-                    new Plane
-                ),
-                new Animation(8, 8)
             )
         );
+        const TreesDefault = (
+            plane: Plane,
+            animation: Animation
+        ) => new Animations(
+            new Coordinate,
+            new Size,
+            canvas,
+            "images/terrain/ground/trees.png",
+            new Element(
+                new Size(64, 64),
+                plane
+            ),
+            animation
+        );
+
         this.treesDefault = {
-            quitle: new Animations(
-                new Coordinate,
-                new Size,
-                canvas,
-                "images/terrain/ground/trees.png",
-                new Element(
-                    new Size(64, 64),
-                    new Plane
-                ),
-                new Animation(4, 4)
-            ),
-            motion: new Animations(
-                new Coordinate,
-                new Size,
-                canvas,
-                "images/terrain/ground/trees.png",
-                new Element(
-                    new Size(64, 64),
-                    new Plane(0, 1)
-                ),
-                new Animation(2, 2)
-            ),
-            felled: new Animations(
-                new Coordinate,
-                new Size,
-                canvas,
-                "images/terrain/ground/trees.png",
-                new Element(
-                    new Size(64, 64),
-                    new Plane(0, 3)
-                ),
-                new Animation(1, 1)
-            )
+            idle: TreesDefault(new Plane, new Animation(4, 4)),
+            motion: TreesDefault(new Plane(0, 1), new Animation(2, 2)),
+            felled: TreesDefault(new Plane(0, 3), new Animation(1, 1))
         }
     }
 
     setTrees(
         boxes: Coordinate,
-        animation: "quitle" | "motion" | "felled"
+        animation: "idle" | "motion" | "felled"
     ) {
         const animations = this.treesDefault[animation];
         this.setAnimations(

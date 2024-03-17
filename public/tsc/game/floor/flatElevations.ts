@@ -28,27 +28,19 @@ export class FlatElevations extends ElementBoxes {
                 true,
             ),
         );
-        this.flatElevationsDefault = {
-            grass: new Elements(
-                new Coordinate,
-                new Size,
-                this.canvas,
-                "images/terrain/ground/flat.png",
-                new Element(
-                    new Size(64, 64),
-                    new Plane(4, 0)
-                )
-            ),
-            sand: new Elements(
-                new Coordinate,
-                new Size,
-                this.canvas,
-                "images/terrain/ground/flat.png",
-                new Element(
-                    new Size(64, 64),
-                    new Plane(9, 0)
-                )
+        const FlatElevationsDefault = (plane: Plane) => new Elements(
+            new Coordinate,
+            new Size,
+            canvas,
+            "images/terrain/ground/flat.png",
+            new Element(
+                new Size(64, 64),
+                plane
             )
+        );
+        this.flatElevationsDefault = {
+            grass: FlatElevationsDefault(new Plane(4, 0)),
+            sand: FlatElevationsDefault(new Plane(9, 0))
         };
     }
 

@@ -116,7 +116,7 @@ export class Canvas extends Camera {
     this.onePercentage.height = this.element.height / 100;
   }
 
-  getTouchCoordiante(touch: Touch) {
+  getTouchCoordinate(touch: Touch) {
     const left = this.margin.width / 2;
     const top = this.margin.height / 2;
     return new Coordinate(
@@ -129,7 +129,7 @@ export class Canvas extends Camera {
     event.preventDefault();
     for (let index = 0; index < event.changedTouches.length; index++) {
       const touch = event.changedTouches[index];
-      const coordinate = this.getTouchCoordiante(touch);
+      const coordinate = this.getTouchCoordinate(touch);
       this.touchstartScene(coordinate);
     }
   }
@@ -138,7 +138,7 @@ export class Canvas extends Camera {
     event.preventDefault();
     for (let index = 0; index < event.changedTouches.length; index++) {
       const touch = event.changedTouches[index];
-      const coordinate = this.getTouchCoordiante(touch);
+      const coordinate = this.getTouchCoordinate(touch);
       this.touchmoveScene(coordinate);
     }
   }
@@ -147,7 +147,7 @@ export class Canvas extends Camera {
     event.preventDefault();
     for (let index = 0; index < event.changedTouches.length; index++) {
       const touch = event.changedTouches[index];
-      const coordinate = this.getTouchCoordiante(touch);
+      const coordinate = this.getTouchCoordinate(touch);
       this.touchendScene(coordinate);
     }
   }

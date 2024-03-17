@@ -1,12 +1,14 @@
 
 import type { Canvas } from "../../engine/canvas.js";
-import type { Coordinate } from "../../engine/coordinate.js";
+import { Coordinate } from "../../engine/coordinate.js";
+import { Image } from "../../engine/image.js";
 import { ImageBoxes } from "../../engine/imageBoxes.js";
 import { Plane } from "../../engine/plane.js";
 import { Size } from "../../engine/size.js";
 import type { Map } from "../map.js";
 
 export class Shadows extends ImageBoxes {
+    imageDefault: Image;
     constructor(
         canvas: Canvas,
         map: Map
@@ -25,18 +27,23 @@ export class Shadows extends ImageBoxes {
                 ]
             }
         );
+        this.imageDefault = new Image(
+            new Coordinate,
+            new Size,
+            this.canvas,
+            "images/terrain/ground/shadows.png",
+        );
     }
 
     setShadow(boxes: Coordinate) {
-        const route = "images/terrain/ground/shadows.png";
         const index = this.setImage(
             boxes,
-            route
+            this.imageDefault
         );
         if (index === false) return false;
         const shadow = this.images[index];
-        shadow.initial.x -= this.boxParameters.size.width;
-        shadow.initial.y -= this.boxParameters.size.height;
+        shadow.initial.x -= this.boxDefault.size.width;
+        shadow.initial.y -= this.boxDefault.size.height;
     }
 
     async drawShadows() {

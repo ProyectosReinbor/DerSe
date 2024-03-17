@@ -4,44 +4,53 @@ import { Coordinate } from "../../engine/coordinate.js";
 import { Plane } from "../../engine/plane.js";
 import { Grounds } from "./grounds.js";
 import type { Map } from "../map.js";
+import { Size } from "../../engine/size.js";
+import { Elements } from "../../engine/elements.js";
+import { Element } from "../../engine/elements/element.js";
 
 export class FlatsSand extends Grounds {
     constructor(
         canvas: Canvas,
         map: Map,
     ) {
+        const GroundsDefault = (plane: Plane) => new Elements(
+            new Coordinate,
+            new Size,
+            canvas,
+            "images/terrain/ground/flat.png",
+            new Element(
+                new Size(64, 64),
+                plane
+            )
+        );
         super(
             map.initial.x,
             map.initial.y,
             canvas,
             map,
             {
-                leftUp: new Plane(5, 0),
-                up: new Plane(6, 0),
-                rightUp: new Plane(7, 0),
-                left: new Plane(5, 1),
-                center: new Plane(6, 1),
-                right: new Plane(7, 1),
-                leftDown: new Plane(5, 2),
-                down: new Plane(6, 2),
-                rightDown: new Plane(7, 2),
-                horizontalLeft: new Plane(5, 3),
-                horizontalCenter: new Plane(6, 3),
-                horizontalRight: new Plane(7, 3),
-                verticalUp: new Plane(8, 0),
-                verticalCenter: new Plane(8, 1),
-                verticalDown: new Plane(8, 2),
-                only: new Plane(8, 3)
+                leftUp: GroundsDefault(new Plane(5, 0)),
+                up: GroundsDefault(new Plane(6, 0)),
+                rightUp: GroundsDefault(new Plane(7, 0)),
+                left: GroundsDefault(new Plane(5, 1)),
+                center: GroundsDefault(new Plane(6, 1)),
+                right: GroundsDefault(new Plane(7, 1)),
+                leftDown: GroundsDefault(new Plane(5, 2)),
+                down: GroundsDefault(new Plane(6, 2)),
+                rightDown: GroundsDefault(new Plane(7, 2)),
+                horizontalLeft: GroundsDefault(new Plane(5, 3)),
+                horizontalCenter: GroundsDefault(new Plane(6, 3)),
+                horizontalRight: GroundsDefault(new Plane(7, 3)),
+                verticalUp: GroundsDefault(new Plane(8, 0)),
+                verticalCenter: GroundsDefault(new Plane(8, 1)),
+                verticalDown: GroundsDefault(new Plane(8, 2)),
+                only: GroundsDefault(new Plane(8, 3))
             }
         );
     }
 
     setFlatSand(boxes: Coordinate) {
-        const route = `images/terrain/ground/flat.png`;
-        this.setGround(
-            boxes,
-            route
-        );
+        this.setGround(boxes);
     }
 
     async drawFlatsSand() {

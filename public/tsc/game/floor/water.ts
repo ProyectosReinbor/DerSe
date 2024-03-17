@@ -4,8 +4,10 @@ import { Plane } from "../../engine/plane.js";
 import { Size } from "../../engine/size.js";
 import { Coordinate } from "../../engine/coordinate.js";
 import type { Map } from "../map.js";
+import { Image } from "../../engine/image.js";
 
 export class Water extends ImageBoxes {
+    imageDefault: Image;
     constructor(
         canvas: Canvas,
         map: Map
@@ -20,13 +22,18 @@ export class Water extends ImageBoxes {
                 occupiedBoxes: true
             }
         );
+        this.imageDefault = new Image(
+            new Coordinate,
+            new Size,
+            this.canvas,
+            "images/terrain/water/water.png",
+        );
     }
 
     setWater(boxes: Coordinate) {
-        const route = "images/terrain/water/water.png";
         this.setImage(
             boxes,
-            route
+            this.imageDefault
         );
     }
 

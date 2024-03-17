@@ -9,7 +9,16 @@ import { Size } from "../../engine/size.js";
 import type { Map } from "../map.js";
 
 export class Castles extends ImageBoxes {
-
+    castlesDefault: {
+        ready: {
+            blue: Image;
+            purple: Image;
+            red: Image;
+            yellow: Image;
+        };
+        construction: Image;
+        destroyed: Image;
+    }
     constructor(
         canvas: Canvas,
         map: Map
@@ -24,32 +33,46 @@ export class Castles extends ImageBoxes {
                 true
             ),
         );
+        const CastlesDefault = (
+            state: "construction" | "ready" | "destroyed",
+            color: "blue" | "purple" | "red" | "yellow" = "blue",
+        ) => {
+            let file: string = state;
+            if (state === "ready") file = color;
+            return new Image(
+                new Coordinate,
+                new Size,
+                this.canvas,
+                `images/factions/knights/buildings/castle/${file}.png`,
+            );
+        }
+        this.castlesDefault = {
+            ready: {
+                blue: CastlesDefault("ready", "blue"),
+                purple: CastlesDefault("ready", "purple"),
+                red: CastlesDefault("ready", "red"),
+                yellow: CastlesDefault("ready", "yellow"),
+            },
+            construction: CastlesDefault("construction"),
+            destroyed: CastlesDefault("destroyed")
+        }
     }
 
     setCastle(
         boxes: Coordinate,
-        color: "blue" | "purple" | "red" | "yellow",
         state: "construction" | "ready" | "destroyed",
+        color: "blue" | "purple" | "red" | "yellow",
     ) {
+        let imageDefault = this.castlesDefault.ready[color];
+        if (state !== "ready") {
+            imageDefault = this.castlesDefault[state];
+        }
         return this.setImage(
             boxes,
-            new Image(
-                new Coordinate,
-                new Size,
-                this.canvas,
-                this.routeCastle(color, state)
-            )
+            imageDefault
         );
     }
 
-    routeCastle(
-        color: "blue" | "purple" | "red" | "yellow",
-        state: "construction" | "ready" | "destroyed",
-    ) {
-        let file: string = state;
-        if (state === "ready") file = color;
-        return `images/factions/knights/buildings/castle/${file}.png`;
-    }
 
     async drawCastles() {
         await this.drawImages();

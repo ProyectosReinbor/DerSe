@@ -1,19 +1,20 @@
 
+import { Box } from "../../engine/box.js";
 import type { Canvas } from "../../engine/canvas.js";
 import { Coordinate } from "../../engine/coordinate.js";
 import { ElementBoxes } from "../../engine/elementBoxes.js";
+import { Elements } from "../../engine/elements.js";
+import { Element } from "../../engine/elements/element.js";
 import { Plane } from "../../engine/plane.js";
 import { Size } from "../../engine/size.js";
 import type { Map } from "../map.js";
 
 export class StairsElevations extends ElementBoxes {
-    stairsElevationsParameters: {
-        element: {
-            left: Plane;
-            center: Plane;
-            right: Plane;
-            only: Plane;
-        }
+    stairsElevationsDefault: {
+        left: Elements;
+        center: Elements;
+        right: Elements;
+        only: Elements;
     };
     constructor(
         canvas: Canvas,
@@ -23,24 +24,27 @@ export class StairsElevations extends ElementBoxes {
             map.initial.x,
             map.initial.y,
             canvas,
-            {
-                size: new Size(map.boxes.width, map.boxes.height),
-                length: new Plane(1, 1),
-                occupiedBoxes: true,
-            },
-            {
-                element: {
-                    size: new Size(64, 64),
-                }
-            }
+            new Box(
+                new Size(map.boxes.width, map.boxes.height),
+                new Plane(1, 1),
+                true,
+            )
         );
-        this.stairsElevationsParameters = {
-            element: {
-                left: new Plane(0, 7),
-                center: new Plane(1, 7),
-                right: new Plane(2, 7),
-                only: new Plane(3, 7)
-            }
+        const StairsElevationsDefault = (plane: Plane) => new Elements(
+            new Coordinate,
+            new Size,
+            canvas,
+            "images/terrain/ground/elevation.png",
+            new Element(
+                new Size(64, 64),
+                plane
+            )
+        );
+        this.stairsElevationsDefault = {
+            left: StairsElevationsDefault(new Plane(0, 7)),
+            center: StairsElevationsDefault(new Plane(1, 7)),
+            right: StairsElevationsDefault(new Plane(2, 7)),
+            only: StairsElevationsDefault(new Plane(3, 7))
         };
     }
 
@@ -58,16 +62,16 @@ export class StairsElevations extends ElementBoxes {
         const right = this.boxIndex(rightBoxes) !== false;
 
         const isLeft = !left && right;
-        if (isLeft) return this.stairsElevationsParameters.element.left;
+        if (isLeft) return this.stairsElevationsDefault.left;
 
         const isCenter = left && right;
-        if (isCenter) return this.stairsElevationsParameters.element.center;
+        if (isCenter) return this.stairsElevationsDefault.center;
 
         const isRight = left && !right;
-        if (isRight) return this.stairsElevationsParameters.element.right;
+        if (isRight) return this.stairsElevationsDefault.right;
 
         const isOnly = !left && !right;
-        if (isOnly) return this.stairsElevationsParameters.element.only;
+        if (isOnly) return this.stairsElevationsDefault.only;
 
         throw new Error("invalid element");
     }
@@ -75,23 +79,17 @@ export class StairsElevations extends ElementBoxes {
     refreshElements() {
         this.groupElements.forEach(elements => {
             const boxes = this.getBoxesOfCoordinate(elements.initial);
-            const element = this.getElementFromBox(boxes);
-            elements.element.horizontal = element.horizontal;
-            elements.element.vertical = element.vertical;
+            const elementsDefault = this.getElementFromBox(boxes);
+            elements.element.horizontal = elementsDefault.element.horizontal;
+            elements.element.vertical = elementsDefault.element.vertical;
         });
     }
 
     setStairsElevations(boxes: Coordinate) {
-        const element = this.getElementFromBox(boxes);
-        const route = `images/terrain/ground/elevation.png`;
+        const elementsDefault = this.getElementFromBox(boxes);
         this.setElements(
             boxes,
-            route,
-            {
-                element: {
-                    plane: element
-                }
-            }
+            elementsDefault
         );
         this.refreshElements();
     }
