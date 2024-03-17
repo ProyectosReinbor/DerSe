@@ -10,6 +10,7 @@ class Coordinate {
     return this.x === coordinate.x && this.y === coordinate.y;
   }
 }
+
 // public/tsc/engine/size.ts
 class Size {
   width;
@@ -19,22 +20,14 @@ class Size {
     this.height = height;
   }
 }
-// public/tsc/engine/plane.ts
-class Plane {
-  horizontal;
-  vertical;
-  constructor(horizontal = 0, vertical = 0) {
-    this.horizontal = horizontal;
-    this.vertical = vertical;
-  }
-}
+
 // public/tsc/engine/position.ts
 class Position {
   initial;
   size;
-  constructor(initial, size) {
+  constructor(initial, size2) {
     this.initial = initial;
-    this.size = size;
+    this.size = size2;
   }
   get end() {
     return new Coordinate(this.initial.x + this.size.width, this.initial.y + this.size.height);
@@ -46,30 +39,32 @@ class Position {
     return this.initial.x <= position.initial.x && this.initial.y <= position.initial.y && this.end.x >= position.end.x && this.end.y >= position.end.y;
   }
 }
+
 // public/tsc/engine/camera.ts
 class Camera extends Position {
   constructor(initial) {
     super(initial, new Size(100, 100));
   }
-  insideCamera(position) {
-    const vision = new Position(new Coordinate(this.initial.x - position.size.width, this.initial.y - position.size.height), new Size(this.size.width + position.size.width * 2, this.size.height + position.size.height * 2));
-    return vision.inside(position);
+  insideCamera(position2) {
+    const vision = new Position(new Coordinate(this.initial.x - position2.size.width, this.initial.y - position2.size.height), new Size(this.size.width + position2.size.width * 2, this.size.height + position2.size.height * 2));
+    return vision.inside(position2);
   }
-  positionOnCamera(position) {
-    const appearsInCamera = this.insideCamera(position);
+  positionOnCamera(position2) {
+    const appearsInCamera = this.insideCamera(position2);
     if (appearsInCamera === false)
       return false;
-    return new Position(new Coordinate(position.initial.x - this.initial.x, position.initial.y - this.initial.y), new Size(position.size.width, position.size.height));
+    return new Position(new Coordinate(position2.initial.x - this.initial.x, position2.initial.y - this.initial.y), new Size(position2.size.width, position2.size.height));
   }
-  focusPosition(position) {
-    let x = position.initial.x - this.size.width / 2;
-    x += position.size.width / 2;
-    let y = position.initial.y - this.size.height / 2;
-    y += position.size.height / 2;
+  focusPosition(position2) {
+    let x = position2.initial.x - this.size.width / 2;
+    x += position2.size.width / 2;
+    let y = position2.initial.y - this.size.height / 2;
+    y += position2.size.height / 2;
     this.initial.x = x;
     this.initial.y = y;
   }
 }
+
 // public/tsc/engine/images.ts
 class Images {
   images;
@@ -90,6 +85,7 @@ class Images {
     });
   }
 }
+
 // public/tsc/engine/canvas.ts
 class Canvas extends Camera {
   onePercentage = new Size;
@@ -172,28 +168,28 @@ class Canvas extends Camera {
     event.preventDefault();
     for (let index = 0;index < event.changedTouches.length; index++) {
       const touch = event.changedTouches[index];
-      const coordinate = this.getTouchCoordiante(touch);
-      this.touchstartScene(coordinate);
+      const coordinate4 = this.getTouchCoordiante(touch);
+      this.touchstartScene(coordinate4);
     }
   }
   touchmoveCanvas(event) {
     event.preventDefault();
     for (let index = 0;index < event.changedTouches.length; index++) {
       const touch = event.changedTouches[index];
-      const coordinate = this.getTouchCoordiante(touch);
-      this.touchmoveScene(coordinate);
+      const coordinate4 = this.getTouchCoordiante(touch);
+      this.touchmoveScene(coordinate4);
     }
   }
   touchendCanvas(event) {
     event.preventDefault();
     for (let index = 0;index < event.changedTouches.length; index++) {
       const touch = event.changedTouches[index];
-      const coordinate = this.getTouchCoordiante(touch);
-      this.touchendScene(coordinate);
+      const coordinate4 = this.getTouchCoordiante(touch);
+      this.touchendScene(coordinate4);
     }
   }
-  positionOnCanvas(position) {
-    const positionOnCamera = this.positionOnCamera(position);
+  positionOnCanvas(position3) {
+    const positionOnCamera = this.positionOnCamera(position3);
     if (positionOnCamera === false)
       return false;
     return new Position(new Coordinate(this.getWidthPixels(positionOnCamera.initial.x), this.getHeightPixels(positionOnCamera.initial.y)), new Size(this.getWidthPixels(positionOnCamera.size.width), this.getHeightPixels(positionOnCamera.size.height)));
@@ -211,98 +207,7 @@ class Canvas extends Camera {
     return percentage * this.onePercentage.height;
   }
 }
-// public/tsc/engine/text.ts
-class Text extends Position {
-  canvas;
-  value;
-  fillStyle;
-  strokeStyle;
-  dungeonFont;
-  constructor(initial, size, canvas, value = "", fillStyle = "", strokeStyle = "", dungeonFont = false) {
-    super(initial, size);
-    this.canvas = canvas;
-    this.value = value;
-    this.fillStyle = fillStyle;
-    this.strokeStyle = strokeStyle;
-    this.dungeonFont = dungeonFont;
-  }
-  get font() {
-    let font = `${this.size.height}px`;
-    if (this.dungeonFont === true)
-      font.concat(" Dungeon,");
-    return font.concat("sans - serif, arial");
-  }
-  drawText() {
-    if (this.value.length === 0)
-      return;
-    const positionOnCanvas = this.canvas.positionOnCanvas(this);
-    if (positionOnCanvas === false)
-      return;
-    this.canvas.context.font = this.font;
-    this.canvas.context.textAlign = "left";
-    this.canvas.context.textBaseline = "top";
-    positionOnCanvas.size.width = this.canvas.context.measureText(this.value).width;
-    positionOnCanvas.initial.x += this.size.width / 2;
-    positionOnCanvas.initial.x -= positionOnCanvas.size.width / 2;
-    if (this.fillStyle.length > 0) {
-      this.canvas.context.fillStyle = this.fillStyle;
-      this.canvas.context.fillText(this.value, positionOnCanvas.initial.x, positionOnCanvas.initial.y);
-    }
-    if (this.strokeStyle.length > 0) {
-      this.canvas.context.strokeStyle = this.strokeStyle;
-      this.canvas.context.strokeText(this.value, positionOnCanvas.initial.x, positionOnCanvas.initial.y);
-    }
-  }
-}
-// public/tsc/engine/rect.ts
-class Rect extends Position {
-  canvas;
-  fillStyle;
-  strokeStyle;
-  lineWidth;
-  constructor(initial, size, canvas, fillStyle = "", strokeStyle = "", lineWidth = 0) {
-    super(initial, size);
-    this.canvas = canvas;
-    this.fillStyle = fillStyle;
-    this.strokeStyle = strokeStyle;
-    this.lineWidth = lineWidth;
-  }
-  drawRect() {
-    const positionOnCanvas = this.canvas.positionOnCanvas(this);
-    if (positionOnCanvas === false)
-      return;
-    if (this.fillStyle.length > 0) {
-      this.canvas.context.fillStyle = this.fillStyle;
-      this.canvas.context.fillRect(positionOnCanvas.initial.x, positionOnCanvas.initial.y, positionOnCanvas.size.width, positionOnCanvas.size.height);
-    }
-    if (this.strokeStyle.length > 0) {
-      this.canvas.context.lineWidth = this.lineWidth;
-      this.canvas.context.strokeStyle = this.strokeStyle;
-      this.canvas.context.strokeRect(positionOnCanvas.initial.x, positionOnCanvas.initial.y, positionOnCanvas.size.width, positionOnCanvas.size.height);
-    }
-  }
-}
-// public/tsc/engine/image.ts
-class Image2 extends Position {
-  canvas;
-  route;
-  constructor(initial, size, canvas, route) {
-    super(initial, size);
-    this.canvas = canvas;
-    this.route = route;
-  }
-  async image() {
-    return await this.canvas.images.get(this.route);
-  }
-  async drawImage() {
-    const image = await this.image();
-    const positionOnCanvas = this.canvas.positionOnCanvas(this);
-    if (positionOnCanvas === false)
-      return;
-    this.canvas.context.imageSmoothingEnabled = false;
-    this.canvas.context.drawImage(image, positionOnCanvas.initial.x, positionOnCanvas.initial.y, positionOnCanvas.size.width, positionOnCanvas.size.height);
-  }
-}
+
 // public/tsc/engine/scene.ts
 class Scene {
   canvas;
@@ -321,80 +226,7 @@ class Scene {
     this.canvas.start(() => this.draw(), (touch) => this.touchstart(touch), (touch) => this.touchmove(touch), (touch) => this.touchend(touch));
   }
 }
-// public/tsc/engine/elements/element.ts
-class Element extends Position {
-  constructor(size, plane) {
-    super(new Coordinate, size);
-    this.horizontal = plane.horizontal;
-    this.vertical = plane.vertical;
-  }
-  set horizontal(horizontal) {
-    this.initial.x = this.size.width * horizontal;
-  }
-  get horizontal() {
-    return this.initial.x / this.size.width;
-  }
-  set vertical(vertical) {
-    this.initial.y = this.size.height * vertical;
-  }
-  get vertical() {
-    return this.initial.y / this.size.height;
-  }
-  nextFrame(frames) {
-    this.horizontal++;
-    if (this.horizontal >= frames)
-      this.horizontal = 0;
-  }
-}
 
-// public/tsc/engine/elements.ts
-class Elements extends Image2 {
-  element;
-  constructor(initial, size, canvas, route, elementParameters) {
-    super(initial, size, canvas, route);
-    this.element = new Element(elementParameters.size, elementParameters.plane);
-  }
-  async drawElement() {
-    const image = await this.image();
-    const positionOnCanvas = this.canvas.positionOnCanvas(this);
-    if (positionOnCanvas === false)
-      return;
-    this.canvas.context.imageSmoothingEnabled = false;
-    this.canvas.context.drawImage(image, this.element.initial.x, this.element.initial.y, this.element.size.width, this.element.size.height, positionOnCanvas.initial.x, positionOnCanvas.initial.y, positionOnCanvas.size.width, positionOnCanvas.size.height);
-  }
-}
-// public/tsc/engine/animations/animation.ts
-class Animation {
-  frames;
-  framesPerSecond;
-  intervalBetweenFrame;
-  constructor(frames, framesPerSecond) {
-    this.frames = frames;
-    this.framesPerSecond = framesPerSecond;
-    this.intervalBetweenFrame = 1000 / this.framesPerSecond;
-  }
-}
-
-// public/tsc/engine/animations.ts
-class Animations extends Elements {
-  timerNextFrame = 0;
-  animation;
-  constructor(initial, size, canvas, route, elementParameters, animation2) {
-    super(initial, size, canvas, route, elementParameters);
-    this.animation = new Animation(animation2.frames, animation2.framesPerSecond);
-  }
-  nextFrame() {
-    this.timerNextFrame += this.canvas.timeBetweenFrames;
-    if (this.timerNextFrame < this.animation.intervalBetweenFrame)
-      return;
-    this.timerNextFrame = 0;
-    this.element.nextFrame(this.animation.frames);
-  }
-  async drawAnimation() {
-    this.nextFrame();
-    await this.drawElement();
-  }
-}
 // public/tsc/engine/boxes.ts
 class Boxes extends Coordinate {
   boxes = [];
@@ -405,9 +237,9 @@ class Boxes extends Coordinate {
     this.canvas = canvas;
     this.boxParameters = boxParameters;
   }
-  getBoxesOfCoordinate(coordinate) {
-    const boxX = Math.floor(coordinate.x / this.boxParameters.size.width);
-    const boxY = Math.floor(coordinate.y / this.boxParameters.size.height);
+  getBoxesOfCoordinate(coordinate5) {
+    const boxX = Math.floor(coordinate5.x / this.boxParameters.size.width);
+    const boxY = Math.floor(coordinate5.y / this.boxParameters.size.height);
     return new Coordinate(boxX, boxY);
   }
   getCoordinateOfBoxes(boxes) {
@@ -448,6 +280,157 @@ class Boxes extends Coordinate {
     });
   }
 }
+
+// public/tsc/engine/image.ts
+class Image2 extends Position {
+  canvas;
+  route;
+  constructor(initial, size4, canvas, route) {
+    super(initial, size4);
+    this.canvas = canvas;
+    this.route = route;
+  }
+  async image() {
+    return await this.canvas.images.get(this.route);
+  }
+  async drawImage() {
+    const image = await this.image();
+    const positionOnCanvas = this.canvas.positionOnCanvas(this);
+    if (positionOnCanvas === false)
+      return;
+    this.canvas.context.imageSmoothingEnabled = false;
+    this.canvas.context.drawImage(image, positionOnCanvas.initial.x, positionOnCanvas.initial.y, positionOnCanvas.size.width, positionOnCanvas.size.height);
+  }
+}
+
+// public/tsc/engine/imageBoxes.ts
+class ImageBoxes extends Boxes {
+  images = [];
+  constructor(x, y, canvas, boxesParameters) {
+    super(x, y, canvas, boxesParameters);
+  }
+  setImage(boxes2, route) {
+    const index = this.boxIndex(boxes2);
+    if (index !== false)
+      return false;
+    const coordinateOfBoxes = this.getCoordinateOfBoxes(boxes2);
+    const newImage = new Image2(new Coordinate(coordinateOfBoxes.x, coordinateOfBoxes.y), new Size(this.boxParameters.size.width * this.boxParameters.length.horizontal, this.boxParameters.size.height * this.boxParameters.length.vertical), this.canvas, route);
+    this.images.push(newImage);
+    const newIndex = this.images.length - 1;
+    this.setBoxIndex(newIndex, boxes2);
+    return newIndex;
+  }
+  async drawImages() {
+    for (const image2 of this.images) {
+      await image2.drawImage();
+    }
+  }
+}
+
+// public/tsc/engine/plane.ts
+class Plane {
+  horizontal;
+  vertical;
+  constructor(horizontal = 0, vertical = 0) {
+    this.horizontal = horizontal;
+    this.vertical = vertical;
+  }
+}
+
+// public/tsc/game/floor/water.ts
+class Water extends ImageBoxes {
+  constructor(canvas, map) {
+    super(map.initial.x, map.initial.y, canvas, {
+      size: new Size(map.boxes.width, map.boxes.height),
+      length: new Plane(1, 1),
+      occupiedBoxes: true
+    });
+  }
+  setWater(boxes2) {
+    const route = "images/terrain/water/water.png";
+    this.setImage(boxes2, route);
+  }
+  async drawWaters() {
+    await this.drawImages();
+  }
+}
+
+// public/tsc/engine/animations/animation.ts
+class Animation {
+  frames;
+  framesPerSecond;
+  intervalBetweenFrame;
+  constructor(frames, framesPerSecond) {
+    this.frames = frames;
+    this.framesPerSecond = framesPerSecond;
+    this.intervalBetweenFrame = 1000 / this.framesPerSecond;
+  }
+}
+
+// public/tsc/engine/elements/element.ts
+class Element extends Position {
+  constructor(size6, plane2) {
+    super(new Coordinate, size6);
+    this.horizontal = plane2.horizontal;
+    this.vertical = plane2.vertical;
+  }
+  set horizontal(horizontal) {
+    this.initial.x = this.size.width * horizontal;
+  }
+  get horizontal() {
+    return this.initial.x / this.size.width;
+  }
+  set vertical(vertical) {
+    this.initial.y = this.size.height * vertical;
+  }
+  get vertical() {
+    return this.initial.y / this.size.height;
+  }
+  nextFrame(frames) {
+    this.horizontal++;
+    if (this.horizontal >= frames)
+      this.horizontal = 0;
+  }
+}
+
+// public/tsc/engine/elements.ts
+class Elements extends Image2 {
+  element;
+  constructor(initial, size6, canvas, route, elementParameters) {
+    super(initial, size6, canvas, route);
+    this.element = new Element(elementParameters.size, elementParameters.plane);
+  }
+  async drawElement() {
+    const image3 = await this.image();
+    const positionOnCanvas = this.canvas.positionOnCanvas(this);
+    if (positionOnCanvas === false)
+      return;
+    this.canvas.context.imageSmoothingEnabled = false;
+    this.canvas.context.drawImage(image3, this.element.initial.x, this.element.initial.y, this.element.size.width, this.element.size.height, positionOnCanvas.initial.x, positionOnCanvas.initial.y, positionOnCanvas.size.width, positionOnCanvas.size.height);
+  }
+}
+
+// public/tsc/engine/animations.ts
+class Animations extends Elements {
+  timerNextFrame = 0;
+  animation;
+  constructor(initial, size6, canvas, route, elementParameters, animation2) {
+    super(initial, size6, canvas, route, elementParameters);
+    this.animation = new Animation(animation2.frames, animation2.framesPerSecond);
+  }
+  nextFrame() {
+    this.timerNextFrame += this.canvas.timeBetweenFrames;
+    if (this.timerNextFrame < this.animation.intervalBetweenFrame)
+      return;
+    this.timerNextFrame = 0;
+    this.element.nextFrame(this.animation.frames);
+  }
+  async drawAnimation() {
+    this.nextFrame();
+    await this.drawElement();
+  }
+}
+
 // public/tsc/engine/animationBoxes.ts
 class AnimationBoxes extends Boxes {
   animationGroup = [];
@@ -456,54 +439,60 @@ class AnimationBoxes extends Boxes {
     super(x, y, canvas, boxesParameters);
     this.animationsParameters = animationsParameters;
   }
-  setAnimations(boxes, route, plane) {
-    const index = this.boxIndex(boxes);
+  setAnimations(boxes3, route, plane3) {
+    const index = this.boxIndex(boxes3);
     if (index !== false)
       return index;
-    const coordinateOfBoxes = this.getCoordinateOfBoxes(boxes);
+    const coordinateOfBoxes = this.getCoordinateOfBoxes(boxes3);
     const newAnimations = new Animations(coordinateOfBoxes, new Size(this.boxParameters.size.width * this.boxParameters.length.horizontal, this.boxParameters.size.height * this.boxParameters.length.vertical), this.canvas, route, {
       size: this.animationsParameters.element.size,
-      plane: new Plane(0, plane.vertical)
+      plane: new Plane(0, plane3.vertical)
     }, this.animationsParameters.animation);
     this.animationGroup.push(newAnimations);
     const newIndex = this.animationGroup.length - 1;
-    this.setBoxIndex(newIndex, boxes);
+    this.setBoxIndex(newIndex, boxes3);
     return newIndex;
   }
   async drawAnimations() {
-    for (const animations of this.animationGroup) {
-      await animations.drawAnimation();
+    for (const animations2 of this.animationGroup) {
+      await animations2.drawAnimation();
     }
   }
 }
-// public/tsc/engine/character.ts
-class Character extends Animations {
-  speed;
-  address;
-  constructor(initial, size, canvas, route, elementParameters, animation2, speed) {
-    super(initial, size, canvas, route, elementParameters, animation2);
-    this.speed = speed;
-    this.address = new Coordinate;
+
+// public/tsc/game/floor/foams.ts
+class Foams extends AnimationBoxes {
+  constructor(canvas, map) {
+    super(map.initial.x, map.initial.y, canvas, {
+      size: new Size(map.boxes.width, map.boxes.height),
+      length: new Plane(3, 3),
+      occupiedBoxes: [
+        [true, false, false],
+        [false, false, false],
+        [false, false, false]
+      ]
+    }, {
+      element: {
+        size: new Size(192, 192)
+      },
+      animation: {
+        frames: 8,
+        framesPerSecond: 8
+      }
+    });
   }
-  move() {
-    if (this.address.equals(new Coordinate))
-      return false;
-    const secondsBetweenFrames = this.canvas.timeBetweenFrames / 1000;
-    const speedX = this.speed.x * secondsBetweenFrames;
-    const speedY = this.speed.y * secondsBetweenFrames;
-    const distanceX = speedX * this.address.x;
-    const distanceY = speedY * this.address.y;
-    const newX = this.initial.x + distanceX;
-    const newY = this.initial.y + distanceY;
-    this.initial.x = newX;
-    this.initial.y = newY;
-    return true;
+  setFoam(boxes3) {
+    const route = `images/terrain/water/foam.png`;
+    const index = this.setAnimations(boxes3, route, new Plane);
+    const foam = this.animationGroup[index];
+    foam.initial.x -= this.boxParameters.size.width;
+    foam.initial.y -= this.boxParameters.size.height;
   }
-  async drawCharacter() {
-    this.move();
-    await this.drawAnimation();
+  async drawFoams() {
+    await this.drawAnimations();
   }
 }
+
 // public/tsc/engine/elementBoxes.ts
 class ElementBoxes extends Boxes {
   groupElements;
@@ -513,72 +502,27 @@ class ElementBoxes extends Boxes {
     this.groupElements = [];
     this.elementsParameters = elementsParameters;
   }
-  setElements(boxes, route, elementsParameters) {
-    const index = this.boxIndex(boxes);
+  setElements(boxes4, route, elementsParameters) {
+    const index = this.boxIndex(boxes4);
     if (index !== false)
       return index;
-    const coordinateOfBoxes = this.getCoordinateOfBoxes(boxes);
+    const coordinateOfBoxes = this.getCoordinateOfBoxes(boxes4);
     const newElements = new Elements(coordinateOfBoxes, new Size(this.boxParameters.size.width * this.boxParameters.length.horizontal, this.boxParameters.size.height * this.boxParameters.length.vertical), this.canvas, route, {
       size: this.elementsParameters.element.size,
       plane: elementsParameters.element.plane
     });
     this.groupElements.push(newElements);
     const newIndex = this.groupElements.length - 1;
-    this.setBoxIndex(newIndex, boxes);
+    this.setBoxIndex(newIndex, boxes4);
     return newIndex;
   }
   async drawElements() {
-    for (const elements of this.groupElements) {
-      await elements.drawElement();
+    for (const elements3 of this.groupElements) {
+      await elements3.drawElement();
     }
   }
 }
-// public/tsc/engine/imageBoxes.ts
-class ImageBoxes extends Boxes {
-  images = [];
-  constructor(x, y, canvas, boxesParameters) {
-    super(x, y, canvas, boxesParameters);
-  }
-  setImage(boxes, route) {
-    const index = this.boxIndex(boxes);
-    if (index !== false)
-      return index;
-    const coordinateOfBoxes = this.getCoordinateOfBoxes(boxes);
-    const newImage = new Image2(coordinateOfBoxes, new Size(this.boxParameters.size.width * this.boxParameters.length.horizontal, this.boxParameters.size.height * this.boxParameters.length.vertical), this.canvas, route);
-    this.images.push(newImage);
-    const newIndex = this.images.length - 1;
-    this.setBoxIndex(newIndex, boxes);
-    return newIndex;
-  }
-  async drawImages() {
-    for (const image of this.images) {
-      await image.drawImage();
-    }
-  }
-}
-// public/tsc/game/floor/castles.ts
-class Castles extends ImageBoxes {
-  constructor(x, y, canvas, map) {
-    super(x, y, canvas, {
-      size: new Size(map.boxes.width, map.boxes.height),
-      length: new Plane(4, 3),
-      occupiedBoxes: true
-    });
-  }
-  setCastle(boxes, color, state) {
-    const route = this.routeCastle(color, state);
-    return this.setImage(boxes, route);
-  }
-  routeCastle(color, state) {
-    let file = state;
-    if (state === "ready")
-      file = color;
-    return `images/factions/knights/buildings/castle/${file}.png`;
-  }
-  async drawCastles() {
-    await this.drawImages();
-  }
-}
+
 // public/tsc/game/floor/grounds.ts
 class Grounds extends ElementBoxes {
   elementPlanes;
@@ -594,8 +538,8 @@ class Grounds extends ElementBoxes {
     });
     this.elementPlanes = elementPlanes;
   }
-  setGround(boxes, route) {
-    this.setElements(boxes, route, {
+  setGround(boxes4, route) {
+    this.setElements(boxes4, route, {
       element: {
         plane: new Plane(this.elementPlanes.only.horizontal, this.elementPlanes.only.vertical)
       }
@@ -603,18 +547,18 @@ class Grounds extends ElementBoxes {
     this.refreshElements();
   }
   refreshElements() {
-    this.groupElements.forEach((elements) => {
-      const boxes = this.getBoxesOfCoordinate(elements.initial);
-      const element2 = this.getElementsFactoryOfBoxes(boxes);
-      elements.element.horizontal = element2.horizontal;
-      elements.element.vertical = element2.vertical;
+    this.groupElements.forEach((elements3) => {
+      const boxes4 = this.getBoxesOfCoordinate(elements3.initial);
+      const element2 = this.getElementsFactoryOfBoxes(boxes4);
+      elements3.element.horizontal = element2.horizontal;
+      elements3.element.vertical = element2.vertical;
     });
   }
-  getElementsFactoryOfBoxes(boxes) {
-    const leftBoxes = new Coordinate(boxes.x - 1, boxes.y);
-    const rightBoxes = new Coordinate(boxes.x + 1, boxes.y);
-    const upBoxes = new Coordinate(boxes.x, boxes.y - 1);
-    const downBoxes = new Coordinate(boxes.x, boxes.y + 1);
+  getElementsFactoryOfBoxes(boxes4) {
+    const leftBoxes = new Coordinate(boxes4.x - 1, boxes4.y);
+    const rightBoxes = new Coordinate(boxes4.x + 1, boxes4.y);
+    const upBoxes = new Coordinate(boxes4.x, boxes4.y - 1);
+    const downBoxes = new Coordinate(boxes4.x, boxes4.y + 1);
     const left = this.boxIndex(leftBoxes) !== false;
     const right = this.boxIndex(rightBoxes) !== false;
     const up = this.boxIndex(upBoxes) !== false;
@@ -671,101 +615,10 @@ class Grounds extends ElementBoxes {
   }
 }
 
-// public/tsc/game/floor/elevations.ts
-class Elevations extends Grounds {
-  constructor(x, y, canvas, map) {
-    super(x, y, canvas, map, {
-      leftUp: new Plane(0, 0),
-      up: new Plane(1, 0),
-      rightUp: new Plane(2, 0),
-      left: new Plane(0, 1),
-      center: new Plane(1, 1),
-      right: new Plane(2, 1),
-      leftDown: new Plane(0, 2),
-      down: new Plane(1, 2),
-      rightDown: new Plane(2, 2),
-      horizontalLeft: new Plane(0, 4),
-      horizontalCenter: new Plane(1, 4),
-      horizontalRight: new Plane(2, 4),
-      verticalUp: new Plane(3, 0),
-      verticalCenter: new Plane(3, 1),
-      verticalDown: new Plane(3, 2),
-      only: new Plane(3, 4)
-    });
-  }
-  setElevation(boxes) {
-    const route = "images/terrain/ground/elevation.png";
-    this.setGround(boxes, route);
-  }
-  async drawElevations() {
-    await this.drawGrounds();
-  }
-}
-// public/tsc/game/floor/flatElevations.ts
-class FlatElevations extends ElementBoxes {
-  elementPlanes;
-  constructor(x, y, canvas, map) {
-    super(x, y, canvas, {
-      size: new Size(map.boxes.width, map.boxes.height),
-      length: new Plane(1, 1),
-      occupiedBoxes: true
-    }, {
-      element: {
-        size: new Size(64, 64)
-      }
-    });
-    this.elementPlanes = {
-      grass: new Plane(4, 0),
-      sand: new Plane(9, 0)
-    };
-  }
-  setFlatElevation(boxes, plane) {
-    const element2 = this.elementPlanes[plane];
-    const route = `images/terrain/ground/flat.png`;
-    this.setElements(boxes, route, {
-      element: {
-        plane: element2
-      }
-    });
-  }
-  async drawFlatElevations() {
-    await this.drawElements();
-  }
-}
-// public/tsc/game/floor/flatsGrass.ts
-class FlatsGrass extends Grounds {
-  constructor(x, y, canvas, map) {
-    super(x, y, canvas, map, {
-      leftUp: new Plane(0, 0),
-      up: new Plane(1, 0),
-      rightUp: new Plane(2, 0),
-      left: new Plane(0, 1),
-      center: new Plane(1, 1),
-      right: new Plane(2, 1),
-      leftDown: new Plane(0, 2),
-      down: new Plane(1, 2),
-      rightDown: new Plane(2, 2),
-      horizontalLeft: new Plane(0, 3),
-      horizontalCenter: new Plane(1, 3),
-      horizontalRight: new Plane(2, 3),
-      verticalUp: new Plane(3, 0),
-      verticalCenter: new Plane(3, 1),
-      verticalDown: new Plane(3, 2),
-      only: new Plane(3, 3)
-    });
-  }
-  setFlatGrass(boxes) {
-    const route = `images/terrain/ground/flat.png`;
-    this.setGround(boxes, route);
-  }
-  async drawFlatsGrass() {
-    await this.drawGrounds();
-  }
-}
 // public/tsc/game/floor/flatsSand.ts
 class FlatsSand extends Grounds {
-  constructor(x, y, canvas, map) {
-    super(x, y, canvas, map, {
+  constructor(canvas, map) {
+    super(map.initial.x, map.initial.y, canvas, map, {
       leftUp: new Plane(5, 0),
       up: new Plane(6, 0),
       rightUp: new Plane(7, 0),
@@ -784,50 +637,81 @@ class FlatsSand extends Grounds {
       only: new Plane(8, 3)
     });
   }
-  setFlatSand(boxes) {
+  setFlatSand(boxes4) {
     const route = `images/terrain/ground/flat.png`;
-    this.setGround(boxes, route);
+    this.setGround(boxes4, route);
   }
   async drawFlatsSand() {
     await this.drawGrounds();
   }
 }
-// public/tsc/game/floor/foams.ts
-class Foams extends AnimationBoxes {
-  constructor(x, y, canvas, map) {
-    super(x, y, canvas, {
-      size: new Size(map.boxes.width, map.boxes.height),
-      length: new Plane(3, 3),
-      occupiedBoxes: [
-        [true, false, false],
-        [false, false, false],
-        [false, false, false]
-      ]
-    }, {
-      element: {
-        size: new Size(192, 192)
-      },
-      animation: {
-        frames: 8,
-        framesPerSecond: 8
-      }
+
+// public/tsc/game/floor/elevations.ts
+class Elevations extends Grounds {
+  constructor(canvas, map) {
+    super(map.initial.x, map.initial.y, canvas, map, {
+      leftUp: new Plane(0, 0),
+      up: new Plane(1, 0),
+      rightUp: new Plane(2, 0),
+      left: new Plane(0, 1),
+      center: new Plane(1, 1),
+      right: new Plane(2, 1),
+      leftDown: new Plane(0, 2),
+      down: new Plane(1, 2),
+      rightDown: new Plane(2, 2),
+      horizontalLeft: new Plane(0, 4),
+      horizontalCenter: new Plane(1, 4),
+      horizontalRight: new Plane(2, 4),
+      verticalUp: new Plane(3, 0),
+      verticalCenter: new Plane(3, 1),
+      verticalDown: new Plane(3, 2),
+      only: new Plane(3, 4)
     });
   }
-  setFoam(boxes) {
-    const route = `images/terrain/water/foam.png`;
-    const index = this.setAnimations(boxes, route, new Plane);
-    const foam = this.animationGroup[index];
-    foam.initial.x -= this.boxParameters.size.width;
-    foam.initial.y -= this.boxParameters.size.height;
+  setElevation(boxes4) {
+    const route = "images/terrain/ground/elevation.png";
+    this.setGround(boxes4, route);
   }
-  async drawFoams() {
-    await this.drawAnimations();
+  async drawElevations() {
+    await this.drawGrounds();
   }
 }
+
+// public/tsc/game/floor/flatsGrass.ts
+class FlatsGrass extends Grounds {
+  constructor(canvas, map) {
+    super(map.initial.x, map.initial.y, canvas, map, {
+      leftUp: new Plane(0, 0),
+      up: new Plane(1, 0),
+      rightUp: new Plane(2, 0),
+      left: new Plane(0, 1),
+      center: new Plane(1, 1),
+      right: new Plane(2, 1),
+      leftDown: new Plane(0, 2),
+      down: new Plane(1, 2),
+      rightDown: new Plane(2, 2),
+      horizontalLeft: new Plane(0, 3),
+      horizontalCenter: new Plane(1, 3),
+      horizontalRight: new Plane(2, 3),
+      verticalUp: new Plane(3, 0),
+      verticalCenter: new Plane(3, 1),
+      verticalDown: new Plane(3, 2),
+      only: new Plane(3, 3)
+    });
+  }
+  setFlatGrass(boxes4) {
+    const route = `images/terrain/ground/flat.png`;
+    this.setGround(boxes4, route);
+  }
+  async drawFlatsGrass() {
+    await this.drawGrounds();
+  }
+}
+
 // public/tsc/game/floor/shadows.ts
 class Shadows extends ImageBoxes {
-  constructor(x, y, canvas, map) {
-    super(x, y, canvas, {
+  constructor(canvas, map) {
+    super(map.initial.x, map.initial.y, canvas, {
       size: new Size(map.boxes.width, map.boxes.height),
       length: new Plane(3, 3),
       occupiedBoxes: [
@@ -837,9 +721,11 @@ class Shadows extends ImageBoxes {
       ]
     });
   }
-  setShadow(boxes) {
+  setShadow(boxes4) {
     const route = "images/terrain/ground/shadows.png";
-    const index = this.setImage(boxes, route);
+    const index = this.setImage(boxes4, route);
+    if (index === false)
+      return false;
     const shadow = this.images[index];
     shadow.initial.x -= this.boxParameters.size.width;
     shadow.initial.y -= this.boxParameters.size.height;
@@ -848,72 +734,12 @@ class Shadows extends ImageBoxes {
     await this.drawImages();
   }
 }
-// public/tsc/game/floor/stairsElevations.ts
-class StairsElevations extends ElementBoxes {
-  elementPlanes;
-  constructor(x, y, canvas, map) {
-    super(x, y, canvas, {
-      size: new Size(map.boxes.width, map.boxes.height),
-      length: new Plane(1, 1),
-      occupiedBoxes: true
-    }, {
-      element: {
-        size: new Size(64, 64)
-      }
-    });
-    this.elementPlanes = {
-      left: new Plane(0, 7),
-      center: new Plane(1, 7),
-      right: new Plane(2, 7),
-      only: new Plane(3, 7)
-    };
-  }
-  getElementFromBox(boxes) {
-    const leftBoxes = new Coordinate(boxes.x - 1, boxes.y);
-    const rightBoxes = new Coordinate(boxes.x + 1, boxes.y);
-    const left = this.boxIndex(leftBoxes) !== false;
-    const right = this.boxIndex(rightBoxes) !== false;
-    const isLeft = !left && right;
-    if (isLeft)
-      return this.elementPlanes.left;
-    const isCenter = left && right;
-    if (isCenter)
-      return this.elementPlanes.center;
-    const isRight = left && !right;
-    if (isRight)
-      return this.elementPlanes.right;
-    const isOnly = !left && !right;
-    if (isOnly)
-      return this.elementPlanes.only;
-    throw new Error("invalid element");
-  }
-  refreshElements() {
-    this.groupElements.forEach((elements) => {
-      const boxes = this.getBoxesOfCoordinate(elements.initial);
-      const element2 = this.getElementFromBox(boxes);
-      elements.element.horizontal = element2.horizontal;
-      elements.element.vertical = element2.vertical;
-    });
-  }
-  setStairsElevations(boxes) {
-    const element2 = this.getElementFromBox(boxes);
-    const route = `images/terrain/ground/elevation.png`;
-    this.setElements(boxes, route, {
-      element: {
-        plane: element2
-      }
-    });
-    this.refreshElements();
-  }
-  async drawStairsElevations() {
-    await this.drawElements();
-  }
-}
+
 // public/tsc/game/floor/wallElevations.ts
 class WallElevations extends ElementBoxes {
   elementPlanes;
-  constructor(x, y, canvas, map) {
-    super(x, y, canvas, {
+  constructor(canvas, map) {
+    super(map.initial.x, map.initial.y, canvas, {
       size: new Size(map.boxes.width, map.boxes.height),
       length: new Plane(1, 1),
       occupiedBoxes: true
@@ -933,9 +759,9 @@ class WallElevations extends ElementBoxes {
       only: new Plane(3, 5)
     };
   }
-  getElementFromBox(boxes) {
-    const leftBoxes = new Coordinate(boxes.x - 1, boxes.y);
-    const rightBoxes = new Coordinate(boxes.x + 1, boxes.y);
+  getElementFromBox(boxes4) {
+    const leftBoxes = new Coordinate(boxes4.x - 1, boxes4.y);
+    const rightBoxes = new Coordinate(boxes4.x + 1, boxes4.y);
     const left = this.boxIndex(leftBoxes) !== false;
     const right = this.boxIndex(rightBoxes) !== false;
     const isLeft = !left && right;
@@ -953,17 +779,17 @@ class WallElevations extends ElementBoxes {
     throw new Error("invalid element");
   }
   refreshElements() {
-    this.groupElements.forEach((elements) => {
-      const boxes = this.getBoxesOfCoordinate(elements.initial);
-      const element2 = this.getElementFromBox(boxes);
-      elements.element.horizontal = element2.horizontal;
-      elements.element.vertical = element2.vertical;
+    this.groupElements.forEach((elements3) => {
+      const boxes4 = this.getBoxesOfCoordinate(elements3.initial);
+      const element2 = this.getElementFromBox(boxes4);
+      elements3.element.horizontal = element2.horizontal;
+      elements3.element.vertical = element2.vertical;
     });
   }
-  setWallElevations(boxes) {
-    const element2 = this.getElementFromBox(boxes);
+  setWallElevations(boxes4) {
+    const element2 = this.getElementFromBox(boxes4);
     const route = "images/terrain/ground/elevation.png";
-    this.setElements(boxes, route, {
+    this.setElements(boxes4, route, {
       element: {
         plane: element2
       }
@@ -974,23 +800,125 @@ class WallElevations extends ElementBoxes {
     await this.drawElements();
   }
 }
-// public/tsc/game/floor/water.ts
-class Water extends ImageBoxes {
-  constructor(x, y, canvas, map) {
-    super(x, y, canvas, {
+
+// public/tsc/game/floor/stairsElevations.ts
+class StairsElevations extends ElementBoxes {
+  elementPlanes;
+  constructor(canvas, map) {
+    super(map.initial.x, map.initial.y, canvas, {
       size: new Size(map.boxes.width, map.boxes.height),
       length: new Plane(1, 1),
       occupiedBoxes: true
+    }, {
+      element: {
+        size: new Size(64, 64)
+      }
+    });
+    this.elementPlanes = {
+      left: new Plane(0, 7),
+      center: new Plane(1, 7),
+      right: new Plane(2, 7),
+      only: new Plane(3, 7)
+    };
+  }
+  getElementFromBox(boxes4) {
+    const leftBoxes = new Coordinate(boxes4.x - 1, boxes4.y);
+    const rightBoxes = new Coordinate(boxes4.x + 1, boxes4.y);
+    const left = this.boxIndex(leftBoxes) !== false;
+    const right = this.boxIndex(rightBoxes) !== false;
+    const isLeft = !left && right;
+    if (isLeft)
+      return this.elementPlanes.left;
+    const isCenter = left && right;
+    if (isCenter)
+      return this.elementPlanes.center;
+    const isRight = left && !right;
+    if (isRight)
+      return this.elementPlanes.right;
+    const isOnly = !left && !right;
+    if (isOnly)
+      return this.elementPlanes.only;
+    throw new Error("invalid element");
+  }
+  refreshElements() {
+    this.groupElements.forEach((elements3) => {
+      const boxes4 = this.getBoxesOfCoordinate(elements3.initial);
+      const element2 = this.getElementFromBox(boxes4);
+      elements3.element.horizontal = element2.horizontal;
+      elements3.element.vertical = element2.vertical;
     });
   }
-  setWater(boxes) {
-    const route = "images/terrain/water/water.png";
-    this.setImage(boxes, route);
+  setStairsElevations(boxes4) {
+    const element2 = this.getElementFromBox(boxes4);
+    const route = `images/terrain/ground/elevation.png`;
+    this.setElements(boxes4, route, {
+      element: {
+        plane: element2
+      }
+    });
+    this.refreshElements();
   }
-  async drawWaters() {
+  async drawStairsElevations() {
+    await this.drawElements();
+  }
+}
+
+// public/tsc/game/floor/flatElevations.ts
+class FlatElevations extends ElementBoxes {
+  elementPlanes;
+  constructor(canvas, map) {
+    super(map.initial.x, map.initial.y, canvas, {
+      size: new Size(map.boxes.width, map.boxes.height),
+      length: new Plane(1, 1),
+      occupiedBoxes: true
+    }, {
+      element: {
+        size: new Size(64, 64)
+      }
+    });
+    this.elementPlanes = {
+      grass: new Plane(4, 0),
+      sand: new Plane(9, 0)
+    };
+  }
+  setFlatElevation(boxes4, plane12) {
+    const element2 = this.elementPlanes[plane12];
+    const route = `images/terrain/ground/flat.png`;
+    this.setElements(boxes4, route, {
+      element: {
+        plane: element2
+      }
+    });
+  }
+  async drawFlatElevations() {
+    await this.drawElements();
+  }
+}
+
+// public/tsc/game/floor/castles.ts
+class Castles extends ImageBoxes {
+  constructor(canvas, map) {
+    super(map.initial.x, map.initial.y, canvas, {
+      size: new Size(map.boxes.width, map.boxes.height),
+      length: new Plane(4, 3),
+      occupiedBoxes: true
+    });
+  }
+  setCastle(boxes4, color, state) {
+    const route = this.routeCastle(color, state);
+    return this.setImage(boxes4, route);
+  }
+  routeCastle(color, state) {
+    let file = state;
+    if (state === "ready")
+      file = color;
+    return `images/factions/knights/buildings/castle/${file}.png`;
+  }
+  async drawCastles() {
     await this.drawImages();
   }
 }
+
 // public/tsc/game/floor.ts
 class Floor {
   canvas;
@@ -1008,51 +936,51 @@ class Floor {
   constructor(canvas, map) {
     this.canvas = canvas;
     this.map = map;
-    this.water = new Water(0, 0, this.canvas, this.map);
-    this.foams = new Foams(0, 0, this.canvas, this.map);
-    this.flatsSand = new FlatsSand(0, 0, this.canvas, this.map);
-    this.elevations = new Elevations(0, 0, this.canvas, this.map);
-    this.flatsGrass = new FlatsGrass(0, 0, this.canvas, this.map);
-    this.shadows = new Shadows(0, 0, this.canvas, this.map);
-    this.wallElevations = new WallElevations(0, 0, this.canvas, this.map);
-    this.stairsElevation = new StairsElevations(0, 0, this.canvas, this.map);
-    this.flatElevations = new FlatElevations(0, 0, this.canvas, this.map);
-    this.castles = new Castles(0, 0, this.canvas, this.map);
+    this.water = new Water(this.canvas, this.map);
+    this.foams = new Foams(this.canvas, this.map);
+    this.flatsSand = new FlatsSand(this.canvas, this.map);
+    this.elevations = new Elevations(this.canvas, this.map);
+    this.flatsGrass = new FlatsGrass(this.canvas, this.map);
+    this.shadows = new Shadows(this.canvas, this.map);
+    this.wallElevations = new WallElevations(this.canvas, this.map);
+    this.stairsElevation = new StairsElevations(this.canvas, this.map);
+    this.flatElevations = new FlatElevations(this.canvas, this.map);
+    this.castles = new Castles(this.canvas, this.map);
   }
   setFloor(floor) {
     floor.forEach((row, y) => {
       row.forEach((box, x) => {
-        const boxes = new Coordinate(x, y);
+        const boxes4 = new Coordinate(x, y);
         if (box.water === true)
-          this.water.setWater(boxes);
+          this.water.setWater(boxes4);
         if (box.foam !== false) {
-          this.foams.setFoam(boxes);
+          this.foams.setFoam(boxes4);
           if (box.foam.flatSand === true)
-            this.flatsSand.setFlatSand(boxes);
+            this.flatsSand.setFlatSand(boxes4);
         }
         if (box.elevation !== false) {
           if (box.elevation.shadow === true)
-            this.shadows.setShadow(boxes);
+            this.shadows.setShadow(boxes4);
           if (box.elevation.flatGrass === true)
-            this.flatsGrass.setFlatGrass(boxes);
-          this.elevations.setElevation(boxes);
+            this.flatsGrass.setFlatGrass(boxes4);
+          this.elevations.setElevation(boxes4);
         }
         if (box.wallElevation !== false) {
           if (box.wallElevation.shadow === true)
-            this.shadows.setShadow(boxes);
-          this.wallElevations.setWallElevations(boxes);
+            this.shadows.setShadow(boxes4);
+          this.wallElevations.setWallElevations(boxes4);
           if (box.wallElevation.flatElevation !== false)
-            this.flatElevations.setFlatElevation(boxes, box.wallElevation.flatElevation);
+            this.flatElevations.setFlatElevation(boxes4, box.wallElevation.flatElevation);
         }
         if (box.stairElevation !== false) {
           if (box.stairElevation.shadow === true)
-            this.shadows.setShadow(boxes);
-          this.stairsElevation.setStairsElevations(boxes);
+            this.shadows.setShadow(boxes4);
+          this.stairsElevation.setStairsElevations(boxes4);
           if (box.stairElevation.flatElevation !== false)
-            this.flatElevations.setFlatElevation(boxes, box.stairElevation.flatElevation);
+            this.flatElevations.setFlatElevation(boxes4, box.stairElevation.flatElevation);
         }
         if (box.castle !== false) {
-          this.castles.setCastle(boxes, box.castle.color, box.castle.state);
+          this.castles.setCastle(boxes4, box.castle.color, box.castle.state);
         }
       });
     });
@@ -1062,10 +990,10 @@ class Floor {
     await this.foams.drawFoams();
     await this.flatsSand.drawFlatsSand();
     await this.shadows.drawShadows();
+    await this.stairsElevation.drawStairsElevations();
     await this.elevations.drawElevations();
     await this.flatsGrass.drawFlatsGrass();
     await this.wallElevations.drawWallElevations();
-    await this.stairsElevation.drawStairsElevations();
     await this.flatElevations.drawFlatElevations();
     await this.castles.drawCastles();
   }
@@ -1082,41 +1010,68 @@ var BoxFalse = () => ({
 });
 var BoxFloor1 = (x, y) => {
   const box = BoxFalse();
-  if (x >= 4 && x <= 16 && y > 0 && y < 8)
+  if (x >= 6 && x <= 14 && y >= 1 && y <= 6) {
+    box.elevation = {
+      shadow: y >= 3,
+      flatGrass: true
+    };
+  }
+  if (x >= 6 && x <= 10 && y === 7) {
     box.elevation = {
       shadow: true,
       flatGrass: true
     };
-  if (y === 7 && x >= 9 && x <= 11)
+  }
+  if (x >= 14 && x <= 14 && y === 7) {
+    box.elevation = {
+      shadow: true,
+      flatGrass: true
+    };
+  }
+  if (y === 7 && x >= 11 && x <= 13)
     box.stairElevation = {
       shadow: true,
       flatElevation: x === 9 ? "grass" : false
     };
-  if (y === 8 && x >= 4 && x <= 8)
+  if (y === 8 && x >= 6 && x <= 10) {
+    const flatElevationRandom = Math.round(Math.random());
     box.wallElevation = {
       shadow: true,
-      flatElevation: "sand"
+      flatElevation: flatElevationRandom === 0 ? "grass" : false
     };
-  if (y === 8 && x >= 12 && x <= 16)
+  }
+  if (y === 8 && x === 14) {
+    const flatElevationRandom = Math.round(Math.random());
     box.wallElevation = {
       shadow: true,
-      flatElevation: "sand"
+      flatElevation: flatElevationRandom === 0 ? "grass" : false
     };
+  }
   return box;
 };
 var BoxFloor0 = (x, y) => {
   const box = BoxFalse();
   box.water = true;
-  if (y > 0 && y < 19 && x >= 1 && x <= 19)
+  if (y >= 3 && y <= 19 && x >= 1 && x <= 19)
     box.foam = {
       flatSand: true
     };
-  if (x >= 4 && x <= 16 && y > 0 && y < 15)
+  if (x >= 2 && x <= 17 && y >= 2 && y <= 13)
+    box.elevation = {
+      shadow: y >= 3,
+      flatGrass: true
+    };
+  if (x >= 2 && x <= 10 && y === 14)
     box.elevation = {
       shadow: true,
       flatGrass: true
     };
-  if (y === 14 && x >= 9 && x <= 11)
+  if (x >= 14 && x <= 17 && y === 14)
+    box.elevation = {
+      shadow: true,
+      flatGrass: true
+    };
+  if (y === 14 && x >= 11 && x <= 13)
     box.stairElevation = {
       shadow: true,
       flatElevation: x === 11 ? "sand" : false
@@ -1125,25 +1080,20 @@ var BoxFloor0 = (x, y) => {
     box.foam = {
       flatSand: true
     };
-  if (y === 15 && x >= 4 && x <= 8) {
+  if (y === 15 && x >= 2 && x <= 10) {
     const flatElevationRandom = Math.round(Math.random());
     box.wallElevation = {
       shadow: true,
       flatElevation: flatElevationRandom === 0 ? "sand" : false
     };
   }
-  if (y === 15 && x >= 12 && x <= 16) {
+  if (y === 15 && x >= 14 && x <= 17) {
     const flatElevationRandom = Math.round(Math.random());
     box.wallElevation = {
       shadow: true,
       flatElevation: flatElevationRandom === 0 ? "sand" : false
     };
   }
-  if (y === 4 && x === 8)
-    box.castle = {
-      color: "blue",
-      state: "ready"
-    };
   return box;
 };
 var FloorLength = new Plane(21, 21);
@@ -1172,7 +1122,13 @@ class Map extends Position {
   constructor(canvas) {
     super(new Coordinate, new Size(100, 100));
     this.boxes = new Size(this.size.width / FloorLength.horizontal, this.size.height / FloorLength.vertical);
-    this.floors = new Array(this.matrix.length).fill(new Floor(canvas, this));
+    this.floors = [
+      new Floor(canvas, this),
+      new Floor(canvas, this)
+    ];
+    this.floors.forEach((floor2, index) => {
+      floor2.setFloor(this.matrix[index]);
+    });
   }
   async drawMap() {
     for (const floor2 of this.floors) {
@@ -1181,12 +1137,114 @@ class Map extends Position {
   }
 }
 
+// public/tsc/engine/character.ts
+class Character extends Animations {
+  speed;
+  address;
+  constructor(initial, size16, canvas, route, elementParameters, animation2, speed) {
+    super(initial, size16, canvas, route, elementParameters, animation2);
+    this.speed = speed;
+    this.address = new Coordinate;
+  }
+  move() {
+    if (this.address.equals(new Coordinate))
+      return false;
+    const secondsBetweenFrames = this.canvas.timeBetweenFrames / 1000;
+    const speedX = this.speed.x * secondsBetweenFrames;
+    const speedY = this.speed.y * secondsBetweenFrames;
+    const distanceX = speedX * this.address.x;
+    const distanceY = speedY * this.address.y;
+    const newX = this.initial.x + distanceX;
+    const newY = this.initial.y + distanceY;
+    this.initial.x = newX;
+    this.initial.y = newY;
+    return true;
+  }
+  async drawCharacter() {
+    this.move();
+    await this.drawAnimation();
+  }
+}
+
+// public/tsc/engine/rect.ts
+class Rect extends Position {
+  canvas;
+  fillStyle;
+  strokeStyle;
+  lineWidth;
+  constructor(initial, size16, canvas, fillStyle = "", strokeStyle = "", lineWidth = 0) {
+    super(initial, size16);
+    this.canvas = canvas;
+    this.fillStyle = fillStyle;
+    this.strokeStyle = strokeStyle;
+    this.lineWidth = lineWidth;
+  }
+  drawRect() {
+    const positionOnCanvas = this.canvas.positionOnCanvas(this);
+    if (positionOnCanvas === false)
+      return;
+    if (this.fillStyle.length > 0) {
+      this.canvas.context.fillStyle = this.fillStyle;
+      this.canvas.context.fillRect(positionOnCanvas.initial.x, positionOnCanvas.initial.y, positionOnCanvas.size.width, positionOnCanvas.size.height);
+    }
+    if (this.strokeStyle.length > 0) {
+      this.canvas.context.lineWidth = this.lineWidth;
+      this.canvas.context.strokeStyle = this.strokeStyle;
+      this.canvas.context.strokeRect(positionOnCanvas.initial.x, positionOnCanvas.initial.y, positionOnCanvas.size.width, positionOnCanvas.size.height);
+    }
+  }
+}
+
+// public/tsc/engine/text.ts
+class Text extends Position {
+  canvas;
+  value;
+  fillStyle;
+  strokeStyle;
+  dungeonFont;
+  constructor(initial, size16, canvas, value = "", fillStyle = "", strokeStyle = "", dungeonFont = false) {
+    super(initial, size16);
+    this.canvas = canvas;
+    this.value = value;
+    this.fillStyle = fillStyle;
+    this.strokeStyle = strokeStyle;
+    this.dungeonFont = dungeonFont;
+  }
+  get font() {
+    let font = `${this.size.height}px`;
+    if (this.dungeonFont === true)
+      font.concat(" Dungeon,");
+    return font.concat("sans - serif, arial");
+  }
+  drawText() {
+    if (this.value.length === 0)
+      return;
+    const positionOnCanvas = this.canvas.positionOnCanvas(this);
+    if (positionOnCanvas === false)
+      return;
+    this.canvas.context.font = this.font;
+    this.canvas.context.textAlign = "left";
+    this.canvas.context.textBaseline = "top";
+    positionOnCanvas.size.width = this.canvas.context.measureText(this.value).width;
+    positionOnCanvas.initial.x += this.size.width / 2;
+    positionOnCanvas.initial.x -= positionOnCanvas.size.width / 2;
+    if (this.fillStyle.length > 0) {
+      this.canvas.context.fillStyle = this.fillStyle;
+      this.canvas.context.fillText(this.value, positionOnCanvas.initial.x, positionOnCanvas.initial.y);
+    }
+    if (this.strokeStyle.length > 0) {
+      this.canvas.context.strokeStyle = this.strokeStyle;
+      this.canvas.context.strokeText(this.value, positionOnCanvas.initial.x, positionOnCanvas.initial.y);
+    }
+  }
+}
+
 // public/tsc/game/userBar.ts
 class UserBar extends Rect {
   photo;
   name;
-  constructor(size, canvas, photoRoute, nickname) {
-    super(new Coordinate, size, canvas, "#416177", "#fff", 0.5);
+  constructor(size17, canvas, photoRoute, nickname) {
+    super(new Coordinate, size17, canvas, "#416177", "#fff", 0.5);
     this.photo = new Image2(new Coordinate, new Size(this.size.width * 0.3, this.size.height), this.canvas, photoRoute);
     this.name = new Text(new Coordinate, new Size(this.size.width * 0.7, 9), this.canvas, nickname, "#fff");
   }
@@ -1255,7 +1313,7 @@ class Game extends Scene {
 
 // public/tsc/index.ts
 window.addEventListener("load", () => {
-  const canvas = new Canvas(new Coordinate, 24);
-  const game2 = new Game(canvas);
+  const canvas2 = new Canvas(new Coordinate, 24);
+  const game2 = new Game(canvas2);
   game2.start();
 });

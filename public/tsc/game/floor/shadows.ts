@@ -8,13 +8,12 @@ import type { Map } from "../map.js";
 
 export class Shadows extends ImageBoxes {
     constructor(
-        x: number,
-        y: number,
         canvas: Canvas,
         map: Map
     ) {
         super(
-            x, y,
+            map.initial.x,
+            map.initial.y,
             canvas,
             {
                 size: new Size(map.boxes.width, map.boxes.height),
@@ -34,6 +33,7 @@ export class Shadows extends ImageBoxes {
             boxes,
             route
         );
+        if (index === false) return false;
         const shadow = this.images[index];
         shadow.initial.x -= this.boxParameters.size.width;
         shadow.initial.y -= this.boxParameters.size.height;

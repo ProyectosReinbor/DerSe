@@ -2,6 +2,7 @@ import { Animation } from "./animations/animation.js";
 import type { Canvas } from "./canvas.js";
 import type { Coordinate } from "./coordinate.js";
 import { Elements } from "./elements.js";
+import type { Element } from "./elements/element.js";
 import type { Plane } from "./plane.js";
 import type { Size } from "./size.js";
 
@@ -13,23 +14,17 @@ export class Animations extends Elements {
     size: Size,
     canvas: Canvas,
     route: string,
-    elementParameters: {
-      size: Size;
-      plane: Plane;
-    },
-    animation: {
-      frames: number;
-      framesPerSecond: number;
-    }
+    element: Element,
+    animation: Animation
   ) {
     super(
       initial,
       size,
       canvas,
       route,
-      elementParameters,
+      element,
     );
-    this.animation = new Animation(animation.frames, animation.framesPerSecond);
+    this.animation = animation;
   }
 
   nextFrame() {

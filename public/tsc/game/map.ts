@@ -18,10 +18,14 @@ export class Map extends Position {
         this.boxes = new Size(
             this.size.width / FloorLength.horizontal,
             this.size.height / FloorLength.vertical,
-        )
-        this.floors = new Array(this.matrix.length).fill(
-            new Floor(canvas, this)
         );
+        this.floors = [
+            new Floor(canvas, this),
+            new Floor(canvas, this),
+        ];
+        this.floors.forEach((floor, index) => {
+            floor.setFloor(this.matrix[index]);
+        });
     }
 
     async drawMap() {

@@ -1,45 +1,44 @@
+import type { Box } from "./box";
 import { Boxes } from "./boxes";
 import type { Canvas } from "./canvas";
-import type { Coordinate } from "./coordinate";
+import { Coordinate } from "./coordinate";
 import { Image } from "./image";
-import type { Plane } from "./plane";
 import { Size } from "./size";
 
 export class ImageBoxes extends Boxes {
     images: Image[] = [];
+    imageDefault: Image;
     constructor(
         x: number,
         y: number,
         canvas: Canvas,
-        boxesParameters: {
-            size: Size;
-            length: Plane;
-            occupiedBoxes: true | boolean[][];
-        }
+        boxDefault: Box,
+        imageDefault: Image,
     ) {
         super(
             x,
             y,
             canvas,
-            boxesParameters
+            boxDefault
         );
+        this.imageDefault = imageDefault;
     }
 
-    setImage(
-        boxes: Coordinate,
-        route: string
-    ) {
+    setImage(boxes: Coordinate) {
         const index = this.boxIndex(boxes);
-        if (index !== false) return index;
+        if (index !== false) return false;
         const coordinateOfBoxes = this.getCoordinateOfBoxes(boxes);
         const newImage = new Image(
-            coordinateOfBoxes,
+            new Coordinate(
+                coordinateOfBoxes.x,
+                coordinateOfBoxes.y
+            ),
             new Size(
-                this.boxParameters.size.width * this.boxParameters.length.horizontal,
-                this.boxParameters.size.height * this.boxParameters.length.vertical,
+                this.boxDefault.size.width * this.boxDefault.length.horizontal,
+                this.boxDefault.size.height * this.boxDefault.length.vertical,
             ),
             this.canvas,
-            route,
+            this.imageDefault.route,
         );
         this.images.push(newImage);
         const newIndex = this.images.length - 1;

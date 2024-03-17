@@ -7,13 +7,12 @@ import type { Map } from "../map.js";
 
 export class Elevations extends Grounds {
     constructor(
-        x: number,
-        y: number,
         canvas: Canvas,
         map: Map,
     ) {
         super(
-            x, y,
+            map.initial.x,
+            map.initial.y,
             canvas,
             map,
             {

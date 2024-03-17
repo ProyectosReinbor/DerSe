@@ -6,16 +6,13 @@ import { Coordinate } from "../../engine/coordinate.js";
 import type { Map } from "../map.js";
 
 export class Water extends ImageBoxes {
-
     constructor(
-        x: number,
-        y: number,
         canvas: Canvas,
         map: Map
     ) {
         super(
-            x,
-            y,
+            map.initial.x,
+            map.initial.y,
             canvas,
             {
                 size: new Size(map.boxes.width, map.boxes.height),

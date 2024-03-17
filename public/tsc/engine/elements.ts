@@ -4,7 +4,6 @@ import type { Canvas } from "./canvas.js";
 import type { Coordinate } from "./coordinate.js";
 import { Element } from "./elements/element.js";
 import { Image } from "./image.js";
-import type { Plane } from "./plane.js";
 import type { Size } from "./size.js";
 
 export class Elements extends Image {
@@ -14,10 +13,7 @@ export class Elements extends Image {
     size: Size,
     canvas: Canvas,
     route: string,
-    elementParameters: {
-      size: Size;
-      plane: Plane;
-    }
+    element: Element
   ) {
     super(
       initial,
@@ -25,10 +21,7 @@ export class Elements extends Image {
       canvas,
       route,
     );
-    this.element = new Element(
-      elementParameters.size,
-      elementParameters.plane,
-    );
+    this.element = element;
   }
 
   async drawElement() {

@@ -6,25 +6,25 @@ import { Coordinate } from "../../engine/coordinate.js";
 import type { Canvas } from "../../engine/canvas.js";
 
 export class WallElevations extends ElementBoxes {
-    elementPlanes: {
-        left: Plane;
-        center: Plane;
-        right: Plane;
-        vertical: Plane;
-        horizontalLeft: Plane;
-        horizontalCenter: Plane;
-        horizontalRight: Plane;
-        only: Plane;
+    wallElevationsParameters: {
+        element: {
+            left: Plane;
+            center: Plane;
+            right: Plane;
+            vertical: Plane;
+            horizontalLeft: Plane;
+            horizontalCenter: Plane;
+            horizontalRight: Plane;
+            only: Plane;
+        }
     };
     constructor(
-        x: number,
-        y: number,
         canvas: Canvas,
         map: Map,
     ) {
         super(
-            x,
-            y,
+            map.initial.x,
+            map.initial.y,
             canvas,
             {
                 size: new Size(map.boxes.width, map.boxes.height),
@@ -37,15 +37,17 @@ export class WallElevations extends ElementBoxes {
                 }
             }
         );
-        this.elementPlanes = {
-            left: new Plane(0, 3),
-            center: new Plane(1, 3),
-            right: new Plane(2, 3),
-            vertical: new Plane(3, 3),
-            horizontalLeft: new Plane(0, 5),
-            horizontalCenter: new Plane(1, 5),
-            horizontalRight: new Plane(2, 5),
-            only: new Plane(3, 5)
+        this.wallElevationsParameters = {
+            element: {
+                left: new Plane(0, 3),
+                center: new Plane(1, 3),
+                right: new Plane(2, 3),
+                vertical: new Plane(3, 3),
+                horizontalLeft: new Plane(0, 5),
+                horizontalCenter: new Plane(1, 5),
+                horizontalRight: new Plane(2, 5),
+                only: new Plane(3, 5)
+            }
         };
     }
 
@@ -63,16 +65,16 @@ export class WallElevations extends ElementBoxes {
         const right = this.boxIndex(rightBoxes) !== false;
 
         const isLeft = !left && right;
-        if (isLeft) return this.elementPlanes.left;
+        if (isLeft) return this.wallElevationsParameters.element.left;
 
         const isCenter = left && right;
-        if (isCenter) return this.elementPlanes.center;
+        if (isCenter) return this.wallElevationsParameters.element.center;
 
         const isRight = left && !right;
-        if (isRight) return this.elementPlanes.right;
+        if (isRight) return this.wallElevationsParameters.element.right;
 
         const isVertical = !left && !right;
-        if (isVertical) return this.elementPlanes.only;
+        if (isVertical) return this.wallElevationsParameters.element.only;
 
         throw new Error("invalid element");
     }

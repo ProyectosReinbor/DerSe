@@ -7,20 +7,21 @@ import { Size } from "../../engine/size.js";
 import type { Map } from "../map.js";
 
 export class StairsElevations extends ElementBoxes {
-    elementPlanes: {
-        left: Plane;
-        center: Plane;
-        right: Plane;
-        only: Plane;
+    stairsElevationsParameters: {
+        element: {
+            left: Plane;
+            center: Plane;
+            right: Plane;
+            only: Plane;
+        }
     };
     constructor(
-        x: number,
-        y: number,
         canvas: Canvas,
         map: Map,
     ) {
         super(
-            x, y,
+            map.initial.x,
+            map.initial.y,
             canvas,
             {
                 size: new Size(map.boxes.width, map.boxes.height),
@@ -33,11 +34,13 @@ export class StairsElevations extends ElementBoxes {
                 }
             }
         );
-        this.elementPlanes = {
-            left: new Plane(0, 7),
-            center: new Plane(1, 7),
-            right: new Plane(2, 7),
-            only: new Plane(3, 7)
+        this.stairsElevationsParameters = {
+            element: {
+                left: new Plane(0, 7),
+                center: new Plane(1, 7),
+                right: new Plane(2, 7),
+                only: new Plane(3, 7)
+            }
         };
     }
 
@@ -55,16 +58,16 @@ export class StairsElevations extends ElementBoxes {
         const right = this.boxIndex(rightBoxes) !== false;
 
         const isLeft = !left && right;
-        if (isLeft) return this.elementPlanes.left;
+        if (isLeft) return this.stairsElevationsParameters.element.left;
 
         const isCenter = left && right;
-        if (isCenter) return this.elementPlanes.center;
+        if (isCenter) return this.stairsElevationsParameters.element.center;
 
         const isRight = left && !right;
-        if (isRight) return this.elementPlanes.right;
+        if (isRight) return this.stairsElevationsParameters.element.right;
 
         const isOnly = !left && !right;
-        if (isOnly) return this.elementPlanes.only;
+        if (isOnly) return this.stairsElevationsParameters.element.only;
 
         throw new Error("invalid element");
     }

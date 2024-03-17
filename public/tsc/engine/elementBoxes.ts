@@ -1,50 +1,35 @@
+import type { Box } from "./box";
 import { Boxes } from "./boxes";
 import type { Canvas } from "./canvas";
 import type { Coordinate } from "./coordinate";
 import { Elements } from "./elements";
-import type { Plane } from "./plane";
+import { Element } from "./elements/element";
+import { Plane } from "./plane";
 import { Size } from "./size";
 
 
 export class ElementBoxes extends Boxes {
     groupElements: Elements[];
-    elementsParameters: {
-        element: {
-            size: Size;
-        }
-    };
+    elementsDefault: Elements;
     constructor(
         x: number,
         y: number,
         canvas: Canvas,
-        boxParameters: {
-            size: Size;
-            length: Plane;
-            occupiedBoxes: true | boolean[][];
-        },
-        elementsParameters: {
-            element: {
-                size: Size;
-            }
-        }
+        boxDefault: Box,
+        elementsDefault: Elements,
     ) {
         super(
             x, y,
             canvas,
-            boxParameters
+            boxDefault
         );
         this.groupElements = [];
-        this.elementsParameters = elementsParameters;
+        this.elementsDefault = elementsDefault;
     }
 
     setElements(
         boxes: Coordinate,
-        route: string,
-        elementsParameters: {
-            element: {
-                plane: Plane;
-            }
-        },
+        elementsDefault: Elements
     ) {
         const index = this.boxIndex(boxes);
         if (index !== false) return index;
@@ -52,15 +37,21 @@ export class ElementBoxes extends Boxes {
         const newElements = new Elements(
             coordinateOfBoxes,
             new Size(
-                this.boxParameters.size.width * this.boxParameters.length.horizontal,
-                this.boxParameters.size.height * this.boxParameters.length.vertical,
+                this.boxDefault.size.width * this.boxDefault.length.horizontal,
+                this.boxDefault.size.height * this.boxDefault.length.vertical,
             ),
             this.canvas,
-            route,
-            {
-                size: this.elementsParameters.element.size,
-                plane: elementsParameters.element.plane,
-            }
+            elementsDefault.route,
+            new Element(
+                new Size(
+                    this.elementsDefault.element.size.width,
+                    this.elementsDefault.element.size.height
+                ),
+                new Plane(
+                    elementsDefault.element.horizontal,
+                    elementsDefault.element.vertical
+                )
+            )
         );
         this.groupElements.push(newElements);
         const newIndex = this.groupElements.length - 1;

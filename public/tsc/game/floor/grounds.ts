@@ -26,7 +26,9 @@ type ElementPlanes = {
 }
 
 export class Grounds extends ElementBoxes {
-    elementPlanes: ElementPlanes;
+    groundsParameters: {
+        element: ElementPlanes;
+    }
     constructor(
         x: number,
         y: number,
@@ -48,7 +50,9 @@ export class Grounds extends ElementBoxes {
                 }
             }
         );
-        this.elementPlanes = elementPlanes;
+        this.groundsParameters = {
+            element: elementPlanes
+        };
     }
 
     setGround(
@@ -60,10 +64,7 @@ export class Grounds extends ElementBoxes {
             route,
             {
                 element: {
-                    plane: new Plane(
-                        this.elementPlanes.only.horizontal,
-                        this.elementPlanes.only.vertical
-                    )
+                    plane: new Plane
                 }
             }
         );
@@ -103,51 +104,51 @@ export class Grounds extends ElementBoxes {
         const down = this.boxIndex(downBoxes) !== false;
 
         const isLeftUp = !up && down && !left && right;
-        if (isLeftUp) return this.elementPlanes.leftUp;
+        if (isLeftUp) return this.groundsParameters.element.leftUp;
 
         const isUp = !up && down && left && right;
-        if (isUp) return this.elementPlanes.up;
+        if (isUp) return this.groundsParameters.element.up;
 
         const isRightUp = !up && down && left && !right;
-        if (isRightUp) return this.elementPlanes.rightUp;
+        if (isRightUp) return this.groundsParameters.element.rightUp;
 
         const isLeft = up && down && !left && right;
-        if (isLeft) return this.elementPlanes.left;
+        if (isLeft) return this.groundsParameters.element.left;
 
         const isCenter = up && down && left && right;
-        if (isCenter) return this.elementPlanes.center;
+        if (isCenter) return this.groundsParameters.element.center;
 
         const isRight = up && down && left && !right;
-        if (isRight) return this.elementPlanes.right;
+        if (isRight) return this.groundsParameters.element.right;
 
         const isLeftDown = up && !down && !left && right;
-        if (isLeftDown) return this.elementPlanes.leftDown;
+        if (isLeftDown) return this.groundsParameters.element.leftDown;
 
         const isDown = up && !down && left && right;
-        if (isDown) return this.elementPlanes.down;
+        if (isDown) return this.groundsParameters.element.down;
 
         const isRightDown = up && !down && left && !right;
-        if (isRightDown) return this.elementPlanes.rightDown;
+        if (isRightDown) return this.groundsParameters.element.rightDown;
 
         const isHorizontalLeft = !up && !down && !left && right;
-        if (isHorizontalLeft) return this.elementPlanes.horizontalLeft;
+        if (isHorizontalLeft) return this.groundsParameters.element.horizontalLeft;
 
         const isHorizontalCenter = !up && !down && left && right;
-        if (isHorizontalCenter) return this.elementPlanes.horizontalCenter;
+        if (isHorizontalCenter) return this.groundsParameters.element.horizontalCenter;
 
         const isHorizontalRight = !up && !down && left && !right;
-        if (isHorizontalRight) return this.elementPlanes.horizontalRight;
+        if (isHorizontalRight) return this.groundsParameters.element.horizontalRight;
 
         const isVerticalUp = !up && down && !left && !right;
-        if (isVerticalUp) return this.elementPlanes.verticalUp;
+        if (isVerticalUp) return this.groundsParameters.element.verticalUp;
 
         const isVerticalCenter = up && down && !left && !right;
-        if (isVerticalCenter) return this.elementPlanes.verticalCenter;
+        if (isVerticalCenter) return this.groundsParameters.element.verticalCenter;
 
         const isVerticalDown = up && !down && !left && !right;
-        if (isVerticalDown) return this.elementPlanes.verticalDown;
+        if (isVerticalDown) return this.groundsParameters.element.verticalDown;
 
-        return this.elementPlanes.only;
+        return this.groundsParameters.element.only;
     }
 
     async drawGrounds() {

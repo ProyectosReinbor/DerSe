@@ -8,14 +8,12 @@ import type { Map } from "../map.js";
 
 export class Foams extends AnimationBoxes {
     constructor(
-        x: number,
-        y: number,
         canvas: Canvas,
         map: Map
     ) {
         super(
-            x,
-            y,
+            map.initial.x,
+            map.initial.y,
             canvas,
             {
                 size: new Size(map.boxes.width, map.boxes.height),
@@ -30,10 +28,6 @@ export class Foams extends AnimationBoxes {
                 element: {
                     size: new Size(192, 192),
                 },
-                animation: {
-                    frames: 8,
-                    framesPerSecond: 8
-                }
             }
         );
     }
@@ -44,6 +38,12 @@ export class Foams extends AnimationBoxes {
             boxes,
             route,
             new Plane,
+            {
+                animation: {
+                    frames: 8,
+                    framesPerSecond: 8
+                }
+            }
         );
         const foam = this.animationGroup[index];
         foam.initial.x -= this.boxParameters.size.width;

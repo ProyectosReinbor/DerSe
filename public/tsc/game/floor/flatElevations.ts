@@ -7,19 +7,19 @@ import { Size } from "../../engine/size.js";
 import type { Map } from "../map.js";
 
 export class FlatElevations extends ElementBoxes {
-    elementPlanes: {
-        grass: Plane;
-        sand: Plane;
+    flatElevationsParameters: {
+        element: {
+            grass: Plane;
+            sand: Plane;
+        }
     };
     constructor(
-        x: number,
-        y: number,
         canvas: Canvas,
         map: Map,
     ) {
         super(
-            x,
-            y,
+            map.initial.x,
+            map.initial.y,
             canvas,
             {
                 size: new Size(map.boxes.width, map.boxes.height),
@@ -32,9 +32,11 @@ export class FlatElevations extends ElementBoxes {
                 }
             }
         );
-        this.elementPlanes = {
-            grass: new Plane(4, 0),
-            sand: new Plane(9, 0)
+        this.flatElevationsParameters = {
+            element: {
+                grass: new Plane(4, 0),
+                sand: new Plane(9, 0)
+            }
         };
     }
 
@@ -42,7 +44,7 @@ export class FlatElevations extends ElementBoxes {
         boxes: Coordinate,
         plane: "grass" | "sand"
     ) {
-        const element = this.elementPlanes[plane];
+        const element = this.flatElevationsParameters.element[plane];
         const route = `images/terrain/ground/flat.png`;
         this.setElements(
             boxes,

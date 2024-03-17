@@ -32,16 +32,16 @@ export class Floor {
     ) {
         this.canvas = canvas;
         this.map = map;
-        this.water = new Water(0, 0, this.canvas, this.map);
-        this.foams = new Foams(0, 0, this.canvas, this.map);
-        this.flatsSand = new FlatsSand(0, 0, this.canvas, this.map);
-        this.elevations = new Elevations(0, 0, this.canvas, this.map);
-        this.flatsGrass = new FlatsGrass(0, 0, this.canvas, this.map);
-        this.shadows = new Shadows(0, 0, this.canvas, this.map);
-        this.wallElevations = new WallElevations(0, 0, this.canvas, this.map);
-        this.stairsElevation = new StairsElevations(0, 0, this.canvas, this.map);
-        this.flatElevations = new FlatElevations(0, 0, this.canvas, this.map);
-        this.castles = new Castles(0, 0, this.canvas, this.map);
+        this.water = new Water(this.canvas, this.map);
+        this.foams = new Foams(this.canvas, this.map);
+        this.flatsSand = new FlatsSand(this.canvas, this.map);
+        this.elevations = new Elevations(this.canvas, this.map);
+        this.flatsGrass = new FlatsGrass(this.canvas, this.map);
+        this.shadows = new Shadows(this.canvas, this.map);
+        this.wallElevations = new WallElevations(this.canvas, this.map);
+        this.stairsElevation = new StairsElevations(this.canvas, this.map);
+        this.flatElevations = new FlatElevations(this.canvas, this.map);
+        this.castles = new Castles(this.canvas, this.map);
     }
 
     setFloor(floor: MapFloor) {
@@ -108,10 +108,10 @@ export class Floor {
         await this.foams.drawFoams();
         await this.flatsSand.drawFlatsSand();
         await this.shadows.drawShadows();
+        await this.stairsElevation.drawStairsElevations();
         await this.elevations.drawElevations();
         await this.flatsGrass.drawFlatsGrass();
         await this.wallElevations.drawWallElevations();
-        await this.stairsElevation.drawStairsElevations();
         await this.flatElevations.drawFlatElevations();
         await this.castles.drawCastles();
     }
