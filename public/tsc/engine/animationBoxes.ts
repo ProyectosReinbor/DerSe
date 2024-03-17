@@ -9,13 +9,11 @@ import { Size } from "./size";
 
 export class AnimationBoxes extends Boxes {
     animationGroup: Animations[] = [];
-    animatinosDefault: Animations;
     constructor(
         x: number,
         y: number,
         canvas: Canvas,
         boxDefault: Box,
-        animatinosDefault: Animations,
     ) {
         super(
             x,
@@ -23,7 +21,6 @@ export class AnimationBoxes extends Boxes {
             canvas,
             boxDefault
         );
-        this.animatinosDefault = animatinosDefault;
     }
 
     setAnimations(
@@ -43,8 +40,8 @@ export class AnimationBoxes extends Boxes {
             animationsDefault.route,
             new Element(
                 new Size(
-                    this.animatinosDefault.element.size.width,
-                    this.animatinosDefault.element.size.height
+                    animationsDefault.element.size.width,
+                    animationsDefault.element.size.height
                 ),
                 new Plane(
                     0,

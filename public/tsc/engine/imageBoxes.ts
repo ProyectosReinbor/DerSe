@@ -7,13 +7,11 @@ import { Size } from "./size";
 
 export class ImageBoxes extends Boxes {
     images: Image[] = [];
-    imageDefault: Image;
     constructor(
         x: number,
         y: number,
         canvas: Canvas,
         boxDefault: Box,
-        imageDefault: Image,
     ) {
         super(
             x,
@@ -21,10 +19,12 @@ export class ImageBoxes extends Boxes {
             canvas,
             boxDefault
         );
-        this.imageDefault = imageDefault;
     }
 
-    setImage(boxes: Coordinate) {
+    setImage(
+        boxes: Coordinate,
+        imageDefault: Image
+    ) {
         const index = this.boxIndex(boxes);
         if (index !== false) return false;
         const coordinateOfBoxes = this.getCoordinateOfBoxes(boxes);
@@ -38,7 +38,7 @@ export class ImageBoxes extends Boxes {
                 this.boxDefault.size.height * this.boxDefault.length.vertical,
             ),
             this.canvas,
-            this.imageDefault.route,
+            imageDefault.route,
         );
         this.images.push(newImage);
         const newIndex = this.images.length - 1;

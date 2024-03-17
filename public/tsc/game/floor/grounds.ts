@@ -1,72 +1,57 @@
 
+import { Box } from "../../engine/box.js";
 import type { Canvas } from "../../engine/canvas.js";
 import { Coordinate } from "../../engine/coordinate.js";
 import { ElementBoxes } from "../../engine/elementBoxes.js";
+import { Elements } from "../../engine/elements.js";
 import { Plane } from "../../engine/plane.js";
 import { Size } from "../../engine/size.js";
 import type { Map } from "../map.js";
 
-type ElementPlanes = {
-    leftUp: Plane;
-    up: Plane;
-    rightUp: Plane;
-    left: Plane;
-    center: Plane;
-    right: Plane;
-    leftDown: Plane;
-    down: Plane;
-    rightDown: Plane;
-    horizontalLeft: Plane;
-    horizontalCenter: Plane;
-    horizontalRight: Plane;
-    verticalUp: Plane;
-    verticalCenter: Plane;
-    verticalDown: Plane;
-    only: Plane;
+type GroundsDefault = {
+    leftUp: Elements;
+    up: Elements;
+    rightUp: Elements;
+    left: Elements;
+    center: Elements;
+    right: Elements;
+    leftDown: Elements;
+    down: Elements;
+    rightDown: Elements;
+    horizontalLeft: Elements;
+    horizontalCenter: Elements;
+    horizontalRight: Elements;
+    verticalUp: Elements;
+    verticalCenter: Elements;
+    verticalDown: Elements;
+    only: Elements;
 }
 
 export class Grounds extends ElementBoxes {
-    groundsParameters: {
-        element: ElementPlanes;
-    }
+    groundsDefault: GroundsDefault;
     constructor(
         x: number,
         y: number,
         canvas: Canvas,
         map: Map,
-        elementPlanes: ElementPlanes
+        groundsDefault: GroundsDefault
     ) {
         super(
             x, y,
             canvas,
-            {
-                size: new Size(map.boxes.width, map.boxes.height),
-                length: new Plane(1, 1),
-                occupiedBoxes: true
-            },
-            {
-                element: {
-                    size: new Size(64, 64),
-                }
-            }
+            new Box(
+                new Size(map.boxes.width, map.boxes.height),
+                new Plane(1, 1),
+                true
+            ),
         );
-        this.groundsParameters = {
-            element: elementPlanes
-        };
+        this.groundsDefault = groundsDefault;
     }
 
-    setGround(
-        boxes: Coordinate,
-        route: string
-    ) {
+    setGround(boxes: Coordinate) {
         this.setElements(
             boxes,
-            route,
-            {
-                element: {
-                    plane: new Plane
-                }
-            }
+            this.groundsDefault.only
         );
         this.refreshElements();
     }
@@ -74,9 +59,9 @@ export class Grounds extends ElementBoxes {
     refreshElements() {
         this.groupElements.forEach(elements => {
             const boxes = this.getBoxesOfCoordinate(elements.initial);
-            const element = this.getElementsFactoryOfBoxes(boxes);
-            elements.element.horizontal = element.horizontal;
-            elements.element.vertical = element.vertical;
+            const elementsDefault = this.getElementsFactoryOfBoxes(boxes);
+            elements.element.horizontal = elementsDefault.element.horizontal;
+            elements.element.vertical = elementsDefault.element.vertical;
         });
     }
 
@@ -104,51 +89,51 @@ export class Grounds extends ElementBoxes {
         const down = this.boxIndex(downBoxes) !== false;
 
         const isLeftUp = !up && down && !left && right;
-        if (isLeftUp) return this.groundsParameters.element.leftUp;
+        if (isLeftUp) return this.groundsDefault.leftUp;
 
         const isUp = !up && down && left && right;
-        if (isUp) return this.groundsParameters.element.up;
+        if (isUp) return this.groundsDefault.up;
 
         const isRightUp = !up && down && left && !right;
-        if (isRightUp) return this.groundsParameters.element.rightUp;
+        if (isRightUp) return this.groundsDefault.rightUp;
 
         const isLeft = up && down && !left && right;
-        if (isLeft) return this.groundsParameters.element.left;
+        if (isLeft) return this.groundsDefault.left;
 
         const isCenter = up && down && left && right;
-        if (isCenter) return this.groundsParameters.element.center;
+        if (isCenter) return this.groundsDefault.center;
 
         const isRight = up && down && left && !right;
-        if (isRight) return this.groundsParameters.element.right;
+        if (isRight) return this.groundsDefault.right;
 
         const isLeftDown = up && !down && !left && right;
-        if (isLeftDown) return this.groundsParameters.element.leftDown;
+        if (isLeftDown) return this.groundsDefault.leftDown;
 
         const isDown = up && !down && left && right;
-        if (isDown) return this.groundsParameters.element.down;
+        if (isDown) return this.groundsDefault.down;
 
         const isRightDown = up && !down && left && !right;
-        if (isRightDown) return this.groundsParameters.element.rightDown;
+        if (isRightDown) return this.groundsDefault.rightDown;
 
         const isHorizontalLeft = !up && !down && !left && right;
-        if (isHorizontalLeft) return this.groundsParameters.element.horizontalLeft;
+        if (isHorizontalLeft) return this.groundsDefault.horizontalLeft;
 
         const isHorizontalCenter = !up && !down && left && right;
-        if (isHorizontalCenter) return this.groundsParameters.element.horizontalCenter;
+        if (isHorizontalCenter) return this.groundsDefault.horizontalCenter;
 
         const isHorizontalRight = !up && !down && left && !right;
-        if (isHorizontalRight) return this.groundsParameters.element.horizontalRight;
+        if (isHorizontalRight) return this.groundsDefault.horizontalRight;
 
         const isVerticalUp = !up && down && !left && !right;
-        if (isVerticalUp) return this.groundsParameters.element.verticalUp;
+        if (isVerticalUp) return this.groundsDefault.verticalUp;
 
         const isVerticalCenter = up && down && !left && !right;
-        if (isVerticalCenter) return this.groundsParameters.element.verticalCenter;
+        if (isVerticalCenter) return this.groundsDefault.verticalCenter;
 
         const isVerticalDown = up && !down && !left && !right;
-        if (isVerticalDown) return this.groundsParameters.element.verticalDown;
+        if (isVerticalDown) return this.groundsDefault.verticalDown;
 
-        return this.groundsParameters.element.only;
+        return this.groundsDefault.only;
     }
 
     async drawGrounds() {

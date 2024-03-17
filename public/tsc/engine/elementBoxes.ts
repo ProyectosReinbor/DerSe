@@ -10,13 +10,11 @@ import { Size } from "./size";
 
 export class ElementBoxes extends Boxes {
     groupElements: Elements[];
-    elementsDefault: Elements;
     constructor(
         x: number,
         y: number,
         canvas: Canvas,
         boxDefault: Box,
-        elementsDefault: Elements,
     ) {
         super(
             x, y,
@@ -24,7 +22,6 @@ export class ElementBoxes extends Boxes {
             boxDefault
         );
         this.groupElements = [];
-        this.elementsDefault = elementsDefault;
     }
 
     setElements(
@@ -44,8 +41,8 @@ export class ElementBoxes extends Boxes {
             elementsDefault.route,
             new Element(
                 new Size(
-                    this.elementsDefault.element.size.width,
-                    this.elementsDefault.element.size.height
+                    elementsDefault.element.size.width,
+                    elementsDefault.element.size.height
                 ),
                 new Plane(
                     elementsDefault.element.horizontal,

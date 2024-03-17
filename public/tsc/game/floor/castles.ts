@@ -1,6 +1,8 @@
 
+import { Box } from "../../engine/box.js";
 import type { Canvas } from "../../engine/canvas.js";
 import { Coordinate } from "../../engine/coordinate.js";
+import { Image } from "../../engine/image.js";
 import { ImageBoxes } from "../../engine/imageBoxes.js";
 import { Plane } from "../../engine/plane.js";
 import { Size } from "../../engine/size.js";
@@ -16,11 +18,11 @@ export class Castles extends ImageBoxes {
             map.initial.x,
             map.initial.y,
             canvas,
-            {
-                size: new Size(map.boxes.width, map.boxes.height),
-                length: new Plane(4, 3),
-                occupiedBoxes: true
-            }
+            new Box(
+                new Size(map.boxes.width, map.boxes.height),
+                new Plane(4, 3),
+                true
+            ),
         );
     }
 
@@ -29,10 +31,14 @@ export class Castles extends ImageBoxes {
         color: "blue" | "purple" | "red" | "yellow",
         state: "construction" | "ready" | "destroyed",
     ) {
-        const route = this.routeCastle(color, state);
         return this.setImage(
             boxes,
-            route
+            new Image(
+                new Coordinate,
+                new Size,
+                this.canvas,
+                this.routeCastle(color, state)
+            )
         );
     }
 
