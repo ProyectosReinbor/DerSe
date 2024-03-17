@@ -1,33 +1,57 @@
 export class Images {
+  notFound: string[] = [];
+  routes: string[] = [];
   images: {
     [key: string]: HTMLImageElement;
-  };
-  notFound: string[] = [];
-  constructor() {
-    this.images = {};
+  } = {};
+
+  imageExists(route: string): boolean {
+    if (this.notFound.includes(route))
+      throw new Error(`image ${route} is not found`);
+
+    if (this.images[route] === undefined)
+      return false;
+
+    return true;
   }
 
-  get(route: string): Promise<HTMLImageElement> {
-    return new Promise((resolve, reject) => {
-      if (this.notFound.includes(route))
-        throw new Error(`image ${route} is not found`);
+  getImage(route: string): HTMLImageElement {
+    if (this.imageExists(route) === false)
+      throw new Error(`image ${route} is not found`);
 
-      if (this.images[route] !== undefined)
+    return this.images[route];
+  }
+
+  addRoute(route: string) {
+    if (this.routes.includes(route) === true)
+      return;
+    this.routes.push(route);
+  }
+
+  async loadAll() {
+    for (const route of this.routes) {
+      await this.load(route);
+    }
+  }
+
+  load(route: string): Promise<HTMLImageElement> {
+    return new Promise((resolve, reject) => {
+      if (this.imageExists(route) === true)
         return resolve(this.images[route]);
 
-      this.images[route] = new Image();
-      this.images[route].addEventListener(
+      const image = new Image();
+      image.addEventListener(
         "load",
-        () => resolve(this.images[route])
-      );
-      this.images[route].addEventListener(
-        "error",
-        (err) => {
-          this.notFound.push(route);
-          throw new Error(`image ${route} is not found`);
+        () => {
+          this.images[route] = image;
+          resolve(this.images[route]);
         }
       );
-      this.images[route].src = route;
+      image.addEventListener(
+        "error",
+        () => this.notFound.push(route)
+      );
+      image.src = route;
     });
   }
 }

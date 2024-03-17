@@ -28,9 +28,9 @@ export class Map extends Position {
         });
     }
 
-    async drawMap() {
-        for (const floor of this.floors) {
-            await floor.drawFloor();
-        }
+    drawMap() {
+        this.floors.forEach(
+            floor => floor.drawFloor()
+        );
     }
 }   

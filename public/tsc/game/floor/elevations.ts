@@ -53,7 +53,7 @@ export class Elevations extends Grounds {
         this.setGround(boxes);
     }
 
-    async drawElevations() {
-        await this.drawGrounds();
+    drawElevations() {
+        this.drawGrounds();
     }
 }

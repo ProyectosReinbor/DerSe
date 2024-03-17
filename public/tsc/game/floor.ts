@@ -113,17 +113,17 @@ export class Floor {
         });
     }
 
-    async drawFloor() {
-        await this.water.drawWaters();
-        await this.foams.drawFoams();
-        await this.flatsSand.drawFlatsSand();
-        await this.shadows.drawShadows();
-        await this.stairsElevation.drawStairsElevations();
-        await this.elevations.drawElevations();
-        await this.flatsGrass.drawFlatsGrass();
-        await this.wallElevations.drawWallElevations();
-        await this.flatElevations.drawFlatElevations();
-        await this.castles.drawCastles();
-        await this.trees.drawTrees();
+    drawFloor() {
+        this.water.drawWaters();
+        this.foams.drawFoams();
+        this.flatsSand.drawFlatsSand();
+        this.shadows.drawShadows();
+        this.stairsElevation.drawStairsElevations();
+        this.elevations.drawElevations();
+        this.flatsGrass.drawFlatsGrass();
+        this.wallElevations.drawWallElevations();
+        this.flatElevations.drawFlatElevations();
+        this.castles.drawCastles();
+        this.trees.drawTrees();
     }
 }

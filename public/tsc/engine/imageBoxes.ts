@@ -46,9 +46,9 @@ export class ImageBoxes extends Boxes {
         return newIndex;
     }
 
-    async drawImages() {
-        for (const image of this.images) {
-            await image.drawImage();
-        }
+    drawImages() {
+        this.images.forEach(
+            image => image.drawImage()
+        );
     }
 }

@@ -53,7 +53,7 @@ export class FlatsGrass extends Grounds {
         this.setGround(boxes);
     }
 
-    async drawFlatsGrass() {
-        await this.drawGrounds();
+    drawFlatsGrass() {
+        this.drawGrounds();
     }
 }   

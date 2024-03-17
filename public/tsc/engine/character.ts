@@ -29,7 +29,7 @@ export class Character extends Animations {
         this.address = new Coordinate;
     }
 
-    move() {
+    moveCharacter() {
         if (this.address.equals(new Coordinate)) return false;
         const secondsBetweenFrames = this.canvas.timeBetweenFrames / 1000;
         const speedX = this.speed.x * secondsBetweenFrames;
@@ -43,8 +43,8 @@ export class Character extends Animations {
         return true;
     }
 
-    async drawCharacter() {
-        this.move();
-        await this.drawAnimation();
+    drawCharacter() {
+        this.moveCharacter();
+        this.drawAnimation();
     }
 }

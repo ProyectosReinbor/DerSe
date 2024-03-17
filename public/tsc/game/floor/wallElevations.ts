@@ -102,7 +102,7 @@ export class WallElevations extends ElementBoxes {
         this.refreshElements();
     }
 
-    async drawWallElevations() {
-        await this.drawElements();
+    drawWallElevations() {
+        this.drawElements();
     }
 } 

@@ -43,7 +43,7 @@ export class UserBar extends Rect {
         );
     }
 
-    async drawUserBar(initial: Coordinate) {
+    drawUserBar(initial: Coordinate) {
         this.initial.x = initial.x;
         this.initial.y = initial.y - this.size.height;
         this.photo.initial.x = this.initial.x;
@@ -51,7 +51,7 @@ export class UserBar extends Rect {
         this.name.initial.x = this.initial.x + this.photo.size.width;
         this.name.initial.y = this.initial.y;
         this.drawRect();
-        await this.photo.drawImage();
+        this.photo.drawImage();
         this.name.drawText();
     }
 }

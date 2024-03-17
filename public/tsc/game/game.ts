@@ -3,15 +3,27 @@ import { Coordinate } from "../engine/coordinate.js";
 import { Scene } from "../engine/scene.js";
 import { Map } from "./map.js";
 import { Pawn } from "./pawn.js";
+import { Sheep } from "./sheep.js";
 
 export class Game extends Scene {
     map: Map;
     pawns: Pawn[] = [];
+    sheepGroup: Sheep[] = [];
     constructor(
         canvas: Canvas
     ) {
         super(canvas);
         this.map = new Map(this.canvas);
+        this.sheepGroup = [
+            new Sheep(
+                new Coordinate(
+                    // Math.floor(Math.random() * this.map.size.width),
+                    // Math.floor(Math.random() * this.map.size.height)
+                ),
+                this.map,
+                this.canvas
+            )
+        ];
     }
 
     tiktokGift(gift: {
@@ -48,10 +60,13 @@ export class Game extends Scene {
         console.log(chat);
     }
 
-    override async draw() {
-        await this.map.drawMap();
-        for (const pawn of this.pawns) {
-            await pawn.drawPawn();
-        }
+    override draw() {
+        this.map.drawMap();
+        this.pawns.forEach(
+            pawn => pawn.drawPawn()
+        );
+        this.sheepGroup.forEach(
+            sheep => sheep.drawSheep()
+        );
     }
 }

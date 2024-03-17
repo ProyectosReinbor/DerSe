@@ -13,8 +13,8 @@ export class Scene {
         this.canvas = canvas;
     }
 
-    start() {
-        this.canvas.start(
+    async start() {
+        await this.canvas.start(
             () => this.draw(),
             (touch: Coordinate) => this.touchstart(touch),
             (touch: Coordinate) => this.touchmove(touch),

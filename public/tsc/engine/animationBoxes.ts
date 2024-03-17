@@ -56,9 +56,9 @@ export class AnimationBoxes extends Boxes {
         return newIndex;
     }
 
-    async drawAnimations() {
-        for (const animations of this.animationGroup) {
-            await animations.drawAnimation();
-        }
+    drawAnimations() {
+        this.animationGroup.forEach(
+            animations => animations.drawAnimation()
+        );
     }
 }

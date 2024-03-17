@@ -37,7 +37,7 @@ export class Water extends ImageBoxes {
         );
     }
 
-    async drawWaters() {
-        await this.drawImages();
+    drawWaters() {
+        this.drawImages();
     }
 }  

@@ -55,7 +55,7 @@ export class FlatElevations extends ElementBoxes {
         );
     }
 
-    async drawFlatElevations() {
-        await this.drawElements();
+    drawFlatElevations() {
+        this.drawElements();
     }
 }           

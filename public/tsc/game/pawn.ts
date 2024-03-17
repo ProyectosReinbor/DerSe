@@ -48,9 +48,9 @@ export class Pawn extends Character {
         );
     }
 
-    async drawPawn() {
-        await this.drawCharacter();
-        await this.userBar.drawUserBar(new Coordinate(
+    drawPawn() {
+        this.drawCharacter();
+        this.userBar.drawUserBar(new Coordinate(
             this.initial.x + this.map.boxes.width,
             this.initial.y + this.map.boxes.height
         ));

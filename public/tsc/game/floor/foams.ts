@@ -54,7 +54,7 @@ export class Foams extends AnimationBoxes {
         foam.initial.y -= this.boxDefault.size.height;
     }
 
-    async drawFoams() {
-        await this.drawAnimations();
+    drawFoams() {
+        this.drawAnimations();
     }
 }

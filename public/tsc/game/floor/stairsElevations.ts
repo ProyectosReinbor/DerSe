@@ -94,7 +94,7 @@ export class StairsElevations extends ElementBoxes {
         this.refreshElements();
     }
 
-    async drawStairsElevations() {
-        await this.drawElements();
+    drawStairsElevations() {
+        this.drawElements();
     }
 }

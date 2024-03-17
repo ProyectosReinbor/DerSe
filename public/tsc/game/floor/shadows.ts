@@ -46,7 +46,7 @@ export class Shadows extends ImageBoxes {
         shadow.initial.y -= this.boxDefault.size.height;
     }
 
-    async drawShadows() {
-        await this.drawImages();
+    drawShadows() {
+        this.drawImages();
     }
 }           

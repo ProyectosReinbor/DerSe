@@ -67,24 +67,43 @@ class Camera extends Position {
 
 // public/tsc/engine/images.ts
 class Images {
-  images;
   notFound = [];
-  constructor() {
-    this.images = {};
+  routes = [];
+  images = {};
+  imageExists(route) {
+    if (this.notFound.includes(route))
+      throw new Error(`image ${route} is not found`);
+    if (this.images[route] === undefined)
+      return false;
+    return true;
   }
-  get(route) {
+  getImage(route) {
+    if (this.imageExists(route) === false)
+      throw new Error(`image ${route} is not found`);
+    return this.images[route];
+  }
+  addRoute(route) {
+    if (this.routes.includes(route) === true)
+      return;
+    this.routes.push(route);
+  }
+  async loadAll() {
+    for (const route of this.routes) {
+      await this.load(route);
+    }
+  }
+  load(route) {
     return new Promise((resolve, reject) => {
-      if (this.notFound.includes(route))
-        throw new Error(`image ${route} is not found`);
-      if (this.images[route] !== undefined)
+      if (this.imageExists(route) === true)
         return resolve(this.images[route]);
-      this.images[route] = new Image;
-      this.images[route].addEventListener("load", () => resolve(this.images[route]));
-      this.images[route].addEventListener("error", (err) => {
-        this.notFound.push(route);
-        throw new Error(`image ${route} is not found`);
+      const image = new Image;
+      image.addEventListener("load", () => {
+        console.log("load");
+        this.images[route] = image;
+        resolve(this.images[route]);
       });
-      this.images[route].src = route;
+      image.addEventListener("error", () => this.notFound.push(route));
+      image.src = route;
     });
   }
 }
@@ -135,7 +154,8 @@ class Canvas extends Camera {
     this.drawCanvas();
     requestAnimationFrame((time2) => this.nextFrame(time2));
   }
-  start(drawScene, touchstartScene, touchmoveScene, touchendScene) {
+  async start(drawScene, touchstartScene, touchmoveScene, touchendScene) {
+    await this.images.loadAll();
     this.drawScene = drawScene;
     this.touchstartScene = touchstartScene;
     this.touchmoveScene = touchmoveScene;
@@ -225,8 +245,8 @@ class Scene {
   constructor(canvas) {
     this.canvas = canvas;
   }
-  start() {
-    this.canvas.start(() => this.draw(), (touch) => this.touchstart(touch), (touch) => this.touchmove(touch), (touch) => this.touchend(touch));
+  async start() {
+    await this.canvas.start(() => this.draw(), (touch) => this.touchstart(touch), (touch) => this.touchmove(touch), (touch) => this.touchend(touch));
   }
 }
 
@@ -292,17 +312,17 @@ class Image2 extends Position {
     super(initial, size4);
     this.canvas = canvas;
     this.route = route;
+    this.canvas.images.addRoute(this.route);
   }
-  async image() {
-    return await this.canvas.images.get(this.route);
+  image() {
+    return this.canvas.images.getImage(this.route);
   }
-  async drawImage() {
-    const image = await this.image();
+  drawImage() {
     const positionOnCanvas = this.canvas.positionOnCanvas(this);
     if (positionOnCanvas === false)
       return;
     this.canvas.context.imageSmoothingEnabled = false;
-    this.canvas.context.drawImage(image, positionOnCanvas.initial.x, positionOnCanvas.initial.y, positionOnCanvas.size.width, positionOnCanvas.size.height);
+    this.canvas.context.drawImage(this.image(), positionOnCanvas.initial.x, positionOnCanvas.initial.y, positionOnCanvas.size.width, positionOnCanvas.size.height);
   }
 }
 
@@ -323,10 +343,8 @@ class ImageBoxes extends Boxes {
     this.setBoxIndex(newIndex, boxes2);
     return newIndex;
   }
-  async drawImages() {
-    for (const image2 of this.images) {
-      await image2.drawImage();
-    }
+  drawImages() {
+    this.images.forEach((image2) => image2.drawImage());
   }
 }
 
@@ -354,8 +372,8 @@ class Water extends ImageBoxes {
   setWater(boxes2) {
     this.setImage(boxes2, this.imageDefault);
   }
-  async drawWaters() {
-    await this.drawImages();
+  drawWaters() {
+    this.drawImages();
   }
 }
 
@@ -366,13 +384,12 @@ class Elements extends Image2 {
     super(initial, size6, canvas, route);
     this.element = element;
   }
-  async drawElement() {
-    const image4 = await this.image();
+  drawElement() {
     const positionOnCanvas = this.canvas.positionOnCanvas(this);
     if (positionOnCanvas === false)
       return;
     this.canvas.context.imageSmoothingEnabled = false;
-    this.canvas.context.drawImage(image4, this.element.initial.x, this.element.initial.y, this.element.size.width, this.element.size.height, positionOnCanvas.initial.x, positionOnCanvas.initial.y, positionOnCanvas.size.width, positionOnCanvas.size.height);
+    this.canvas.context.drawImage(this.image(), this.element.initial.x, this.element.initial.y, this.element.size.width, this.element.size.height, positionOnCanvas.initial.x, positionOnCanvas.initial.y, positionOnCanvas.size.width, positionOnCanvas.size.height);
   }
 }
 
@@ -391,9 +408,9 @@ class Animations extends Elements {
     this.timerNextFrame = 0;
     this.element.nextFrame(this.animation.frames);
   }
-  async drawAnimation() {
+  drawAnimation() {
     this.nextFrame();
-    await this.drawElement();
+    this.drawElement();
   }
 }
 
@@ -440,22 +457,24 @@ class AnimationBoxes extends Boxes {
     this.setBoxIndex(newIndex, boxes3);
     return newIndex;
   }
-  async drawAnimations() {
-    for (const animations2 of this.animationGroup) {
-      await animations2.drawAnimation();
-    }
+  drawAnimations() {
+    this.animationGroup.forEach((animations2) => animations2.drawAnimation());
   }
 }
 
 // public/tsc/engine/animations/animation.ts
 class Animation {
   frames;
-  framesPerSecond;
-  intervalBetweenFrame;
+  intervalBetweenFrame = 0;
   constructor(frames, framesPerSecond) {
     this.frames = frames;
     this.framesPerSecond = framesPerSecond;
-    this.intervalBetweenFrame = 1000 / this.framesPerSecond;
+  }
+  get framesPerSecond() {
+    return 1000 / this.intervalBetweenFrame;
+  }
+  set framesPerSecond(value) {
+    this.intervalBetweenFrame = 1000 / value;
   }
 }
 
@@ -490,8 +509,8 @@ class Foams extends AnimationBoxes {
     foam.initial.x -= this.boxDefault.size.width;
     foam.initial.y -= this.boxDefault.size.height;
   }
-  async drawFoams() {
-    await this.drawAnimations();
+  drawFoams() {
+    this.drawAnimations();
   }
 }
 
@@ -513,10 +532,8 @@ class ElementBoxes extends Boxes {
     this.setBoxIndex(newIndex, boxes4);
     return newIndex;
   }
-  async drawElements() {
-    for (const elements3 of this.groupElements) {
-      await elements3.drawElement();
-    }
+  drawElements() {
+    this.groupElements.forEach((elements3) => elements3.drawElement());
   }
 }
 
@@ -595,8 +612,8 @@ class Grounds extends ElementBoxes {
       return this.groundsDefault.verticalDown;
     return this.groundsDefault.only;
   }
-  async drawGrounds() {
-    await this.drawElements();
+  drawGrounds() {
+    this.drawElements();
   }
 }
 
@@ -626,8 +643,8 @@ class FlatsSand extends Grounds {
   setFlatSand(boxes4) {
     this.setGround(boxes4);
   }
-  async drawFlatsSand() {
-    await this.drawGrounds();
+  drawFlatsSand() {
+    this.drawGrounds();
   }
 }
 
@@ -657,8 +674,8 @@ class Elevations extends Grounds {
   setElevation(boxes4) {
     this.setGround(boxes4);
   }
-  async drawElevations() {
-    await this.drawGrounds();
+  drawElevations() {
+    this.drawGrounds();
   }
 }
 
@@ -688,8 +705,8 @@ class FlatsGrass extends Grounds {
   setFlatGrass(boxes4) {
     this.setGround(boxes4);
   }
-  async drawFlatsGrass() {
-    await this.drawGrounds();
+  drawFlatsGrass() {
+    this.drawGrounds();
   }
 }
 
@@ -716,8 +733,8 @@ class Shadows extends ImageBoxes {
     shadow.initial.x -= this.boxDefault.size.width;
     shadow.initial.y -= this.boxDefault.size.height;
   }
-  async drawShadows() {
-    await this.drawImages();
+  drawShadows() {
+    this.drawImages();
   }
 }
 
@@ -770,8 +787,8 @@ class WallElevations extends ElementBoxes {
     this.setElements(boxes4, elementsDefault);
     this.refreshElements();
   }
-  async drawWallElevations() {
-    await this.drawElements();
+  drawWallElevations() {
+    this.drawElements();
   }
 }
 
@@ -820,8 +837,8 @@ class StairsElevations extends ElementBoxes {
     this.setElements(boxes4, elementsDefault);
     this.refreshElements();
   }
-  async drawStairsElevations() {
-    await this.drawElements();
+  drawStairsElevations() {
+    this.drawElements();
   }
 }
 
@@ -840,8 +857,8 @@ class FlatElevations extends ElementBoxes {
     const elementsDefault = this.flatElevationsDefault[plane13];
     this.setElements(boxes4, elementsDefault);
   }
-  async drawFlatElevations() {
-    await this.drawElements();
+  drawFlatElevations() {
+    this.drawElements();
   }
 }
 
@@ -874,8 +891,8 @@ class Castles extends ImageBoxes {
     }
     return this.setImage(boxes4, imageDefault);
   }
-  async drawCastles() {
-    await this.drawImages();
+  drawCastles() {
+    this.drawImages();
   }
 }
 
@@ -886,7 +903,7 @@ class Trees extends AnimationBoxes {
     super(map.initial.x, map.initial.y, canvas, new Box(new Size(map.boxes.width, map.boxes.height), new Plane(3, 3), [
       [true, false, false],
       [true, false, false],
-      [true, false, false]
+      [false, false, false]
     ]));
     const TreesDefault = (plane15, animation3) => new Animations(new Coordinate, new Size, canvas, "images/resources/tree.png", new Element(new Size(192, 192), plane15), animation3);
     this.treesDefault = {
@@ -899,8 +916,8 @@ class Trees extends AnimationBoxes {
     const animations4 = this.treesDefault[animation3];
     this.setAnimations(boxes4, animations4);
   }
-  async drawTrees() {
-    await this.drawAnimations();
+  drawTrees() {
+    this.drawAnimations();
   }
 }
 
@@ -975,18 +992,18 @@ class Floor {
       });
     });
   }
-  async drawFloor() {
-    await this.water.drawWaters();
-    await this.foams.drawFoams();
-    await this.flatsSand.drawFlatsSand();
-    await this.shadows.drawShadows();
-    await this.stairsElevation.drawStairsElevations();
-    await this.elevations.drawElevations();
-    await this.flatsGrass.drawFlatsGrass();
-    await this.wallElevations.drawWallElevations();
-    await this.flatElevations.drawFlatElevations();
-    await this.castles.drawCastles();
-    await this.trees.drawTrees();
+  drawFloor() {
+    this.water.drawWaters();
+    this.foams.drawFoams();
+    this.flatsSand.drawFlatsSand();
+    this.shadows.drawShadows();
+    this.stairsElevation.drawStairsElevations();
+    this.elevations.drawElevations();
+    this.flatsGrass.drawFlatsGrass();
+    this.wallElevations.drawWallElevations();
+    this.flatElevations.drawFlatElevations();
+    this.castles.drawCastles();
+    this.trees.drawTrees();
   }
 }
 
@@ -1127,10 +1144,8 @@ class Map extends Position {
       floor2.setFloor(this.matrix[index]);
     });
   }
-  async drawMap() {
-    for (const floor2 of this.floors) {
-      await floor2.drawFloor();
-    }
+  drawMap() {
+    this.floors.forEach((floor2) => floor2.drawFloor());
   }
 }
 
@@ -1143,7 +1158,7 @@ class Character extends Animations {
     this.speed = speed;
     this.address = new Coordinate;
   }
-  move() {
+  moveCharacter() {
     if (this.address.equals(new Coordinate))
       return false;
     const secondsBetweenFrames = this.canvas.timeBetweenFrames / 1000;
@@ -1157,9 +1172,9 @@ class Character extends Animations {
     this.initial.y = newY;
     return true;
   }
-  async drawCharacter() {
-    this.move();
-    await this.drawAnimation();
+  drawCharacter() {
+    this.moveCharacter();
+    this.drawAnimation();
   }
 }
 
@@ -1245,7 +1260,7 @@ class UserBar extends Rect {
     this.photo = new Image2(new Coordinate, new Size(this.size.width * 0.3, this.size.height), this.canvas, photoRoute);
     this.name = new Text(new Coordinate, new Size(this.size.width * 0.7, 9), this.canvas, nickname, "#fff");
   }
-  async drawUserBar(initial) {
+  drawUserBar(initial) {
     this.initial.x = initial.x;
     this.initial.y = initial.y - this.size.height;
     this.photo.initial.x = this.initial.x;
@@ -1253,7 +1268,7 @@ class UserBar extends Rect {
     this.name.initial.x = this.initial.x + this.photo.size.width;
     this.name.initial.y = this.initial.y;
     this.drawRect();
-    await this.photo.drawImage();
+    this.photo.drawImage();
     this.name.drawText();
   }
 }
@@ -1269,9 +1284,59 @@ class Pawn extends Character {
     this.nickname = nickname;
     this.userBar = new UserBar(new Size(map.boxes.width, map.boxes.height / 2), canvas, userBar2.photoRoute, this.nickname);
   }
-  async drawPawn() {
-    await this.drawCharacter();
-    await this.userBar.drawUserBar(new Coordinate(this.initial.x + this.map.boxes.width, this.initial.y + this.map.boxes.height));
+  drawPawn() {
+    this.drawCharacter();
+    this.userBar.drawUserBar(new Coordinate(this.initial.x + this.map.boxes.width, this.initial.y + this.map.boxes.height));
+  }
+}
+
+// public/tsc/game/sheep.ts
+class Sheep extends Character {
+  state = "move";
+  sheepDefault;
+  jumpTimer = 0;
+  constructor(initial, map, canvas) {
+    const SheepDefault = (plane18, animation5) => {
+      return new Character(new Coordinate, new Size, canvas, "images/resources/sheep.png", new Element(new Size(128, 128), plane18), animation5, new Coordinate(2, 2));
+    };
+    super(initial, new Size(map.boxes.width * 3, map.boxes.height * 3), canvas, "images/resources/sheep.png", new Element(new Size(128, 128), new Plane), new Animation(8, 8), new Coordinate(2, 2));
+    this.sheepDefault = {
+      move: SheepDefault(new Plane, new Animation(8, 8)),
+      jump: SheepDefault(new Plane(0, 1), new Animation(6, 6))
+    };
+    this.state = "jump";
+  }
+  moveSheep() {
+  }
+  jumpSheep() {
+    if (this.state !== "jump")
+      return;
+    const secondsBetweenFrames = this.canvas.timeBetweenFrames / 1000;
+    this.jumpTimer += secondsBetweenFrames;
+    const seconds = this.animation.frames / this.animation.framesPerSecond;
+    console.log(seconds);
+    if (this.jumpTimer >= seconds) {
+      console.log("stop jump");
+      this.state = "move";
+      this.jumpTimer = 0;
+      return;
+    }
+  }
+  refreshState() {
+    let stateDefault = this.sheepDefault[this.state];
+    if (this.element.vertical === stateDefault.element.vertical)
+      return;
+    this.element.vertical = stateDefault.element.vertical;
+    this.element.horizontal = stateDefault.element.horizontal;
+    this.animation.frames = stateDefault.animation.frames;
+    this.animation.framesPerSecond = stateDefault.animation.framesPerSecond;
+    console.log(this.animation.frames, this.animation.framesPerSecond);
+  }
+  drawSheep() {
+    this.refreshState();
+    this.moveSheep();
+    this.jumpSheep();
+    this.drawCharacter();
   }
 }
 
@@ -1279,9 +1344,13 @@ class Pawn extends Character {
 class Game extends Scene {
   map;
   pawns = [];
+  sheepGroup = [];
   constructor(canvas) {
     super(canvas);
     this.map = new Map(this.canvas);
+    this.sheepGroup = [
+      new Sheep(new Coordinate, this.map, this.canvas)
+    ];
   }
   tiktokGift(gift) {
     const exist = this.pawns.some((pawn2) => pawn2.nickname === gift.nickname);
@@ -1294,11 +1363,10 @@ class Game extends Scene {
   tiktokChat(chat) {
     console.log(chat);
   }
-  async draw() {
-    await this.map.drawMap();
-    for (const pawn2 of this.pawns) {
-      await pawn2.drawPawn();
-    }
+  draw() {
+    this.map.drawMap();
+    this.pawns.forEach((pawn2) => pawn2.drawPawn());
+    this.sheepGroup.forEach((sheep2) => sheep2.drawSheep());
   }
 }
 

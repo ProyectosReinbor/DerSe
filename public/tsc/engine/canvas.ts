@@ -69,12 +69,13 @@ export class Canvas extends Camera {
     requestAnimationFrame((time) => this.nextFrame(time));
   }
 
-  start(
+  async start(
     drawScene: () => void,
     touchstartScene: (touch: Coordinate) => void,
     touchmoveScene: (touch: Coordinate) => void,
     touchendScene: (touch: Coordinate) => void,
   ) {
+    await this.images.loadAll();
     this.drawScene = drawScene;
     this.touchstartScene = touchstartScene;
     this.touchmoveScene = touchmoveScene;

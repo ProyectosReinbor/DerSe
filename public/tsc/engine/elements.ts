@@ -24,15 +24,13 @@ export class Elements extends Image {
     this.element = element;
   }
 
-  async drawElement() {
-    const image = await this.image();
-
+  drawElement() {
     const positionOnCanvas = this.canvas.positionOnCanvas(this);
     if (positionOnCanvas === false) return;
 
     this.canvas.context.imageSmoothingEnabled = false;
     this.canvas.context.drawImage(
-      image,
+      this.image(),
       this.element.initial.x,
       this.element.initial.y,
       this.element.size.width,

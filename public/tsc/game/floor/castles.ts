@@ -74,7 +74,7 @@ export class Castles extends ImageBoxes {
     }
 
 
-    async drawCastles() {
-        await this.drawImages();
+    drawCastles() {
+        this.drawImages();
     }
 }

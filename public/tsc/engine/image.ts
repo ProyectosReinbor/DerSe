@@ -15,21 +15,20 @@ export class Image extends Position {
     super(initial, size);
     this.canvas = canvas;
     this.route = route;
+    this.canvas.images.addRoute(this.route);
   }
 
-  async image() {
-    return await this.canvas.images.get(this.route);
+  image() {
+    return this.canvas.images.getImage(this.route);
   }
 
-  async drawImage() {
-    const image = await this.image();
-
+  drawImage() {
     const positionOnCanvas = this.canvas.positionOnCanvas(this);
     if (positionOnCanvas === false) return;
 
     this.canvas.context.imageSmoothingEnabled = false;
     this.canvas.context.drawImage(
-      image,
+      this.image(),
       positionOnCanvas.initial.x,
       positionOnCanvas.initial.y,
       positionOnCanvas.size.width,

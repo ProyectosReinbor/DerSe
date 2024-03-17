@@ -1,13 +1,19 @@
 export class Animation {
   frames: number;
-  framesPerSecond: number;
-  intervalBetweenFrame: number;
+  intervalBetweenFrame: number = 0;
   constructor(
     frames: number,
     framesPerSecond: number,
   ) {
     this.frames = frames;
     this.framesPerSecond = framesPerSecond;
-    this.intervalBetweenFrame = 1000 / this.framesPerSecond;
+  }
+
+  get framesPerSecond() {
+    return 1000 / this.intervalBetweenFrame;
+  }
+
+  set framesPerSecond(value: number) {
+    this.intervalBetweenFrame = 1000 / value;
   }
 }

@@ -66,7 +66,7 @@ export class Trees extends AnimationBoxes {
         );
     }
 
-    async drawTrees() {
-        await this.drawAnimations();
+    drawTrees() {
+        this.drawAnimations();
     }
 }
