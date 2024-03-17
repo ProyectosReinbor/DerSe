@@ -13,8 +13,8 @@ import type { Map } from "../map.js";
 export class Foams extends AnimationBoxes {
     foamDefault: Animations;
     constructor(
+        map: Map,
         canvas: Canvas,
-        map: Map
     ) {
         super(
             map.initial.x,

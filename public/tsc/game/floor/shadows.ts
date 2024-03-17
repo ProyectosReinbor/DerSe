@@ -10,8 +10,8 @@ import type { Map } from "../map.js";
 export class Shadows extends ImageBoxes {
     imageDefault: Image;
     constructor(
+        map: Map,
         canvas: Canvas,
-        map: Map
     ) {
         super(
             map.initial.x,

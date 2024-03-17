@@ -24,6 +24,10 @@ type Castle = {
     state: "construction" | "ready" | "destroyed";
 };
 
+type Trees = {
+    animation: "motion" | "attacked" | "felled";
+};
+
 export type Box = {
     water: boolean;
     foam: false | Foam;
@@ -31,6 +35,7 @@ export type Box = {
     wallElevation: false | WallElevation;
     stairElevation: false | StairElevation;
     castle: false | Castle;
+    trees: false | Trees;
 }
 
 const BoxFalse = (): Box => ({
@@ -40,6 +45,7 @@ const BoxFalse = (): Box => ({
     wallElevation: false,
     stairElevation: false,
     castle: false,
+    trees: false,
 });
 
 export const BoxFloor1 = (
@@ -87,6 +93,12 @@ export const BoxFloor1 = (
             shadow: true,
             flatElevation: (flatElevationRandom === 0) ? "grass" : false
         };
+    }
+
+    if (y === 3 && x === 14) {
+        box.trees = {
+            animation: "felled"
+        }
     }
 
     return box;

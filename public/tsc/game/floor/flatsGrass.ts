@@ -10,8 +10,8 @@ import { Element } from "../../engine/elements/element.js";
 
 export class FlatsGrass extends Grounds {
     constructor(
-        canvas: Canvas,
         map: Map,
+        canvas: Canvas,
     ) {
         const GroundsDefault = (plane: Plane) => new Elements(
             new Coordinate,

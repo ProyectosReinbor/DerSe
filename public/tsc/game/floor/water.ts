@@ -9,8 +9,8 @@ import { Image } from "../../engine/image.js";
 export class Water extends ImageBoxes {
     imageDefault: Image;
     constructor(
+        map: Map,
         canvas: Canvas,
-        map: Map
     ) {
         super(
             map.initial.x,

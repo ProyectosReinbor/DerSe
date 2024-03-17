@@ -20,8 +20,8 @@ export class WallElevations extends ElementBoxes {
         only: Elements;
     };
     constructor(
-        canvas: Canvas,
         map: Map,
+        canvas: Canvas,
     ) {
         super(
             map.initial.x,

@@ -20,8 +20,8 @@ export class Castles extends ImageBoxes {
         destroyed: Image;
     }
     constructor(
+        map: Map,
         canvas: Canvas,
-        map: Map
     ) {
         super(
             map.initial.x,

@@ -11,8 +11,8 @@ import { Map } from "../map";
 
 export class Trees extends AnimationBoxes {
     treesDefault: {
-        idle: Animations,
         motion: Animations,
+        attacked: Animations,
         felled: Animations,
     }
     constructor(
@@ -25,8 +25,12 @@ export class Trees extends AnimationBoxes {
             canvas,
             new Box(
                 new Size(map.boxes.width, map.boxes.height),
-                new Plane(1, 1),
-                true,
+                new Plane(3, 3),
+                [
+                    [true, false, false],
+                    [true, false, false],
+                    [false, false, false]
+                ]
             )
         );
         const TreesDefault = (
@@ -36,24 +40,24 @@ export class Trees extends AnimationBoxes {
             new Coordinate,
             new Size,
             canvas,
-            "images/terrain/ground/trees.png",
+            "images/resources/tree.png",
             new Element(
-                new Size(64, 64),
+                new Size(192, 192),
                 plane
             ),
             animation
         );
 
         this.treesDefault = {
-            idle: TreesDefault(new Plane, new Animation(4, 4)),
-            motion: TreesDefault(new Plane(0, 1), new Animation(2, 2)),
-            felled: TreesDefault(new Plane(0, 3), new Animation(1, 1))
+            motion: TreesDefault(new Plane, new Animation(4, 4)),
+            attacked: TreesDefault(new Plane(0, 1), new Animation(2, 2)),
+            felled: TreesDefault(new Plane(0, 2), new Animation(1, 1))
         }
     }
 
     setTrees(
         boxes: Coordinate,
-        animation: "idle" | "motion" | "felled"
+        animation: "motion" | "attacked" | "felled"
     ) {
         const animations = this.treesDefault[animation];
         this.setAnimations(

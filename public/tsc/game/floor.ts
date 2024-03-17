@@ -12,6 +12,7 @@ import { FlatElevations } from "./floor/flatElevations.js";
 import { Castles } from "./floor/castles.js";
 import type { MapFloor } from "./mapMatrix.js";
 import { Coordinate } from "../engine/coordinate.js";
+import { Trees } from "./floor/trees.js";
 
 export class Floor {
     canvas: Canvas;
@@ -26,22 +27,24 @@ export class Floor {
     stairsElevation: StairsElevations;
     flatElevations: FlatElevations;
     castles: Castles;
+    trees: Trees;
     constructor(
         canvas: Canvas,
         map: Map,
     ) {
         this.canvas = canvas;
         this.map = map;
-        this.water = new Water(this.canvas, this.map);
-        this.foams = new Foams(this.canvas, this.map);
-        this.flatsSand = new FlatsSand(this.canvas, this.map);
-        this.elevations = new Elevations(this.canvas, this.map);
-        this.flatsGrass = new FlatsGrass(this.canvas, this.map);
-        this.shadows = new Shadows(this.canvas, this.map);
-        this.wallElevations = new WallElevations(this.canvas, this.map);
-        this.stairsElevation = new StairsElevations(this.canvas, this.map);
-        this.flatElevations = new FlatElevations(this.canvas, this.map);
-        this.castles = new Castles(this.canvas, this.map);
+        this.water = new Water(this.map, this.canvas);
+        this.foams = new Foams(this.map, this.canvas);
+        this.flatsSand = new FlatsSand(this.map, this.canvas);
+        this.elevations = new Elevations(this.map, this.canvas);
+        this.flatsGrass = new FlatsGrass(this.map, this.canvas);
+        this.shadows = new Shadows(this.map, this.canvas);
+        this.wallElevations = new WallElevations(this.map, this.canvas);
+        this.stairsElevation = new StairsElevations(this.map, this.canvas);
+        this.flatElevations = new FlatElevations(this.map, this.canvas);
+        this.castles = new Castles(this.map, this.canvas);
+        this.trees = new Trees(this.map, this.canvas);
     }
 
     setFloor(floor: MapFloor) {
@@ -99,6 +102,13 @@ export class Floor {
                         box.castle.color,
                     );
                 }
+
+                if (box.trees !== false) {
+                    this.trees.setTrees(
+                        boxes,
+                        box.trees.animation
+                    );
+                }
             });
         });
     }
@@ -114,5 +124,6 @@ export class Floor {
         await this.wallElevations.drawWallElevations();
         await this.flatElevations.drawFlatElevations();
         await this.castles.drawCastles();
+        await this.trees.drawTrees();
     }
 }

@@ -15,8 +15,8 @@ export class FlatElevations extends ElementBoxes {
         sand: Elements;
     };
     constructor(
-        canvas: Canvas,
         map: Map,
+        canvas: Canvas,
     ) {
         super(
             map.initial.x,
