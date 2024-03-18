@@ -3,7 +3,8 @@ import type { Animation } from "./animations/animation";
 import type { Canvas } from "./canvas";
 import { Coordinate } from "./coordinate";
 import type { Element } from "./elements/element";
-import type { Size } from "./size";
+import { Position } from "./position";
+import { Size } from "./size";
 
 export class Character extends Animations {
     speed: Coordinate;
@@ -29,7 +30,7 @@ export class Character extends Animations {
         this.address = new Coordinate;
     }
 
-    moveCharacter() {
+    nextInitial(): Coordinate | false {
         if (this.address.equals(new Coordinate)) return false;
         const secondsBetweenFrames = this.canvas.timeBetweenFrames / 1000;
         const speedX = this.speed.x * secondsBetweenFrames;
@@ -38,13 +39,10 @@ export class Character extends Animations {
         const distanceY = speedY * this.address.y;
         const newX = this.initial.x + distanceX;
         const newY = this.initial.y + distanceY;
-        this.initial.x = newX;
-        this.initial.y = newY;
-        return true;
+        return new Coordinate(newX, newY);
     }
 
     drawCharacter() {
-        this.moveCharacter();
         this.drawAnimation();
     }
 }

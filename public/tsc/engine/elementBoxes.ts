@@ -1,12 +1,11 @@
 import type { Box } from "./box";
 import { Boxes } from "./boxes";
 import type { Canvas } from "./canvas";
-import type { Coordinate } from "./coordinate";
+import { Coordinate } from "./coordinate";
 import { Elements } from "./elements";
 import { Element } from "./elements/element";
 import { Plane } from "./plane";
 import { Size } from "./size";
-
 
 export class ElementBoxes extends Boxes {
     groupElements: Elements[];
@@ -54,6 +53,14 @@ export class ElementBoxes extends Boxes {
         const newIndex = this.groupElements.length - 1;
         this.setBoxIndex(newIndex, boxes);
         return newIndex;
+    }
+
+    insideAnElements(
+        coordinate: Coordinate
+    ) {
+        return this.groupElements.some(element =>
+            element.insideCoordinate(coordinate)
+        );
     }
 
     drawElements() {

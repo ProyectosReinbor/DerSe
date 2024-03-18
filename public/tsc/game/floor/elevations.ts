@@ -7,6 +7,7 @@ import type { Map } from "../map.js";
 import { Elements } from "../../engine/elements.js";
 import { Size } from "../../engine/size.js";
 import { Element } from "../../engine/elements/element.js";
+import { Position } from "../../engine/position.js";
 
 export class Elevations extends Grounds {
     constructor(

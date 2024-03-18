@@ -98,7 +98,6 @@ class Images {
         return resolve(this.images[route]);
       const image = new Image;
       image.addEventListener("load", () => {
-        console.log("load");
         this.images[route] = image;
         resolve(this.images[route]);
       });
@@ -532,6 +531,9 @@ class ElementBoxes extends Boxes {
     this.setBoxIndex(newIndex, boxes4);
     return newIndex;
   }
+  insideAnElements(coordinate9) {
+    return this.groupElements.some((element4) => element4.insideCoordinate(coordinate9));
+  }
   drawElements() {
     this.groupElements.forEach((elements3) => elements3.drawElement());
   }
@@ -951,6 +953,55 @@ class Floor {
     this.castles = new Castles(this.map, this.canvas);
     this.trees = new Trees(this.map, this.canvas);
   }
+  insideFloor(initial) {
+    const flatSandInside = this.flatsSand.insideAnElements(initial);
+    const elevationInside = this.elevations.insideAnElements(initial);
+    const stairElevationInside = this.stairsElevation.insideAnElements(initial);
+    return flatSandInside === true || elevationInside === true || stairElevationInside === true;
+  }
+  collision(initial, nextInitial) {
+    const flatSandInside = this.flatsSand.insideAnElements(initial);
+    const elevationInside = this.elevations.insideAnElements(initial);
+    const wallElevationInside = this.wallElevations.insideAnElements(initial);
+    const stairElevationInside = this.stairsElevation.insideAnElements(initial);
+    const nextFlatSandInside = this.flatsSand.insideAnElements(nextInitial);
+    const nextElevationInside = this.elevations.insideAnElements(nextInitial);
+    const nextWallElevationInside = this.wallElevations.insideAnElements(nextInitial);
+    const nextStairElevationInside = this.stairsElevation.insideAnElements(nextInitial);
+    if (flatSandInside === true) {
+      if (nextFlatSandInside === true)
+        return false;
+      if (nextElevationInside === true)
+        return true;
+      if (nextWallElevationInside === true)
+        return true;
+      if (nextStairElevationInside === true)
+        return false;
+    }
+    if (elevationInside === true) {
+      if (nextFlatSandInside === true)
+        return true;
+      if (nextElevationInside === true)
+        return false;
+      if (nextWallElevationInside === true)
+        return true;
+      if (nextStairElevationInside === true)
+        return false;
+    }
+    if (wallElevationInside === true)
+      throw new Error("inside wall elevation");
+    if (stairElevationInside === true) {
+      if (nextFlatSandInside === true)
+        return false;
+      if (nextElevationInside === true)
+        return false;
+      if (nextWallElevationInside === true)
+        return true;
+      if (nextStairElevationInside === true)
+        return false;
+    }
+    throw new Error("no exits collision");
+  }
   setFloor(floor) {
     floor.forEach((row, y) => {
       row.forEach((box8, x) => {
@@ -1144,6 +1195,15 @@ class Map extends Position {
       floor2.setFloor(this.matrix[index]);
     });
   }
+  collision(initial, nextInitial) {
+    for (let index = this.floors.length - 1;index >= 0; index--) {
+      const floor2 = this.floors[index];
+      if (floor2.insideFloor(initial) === false)
+        continue;
+      return floor2.collision(initial, nextInitial);
+    }
+    throw new Error("no floor");
+  }
   drawMap() {
     this.floors.forEach((floor2) => floor2.drawFloor());
   }
@@ -1158,7 +1218,7 @@ class Character extends Animations {
     this.speed = speed;
     this.address = new Coordinate;
   }
-  moveCharacter() {
+  nextInitial() {
     if (this.address.equals(new Coordinate))
       return false;
     const secondsBetweenFrames = this.canvas.timeBetweenFrames / 1000;
@@ -1168,12 +1228,9 @@ class Character extends Animations {
     const distanceY = speedY * this.address.y;
     const newX = this.initial.x + distanceX;
     const newY = this.initial.y + distanceY;
-    this.initial.x = newX;
-    this.initial.y = newY;
-    return true;
+    return new Coordinate(newX, newY);
   }
   drawCharacter() {
-    this.moveCharacter();
     this.drawAnimation();
   }
 }
@@ -1295,18 +1352,30 @@ class Sheep extends Character {
   state = "move";
   sheepDefault;
   jumpTimer = 0;
+  map;
   constructor(initial, map, canvas) {
     const SheepDefault = (plane18, animation5) => {
       return new Character(new Coordinate, new Size, canvas, "images/resources/sheep.png", new Element(new Size(128, 128), plane18), animation5, new Coordinate(2, 2));
     };
     super(initial, new Size(map.boxes.width * 3, map.boxes.height * 3), canvas, "images/resources/sheep.png", new Element(new Size(128, 128), new Plane), new Animation(8, 8), new Coordinate(2, 2));
+    this.map = map;
     this.sheepDefault = {
       move: SheepDefault(new Plane, new Animation(8, 8)),
       jump: SheepDefault(new Plane(0, 1), new Animation(6, 6))
     };
-    this.state = "jump";
+    this.state = "move";
+    this.address.x = 1;
   }
   moveSheep() {
+    const nextInitial = this.nextInitial();
+    if (nextInitial === false)
+      return false;
+    const collision = this.map.collision(this.initial, nextInitial);
+    if (collision === true)
+      return false;
+    this.initial.x = nextInitial.x;
+    this.initial.y = nextInitial.y;
+    return true;
   }
   jumpSheep() {
     if (this.state !== "jump")
@@ -1314,9 +1383,7 @@ class Sheep extends Character {
     const secondsBetweenFrames = this.canvas.timeBetweenFrames / 1000;
     this.jumpTimer += secondsBetweenFrames;
     const seconds = this.animation.frames / this.animation.framesPerSecond;
-    console.log(seconds);
     if (this.jumpTimer >= seconds) {
-      console.log("stop jump");
       this.state = "move";
       this.jumpTimer = 0;
       return;
@@ -1330,7 +1397,6 @@ class Sheep extends Character {
     this.element.horizontal = stateDefault.element.horizontal;
     this.animation.frames = stateDefault.animation.frames;
     this.animation.framesPerSecond = stateDefault.animation.framesPerSecond;
-    console.log(this.animation.frames, this.animation.framesPerSecond);
   }
   drawSheep() {
     this.refreshState();
@@ -1349,7 +1415,7 @@ class Game extends Scene {
     super(canvas);
     this.map = new Map(this.canvas);
     this.sheepGroup = [
-      new Sheep(new Coordinate, this.map, this.canvas)
+      new Sheep(new Coordinate(10, 10), this.map, this.canvas)
     ];
   }
   tiktokGift(gift) {

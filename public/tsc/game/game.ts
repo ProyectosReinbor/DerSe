@@ -16,7 +16,7 @@ export class Game extends Scene {
         this.map = new Map(this.canvas);
         this.sheepGroup = [
             new Sheep(
-                new Coordinate(
+                new Coordinate(10, 10
                     // Math.floor(Math.random() * this.map.size.width),
                     // Math.floor(Math.random() * this.map.size.height)
                 ),

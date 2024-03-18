@@ -16,6 +16,7 @@ export class Sheep extends Character {
         jump: Character;
     };
     jumpTimer: number = 0;
+    map: Map;
     constructor(
         initial: Coordinate,
         map: Map,
@@ -50,7 +51,7 @@ export class Sheep extends Character {
             new Animation(8, 8),
             new Coordinate(2, 2),
         );
-
+        this.map = map;
         this.sheepDefault = {
             move: SheepDefault(
                 new Plane,
@@ -61,11 +62,18 @@ export class Sheep extends Character {
                 new Animation(6, 6)
             )
         }
-        this.state = "jump";
+        this.state = "move";
+        this.address.x = 1;
     }
 
     moveSheep() {
-
+        const nextInitial = this.nextInitial();
+        if (nextInitial === false) return false;
+        const collision = this.map.collision(this.initial, nextInitial);
+        if (collision === true) return false;
+        this.initial.x = nextInitial.x;
+        this.initial.y = nextInitial.y;
+        return true;
     }
 
     jumpSheep() {

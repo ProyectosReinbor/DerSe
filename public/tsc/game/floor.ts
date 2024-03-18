@@ -13,6 +13,7 @@ import { Castles } from "./floor/castles.js";
 import type { MapFloor } from "./mapMatrix.js";
 import { Coordinate } from "../engine/coordinate.js";
 import { Trees } from "./floor/trees.js";
+import { Position } from "../engine/position.js";
 
 export class Floor {
     canvas: Canvas;
@@ -45,6 +46,48 @@ export class Floor {
         this.flatElevations = new FlatElevations(this.map, this.canvas);
         this.castles = new Castles(this.map, this.canvas);
         this.trees = new Trees(this.map, this.canvas);
+    }
+
+    insideFloor(initial: Coordinate) {
+        const flatSandInside = this.flatsSand.insideAnElements(initial);
+        const elevationInside = this.elevations.insideAnElements(initial);
+        const stairElevationInside = this.stairsElevation.insideAnElements(initial);
+        return flatSandInside === true ||
+            elevationInside === true ||
+            stairElevationInside === true;
+    }
+
+    collision(initial: Coordinate, nextInitial: Coordinate) {
+        const flatSandInside = this.flatsSand.insideAnElements(initial);
+        const elevationInside = this.elevations.insideAnElements(initial);
+        const wallElevationInside = this.wallElevations.insideAnElements(initial);
+        const stairElevationInside = this.stairsElevation.insideAnElements(initial);
+        const nextFlatSandInside = this.flatsSand.insideAnElements(nextInitial);
+        const nextElevationInside = this.elevations.insideAnElements(nextInitial);
+        const nextWallElevationInside = this.wallElevations.insideAnElements(nextInitial);
+        const nextStairElevationInside = this.stairsElevation.insideAnElements(nextInitial);
+
+        if (flatSandInside === true) {
+            if (nextFlatSandInside === true) return false;
+            if (nextElevationInside === true) return true;
+            if (nextWallElevationInside === true) return true;
+            if (nextStairElevationInside === true) return false;
+        }
+        if (elevationInside === true) {
+            if (nextFlatSandInside === true) return true;
+            if (nextElevationInside === true) return false;
+            if (nextWallElevationInside === true) return true;
+            if (nextStairElevationInside === true) return false;
+        }
+        if (wallElevationInside === true) throw new Error("inside wall elevation");
+        if (stairElevationInside === true) {
+            if (nextFlatSandInside === true) return false;
+            if (nextElevationInside === true) return false;
+            if (nextWallElevationInside === true) return true;
+            if (nextStairElevationInside === true) return false;
+        }
+
+        throw new Error("no exits collision");
     }
 
     setFloor(floor: MapFloor) {

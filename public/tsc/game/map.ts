@@ -28,6 +28,18 @@ export class Map extends Position {
         });
     }
 
+    collision(
+        initial: Coordinate,
+        nextInitial: Coordinate
+    ): boolean {
+        for (let index = this.floors.length - 1; index >= 0; index--) {
+            const floor = this.floors[index];
+            if (floor.insideFloor(initial) === false) continue;
+            return floor.collision(initial, nextInitial);
+        }
+        throw new Error("no floor");
+    }
+
     drawMap() {
         this.floors.forEach(
             floor => floor.drawFloor()
