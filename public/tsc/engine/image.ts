@@ -6,15 +6,15 @@ import type { Size } from "./size";
 export class Image extends Position {
   canvas: Canvas;
   route: string;
-  constructor(
+  constructor(props: {
     initial: Coordinate,
     size: Size,
     canvas: Canvas,
     route: string,
-  ) {
-    super(initial, size);
-    this.canvas = canvas;
-    this.route = route;
+  }) {
+    super(props);
+    this.canvas = props.canvas;
+    this.route = props.route;
     this.canvas.images.addRoute(this.route);
   }
 

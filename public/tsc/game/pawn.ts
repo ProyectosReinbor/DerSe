@@ -2,6 +2,7 @@
 import { Animation } from "../engine/animations/animation.js";
 import type { Canvas } from "../engine/canvas.js";
 import { Character } from "../engine/character.js";
+import { Collider } from "../engine/collider.js";
 import { Coordinate } from "../engine/coordinate.js";
 import { Element } from "../engine/elements/element.js";
 import { Plane } from "../engine/plane.js";
@@ -37,6 +38,7 @@ export class Pawn extends Character {
             ),
             new Animation(6, 6),
             new Coordinate(2, 2),
+            new Collider(new Coordinate, new Size(64, 64), canvas),
         );
         this.map = map;
         this.nickname = nickname;

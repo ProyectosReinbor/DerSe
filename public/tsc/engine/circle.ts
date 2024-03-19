@@ -1,4 +1,5 @@
 import type { Canvas } from "./canvas";
+import type { FillStyle, StrokeStyle } from "./context";
 import type { Coordinate } from "./coordinate";
 import { Position } from "./position";
 import type { Size } from "./size";
@@ -8,31 +9,28 @@ export class Circle extends Position {
   startingDegrees: number;
   finalDegrees: number;
   counterclockwise: boolean;
-  fillStyle: string;
-  strokeStyle: string;
+  fillStyle: FillStyle;
+  strokeStyle: StrokeStyle;
   lineWidth: number;
-  constructor(
+  constructor(props: {
     initial: Coordinate,
     size: Size,
     canvas: Canvas,
-    startingDegrees: number = 0,
-    finalDegrees: number = 360,
-    counterclockwise: boolean = false,
-    fillStyle: string = "",
-    strokeStyle: string = "",
-    lineWidth: number = 0,
-  ) {
-    super(
-      initial,
-      size,
-    );
-    this.canvas = canvas;
-    this.startingDegrees = startingDegrees;
-    this.finalDegrees = finalDegrees;
-    this.counterclockwise = counterclockwise;
-    this.fillStyle = fillStyle;
-    this.strokeStyle = strokeStyle;
-    this.lineWidth = lineWidth;
+    startingDegrees: number,
+    finalDegrees: number,
+    counterclockwise: boolean,
+    fillStyle: FillStyle,
+    strokeStyle: StrokeStyle,
+    lineWidth: number,
+  }) {
+    super(props);
+    this.canvas = props.canvas;
+    this.startingDegrees = props.startingDegrees;
+    this.finalDegrees = props.finalDegrees;
+    this.counterclockwise = props.counterclockwise;
+    this.fillStyle = props.fillStyle;
+    this.strokeStyle = props.strokeStyle;
+    this.lineWidth = props.lineWidth;
   }
 
   get startingRadians() {
@@ -63,12 +61,12 @@ export class Circle extends Position {
       this.counterclockwise,
     );
 
-    if (this.fillStyle.length > 0) {
+    if (this.fillStyle !== false) {
       this.canvas.context.fillStyle = this.fillStyle;
       this.canvas.context.fill();
     }
 
-    if (this.strokeStyle.length > 0) {
+    if (this.strokeStyle !== false) {
       this.canvas.context.strokeStyle = this.strokeStyle;
       this.canvas.context.lineWidth = this.lineWidth;
       this.canvas.context.stroke();

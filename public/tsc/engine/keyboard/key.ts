@@ -1,36 +1,25 @@
 import { Button } from "../button";
 import type { Canvas } from "../canvas";
+import type { FillStyle, StrokeStyle } from "../context";
 import type { Coordinate } from "../coordinate";
 import type { Size } from "../size";
+import type { Text } from "../text";
 
 
 export class Key extends Button {
     keyPress: (character: string) => void;
-    constructor(
-        initial: Coordinate,
-        size: Size,
-        canvas: Canvas,
-        fillStyle: string = "",
-        strokeStyle: string = "",
-        lineWidth: number = 0,
-        textParameters: {
-            size: Size;
-            value: string;
-            fillStyle: string;
-            strokeStyle: string;
-        },
-        keyPress: (character: string) => void,
-    ) {
-        super(
-            initial,
-            size,
-            canvas,
-            fillStyle,
-            strokeStyle,
-            lineWidth,
-            textParameters,
-        );
-        this.keyPress = keyPress;
+    constructor(props: {
+        initial: Coordinate;
+        size: Size;
+        canvas: Canvas;
+        fillStyle: FillStyle;
+        strokeStyle: StrokeStyle;
+        lineWidth: number;
+        text: Text;
+        keyPress: (character: string) => void;
+    }) {
+        super(props);
+        this.keyPress = props.keyPress;
     }
 
     touchendKey(touch: Coordinate) {

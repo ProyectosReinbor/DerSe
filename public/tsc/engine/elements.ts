@@ -2,26 +2,21 @@
 
 import type { Canvas } from "./canvas.js";
 import type { Coordinate } from "./coordinate.js";
-import { Element } from "./elements/element.js";
+import { Element } from "./element.js";
 import { Image } from "./image.js";
 import type { Size } from "./size.js";
 
 export class Elements extends Image {
   element: Element;
-  constructor(
+  constructor(props: {
     initial: Coordinate,
     size: Size,
     canvas: Canvas,
     route: string,
     element: Element
-  ) {
-    super(
-      initial,
-      size,
-      canvas,
-      route,
-    );
-    this.element = element;
+  }) {
+    super(props);
+    this.element = props.element;
   }
 
   drawElement() {

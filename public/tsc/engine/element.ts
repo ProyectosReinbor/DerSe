@@ -1,16 +1,19 @@
-import { Coordinate } from "../coordinate";
-import { Plane } from "../plane";
-import { Position } from "../position";
-import { Size } from "../size";
+import { Coordinate } from "./coordinate";
+import { Plane } from "./plane";
+import { Position } from "./position";
+import { Size } from "./size";
 
 export class Element extends Position {
-    constructor(
+    constructor(props: {
         size: Size,
         plane: Plane,
-    ) {
-        super(new Coordinate, size);
-        this.horizontal = plane.horizontal;
-        this.vertical = plane.vertical;
+    }) {
+        super({
+            initial: new Coordinate({ x: 0, y: 0 }),
+            size: props.size,
+        });
+        this.horizontal = props.plane.horizontal;
+        this.vertical = props.plane.vertical;
     }
 
     set horizontal(horizontal) {

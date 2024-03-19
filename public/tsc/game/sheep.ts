@@ -3,9 +3,11 @@ import type { Animations } from "../engine/animations";
 import { Animation } from "../engine/animations/animation";
 import type { Canvas } from "../engine/canvas";
 import { Character } from "../engine/character";
+import { Collider } from "../engine/collider";
 import { Coordinate } from "../engine/coordinate";
 import { Element } from "../engine/elements/element";
 import { Plane } from "../engine/plane";
+import { Rect } from "../engine/rect";
 import { Size } from "../engine/size";
 import type { Map } from "./map";
 
@@ -37,6 +39,7 @@ export class Sheep extends Character {
                 ),
                 animation,
                 new Coordinate(2, 2),
+                new Collider(new Coordinate, new Size(64, 64), canvas),
             );
         }
         super(
@@ -50,6 +53,7 @@ export class Sheep extends Character {
             ),
             new Animation(8, 8),
             new Coordinate(2, 2),
+            new Collider(new Coordinate, new Size(64, 64), canvas),
         );
         this.map = map;
         this.sheepDefault = {
@@ -63,16 +67,16 @@ export class Sheep extends Character {
             )
         }
         this.state = "move";
-        this.address.x = 1;
+        this.address.x = -1;
     }
 
     moveSheep() {
-        const nextInitial = this.nextInitial();
-        if (nextInitial === false) return false;
-        const collision = this.map.collision(this.initial, nextInitial);
+        const nextCollider = this.nextCollider();
+        if (nextCollider === false) return false;
+        const collision = this.map.collision(this.collider, nextCollider);
         if (collision === true) return false;
-        this.initial.x = nextInitial.x;
-        this.initial.y = nextInitial.y;
+        this.initial.x = nextCollider.initial.x;
+        this.initial.y = nextCollider.initial.y;
         return true;
     }
 

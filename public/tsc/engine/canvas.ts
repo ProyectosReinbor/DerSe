@@ -5,11 +5,10 @@ import { Position } from "./position";
 import { Size } from "./size";
 
 export class Canvas extends Camera {
-  onePercentage: Size = new Size;
-  margin: Size = new Size;
-  images: Images;
-  framesPerSecond: number;
-  intervalBetweenFrames: number;
+  onePercentage: Size = new Size({ width: 0, height: 0 });
+  margin: Size = new Size({ width: 0, height: 0 });
+  images: Images = new Images();
+  intervalBetweenFrame: number = 0;
   element: HTMLCanvasElement;
   context: CanvasRenderingContext2D;
   time: number = 0;
@@ -18,14 +17,12 @@ export class Canvas extends Camera {
   touchstartScene: (touch: Coordinate) => void = () => { }
   touchmoveScene: (touch: Coordinate) => void = () => { };
   touchendScene: (touch: Coordinate) => void = () => { };
-  constructor(
+  constructor(props: {
     initial: Coordinate,
     framesPerSecond: number,
-  ) {
-    super(initial);
-    this.images = new Images();
-    this.framesPerSecond = framesPerSecond;
-    this.intervalBetweenFrames = 1000 / this.framesPerSecond;
+  }) {
+    super(props);
+    this.framesPerSecond = props.framesPerSecond;
     this.element = window.document.getElementById("canvas") as HTMLCanvasElement;
     this.context = this.element.getContext("2d") as CanvasRenderingContext2D;
 
@@ -38,16 +35,10 @@ export class Canvas extends Camera {
     this.element.addEventListener(
       "touchstart",
       (event) => this.touchstartCanvas(event),
-      {
-        passive: false
-      }
     );
     this.element.addEventListener(
       "touchmove",
       (event) => this.touchmoveCanvas(event),
-      // {
-      //   passive: false
-      // }
     );
     this.element.addEventListener(
       "touchend",
@@ -57,9 +48,17 @@ export class Canvas extends Camera {
     this.nextFrame();
   }
 
+  get framesPerSecond(): number {
+    return 1000 / this.intervalBetweenFrame;
+  }
+
+  set framesPerSecond(value: number) {
+    this.intervalBetweenFrame = 1000 / value;
+  }
+
   nextFrame(time: number = 0) {
     const difference = time - this.time;
-    if (difference < this.intervalBetweenFrames) {
+    if (difference < this.intervalBetweenFrame) {
       requestAnimationFrame((time) => this.nextFrame(time));
       return;
     }
@@ -92,10 +91,10 @@ export class Canvas extends Camera {
   }
 
   aspectRatio() {
-    const screen = new Size(
-      window.innerWidth,
-      window.innerHeight
-    );
+    const screen = new Size({
+      width: window.innerWidth,
+      height: window.innerHeight
+    });
 
     const ratio = 720 / 1280;
     this.element.width = screen.width;
@@ -120,10 +119,10 @@ export class Canvas extends Camera {
   getTouchCoordinate(touch: Touch) {
     const left = this.margin.width / 2;
     const top = this.margin.height / 2;
-    return new Coordinate(
-      touch.pageX - left,
-      touch.pageY - top
-    );
+    return new Coordinate({
+      x: touch.pageX - left,
+      y: touch.pageY - top
+    });
   }
 
   touchstartCanvas(event: TouchEvent) {
@@ -157,16 +156,16 @@ export class Canvas extends Camera {
   positionOnCanvas(position: Position) {
     const positionOnCamera = this.positionOnCamera(position);
     if (positionOnCamera === false) return false;
-    return new Position(
-      new Coordinate(
-        this.getWidthPixels(positionOnCamera.initial.x),
-        this.getHeightPixels(positionOnCamera.initial.y),
-      ),
-      new Size(
-        this.getWidthPixels(positionOnCamera.size.width),
-        this.getHeightPixels(positionOnCamera.size.height)
-      )
-    );
+    return new Position({
+      initial: new Coordinate({
+        x: this.getWidthPixels(positionOnCamera.initial.x),
+        y: this.getHeightPixels(positionOnCamera.initial.y),
+      }),
+      size: new Size({
+        width: this.getWidthPixels(positionOnCamera.size.width),
+        height: this.getHeightPixels(positionOnCamera.size.height)
+      })
+    });
   }
 
   getWidthPercentage(pixels: number) {

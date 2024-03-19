@@ -10,68 +10,70 @@ export class Enter extends Rect {
   triangle: Lines;
   lines: Lines;
   keyboard: Keyboard;
-  constructor(
-    canvas: Canvas,
-    keyboard: Keyboard,
-  ) {
-    super(
-      new Coordinate(
-        keyboard.initial.x + (keyboard.size.width * 0.13),
-        keyboard.initial.y + (keyboard.size.height * 0.03),
-      ),
-      new Size(
-        keyboard.size.width * 0.12,
-        keyboard.size.height * 0.14,
-      ),
-      canvas,
-      "#21618C",
-      "#fff",
-      0.5,
-    );
-    this.triangle = new Lines(
-      canvas,
-      "#fff",
-    );
-    this.triangle.addLine(new Coordinate(
-      this.initial.x + (this.size.width * 0.1),
-      this.initial.y + (this.size.height * 0.6),
-    ));
-    this.triangle.addLine(new Coordinate(
-      this.initial.x + (this.size.width * 0.3),
-      this.initial.y + (this.size.height * 0.4),
-    ));
-    this.triangle.addLine(new Coordinate(
-      this.initial.x + (this.size.width * 0.3),
-      this.initial.y + (this.size.height * 0.8),
-    ));
-    this.triangle.addLine(new Coordinate(
-      this.initial.x + (this.size.width * 0.1),
-      this.initial.y + (this.size.height * 0.6),
-    ));
-    this.lines = new Lines(
-      canvas,
-      undefined,
-      "#fff",
-      0.5,
-    );
-    this.lines.addLine(new Coordinate(
-      this.initial.x + (this.size.width * 0.2),
-      this.initial.y + (this.size.height * 0.6),
-    ));
-    this.lines.addLine(new Coordinate(
-      this.initial.x + (this.size.width * 0.8),
-      this.initial.y + (this.size.height * 0.6),
-    ));
-    this.lines.addLine(new Coordinate(
-      this.initial.x + (this.size.width * 0.8),
-      this.initial.y + (this.size.height * 0.2),
-    ));
-    this.keyboard = keyboard;
+  constructor(props: {
+    canvas: Canvas;
+    keyboard: Keyboard;
+  }) {
+    super({
+      canvas: props.canvas,
+      initial: new Coordinate({
+        x: props.keyboard.initial.x + (props.keyboard.size.width * 0.13),
+        y: props.keyboard.initial.y + (props.keyboard.size.height * 0.03),
+      }),
+      size: new Size({
+        width: props.keyboard.size.width * 0.12,
+        height: props.keyboard.size.height * 0.14,
+      }),
+      fillStyle: "#21618C",
+      strokeStyle: "#fff",
+      lineWidth: 0.5,
+    });
+    this.triangle = new Lines({
+      canvas: props.canvas,
+      fillStyle: "#fff",
+      strokeStyle: false,
+      lineWidth: 0
+    });
+    this.triangle.addLine(new Coordinate({
+      x: this.initial.x + (this.size.width * 0.1),
+      y: this.initial.y + (this.size.height * 0.6),
+    }));
+    this.triangle.addLine(new Coordinate({
+      x: this.initial.x + (this.size.width * 0.3),
+      y: this.initial.y + (this.size.height * 0.4),
+    }));
+    this.triangle.addLine(new Coordinate({
+      x: this.initial.x + (this.size.width * 0.3),
+      y: this.initial.y + (this.size.height * 0.8),
+    }));
+    this.triangle.addLine(new Coordinate({
+      x: this.initial.x + (this.size.width * 0.1),
+      y: this.initial.y + (this.size.height * 0.6),
+    }));
+    this.lines = new Lines({
+      canvas: props.canvas,
+      fillStyle: false,
+      strokeStyle: "#fff",
+      lineWidth: 0.5,
+    });
+    this.lines.addLine(new Coordinate({
+      x: this.initial.x + (this.size.width * 0.2),
+      y: this.initial.y + (this.size.height * 0.6),
+    }));
+    this.lines.addLine(new Coordinate({
+      x: this.initial.x + (this.size.width * 0.8),
+      y: this.initial.y + (this.size.height * 0.6),
+    }));
+    this.lines.addLine(new Coordinate({
+      x: this.initial.x + (this.size.width * 0.8),
+      y: this.initial.y + (this.size.height * 0.2),
+    }));
+    this.keyboard = props.keyboard;
   }
 
   touchendEnter(touch: Coordinate) {
     if (this.insideCoordinate(touch) === false) return false;
-    if (this.keyboard.target === null) return false;
+    if (this.keyboard.target === false) return false;
     this.keyboard.target.addLineBreak();
     return true;
   }

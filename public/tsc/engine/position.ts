@@ -4,24 +4,38 @@ import { Size } from "./size";
 export class Position {
   initial: Coordinate;
   size: Size;
-  constructor(
-    initial: Coordinate,
-    size: Size
-  ) {
-    this.initial = initial;
-    this.size = size;
+  constructor(props: {
+    initial: Coordinate;
+    size: Size;
+  }) {
+    this.initial = props.initial;
+    this.size = props.size;
   }
 
   get end() {
-    return new Coordinate(
-      this.initial.x + this.size.width,
-      this.initial.y + this.size.height,
-    );
+    return new Coordinate({
+      x: this.initial.x + this.size.width,
+      y: this.initial.y + this.size.height,
+    });
+  }
+
+  endPercentage(percentage: Coordinate) {
+    const size = this.size.percentage(percentage);
+    return new Coordinate({
+      x: this.initial.x + size.width,
+      y: this.initial.y + size.height,
+    });
   }
 
   insideCoordinate(initial: Coordinate) {
     return this.inside(
-      new Position(initial, new Size)
+      new Position({
+        initial,
+        size: new Size({
+          width: 0,
+          height: 0
+        })
+      })
     );
   }
 

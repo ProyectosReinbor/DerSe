@@ -1,50 +1,47 @@
 import type { Canvas } from "../canvas";
 import { Coordinate } from "../coordinate";
 import { Size } from "../size";
+import { Text } from "../text";
 import { Key } from "./key";
 
 export class Keys extends Coordinate {
-  keyParameters: {
-    size: Size;
-    text: {
-      size: Size;
-    }
-  };
-  keys: Key[];
+  keyDefault: Key;
+  keys: Key[] = [];
   canvas: Canvas;
-  keyPress: (character: string) => void;
-  constructor(
-    x: number,
-    y: number,
-    canvas: Canvas,
-    characters: string,
-    keyParameters: {
-      size: Size;
-      text: {
-        size: Size;
-      }
-    },
-    keyPress: (character: string) => void,
-  ) {
-    super(x, y);
-    this.keys = [];
-    this.canvas = canvas;
-    this.keyPress = keyPress;
-    this.keyParameters = keyParameters;
-    this.keyParameters.size.width /= characters.length;
-    for (let index = 0; index < characters.length; index++) {
-      const character = characters[index];
+  constructor(props: {
+    x: number;
+    y: number;
+    canvas: Canvas;
+    characters: string;
+    keyDefault: Key;
+  }) {
+    super(props);
+    this.canvas = props.canvas;
+    this.keyDefault = props.keyDefault;
+    this.keyDefault.size.width /= props.characters.length;
+    for (let index = 0; index < props.characters.length; index++) {
+      const character = props.characters[index];
       this.setKey(
         index,
-        new Coordinate(index),
-        "#0F6097",
-        "#fff",
-        0.5,
-        {
-          value: character,
-          fillStyle: "#fff",
-          strokeStyle: "",
-        }
+        new Coordinate({ x: index, y: 0 }),
+        new Key({
+          initial: new Coordinate({ x: 0, y: 0 }),
+          size: new Size({ width: 0, height: 0 }),
+          canvas: this.canvas,
+          fillStyle: "#0F6097",
+          strokeStyle: "#fff",
+          lineWidth: 0.5,
+          text: new Text({
+            canvas: this.canvas,
+            initial: new Coordinate({ x: 0, y: 0 }),
+            size: new Size({ width: 0, height: 0 }),
+            value: character,
+            fillStyle: "#fff",
+            strokeStyle: false,
+            dungeonFont: false
+          }),
+          keyPress: () => { },
+        })
       );
     }
   }
@@ -56,42 +53,38 @@ export class Keys extends Coordinate {
   setKey(
     index: number,
     boxes: Coordinate,
-    fillStyle: string,
-    strokeStyle: string,
-    lineWidth: number,
-    textParameters: {
-      value: string;
-      fillStyle: string;
-      strokeStyle: string;
-    },
+    newKey: Key
   ) {
-    const key = new Key(
-      new Coordinate(
-        this.x,
-        this.y,
-      ),
-      new Size(
-        this.keyParameters.size.width,
-        this.keyParameters.size.height,
-      ),
-      this.canvas,
-      fillStyle,
-      strokeStyle,
-      lineWidth,
-      {
-        size: this.keyParameters.text.size,
-        value: textParameters.value,
-        fillStyle: textParameters.fillStyle,
-        strokeStyle: textParameters.strokeStyle,
-      },
-      this.keyPress
-    );
-    const top = key.size.width * boxes.x;
-    const left = key.size.height * boxes.y;
-    key.initial.x += top;
-    key.initial.y += left;
-    this.keys[index] = key;
-    return key;
+    const size = new Size({
+      width: this.keyDefault.size.width,
+      height: this.keyDefault.size.height
+    });
+    const top = size.width * boxes.x;
+    const left = size.height * boxes.y;
+    this.keys[index] = new Key({
+      canvas: this.canvas,
+      initial: new Coordinate({
+        x: this.x + top,
+        y: this.y + left
+      }),
+      size,
+      fillStyle: newKey.fillStyle,
+      strokeStyle: newKey.strokeStyle,
+      lineWidth: newKey.lineWidth,
+      text: new Text({
+        canvas: this.canvas,
+        initial: new Coordinate({ x: 0, y: 0 }),
+        size: new Size({
+          width: 0,
+          height: this.keyDefault.text.size.height
+        }),
+        value: newKey.text.value,
+        fillStyle: newKey.text.fillStyle,
+        strokeStyle: newKey.text.strokeStyle,
+        dungeonFont: this.keyDefault.text.dungeonFont
+      }),
+      keyPress: this.keyDefault.keyPress
+    });
   }
 
   drawKeys() {

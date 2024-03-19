@@ -10,9 +10,11 @@ import { Space } from "./keyboard/space";
 import { Delete } from "./keyboard/delete";
 import { CloseQuestion } from "./keyboard/closeQuestion";
 import { Finish } from "./keyboard/finish";
+import { Key } from "./keyboard/key";
+import { Text } from "./text";
 
 export class Keyboard extends Rect {
-  target: Input | null = null;
+  target: Input | false = false;
   shiftKeys: Keys[];
   keys: Keys[];
   shift: Shift;
@@ -21,15 +23,23 @@ export class Keyboard extends Rect {
   delete: Delete;
   closeQuestion: CloseQuestion;
   finish: Finish;
-  constructor(
-    canvas: Canvas,
-  ) {
-    super(
-      new Coordinate(5, 35),
-      new Size(90, 60),
-      canvas,
-      "#21618C",
-    );
+  constructor(props: {
+    canvas: Canvas;
+  }) {
+    super({
+      canvas: props.canvas,
+      initial: new Coordinate({
+        x: 5,
+        y: 35
+      }),
+      size: new Size({
+        width: 90,
+        height: 60
+      }),
+      fillStyle: "#21618C",
+      strokeStyle: false,
+      lineWidth: 0,
+    });
     this.shiftKeys = this.getKeys([
       "1234567890",
       "QWERTYUIOP",
@@ -42,71 +52,81 @@ export class Keyboard extends Rect {
       "asdfghjkl_",
       "zxcvbnm@.,"
     ]);
-    this.shift = new Shift(
-      canvas,
-      this
-    );
-    this.enter = new Enter(
-      canvas,
-      this,
-    );
-    this.space = new Space(
-      canvas,
-      this,
-    );
-    this.delete = new Delete(
-      canvas,
-      this,
-    );
-
-    this.closeQuestion = new CloseQuestion(
-      canvas,
-      this,
-    );
-
-    this.finish = new Finish(
-      canvas,
-      this,
-    );
+    this.shift = new Shift({
+      canvas: props.canvas,
+      keyboard: this
+    });
+    this.enter = new Enter({
+      canvas: props.canvas,
+      keyboard: this,
+    });
+    this.space = new Space({
+      canvas: props.canvas,
+      keyboard: this,
+    });
+    this.delete = new Delete({
+      canvas: props.canvas,
+      keyboard: this,
+    });
+    this.closeQuestion = new CloseQuestion({
+      canvas: props.canvas,
+      keyboard: this,
+    });
+    this.finish = new Finish({
+      canvas: props.canvas,
+      keyboard: this,
+    });
   }
 
-  getKeys(keys: string[]) {
-    const size = new Size(
-      this.size.width * 0.97,
-      (this.size.height * 0.8) / keys.length
-    );
+  getKeys(keys: string[]): Keys[] {
+    const size = this.size.percentage(new Coordinate({ x: 97, y: 80 }));
+    size.height /= keys.length;
     return keys.map((characters, index) => {
-      const leftIndex = (size.width * 0.01) * index;
-      const topIndex = size.height * (index + 1);
-      return new Keys(
-        this.initial.x + leftIndex,
-        this.initial.y + topIndex,
-        this.canvas,
+      const left = size.aPercent.width * index;
+      const nextIndex = index + 1;
+      const top = size.height * nextIndex;
+      return new Keys({
+        x: this.initial.x + left,
+        y: this.initial.y + top,
+        canvas: this.canvas,
         characters,
-        {
+        keyDefault: new Key({
+          canvas: this.canvas,
+          initial: new Coordinate({ x: 0, y: 0 }),
           size,
-          text: {
-            size: new Size(0, 10),
-          }
-        },
-        (character: string) => {
-          if (this.target === null) return;
-          this.target.addChar(character);
-        }
-      );
+          fillStyle: "#fff",
+          strokeStyle: false,
+          lineWidth: 0,
+          text: new Text({
+            canvas: this.canvas,
+            initial: new Coordinate({ x: 0, y: 0 }),
+            size: new Size({ width: 0, height: 9 }),
+            value: characters,
+            fillStyle: false,
+            strokeStyle: false,
+            dungeonFont: false,
+          }),
+          keyPress: (character: string) => {
+            if (this.target === false) return;
+            this.target.addChar(character);
+          },
+        })
+      });
     });
   }
 
   touchstartKeyboard(touch: Coordinate) {
+    if (this.target === false) return;
     this.delete.touchstartDelete(touch);
   }
 
   touchmoveKeyboard(touch: Coordinate) {
+    if (this.target === false) return;
     this.delete.touchmoveDelete(touch);
   }
 
   touchendKeyboard(touch: Coordinate) {
-    if (this.target === null) return;
+    if (this.target === false) return;
     if (this.delete.touchendDelete() === true) return;
     if (this.space.touchendSpace(touch) === true) return;
     if (this.shift.touchendShift(touch) === true) return;
@@ -125,7 +145,7 @@ export class Keyboard extends Rect {
   }
 
   drawKeyboard() {
-    if (this.target === null) return;
+    if (this.target === false) return;
     this.drawRect();
     if (this.shift.uppercase === true) {
       this.shiftKeys.forEach(keys => keys.drawKeys());

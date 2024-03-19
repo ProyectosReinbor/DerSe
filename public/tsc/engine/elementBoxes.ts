@@ -3,23 +3,19 @@ import { Boxes } from "./boxes";
 import type { Canvas } from "./canvas";
 import { Coordinate } from "./coordinate";
 import { Elements } from "./elements";
-import { Element } from "./elements/element";
+import { Element } from "./element";
 import { Plane } from "./plane";
 import { Size } from "./size";
 
 export class ElementBoxes extends Boxes {
     groupElements: Elements[];
-    constructor(
+    constructor(props: {
         x: number,
         y: number,
         canvas: Canvas,
         boxDefault: Box,
-    ) {
-        super(
-            x, y,
-            canvas,
-            boxDefault
-        );
+    }) {
+        super(props);
         this.groupElements = [];
     }
 
@@ -30,37 +26,29 @@ export class ElementBoxes extends Boxes {
         const index = this.boxIndex(boxes);
         if (index !== false) return index;
         const coordinateOfBoxes = this.getCoordinateOfBoxes(boxes);
-        const newElements = new Elements(
-            coordinateOfBoxes,
-            new Size(
-                this.boxDefault.size.width * this.boxDefault.length.horizontal,
-                this.boxDefault.size.height * this.boxDefault.length.vertical,
-            ),
-            this.canvas,
-            elementsDefault.route,
-            new Element(
-                new Size(
-                    elementsDefault.element.size.width,
-                    elementsDefault.element.size.height
-                ),
-                new Plane(
-                    elementsDefault.element.horizontal,
-                    elementsDefault.element.vertical
-                )
-            )
-        );
+        const newElements = new Elements({
+            initial: coordinateOfBoxes,
+            size: new Size({
+                width: this.boxDefault.size.width * this.boxDefault.length.horizontal,
+                height: this.boxDefault.size.height * this.boxDefault.length.vertical,
+            }),
+            canvas: this.canvas,
+            route: elementsDefault.route,
+            element: new Element({
+                size: new Size({
+                    width: elementsDefault.element.size.width,
+                    height: elementsDefault.element.size.height
+                }),
+                plane: new Plane({
+                    horizontal: elementsDefault.element.horizontal,
+                    vertical: elementsDefault.element.vertical
+                })
+            })
+        });
         this.groupElements.push(newElements);
         const newIndex = this.groupElements.length - 1;
         this.setBoxIndex(newIndex, boxes);
         return newIndex;
-    }
-
-    insideAnElements(
-        coordinate: Coordinate
-    ) {
-        return this.groupElements.some(element =>
-            element.insideCoordinate(coordinate)
-        );
     }
 
     drawElements() {

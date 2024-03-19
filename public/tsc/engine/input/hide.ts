@@ -19,6 +19,7 @@ export class Hide extends Rect {
     turnOn: boolean,
   ) {
     super(
+      canvas,
       new Coordinate(
         input.initial.x + (input.size.width * 0.88),
         input.initial.y + (input.size.height * 0.2),
@@ -27,7 +28,6 @@ export class Hide extends Rect {
         input.size.width * 0.10,
         input.size.height * 0.6,
       ),
-      canvas,
       "#AED6F1",
       "#EAF2F8",
       0.5,

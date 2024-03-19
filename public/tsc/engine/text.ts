@@ -1,32 +1,30 @@
 import type { Canvas } from "./canvas";
-import type { Coordinate } from "./coordinate";
+import type { FillStyle, StrokeStyle } from "./context";
+import { Coordinate } from "./coordinate";
 import { Position } from "./position";
-import type { Size } from "./size";
+import { Size } from "./size";
 
 export class Text extends Position {
     canvas: Canvas;
     value: string;
-    fillStyle: string;
-    strokeStyle: string;
+    fillStyle: FillStyle;
+    strokeStyle: StrokeStyle;
     dungeonFont: boolean;
-    constructor(
-        initial: Coordinate,
-        size: Size,
-        canvas: Canvas,
-        value: string = "",
-        fillStyle: string = "",
-        strokeStyle: string = "",
-        dungeonFont: boolean = false
-    ) {
-        super(
-            initial,
-            size
-        );
-        this.canvas = canvas;
-        this.value = value;
-        this.fillStyle = fillStyle;
-        this.strokeStyle = strokeStyle;
-        this.dungeonFont = dungeonFont;
+    constructor(props: {
+        canvas: Canvas;
+        initial: Coordinate;
+        size: Size;
+        value: string;
+        fillStyle: FillStyle;
+        strokeStyle: StrokeStyle;
+        dungeonFont: boolean;
+    }) {
+        super(props);
+        this.canvas = props.canvas;
+        this.value = props.value;
+        this.fillStyle = props.fillStyle;
+        this.strokeStyle = props.strokeStyle;
+        this.dungeonFont = props.dungeonFont;
     }
 
     get font() {
@@ -49,7 +47,7 @@ export class Text extends Position {
         positionOnCanvas.initial.x += this.size.width / 2;
         positionOnCanvas.initial.x -= positionOnCanvas.size.width / 2;
 
-        if (this.fillStyle.length > 0) {
+        if (this.fillStyle !== false) {
             this.canvas.context.fillStyle = this.fillStyle;
             this.canvas.context.fillText(
                 this.value,
@@ -58,7 +56,7 @@ export class Text extends Position {
             );
         }
 
-        if (this.strokeStyle.length > 0) {
+        if (this.strokeStyle !== false) {
             this.canvas.context.strokeStyle = this.strokeStyle;
             this.canvas.context.strokeText(
                 this.value,

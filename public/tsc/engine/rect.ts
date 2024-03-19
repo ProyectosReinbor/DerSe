@@ -1,33 +1,34 @@
 import type { Canvas } from "./canvas";
-import type { Coordinate } from "./coordinate";
+import type { FillStyle, StrokeStyle } from "./context";
+import { Coordinate } from "./coordinate";
 import { Position } from "./position";
-import type { Size } from "./size";
+import { Size } from "./size";
 
 export class Rect extends Position {
   canvas: Canvas;
-  fillStyle: string;
-  strokeStyle: string;
+  fillStyle: FillStyle;
+  strokeStyle: StrokeStyle;
   lineWidth: number;
-  constructor(
-    initial: Coordinate,
-    size: Size,
-    canvas: Canvas,
-    fillStyle: string = "",
-    strokeStyle: string = "",
-    lineWidth: number = 0,
-  ) {
-    super(initial, size);
-    this.canvas = canvas;
-    this.fillStyle = fillStyle;
-    this.strokeStyle = strokeStyle;
-    this.lineWidth = lineWidth;
+  constructor(props: {
+    canvas: Canvas;
+    initial: Coordinate;
+    size: Size;
+    fillStyle: FillStyle;
+    strokeStyle: StrokeStyle;
+    lineWidth: number;
+  }) {
+    super(props);
+    this.canvas = props.canvas;
+    this.fillStyle = props.fillStyle;
+    this.strokeStyle = props.strokeStyle;
+    this.lineWidth = props.lineWidth;
   }
 
   drawRect() {
     const positionOnCanvas = this.canvas.positionOnCanvas(this);
     if (positionOnCanvas === false) return;
 
-    if (this.fillStyle.length > 0) {
+    if (this.fillStyle !== false) {
       this.canvas.context.fillStyle = this.fillStyle;
       this.canvas.context.fillRect(
         positionOnCanvas.initial.x,
@@ -37,7 +38,7 @@ export class Rect extends Position {
       );
     }
 
-    if (this.strokeStyle.length > 0) {
+    if (this.strokeStyle !== false) {
       this.canvas.context.lineWidth = this.lineWidth;
       this.canvas.context.strokeStyle = this.strokeStyle;
       this.canvas.context.strokeRect(

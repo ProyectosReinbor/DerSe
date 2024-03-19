@@ -9,48 +9,35 @@ import { Size } from "../size";
 export class Finish extends Rect {
   seen: Lines;
   keyboard: Keyboard;
-  constructor(
-    canvas: Canvas,
-    keyboard: Keyboard,
-  ) {
-    super(
-      new Coordinate(
-        keyboard.initial.x + (keyboard.size.width * 0.88),
-        keyboard.initial.y + (keyboard.size.height * 0.03),
-      ),
-      new Size(
-        keyboard.size.width * 0.1,
-        keyboard.size.height * 0.14,
-      ),
-      canvas,
-      "#21618C",
-      "#fff",
-      0.5,
-    );
-    this.seen = new Lines(
-      canvas,
-      undefined,
-      "#fff",
-      0.5
-    );
-    this.seen.addLine(new Coordinate(
-      this.initial.x + (this.size.width * 0.3),
-      this.initial.y + (this.size.height * 0.5),
-    ));
-    this.seen.addLine(new Coordinate(
-      this.initial.x + (this.size.width * 0.5),
-      this.initial.y + (this.size.height * 0.8),
-    ));
-    this.seen.addLine(new Coordinate(
-      this.initial.x + (this.size.width * 0.7),
-      this.initial.y + (this.size.height * 0.2),
-    ));
-    this.keyboard = keyboard;
+  constructor(props: {
+    canvas: Canvas;
+    keyboard: Keyboard;
+  }) {
+    super({
+      canvas: props.canvas,
+      initial: props.keyboard.endPercentage(new Coordinate({ x: 88, y: 3 })),
+      size: props.keyboard.size.percentage(new Coordinate({ x: 1, y: 14 })),
+      fillStyle: "#21618C",
+      strokeStyle: "#fff",
+      lineWidth: 0.5,
+    });
+    this.seen = new Lines({
+      initial: this.initial,
+      size: this.size,
+      canvas: props.canvas,
+      fillStyle: false,
+      strokeStyle: "#fff",
+      lineWidth: 0.5
+    });
+    this.seen.addLine(new Coordinate({ x: 30, y: 50 }));
+    this.seen.addLine(new Coordinate({ x: 50, y: 80 }));
+    this.seen.addLine(new Coordinate({ x: 70, y: 20 }));
+    this.keyboard = props.keyboard;
   }
 
   touchendFinish(touch: Coordinate) {
     if (this.insideCoordinate(touch) === false) return false;
-    this.keyboard.target = null;
+    this.keyboard.target = false;
     return true;
   }
 

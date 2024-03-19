@@ -8,6 +8,7 @@ import { Position } from "../engine/position.js";
 import { Size } from "../engine/size.js";
 import type { Canvas } from "../engine/canvas.js";
 import { Coordinate } from "../engine/coordinate.js";
+import type { Collider } from "../engine/collider.js";
 
 export class Map extends Position {
     matrix: MapFloor[] = MapMatrix();
@@ -29,14 +30,16 @@ export class Map extends Position {
     }
 
     collision(
-        initial: Coordinate,
-        nextInitial: Coordinate
+        collider: Collider,
+        nextCollider: Collider
     ): boolean {
         for (let index = this.floors.length - 1; index >= 0; index--) {
             const floor = this.floors[index];
-            if (floor.insideFloor(initial) === false) continue;
-            return floor.collision(initial, nextInitial);
+            if (floor.insideFloor(collider) === false) continue;
+            console.log("inside floor")
+            if (floor.collision(collider, nextCollider) === true) return true;
         }
+        return false;
         throw new Error("no floor");
     }
 

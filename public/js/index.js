@@ -249,15 +249,79 @@ class Scene {
   }
 }
 
+// public/tsc/engine/rect.ts
+class Rect extends Position {
+  canvas;
+  fillStyle;
+  strokeStyle;
+  lineWidth;
+  constructor(initial, size4, canvas, fillStyle = "", strokeStyle = "", lineWidth = 0) {
+    super(initial, size4);
+    this.canvas = canvas;
+    this.fillStyle = fillStyle;
+    this.strokeStyle = strokeStyle;
+    this.lineWidth = lineWidth;
+  }
+  drawRect() {
+    const positionOnCanvas = this.canvas.positionOnCanvas(this);
+    if (positionOnCanvas === false)
+      return;
+    if (this.fillStyle.length > 0) {
+      this.canvas.context.fillStyle = this.fillStyle;
+      this.canvas.context.fillRect(positionOnCanvas.initial.x, positionOnCanvas.initial.y, positionOnCanvas.size.width, positionOnCanvas.size.height);
+    }
+    if (this.strokeStyle.length > 0) {
+      this.canvas.context.lineWidth = this.lineWidth;
+      this.canvas.context.strokeStyle = this.strokeStyle;
+      this.canvas.context.strokeRect(positionOnCanvas.initial.x, positionOnCanvas.initial.y, positionOnCanvas.size.width, positionOnCanvas.size.height);
+    }
+  }
+}
+
+// public/tsc/engine/collider.ts
+class Collider extends Rect {
+  constructor(initial, size4, canvas, fillStyle = "", strokeStyle = "", lineWidth = 0) {
+    super(initial, size4, canvas, fillStyle, strokeStyle, lineWidth);
+  }
+  collision(collider) {
+    const insideInitial = this.insideCoordinate(collider.initial);
+    if (insideInitial === true)
+      return true;
+    const insideEnd = this.insideCoordinate(collider.end);
+    if (insideEnd === true)
+      return true;
+    return false;
+  }
+  drawCollider() {
+    this.drawRect();
+  }
+}
+
 // public/tsc/engine/boxes.ts
 class Boxes extends Coordinate {
-  boxes = [];
+  indices = [];
   canvas;
   boxDefault;
   constructor(x, y, canvas, boxDefault) {
     super(x, y);
     this.canvas = canvas;
     this.boxDefault = boxDefault;
+  }
+  collision(collider2) {
+    const boxes = this.getBoxesOfCoordinate(collider2.initial);
+    const boxesEnd = this.getBoxesOfCoordinate(collider2.end);
+    for (let yIndex = boxes.y;yIndex < boxesEnd.y; yIndex++) {
+      for (let xIndex = boxes.x;xIndex < boxesEnd.x; xIndex++) {
+        const boxes2 = new Coordinate(xIndex, yIndex);
+        const index = this.boxIndex(boxes2);
+        if (index === false)
+          continue;
+        const boxCollider = this.getColliderOfBoxes(boxes2);
+        if (boxCollider.collision(collider2) === false)
+          continue;
+        return true;
+      }
+    }
   }
   getBoxesOfCoordinate(coordinate5) {
     const boxX = Math.floor(coordinate5.x / this.boxDefault.size.width);
@@ -269,10 +333,14 @@ class Boxes extends Coordinate {
     const distanceBoxY = boxes.y * this.boxDefault.size.height;
     return new Coordinate(this.x + distanceBoxX, this.y + distanceBoxY);
   }
+  getColliderOfBoxes(boxes) {
+    const initial = this.getCoordinateOfBoxes(boxes);
+    return new Collider(initial, this.boxDefault.size, this.canvas);
+  }
   boxIndex(boxes) {
-    if (this.boxes[boxes.y] === undefined)
-      this.boxes[boxes.y] = [];
-    const index = this.boxes[boxes.y][boxes.x];
+    if (this.indices[boxes.y] === undefined)
+      this.indices[boxes.y] = [];
+    const index = this.indices[boxes.y][boxes.x];
     if (index === undefined)
       return false;
     return index;
@@ -280,9 +348,9 @@ class Boxes extends Coordinate {
   setOccupiedBox(boxes, indices, index) {
     const y = boxes.y + indices.y;
     const x = boxes.x + indices.x;
-    if (this.boxes[y] === undefined)
-      this.boxes[y] = [];
-    this.boxes[y][x] = index;
+    if (this.indices[y] === undefined)
+      this.indices[y] = [];
+    this.indices[y][x] = index;
   }
   setBoxIndex(index, boxes) {
     if (this.boxDefault.occupiedBoxes === true) {
@@ -530,9 +598,6 @@ class ElementBoxes extends Boxes {
     const newIndex = this.groupElements.length - 1;
     this.setBoxIndex(newIndex, boxes4);
     return newIndex;
-  }
-  insideAnElements(coordinate9) {
-    return this.groupElements.some((element4) => element4.insideCoordinate(coordinate9));
   }
   drawElements() {
     this.groupElements.forEach((elements3) => elements3.drawElement());
@@ -953,21 +1018,21 @@ class Floor {
     this.castles = new Castles(this.map, this.canvas);
     this.trees = new Trees(this.map, this.canvas);
   }
-  insideFloor(initial) {
-    const flatSandInside = this.flatsSand.insideAnElements(initial);
-    const elevationInside = this.elevations.insideAnElements(initial);
-    const stairElevationInside = this.stairsElevation.insideAnElements(initial);
+  insideFloor(collider2) {
+    const flatSandInside = this.flatsSand.collision(collider2);
+    const elevationInside = this.elevations.collision(collider2);
+    const stairElevationInside = this.stairsElevation.collision(collider2);
     return flatSandInside === true || elevationInside === true || stairElevationInside === true;
   }
-  collision(initial, nextInitial) {
-    const flatSandInside = this.flatsSand.insideAnElements(initial);
-    const elevationInside = this.elevations.insideAnElements(initial);
-    const wallElevationInside = this.wallElevations.insideAnElements(initial);
-    const stairElevationInside = this.stairsElevation.insideAnElements(initial);
-    const nextFlatSandInside = this.flatsSand.insideAnElements(nextInitial);
-    const nextElevationInside = this.elevations.insideAnElements(nextInitial);
-    const nextWallElevationInside = this.wallElevations.insideAnElements(nextInitial);
-    const nextStairElevationInside = this.stairsElevation.insideAnElements(nextInitial);
+  collision(collider2, nextCollider) {
+    const flatSandInside = this.flatsSand.collision(collider2);
+    const elevationInside = this.elevations.collision(collider2);
+    const wallElevationInside = this.wallElevations.collision(collider2);
+    const stairElevationInside = this.stairsElevation.collision(collider2);
+    const nextFlatSandInside = this.flatsSand.collision(nextCollider);
+    const nextElevationInside = this.elevations.collision(nextCollider);
+    const nextWallElevationInside = this.wallElevations.collision(nextCollider);
+    const nextStairElevationInside = this.stairsElevation.collision(nextCollider);
     if (flatSandInside === true) {
       if (nextFlatSandInside === true)
         return false;
@@ -977,6 +1042,7 @@ class Floor {
         return true;
       if (nextStairElevationInside === true)
         return false;
+      return true;
     }
     if (elevationInside === true) {
       if (nextFlatSandInside === true)
@@ -987,6 +1053,7 @@ class Floor {
         return true;
       if (nextStairElevationInside === true)
         return false;
+      return true;
     }
     if (wallElevationInside === true)
       throw new Error("inside wall elevation");
@@ -999,6 +1066,7 @@ class Floor {
         return true;
       if (nextStairElevationInside === true)
         return false;
+      return true;
     }
     throw new Error("no exits collision");
   }
@@ -1195,13 +1263,16 @@ class Map extends Position {
       floor2.setFloor(this.matrix[index]);
     });
   }
-  collision(initial, nextInitial) {
+  collision(collider2, nextCollider) {
     for (let index = this.floors.length - 1;index >= 0; index--) {
       const floor2 = this.floors[index];
-      if (floor2.insideFloor(initial) === false)
+      if (floor2.insideFloor(collider2) === false)
         continue;
-      return floor2.collision(initial, nextInitial);
+      console.log("inside floor");
+      if (floor2.collision(collider2, nextCollider) === true)
+        return true;
     }
+    return false;
     throw new Error("no floor");
   }
   drawMap() {
@@ -1213,12 +1284,14 @@ class Map extends Position {
 class Character extends Animations {
   speed;
   address;
-  constructor(initial, size20, canvas, route, element11, animation3, speed) {
-    super(initial, size20, canvas, route, element11, animation3);
+  collider;
+  constructor(initial, size21, canvas, route, element11, animation3, speed, collider3) {
+    super(initial, size21, canvas, route, element11, animation3);
     this.speed = speed;
     this.address = new Coordinate;
+    this.collider = collider3;
   }
-  nextInitial() {
+  nextCollider() {
     if (this.address.equals(new Coordinate))
       return false;
     const secondsBetweenFrames = this.canvas.timeBetweenFrames / 1000;
@@ -1228,39 +1301,10 @@ class Character extends Animations {
     const distanceY = speedY * this.address.y;
     const newX = this.initial.x + distanceX;
     const newY = this.initial.y + distanceY;
-    return new Coordinate(newX, newY);
+    return new Collider(new Coordinate(newX, newY), new Size(this.collider.size.width, this.collider.size.height), this.canvas);
   }
   drawCharacter() {
     this.drawAnimation();
-  }
-}
-
-// public/tsc/engine/rect.ts
-class Rect extends Position {
-  canvas;
-  fillStyle;
-  strokeStyle;
-  lineWidth;
-  constructor(initial, size20, canvas, fillStyle = "", strokeStyle = "", lineWidth = 0) {
-    super(initial, size20);
-    this.canvas = canvas;
-    this.fillStyle = fillStyle;
-    this.strokeStyle = strokeStyle;
-    this.lineWidth = lineWidth;
-  }
-  drawRect() {
-    const positionOnCanvas = this.canvas.positionOnCanvas(this);
-    if (positionOnCanvas === false)
-      return;
-    if (this.fillStyle.length > 0) {
-      this.canvas.context.fillStyle = this.fillStyle;
-      this.canvas.context.fillRect(positionOnCanvas.initial.x, positionOnCanvas.initial.y, positionOnCanvas.size.width, positionOnCanvas.size.height);
-    }
-    if (this.strokeStyle.length > 0) {
-      this.canvas.context.lineWidth = this.lineWidth;
-      this.canvas.context.strokeStyle = this.strokeStyle;
-      this.canvas.context.strokeRect(positionOnCanvas.initial.x, positionOnCanvas.initial.y, positionOnCanvas.size.width, positionOnCanvas.size.height);
-    }
   }
 }
 
@@ -1271,8 +1315,8 @@ class Text extends Position {
   fillStyle;
   strokeStyle;
   dungeonFont;
-  constructor(initial, size20, canvas, value = "", fillStyle = "", strokeStyle = "", dungeonFont = false) {
-    super(initial, size20);
+  constructor(initial, size21, canvas, value = "", fillStyle = "", strokeStyle = "", dungeonFont = false) {
+    super(initial, size21);
     this.canvas = canvas;
     this.value = value;
     this.fillStyle = fillStyle;
@@ -1312,8 +1356,8 @@ class Text extends Position {
 class UserBar extends Rect {
   photo;
   name;
-  constructor(size21, canvas, photoRoute, nickname) {
-    super(new Coordinate, size21, canvas, "#416177", "#fff", 0.5);
+  constructor(size22, canvas, photoRoute, nickname) {
+    super(new Coordinate, size22, canvas, "#416177", "#fff", 0.5);
     this.photo = new Image2(new Coordinate, new Size(this.size.width * 0.3, this.size.height), this.canvas, photoRoute);
     this.name = new Text(new Coordinate, new Size(this.size.width * 0.7, 9), this.canvas, nickname, "#fff");
   }
@@ -1336,7 +1380,7 @@ class Pawn extends Character {
   nickname;
   userBar;
   constructor(initial, map, canvas, color, nickname, userBar2) {
-    super(initial, new Size(map.boxes.width * 3, map.boxes.height * 3), canvas, `images/factions/knights/troops/pawn/${color}.png`, new Element(new Size(192, 192), new Plane(6, 6)), new Animation(6, 6), new Coordinate(2, 2));
+    super(initial, new Size(map.boxes.width * 3, map.boxes.height * 3), canvas, `images/factions/knights/troops/pawn/${color}.png`, new Element(new Size(192, 192), new Plane(6, 6)), new Animation(6, 6), new Coordinate(2, 2), new Collider(new Coordinate, new Size(64, 64), canvas));
     this.map = map;
     this.nickname = nickname;
     this.userBar = new UserBar(new Size(map.boxes.width, map.boxes.height / 2), canvas, userBar2.photoRoute, this.nickname);
@@ -1355,26 +1399,26 @@ class Sheep extends Character {
   map;
   constructor(initial, map, canvas) {
     const SheepDefault = (plane18, animation5) => {
-      return new Character(new Coordinate, new Size, canvas, "images/resources/sheep.png", new Element(new Size(128, 128), plane18), animation5, new Coordinate(2, 2));
+      return new Character(new Coordinate, new Size, canvas, "images/resources/sheep.png", new Element(new Size(128, 128), plane18), animation5, new Coordinate(2, 2), new Collider(new Coordinate, new Size(64, 64), canvas));
     };
-    super(initial, new Size(map.boxes.width * 3, map.boxes.height * 3), canvas, "images/resources/sheep.png", new Element(new Size(128, 128), new Plane), new Animation(8, 8), new Coordinate(2, 2));
+    super(initial, new Size(map.boxes.width * 3, map.boxes.height * 3), canvas, "images/resources/sheep.png", new Element(new Size(128, 128), new Plane), new Animation(8, 8), new Coordinate(2, 2), new Collider(new Coordinate, new Size(64, 64), canvas));
     this.map = map;
     this.sheepDefault = {
       move: SheepDefault(new Plane, new Animation(8, 8)),
       jump: SheepDefault(new Plane(0, 1), new Animation(6, 6))
     };
     this.state = "move";
-    this.address.x = 1;
+    this.address.x = -1;
   }
   moveSheep() {
-    const nextInitial = this.nextInitial();
-    if (nextInitial === false)
+    const nextCollider = this.nextCollider();
+    if (nextCollider === false)
       return false;
-    const collision = this.map.collision(this.initial, nextInitial);
+    const collision = this.map.collision(this.collider, nextCollider);
     if (collision === true)
       return false;
-    this.initial.x = nextInitial.x;
-    this.initial.y = nextInitial.y;
+    this.initial.x = nextCollider.initial.x;
+    this.initial.y = nextCollider.initial.y;
     return true;
   }
   jumpSheep() {

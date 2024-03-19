@@ -1,26 +1,26 @@
 
 
 import type { Canvas } from "./canvas.js";
+import type { FillStyle, StrokeStyle } from "./context.js";
 import type { Coordinate } from "./coordinate.js";
-import { Curve } from "./curves/curve.js";
+import { Curve } from "./curve.js";
 
 export class Curves {
-  curves: Curve[];
+  curves: Curve[] = [];
   canvas: Canvas;
-  fillStyle: string;
-  strokeStyle: string;
+  fillStyle: FillStyle;
+  strokeStyle: StrokeStyle;
   lineWidth: number;
-  constructor(
-    canvas: Canvas,
-    fillStyle: string = "",
-    strokeStyle: string = "",
-    lineWidth: number = 0,
-  ) {
-    this.curves = [];
-    this.canvas = canvas;
-    this.fillStyle = fillStyle;
-    this.strokeStyle = strokeStyle;
-    this.lineWidth = lineWidth;
+  constructor(props: {
+    canvas: Canvas;
+    fillStyle: FillStyle;
+    strokeStyle: StrokeStyle;
+    lineWidth: number;
+  }) {
+    this.canvas = props.canvas;
+    this.fillStyle = props.fillStyle;
+    this.strokeStyle = props.strokeStyle;
+    this.lineWidth = props.lineWidth;
   }
 
   addCurve(
@@ -29,12 +29,12 @@ export class Curves {
     controlPoint: Coordinate,
   ) {
     this.curves.push(
-      new Curve(
+      new Curve({
         initial,
         end,
-        this.canvas,
+        canvas: this.canvas,
         controlPoint,
-      )
+      })
     );
   }
 
@@ -42,13 +42,13 @@ export class Curves {
     this.canvas.context.beginPath();
     this.curves.forEach(curve => curve.drawCurve());
 
-    if (this.strokeStyle.length > 0) {
+    if (this.strokeStyle !== false) {
       this.canvas.context.strokeStyle = this.strokeStyle;
       this.canvas.context.lineWidth = this.lineWidth;
       this.canvas.context.stroke();
     }
 
-    if (this.fillStyle.length > 0) {
+    if (this.fillStyle !== false) {
       this.canvas.context.fillStyle = this.fillStyle;
       this.canvas.context.fill();
     }

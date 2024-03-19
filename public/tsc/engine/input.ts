@@ -1,68 +1,35 @@
 
 import type { Canvas } from "./canvas.js";
-import type { Coordinate } from "./coordinate.js";
+import type { FillStyle, StrokeStyle } from "./context.js";
+import { Coordinate } from "./coordinate.js";
 import { Hide } from "./input/hide.js";
 import { Rect } from "./rect.js";
 import { Size } from "./size.js";
 import { Text } from "./text.js";
 
-type TextParameters = {
-    size: Size;
-    fillStyle: string;
-    strokeStyle: string;
-};
-
-type InformationParameters = {
-    value: string;
-    fillStyle: string;
-    strokeStyle: string;
-};
-
 export class Input extends Rect {
     value: string = "";
     hide: Hide;
-    textParameters: TextParameters;
-    informationParameters: InformationParameters;
+    textDefault: Text;
+    informationDefault: Text;
     text: Text;
-    constructor(
-        initial: Coordinate,
-        size: Size,
-        canvas: Canvas,
-        fillStyle: string = "",
-        strokeStyle: string = "",
-        lineWidth: number = 0,
-        hide: {
-            turnOn: boolean;
-        },
-        textParameters: TextParameters,
-        informationParameters: InformationParameters,
-    ) {
-        super(
-            initial,
-            size,
-            canvas,
-            fillStyle,
-            strokeStyle,
-            lineWidth
-        );
-        this.hide = new Hide(
-            canvas,
-            this,
-            hide.turnOn,
-        );
-        this.textParameters = textParameters;
-        this.informationParameters = informationParameters;
-        this.text = new Text(
-            this.initial,
-            new Size(
-                this.size.width,
-                textParameters.size.height
-            ),
-            canvas,
-            this.value,
-            this.textParameters.fillStyle,
-            this.textParameters.strokeStyle,
-        );
+    constructor(props: {
+        canvas: Canvas;
+        initial: Coordinate;
+        size: Size;
+        fillStyle: FillStyle;
+        strokeStyle: StrokeStyle;
+        lineWidth: number;
+        hide: Hide;
+        textDefault: Text;
+        informationDefault: Text;
+        text: Text;
+    }) {
+        super(props);
+        this.hide = props.hide;
+        this.textDefault = props.textDefault;
+        this.informationDefault = props.informationDefault;
+        this.text = props.text;
     }
 
     touchendInput(touch: Coordinate) {
@@ -71,8 +38,12 @@ export class Input extends Rect {
     }
 
     get textValue() {
-        if (this.value.length === 0) return this.informationParameters.value;
-        if (this.hide.turnOn === false) return this.value;
+        if (this.value.length === 0)
+            return this.informationDefault.value;
+
+        if (this.hide.turnOn === false)
+            return this.value;
+
         return this.hide.encryption;
     }
 

@@ -3,14 +3,14 @@ import type { Coordinate } from "./coordinate";
 
 export class Scene {
     canvas: Canvas;
-    draw() { }
+    draw: () => void = () => { }
     touchstart: (touch: Coordinate) => void = () => { }
     touchmove: (touch: Coordinate) => void = () => { }
     touchend: (touch: Coordinate) => void = () => { }
-    constructor(
-        canvas: Canvas
-    ) {
-        this.canvas = canvas;
+    constructor(props: {
+        canvas: Canvas;
+    }) {
+        this.canvas = props.canvas;
     }
 
     async start() {

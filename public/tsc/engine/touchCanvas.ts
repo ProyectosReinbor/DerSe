@@ -2,21 +2,19 @@ import type { Canvas } from "./canvas";
 import type { Coordinate } from "./coordinate";
 
 export class TouchCanvas {
-  touch: null | Coordinate;
-  moved: boolean;
+  touch: Coordinate | false = false;
+  moved: boolean = false;
   canvas: Canvas;
   canHorizontal: boolean;
   canVertical: boolean;
-  constructor(
-    canvas: Canvas,
-    canHorizontal: boolean = false,
-    canVertical: boolean = false,
-  ) {
-    this.touch = null;
-    this.moved = false;
-    this.canvas = canvas;
-    this.canHorizontal = canHorizontal;
-    this.canVertical = canVertical;
+  constructor(props: {
+    canvas: Canvas;
+    canHorizontal: boolean;
+    canVertical: boolean;
+  }) {
+    this.canvas = props.canvas;
+    this.canHorizontal = props.canHorizontal;
+    this.canVertical = props.canVertical;
   }
 
   touchstartTouchCamera(touch: Coordinate) {
@@ -24,8 +22,8 @@ export class TouchCanvas {
     this.touch = touch;
   }
 
-  touchmoveTouchCamera(touch: Coordinate) {
-    if (this.touch === null) return false;
+  touchmoveTouchCamera(touch: Coordinate): boolean {
+    if (this.touch === false) return false;
 
     let moved = false;
 
@@ -51,8 +49,8 @@ export class TouchCanvas {
     return this.moved;
   }
 
-  touchendTouchCamera() {
-    this.touch = null;
+  touchendTouchCamera(): boolean {
+    this.touch = false;
     return this.moved;
   }
 }

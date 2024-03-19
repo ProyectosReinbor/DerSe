@@ -3,74 +3,45 @@ import { Coordinate } from "../coordinate";
 import type { Keyboard } from "../keyboard";
 import { Lines } from "../lines";
 import { Position } from "../position";
-import { Size } from "../size";
 import { Text } from "../text";
 
-
 export class Delete extends Position {
-  startTouch: number | null = null;
+  startTouch: number | false = false;
   lines: Lines;
   character: Text;
   keyboard: Keyboard;
-  constructor(
-    canvas: Canvas,
-    keyboard: Keyboard,
-  ) {
-    super(
-      new Coordinate(
-        keyboard.initial.x + (keyboard.size.width * 0.63),
-        keyboard.initial.y,
-      ),
-      new Size(
-        keyboard.size.width * 0.15,
-        keyboard.size.height * 0.2,
-      )
-    );
-    this.startTouch = null;
-    this.lines = new Lines(
-      canvas,
-      "#21618C",
-      "#fff",
-      0.5
-    );
-    this.lines.addLine(new Coordinate(
-      this.initial.x + (this.size.width * 0.1),
-      this.initial.y + (this.size.height * 0.5),
-    ));
-    this.lines.addLine(new Coordinate(
-      this.initial.x + (this.size.width * 0.3),
-      this.initial.y + (this.size.height * 0.2),
-    ));
-    this.lines.addLine(new Coordinate(
-      this.initial.x + (this.size.width * 0.9),
-      this.initial.y + (this.size.height * 0.2),
-    ));
-    this.lines.addLine(new Coordinate(
-      this.initial.x + (this.size.width * 0.9),
-      this.initial.y + (this.size.height * 0.8),
-    ));
-    this.lines.addLine(new Coordinate(
-      this.initial.x + (this.size.width * 0.3),
-      this.initial.y + (this.size.height * 0.8),
-    ));
-    this.lines.addLine(new Coordinate(
-      this.initial.x + (this.size.width * 0.1),
-      this.initial.y + (this.size.height * 0.5),
-    ));
-    this.character = new Text(
-      new Coordinate(
-        this.initial.x + (this.size.width * 0.50),
-        this.initial.y + (this.size.height * 0.15),
-      ),
-      new Size(
-        this.size.width * 0.15,
-        9,
-      ),
-      canvas,
-      "X",
-      "#fff",
-    );
-    this.keyboard = keyboard;
+  constructor(props: {
+    canvas: Canvas;
+    keyboard: Keyboard;
+  }) {
+    super({
+      initial: props.keyboard.endPercentage(new Coordinate({ x: 63, y: 0, })),
+      size: props.keyboard.size.percentage(new Coordinate({ x: 15, y: 20, })),
+    });
+    this.lines = new Lines({
+      initial: this.initial,
+      size: this.size,
+      canvas: props.canvas,
+      fillStyle: "#21618C",
+      strokeStyle: "#fff",
+      lineWidth: 0.5
+    });
+    this.lines.addLine(new Coordinate({ x: 10, y: 50 }));
+    this.lines.addLine(new Coordinate({ x: 30, y: 20 }));
+    this.lines.addLine(new Coordinate({ x: 90, y: 20 }));
+    this.lines.addLine(new Coordinate({ x: 90, y: 80 }));
+    this.lines.addLine(new Coordinate({ x: 30, y: 80 }));
+    this.lines.addLine(new Coordinate({ x: 10, y: 50 }));
+    this.character = new Text({
+      initial: this.endPercentage(new Coordinate({ x: 50, y: 15 })),
+      size: this.size.percentage(new Coordinate({ x: 15, y: 100 })),
+      canvas: props.canvas,
+      value: "X",
+      fillStyle: "#fff",
+      strokeStyle: false,
+      dungeonFont: true
+    });
+    this.keyboard = props.keyboard;
   }
 
   touchstartDelete(touch: Coordinate) {
@@ -81,24 +52,24 @@ export class Delete extends Position {
 
   deleteLastCharacter() {
     this.startTouch = new Date().getTime();
-    if (this.keyboard.target === null) return;
+    if (this.keyboard.target === false) return;
     this.keyboard.target.deleteLastCharacter();
   }
 
   touchmoveDelete(touch: Coordinate) {
     const inside = this.insideCoordinate(touch);
     if (inside === true) return;
-    this.startTouch = null;
+    this.startTouch = false;
   }
 
   touchendDelete() {
-    if (this.startTouch === null) return false;
-    this.startTouch = null;
+    if (this.startTouch === false) return false;
+    this.startTouch = false;
     return true;
   }
 
   holdDown() {
-    if (this.startTouch === null) return;
+    if (this.startTouch === false) return;
     const time = new Date().getTime() - this.startTouch;
     if (time > 250)
       this.deleteLastCharacter();

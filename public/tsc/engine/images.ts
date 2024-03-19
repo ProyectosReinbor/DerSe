@@ -35,7 +35,7 @@ export class Images {
   }
 
   load(route: string): Promise<HTMLImageElement> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       if (this.imageExists(route) === true)
         return resolve(this.images[route]);
 

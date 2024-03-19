@@ -14,6 +14,7 @@ import type { MapFloor } from "./mapMatrix.js";
 import { Coordinate } from "../engine/coordinate.js";
 import { Trees } from "./floor/trees.js";
 import { Position } from "../engine/position.js";
+import type { Collider } from "../engine/collider.js";
 
 export class Floor {
     canvas: Canvas;
@@ -48,36 +49,38 @@ export class Floor {
         this.trees = new Trees(this.map, this.canvas);
     }
 
-    insideFloor(initial: Coordinate) {
-        const flatSandInside = this.flatsSand.insideAnElements(initial);
-        const elevationInside = this.elevations.insideAnElements(initial);
-        const stairElevationInside = this.stairsElevation.insideAnElements(initial);
+    insideFloor(collider: Collider) {
+        const flatSandInside = this.flatsSand.collision(collider);
+        const elevationInside = this.elevations.collision(collider);
+        const stairElevationInside = this.stairsElevation.collision(collider);
         return flatSandInside === true ||
             elevationInside === true ||
             stairElevationInside === true;
     }
 
-    collision(initial: Coordinate, nextInitial: Coordinate) {
-        const flatSandInside = this.flatsSand.insideAnElements(initial);
-        const elevationInside = this.elevations.insideAnElements(initial);
-        const wallElevationInside = this.wallElevations.insideAnElements(initial);
-        const stairElevationInside = this.stairsElevation.insideAnElements(initial);
-        const nextFlatSandInside = this.flatsSand.insideAnElements(nextInitial);
-        const nextElevationInside = this.elevations.insideAnElements(nextInitial);
-        const nextWallElevationInside = this.wallElevations.insideAnElements(nextInitial);
-        const nextStairElevationInside = this.stairsElevation.insideAnElements(nextInitial);
+    collision(collider: Collider, nextCollider: Collider) {
+        const flatSandInside = this.flatsSand.collision(collider);
+        const elevationInside = this.elevations.collision(collider);
+        const wallElevationInside = this.wallElevations.collision(collider);
+        const stairElevationInside = this.stairsElevation.collision(collider);
+        const nextFlatSandInside = this.flatsSand.collision(nextCollider);
+        const nextElevationInside = this.elevations.collision(nextCollider);
+        const nextWallElevationInside = this.wallElevations.collision(nextCollider);
+        const nextStairElevationInside = this.stairsElevation.collision(nextCollider);
 
         if (flatSandInside === true) {
             if (nextFlatSandInside === true) return false;
             if (nextElevationInside === true) return true;
             if (nextWallElevationInside === true) return true;
             if (nextStairElevationInside === true) return false;
+            return true;
         }
         if (elevationInside === true) {
             if (nextFlatSandInside === true) return true;
             if (nextElevationInside === true) return false;
             if (nextWallElevationInside === true) return true;
             if (nextStairElevationInside === true) return false;
+            return true;
         }
         if (wallElevationInside === true) throw new Error("inside wall elevation");
         if (stairElevationInside === true) {
@@ -85,6 +88,7 @@ export class Floor {
             if (nextElevationInside === true) return false;
             if (nextWallElevationInside === true) return true;
             if (nextStairElevationInside === true) return false;
+            return true;
         }
 
         throw new Error("no exits collision");
