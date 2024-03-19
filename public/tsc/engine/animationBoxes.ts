@@ -16,24 +16,24 @@ export class AnimationBoxes extends Boxes {
         if (index !== false) return false;
         const coordinateOfBoxes = this.getCoordinateOfBoxes(boxes);
         const newAnimations = new Animations({
-            coordinateOfBoxes,
-            new Size(
-                this.boxDefault.size.width * this.boxDefault.length.horizontal,
-                this.boxDefault.size.height * this.boxDefault.length.vertical,
-            ),
-            this.canvas,
-            animationsDefault.route,
-            new Element(
-                new Size(
-                    animationsDefault.element.size.width,
-                    animationsDefault.element.size.height
-                ),
-                new Plane(
-                    0,
-                    animationsDefault.element.vertical
-                ),
-            ),
-            animationsDefault.animation
+            initial: coordinateOfBoxes,
+            size: new Size({
+                width: this.boxDefault.size.width * this.boxDefault.length.horizontal,
+                height: this.boxDefault.size.height * this.boxDefault.length.vertical,
+            }),
+            canvas: this.canvas,
+            route: animationsDefault.route,
+            element: new Element({
+                size: new Size({
+                    width: animationsDefault.element.size.width,
+                    height: animationsDefault.element.size.height
+                }),
+                plane: new Plane({
+                    horizontal: 0,
+                    vertical: animationsDefault.element.vertical
+                })
+            }),
+            animation: animationsDefault.animation
         });
         this.animationGroup.push(newAnimations);
         const newIndex = this.animationGroup.length - 1;

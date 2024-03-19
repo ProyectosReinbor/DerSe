@@ -18,7 +18,11 @@ export class Image extends Position {
     this.canvas.images.addRoute(this.route);
   }
 
-  image() {
+  set image(route: string) {
+    this.route = route;
+  }
+
+  get image(): HTMLImageElement {
     return this.canvas.images.getImage(this.route);
   }
 
@@ -28,7 +32,7 @@ export class Image extends Position {
 
     this.canvas.context.imageSmoothingEnabled = false;
     this.canvas.context.drawImage(
-      this.image(),
+      this.image,
       positionOnCanvas.initial.x,
       positionOnCanvas.initial.y,
       positionOnCanvas.size.width,

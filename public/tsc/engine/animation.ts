@@ -1,12 +1,12 @@
 export class Animation {
   frames: number;
   intervalBetweenFrame: number = 0;
-  constructor(
+  constructor(props: {
     frames: number,
     framesPerSecond: number,
-  ) {
-    this.frames = frames;
-    this.framesPerSecond = framesPerSecond;
+  }) {
+    this.frames = props.frames;
+    this.framesPerSecond = props.framesPerSecond;
   }
 
   get framesPerSecond() {

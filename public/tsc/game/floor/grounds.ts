@@ -3,137 +3,120 @@ import { Box } from "../../engine/box.js";
 import type { Canvas } from "../../engine/canvas.js";
 import { Coordinate } from "../../engine/coordinate.js";
 import { ElementBoxes } from "../../engine/elementBoxes.js";
-import { Elements } from "../../engine/elements.js";
 import { Plane } from "../../engine/plane.js";
 import { Size } from "../../engine/size.js";
 import type { Map } from "../map.js";
-
-type GroundsDefault = {
-    leftUp: Elements;
-    up: Elements;
-    rightUp: Elements;
-    left: Elements;
-    center: Elements;
-    right: Elements;
-    leftDown: Elements;
-    down: Elements;
-    rightDown: Elements;
-    horizontalLeft: Elements;
-    horizontalCenter: Elements;
-    horizontalRight: Elements;
-    verticalUp: Elements;
-    verticalCenter: Elements;
-    verticalDown: Elements;
-    only: Elements;
-}
+import type { Ground, GroundPositions } from "./ground.js";
 
 export class Grounds extends ElementBoxes {
-    groundsDefault: GroundsDefault;
-    constructor(
-        x: number,
-        y: number,
+
+    override groupElements: Ground[] = [];
+
+    constructor(props: {
         canvas: Canvas,
         map: Map,
-        groundsDefault: GroundsDefault
-    ) {
-        super(
-            x, y,
-            canvas,
-            new Box(
-                new Size(map.boxes.width, map.boxes.height),
-                new Plane(1, 1),
-                true
-            ),
-        );
-        this.groundsDefault = groundsDefault;
-    }
-
-    setGround(boxes: Coordinate) {
-        this.setElements(
-            boxes,
-            this.groundsDefault.only
-        );
-        this.refreshElements();
-    }
-
-    refreshElements() {
-        this.groupElements.forEach(elements => {
-            const boxes = this.getBoxesOfCoordinate(elements.initial);
-            const elementsDefault = this.getElementsFactoryOfBoxes(boxes);
-            elements.element.horizontal = elementsDefault.element.horizontal;
-            elements.element.vertical = elementsDefault.element.vertical;
+    }) {
+        super({
+            x: props.map.initial.x,
+            y: props.map.initial.y,
+            canvas: props.canvas,
+            boxDefault: new Box({
+                size: new Size({
+                    width: props.map.boxes.width,
+                    height: props.map.boxes.height
+                }),
+                length: new Plane({
+                    horizontal: 1,
+                    vertical: 1
+                }),
+                occupiedBoxes: true
+            }),
         });
     }
 
-    getElementsFactoryOfBoxes(boxes: Coordinate) {
-        const leftBoxes = new Coordinate(
-            boxes.x - 1,
-            boxes.y
-        );
-        const rightBoxes = new Coordinate(
-            boxes.x + 1,
-            boxes.y
-        );
-        const upBoxes = new Coordinate(
-            boxes.x,
-            boxes.y - 1
-        );
-        const downBoxes = new Coordinate(
-            boxes.x,
-            boxes.y + 1
-        );
+    refreshElements() {
+        this.groupElements.forEach(element => {
+            const boxes = this.getBoxesOfCoordinate(element.initial);
+            const groundPosition = this.groundPosition(boxes);
+            element.setElementIndices(groundPosition);
+        });
+    }
 
+    setGround(
+        boxes: Coordinate,
+        newGround: Ground,
+    ) {
+        this.setElements(boxes, newGround);
+    }
+
+    groundPosition(boxes: Coordinate): GroundPositions {
+        const leftBoxes = new Coordinate({
+            x: boxes.x - 1,
+            y: boxes.y
+        });
+        const rightBoxes = new Coordinate({
+            x: boxes.x + 1,
+            y: boxes.y
+        });
+        const upBoxes = new Coordinate({
+            x: boxes.x,
+            y: boxes.y - 1
+        });
+        const downBoxes = new Coordinate({
+            x: boxes.x,
+            y: boxes.y + 1
+        });
         const left = this.boxIndex(leftBoxes) !== false;
         const right = this.boxIndex(rightBoxes) !== false;
         const up = this.boxIndex(upBoxes) !== false;
         const down = this.boxIndex(downBoxes) !== false;
 
         const isLeftUp = !up && down && !left && right;
-        if (isLeftUp) return this.groundsDefault.leftUp;
+        if (isLeftUp) return "leftUp";
 
         const isUp = !up && down && left && right;
-        if (isUp) return this.groundsDefault.up;
+        if (isUp) return "up";
 
         const isRightUp = !up && down && left && !right;
-        if (isRightUp) return this.groundsDefault.rightUp;
+        if (isRightUp) return "rightUp";
 
         const isLeft = up && down && !left && right;
-        if (isLeft) return this.groundsDefault.left;
+        if (isLeft) return "left";
 
         const isCenter = up && down && left && right;
-        if (isCenter) return this.groundsDefault.center;
+        if (isCenter) return "center";
 
         const isRight = up && down && left && !right;
-        if (isRight) return this.groundsDefault.right;
+        if (isRight) return "right";
 
         const isLeftDown = up && !down && !left && right;
-        if (isLeftDown) return this.groundsDefault.leftDown;
+        if (isLeftDown) return "leftDown";
 
         const isDown = up && !down && left && right;
-        if (isDown) return this.groundsDefault.down;
+        if (isDown) return "down";
 
         const isRightDown = up && !down && left && !right;
-        if (isRightDown) return this.groundsDefault.rightDown;
+        if (isRightDown) return "rightDown";
 
         const isHorizontalLeft = !up && !down && !left && right;
-        if (isHorizontalLeft) return this.groundsDefault.horizontalLeft;
+        if (isHorizontalLeft) return "horizontalLeft";
 
         const isHorizontalCenter = !up && !down && left && right;
-        if (isHorizontalCenter) return this.groundsDefault.horizontalCenter;
+        if (isHorizontalCenter) return "horizontalCenter";
 
         const isHorizontalRight = !up && !down && left && !right;
-        if (isHorizontalRight) return this.groundsDefault.horizontalRight;
+        if (isHorizontalRight) return "horizontalRight";
 
         const isVerticalUp = !up && down && !left && !right;
-        if (isVerticalUp) return this.groundsDefault.verticalUp;
+        if (isVerticalUp) return "verticalUp";
 
         const isVerticalCenter = up && down && !left && !right;
-        if (isVerticalCenter) return this.groundsDefault.verticalCenter;
+        if (isVerticalCenter) return "verticalCenter";
 
         const isVerticalDown = up && !down && !left && !right;
-        if (isVerticalDown) return this.groundsDefault.verticalDown;
+        if (isVerticalDown) return "verticalDown";
 
-        return this.groundsDefault.only;
+        return "only";
     }
 
     drawGrounds() {

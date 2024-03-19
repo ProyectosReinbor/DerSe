@@ -25,7 +25,7 @@ export class Elements extends Image {
 
     this.canvas.context.imageSmoothingEnabled = false;
     this.canvas.context.drawImage(
-      this.image(),
+      this.image,
       this.element.initial.x,
       this.element.initial.y,
       this.element.size.width,

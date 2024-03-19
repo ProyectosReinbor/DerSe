@@ -14,14 +14,8 @@ export class Space extends Button {
   }) {
     super({
       canvas: props.canvas,
-      initial: new Coordinate({
-        x: props.keyboard.initial.x + (props.keyboard.size.width * 0.27),
-        y: props.keyboard.initial.y + (props.keyboard.size.height * 0.03),
-      }),
-      size: new Size({
-        width: props.keyboard.size.width * 0.36,
-        height: props.keyboard.size.height * 0.14,
-      }),
+      initial: props.keyboard.endPercentage(new Coordinate({ x: 27, y: 3 })),
+      size: props.keyboard.size.percentage(new Coordinate({ x: 36, y: 14 })),
       fillStyle: "#21618C",
       strokeStyle: "#fff",
       lineWidth: 0.5,

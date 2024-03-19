@@ -9,6 +9,7 @@ import { Size } from "./size";
 
 export class ElementBoxes extends Boxes {
     groupElements: Elements[];
+
     constructor(props: {
         x: number,
         y: number,
@@ -39,9 +40,9 @@ export class ElementBoxes extends Boxes {
                     width: elementsDefault.element.size.width,
                     height: elementsDefault.element.size.height
                 }),
-                plane: new Plane({
-                    horizontal: elementsDefault.element.horizontal,
-                    vertical: elementsDefault.element.vertical
+                indices: new Plane({
+                    horizontal: elementsDefault.element.indices.horizontal,
+                    vertical: elementsDefault.element.indices.vertical
                 })
             })
         });

@@ -3,7 +3,6 @@ import { Coordinate } from "../coordinate";
 import type { Keyboard } from "../keyboard";
 import { Lines } from "../lines";
 import { Rect } from "../rect";
-import { Size } from "../size";
 
 
 export class Finish extends Rect {

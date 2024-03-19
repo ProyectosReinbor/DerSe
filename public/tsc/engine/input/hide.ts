@@ -4,7 +4,6 @@ import { Coordinate } from "../coordinate";
 import { Curves } from "../curves";
 import type { Input } from "../input";
 import { Rect } from "../rect";
-import { Size } from "../size";
 
 
 export class Hide extends Rect {
@@ -13,76 +12,48 @@ export class Hide extends Rect {
   turnOn: boolean;
   eyelid: Curves;
   iris: Circle;
-  constructor(
+  constructor(props: {
     canvas: Canvas,
     input: Input,
     turnOn: boolean,
-  ) {
-    super(
-      canvas,
-      new Coordinate(
-        input.initial.x + (input.size.width * 0.88),
-        input.initial.y + (input.size.height * 0.2),
-      ),
-      new Size(
-        input.size.width * 0.10,
-        input.size.height * 0.6,
-      ),
-      "#AED6F1",
-      "#EAF2F8",
-      0.5,
-    );
-    this.input = input;
-    this.turnOn = turnOn;
-    this.eyelid = new Curves(
-      canvas,
-      undefined,
-      "#fff",
-      0.5
+  }) {
+    super({
+      canvas: props.canvas,
+      initial: props.input.endPercentage(new Coordinate({ x: 88, y: 20 })),
+      size: props.input.size.percentage(new Coordinate({ x: 10, y: 60 })),
+      fillStyle: "#AED6F1",
+      strokeStyle: "#EAF2F8",
+      lineWidth: 0.5,
+    });
+    this.input = props.input;
+    this.turnOn = props.turnOn;
+    this.eyelid = new Curves({
+      canvas: props.canvas,
+      fillStyle: false,
+      strokeStyle: "#fff",
+      lineWidth: 0.5
+    });
+    this.eyelid.addCurve(
+      props.input.endPercentage(new Coordinate({ x: 89, y: 50 })),
+      props.input.endPercentage(new Coordinate({ x: 97, y: 50 })),
+      props.input.endPercentage(new Coordinate({ x: 93, y: 70 }))
     );
     this.eyelid.addCurve(
-      new Coordinate(
-        input.initial.x + (input.size.width * 0.89),
-        input.initial.y + (input.size.height * 0.50),
-      ),
-      new Coordinate(
-        input.initial.x + (input.size.width * 0.97),
-        input.initial.y + (input.size.height * 0.50),
-      ),
-      new Coordinate(
-        input.initial.x + (input.size.width * 0.93),
-        input.initial.y + (input.size.height * 0.70)
-      )
+      props.input.endPercentage(new Coordinate({ x: 89, y: 50 })),
+      props.input.endPercentage(new Coordinate({ x: 97, y: 50 })),
+      props.input.endPercentage(new Coordinate({ x: 93, y: 20 }))
     );
-    this.eyelid.addCurve(
-      new Coordinate(
-        input.initial.x + (input.size.width * 0.89),
-        input.initial.y + (input.size.height * 0.50),
-      ),
-      new Coordinate(
-        input.initial.x + (input.size.width * 0.97),
-        input.initial.y + (input.size.height * 0.50),
-      ),
-      new Coordinate(
-        input.initial.x + (input.size.width * 0.93),
-        input.initial.y + (input.size.height * 0.20),
-      )
-    );
-    this.iris = new Circle(
-      new Coordinate(
-        input.initial.x + (input.size.width * 0.87),
-        input.initial.y + (input.size.height * 0.36),
-      ),
-      new Size(
-        input.size.width * 0.12,
-        input.size.height * 0.26,
-      ),
-      canvas,
-      0,
-      360,
-      false,
-      "#fff",
-    );
+    this.iris = new Circle({
+      initial: props.input.endPercentage(new Coordinate({ x: 87, y: 36 })),
+      size: props.input.size.percentage(new Coordinate({ x: 12, y: 26 })),
+      canvas: props.canvas,
+      startingDegrees: 0,
+      finalDegrees: 360,
+      counterclockwise: false,
+      fillStyle: "#fff",
+      strokeStyle: false,
+      lineWidth: 0,
+    });
   }
 
   touchendHide(touch: Coordinate) {

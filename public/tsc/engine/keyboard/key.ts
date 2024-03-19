@@ -5,7 +5,6 @@ import type { Coordinate } from "../coordinate";
 import type { Size } from "../size";
 import type { Text } from "../text";
 
-
 export class Key extends Button {
     keyPress: (character: string) => void;
     constructor(props: {

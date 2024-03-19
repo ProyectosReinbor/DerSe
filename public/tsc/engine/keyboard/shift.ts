@@ -3,7 +3,6 @@ import { Coordinate } from "../coordinate";
 import type { Keyboard } from "../keyboard";
 import { Lines } from "../lines";
 import { Rect } from "../rect";
-import { Size } from "../size";
 
 
 export class Shift extends Rect {
@@ -16,55 +15,35 @@ export class Shift extends Rect {
   }) {
     super({
       canvas: props.canvas,
-      initial: new Coordinate({
-        x: props.keyboard.initial.x + (props.keyboard.size.width * 0.02),
-        y: props.keyboard.initial.y + (props.keyboard.size.height * 0.03),
-      }),
-      size: new Size({
-        width: props.keyboard.size.width * 0.09,
-        height: props.keyboard.size.height * 0.14,
-      }),
+      initial: props.keyboard.endPercentage(new Coordinate({ x: 2, y: 3 })),
+      size: props.keyboard.size.percentage(new Coordinate({ x: 9, y: 14 })),
       fillStyle: "#21618C",
       strokeStyle: "#AED6F1",
       lineWidth: 0.5,
     });
     this.uppercase = false;
     this.triangle = new Lines({
+      initial: this.initial,
+      size: this.size,
       canvas: props.canvas,
       fillStyle: "#fff",
-      strokeStyle: "",
+      strokeStyle: false,
       lineWidth: 0
     });
-    this.triangle.addLine(new Coordinate({
-      x: this.initial.x + (this.size.width * 0.5),
-      y: this.initial.y + (this.size.height * 0.2),
-    }));
-    this.triangle.addLine(new Coordinate({
-      x: this.initial.x + (this.size.width * 0.1),
-      y: this.initial.y + (this.size.height * 0.5),
-    }));
-    this.triangle.addLine(new Coordinate({
-      x: this.initial.x + (this.size.width * 0.9),
-      y: this.initial.y + (this.size.height * 0.5),
-    }));
-    this.triangle.addLine(new Coordinate({
-      x: this.initial.x + (this.size.width * 0.5),
-      y: this.initial.y + (this.size.height * 0.2),
-    }));
+    this.triangle.addLine(new Coordinate({ x: 50, y: 20 }));
+    this.triangle.addLine(new Coordinate({ x: 10, y: 50 }));
+    this.triangle.addLine(new Coordinate({ x: 90, y: 50 }));
+    this.triangle.addLine(new Coordinate({ x: 50, y: 20 }));
     this.lines = new Lines({
+      initial: this.initial,
+      size: this.size,
       canvas: props.canvas,
-      fillStyle: "",
+      fillStyle: false,
       strokeStyle: "#fff",
       lineWidth: 2,
     });
-    this.lines.addLine(new Coordinate({
-      x: this.initial.x + (this.size.width * 0.5),
-      y: this.initial.y + (this.size.height * 0.5)
-    }));
-    this.lines.addLine(new Coordinate({
-      x: this.initial.x + (this.size.width * 0.5),
-      y: this.initial.y + (this.size.height * 0.8)
-    }));
+    this.lines.addLine(new Coordinate({ x: 50, y: 50 }));
+    this.lines.addLine(new Coordinate({ x: 50, y: 80 }));
   }
 
   touchendShift(touch: Coordinate) {

@@ -13,7 +13,6 @@ import { Castles } from "./floor/castles.js";
 import type { MapFloor } from "./mapMatrix.js";
 import { Coordinate } from "../engine/coordinate.js";
 import { Trees } from "./floor/trees.js";
-import { Position } from "../engine/position.js";
 import type { Collider } from "../engine/collider.js";
 
 export class Floor {

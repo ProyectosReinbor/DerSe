@@ -6,34 +6,29 @@ import { Size } from "./size";
 export class Element extends Position {
     constructor(props: {
         size: Size,
-        plane: Plane,
+        indices: Plane,
     }) {
         super({
             initial: new Coordinate({ x: 0, y: 0 }),
             size: props.size,
         });
-        this.horizontal = props.plane.horizontal;
-        this.vertical = props.plane.vertical;
+        this.indices = props.indices;
     }
 
-    set horizontal(horizontal) {
-        this.initial.x = this.size.width * horizontal;
+    set indices(newIndices: Plane) {
+        this.initial.x = this.size.width * newIndices.horizontal;
+        this.initial.y = this.size.height * newIndices.vertical;
     }
 
-    get horizontal() {
-        return this.initial.x / this.size.width;
-    }
-
-    set vertical(vertical) {
-        this.initial.y = this.size.height * vertical;
-    }
-
-    get vertical() {
-        return this.initial.y / this.size.height;
+    get indices(): Plane {
+        return new Plane({
+            horizontal: this.initial.x / this.size.width,
+            vertical: this.initial.y / this.size.height,
+        });
     }
 
     nextFrame(frames: number) {
-        this.horizontal++;
-        if (this.horizontal >= frames) this.horizontal = 0;
+        this.indices.horizontal++;
+        if (this.indices.horizontal >= frames) this.indices.horizontal = 0;
     }
 }
