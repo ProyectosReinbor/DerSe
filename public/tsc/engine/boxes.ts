@@ -59,7 +59,7 @@ export class Boxes extends Coordinate {
         return false;
     }
 
-    reference(indicesBox: Coordinate): Position {
+    getPosition(indicesBox: Coordinate): Position {
         return new Position({
             initial: new Coordinate({
                 x: indicesBox.x * this.size.width,
@@ -138,10 +138,23 @@ export class Boxes extends Coordinate {
         throw new Error("invalid box");
     }
 
-    pushReference(
+    referencePush(indicesBox: Coordinate): Position | undefined {
+        const position = this.getPosition(indicesBox);
+        const referenceIndex = this.referencesPush(indicesBox, position);
+        if(referenceIndex === undefined)
+            return undefined;
+
+        return this.references[referenceIndex];
+    }
+
+    protected referencesPush(
         indicesBoxInitial: Coordinate,
         reference: Position
-    ) {
+    ): number | undefined {
+        const box = this.getBox(indicesBoxInitial);
+        if (box !== undefined)
+            return undefined;
+
         const referenceIndex = this.references.push(reference) - 1;
         if (this.occupied === true) {
             for (let y = 0; y < this.length.vertical; y++) {

@@ -1,45 +1,64 @@
+import { Animation } from "./animation";
 import { Animations } from "./animations";
-import { Boxes } from "./boxes";
+import type { BoxesOccupied } from "./boxes";
+import type { Canvas } from "./canvas";
 import type { Coordinate } from "./coordinate";
 import { Element } from "./element";
+import { ElementBoxes } from "./elementBoxes";
+import type { ImageRoute } from "./image";
 import { Plane } from "./plane";
 import { Size } from "./size";
 
-export class AnimationBoxes extends Boxes {
+export class AnimationBoxes extends ElementBoxes {
     override references: Animations[] = [];
+    animation: Animation;
 
-    pushAnimations(
-        boxes: Coordinate,
-    ): Animations | undefined {
-        const index = this.getBox(boxes);
-        if (index !== undefined) return undefined;
+    constructor(props: {
+        x: number;
+        y: number;
+        canvas: Canvas;
+        size: Size;
+        length: Plane;
+        occupied: BoxesOccupied;
+        route: ImageRoute;
+        element: Element;
+        animation: Animation;
+    }) {
+        super(props);
+        this.animation = props.animation;
+    }
 
-        const reference = this.reference(boxes);
+    override referencePush(indicesBox: Coordinate): Animations | undefined {
+        const position = this.getPosition(indicesBox);
         const newAnimations = new Animations({
-            initial: reference.initial,
-            size: reference.size,
+            initial: position.initial,
+            size: position.size,
             canvas: this.canvas,
-            route: image.route,
+            route: this.route,
             element: new Element({
                 size: new Size({
-                    width: animationsDefault.element.size.width,
-                    height: animationsDefault.element.size.height
+                    width: this.element.size.width,
+                    height: this.element.size.height
                 }),
                 indices: new Plane({
                     horizontal: 0,
-                    vertical: animationsDefault.element.indices.vertical
+                    vertical: this.element.indices.vertical
                 })
             }),
-            animation: animationsDefault.animation
+            animation: new Animation({
+                frames: this.animation.frames,
+                framesPerSecond: this.animation.framesPerSecond
+            })
         });
-        this.animationGroup.push(newAnimations);
-        const newIndex = this.animationGroup.length - 1;
-        this.setBoxIndex(newIndex, boxes);
-        return newIndex;
+        const indexReference = this.referencesPush(indicesBox, newAnimations);
+        if (indexReference === undefined)
+            return undefined;
+
+        return this.references[indexReference];
     }
 
     drawAnimations() {
-        this.animationGroup.forEach(
+        this.references.forEach(
             animations => animations.drawAnimation()
         );
     }

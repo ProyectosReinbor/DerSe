@@ -22,20 +22,19 @@ export class ImageBoxes extends Boxes {
         this.route = props.route;
     }
 
-    pushImage(indicesBox: Coordinate): Image | undefined {
-        const box = this.getBox(indicesBox);
-        if (box !== undefined)
-            return undefined;
-
-        const reference = this.reference(indicesBox);
+    override referencePush(indicesBox: Coordinate): Image | undefined {
+        const position = this.getPosition(indicesBox);
         const newReference = new Image({
-            initial: reference.initial,
-            size: reference.size,
+            initial: position.initial,
+            size: position.size,
             canvas: this.canvas,
             route: this.route,
         });
 
-        const indexReference = this.pushReference(indicesBox, newReference);
+        const indexReference = this.referencesPush(indicesBox, newReference);
+        if (indexReference === undefined)
+            return undefined;
+
         return this.references[indexReference];
     }
 

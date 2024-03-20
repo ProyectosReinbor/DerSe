@@ -5,11 +5,13 @@ import { Elements } from "./elements";
 import { Element } from "./element";
 import { Plane } from "./plane";
 import { Size } from "./size";
-import { ImageBoxes } from "./imageBoxes";
 import type { ImageRoute } from "./image";
+import { ImageBoxes } from "./imageBoxes";
 
 export class ElementBoxes extends ImageBoxes {
+
     override references: Elements[] = [];
+    element: Element;
 
     constructor(props: {
         x: number;
@@ -19,41 +21,41 @@ export class ElementBoxes extends ImageBoxes {
         length: Plane;
         occupied: BoxesOccupied;
         route: ImageRoute;
+        element: Element;
     }) {
         super(props);
+        this.route = props.route;
+        this.element = props.element;
     }
 
-    pushElements(indicesBox: Coordinate) {
-        const index = this.getBox(indicesBox);
-        if (index !== undefined) return index;
-        const coordinateOfBoxes = this.getCoordinateOfBoxes(boxes);
+    override referencePush(indicesBox: Coordinate): Elements | undefined {
+        const position = this.getPosition(indicesBox);
         const newElements = new Elements({
-            initial: coordinateOfBoxes,
-            size: new Size({
-                width: this.boxDefault.size.width * this.boxDefault.length.horizontal,
-                height: this.boxDefault.size.height * this.boxDefault.length.vertical,
-            }),
+            initial: position.initial,
+            size: position.size,
             canvas: this.canvas,
-            route: elementsDefault.route,
+            route: this.route,
             element: new Element({
                 size: new Size({
-                    width: elementsDefault.element.size.width,
-                    height: elementsDefault.element.size.height
+                    width: this.element.size.width,
+                    height: this.element.size.height
                 }),
                 indices: new Plane({
-                    horizontal: elementsDefault.element.indices.horizontal,
-                    vertical: elementsDefault.element.indices.vertical
+                    horizontal: this.element.indices.horizontal,
+                    vertical: this.element.indices.vertical
                 })
             })
         });
-        this.groupElements.push(newElements);
-        const newIndex = this.groupElements.length - 1;
-        this.setBoxIndex(newIndex, boxes);
-        return newIndex;
+        
+        const indexReference = this.referencesPush(indicesBox, newElements);
+        if (indexReference === undefined)
+            return undefined;
+
+        return this.references[indexReference];
     }
 
     drawElements() {
-        this.groupElements.forEach(
+        this.references.forEach(
             elements => elements.drawElement()
         );
     }
