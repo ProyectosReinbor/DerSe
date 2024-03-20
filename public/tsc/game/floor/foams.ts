@@ -10,7 +10,6 @@ import { Size } from "../../engine/size.js";
 import type { Map } from "../map.js";
 
 export class Foams extends AnimationBoxes {
-    foamDefault: Animations;
     constructor(props: {
         map: Map,
         canvas: Canvas,
@@ -31,12 +30,7 @@ export class Foams extends AnimationBoxes {
                 [true, false, false],
                 [false, false, false],
                 [false, false, false]
-            ]
-        });
-        this.foamDefault = new Animations({
-            initial: new Coordinate({ x: 0, y: 0 }),
-            size: new Size({ width: 0, height: 0 }),
-            canvas: props.canvas,
+            ],
             route: "images/terrain/water/foam.png",
             element: new Element({
                 size: new Size({ width: 192, height: 192 }),
@@ -46,17 +40,12 @@ export class Foams extends AnimationBoxes {
         });
     }
 
-    setFoam(boxes: Coordinate) {
-        const index = this.setAnimations(
-            boxes,
-            this.foamDefault
-        );
-        if (index === false) return false;
-        const foam = this.animationGroup[index];
-        if (foam === undefined) return false;
-        foam.initial.x -= this.default.size.width;
-        foam.initial.y -= this.default.size.height;
-        return index;
+    pushFoam(indicesBox: Coordinate): Animations | undefined {
+        const foam = this.referencePush(indicesBox);
+        if (foam === undefined) return undefined;
+        foam.initial.x -= this.size.width;
+        foam.initial.y -= this.size.height;
+        return foam;
     }
 
     drawFoams() {

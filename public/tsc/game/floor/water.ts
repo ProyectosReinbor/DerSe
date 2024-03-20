@@ -28,7 +28,7 @@ export class Water extends ImageBoxes {
     }
 
     pushWater(indicesBoxes: Coordinate) {
-        return this.pushImage(indicesBoxes);
+        return this.referencePush(indicesBoxes);
     }
 
     drawWaters() {
