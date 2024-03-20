@@ -6,23 +6,20 @@ import { Plane } from "./plane";
 import { Size } from "./size";
 
 export class AnimationBoxes extends Boxes {
-    animationGroup: Animations[] = [];
+    override references: Animations[] = [];
 
-    setAnimations(
+    pushAnimations(
         boxes: Coordinate,
-        animationsDefault: Animations
-    ) {
-        const index = this.boxIndex(boxes);
-        if (index !== false) return false;
-        const coordinateOfBoxes = this.getCoordinateOfBoxes(boxes);
+    ): Animations | undefined {
+        const index = this.getBox(boxes);
+        if (index !== undefined) return undefined;
+
+        const reference = this.reference(boxes);
         const newAnimations = new Animations({
-            initial: coordinateOfBoxes,
-            size: new Size({
-                width: this.default.size.width * this.default.length.horizontal,
-                height: this.default.size.height * this.default.length.vertical,
-            }),
+            initial: reference.initial,
+            size: reference.size,
             canvas: this.canvas,
-            route: animationsDefault.route,
+            route: image.route,
             element: new Element({
                 size: new Size({
                     width: animationsDefault.element.size.width,

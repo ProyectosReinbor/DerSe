@@ -2,7 +2,6 @@
 import { AnimationBoxes } from "../../engine/animationBoxes.js";
 import { Animations } from "../../engine/animations.js";
 import { Animation } from "../../engine/animation.js";
-import { Box } from "../../engine/box.js";
 import type { Canvas } from "../../engine/canvas.js";
 import { Coordinate } from "../../engine/coordinate.js";
 import { Element } from "../../engine/element.js";
@@ -20,21 +19,19 @@ export class Foams extends AnimationBoxes {
             x: props.map.initial.x,
             y: props.map.initial.y,
             canvas: props.canvas,
-            default: new Box({
-                size: new Size({
-                    width: props.map.boxes.width,
-                    height: props.map.boxes.height
-                }),
-                length: new Plane({
-                    horizontal: 3,
-                    vertical: 3
-                }),
-                occupiedBoxes: [
-                    [true, false, false],
-                    [false, false, false],
-                    [false, false, false]
-                ]
-            })
+            size: new Size({
+                width: props.map.boxes.width,
+                height: props.map.boxes.height
+            }),
+            length: new Plane({
+                horizontal: 3,
+                vertical: 3
+            }),
+            occupied: [
+                [true, false, false],
+                [false, false, false],
+                [false, false, false]
+            ]
         });
         this.foamDefault = new Animations({
             initial: new Coordinate({ x: 0, y: 0 }),

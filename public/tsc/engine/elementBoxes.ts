@@ -1,31 +1,31 @@
-import type { Box } from "./box";
-import { Boxes } from "./boxes";
+import { type BoxesOccupied } from "./boxes";
 import type { Canvas } from "./canvas";
 import { Coordinate } from "./coordinate";
 import { Elements } from "./elements";
 import { Element } from "./element";
 import { Plane } from "./plane";
 import { Size } from "./size";
+import { ImageBoxes } from "./imageBoxes";
+import type { ImageRoute } from "./image";
 
-export class ElementBoxes extends Boxes {
-    groupElements: Elements[];
+export class ElementBoxes extends ImageBoxes {
+    override references: Elements[] = [];
 
     constructor(props: {
-        x: number,
-        y: number,
-        canvas: Canvas,
-        boxDefault: Box,
+        x: number;
+        y: number;
+        canvas: Canvas;
+        size: Size;
+        length: Plane;
+        occupied: BoxesOccupied;
+        route: ImageRoute;
     }) {
         super(props);
-        this.groupElements = [];
     }
 
-    setElements(
-        boxes: Coordinate,
-        elementsDefault: Elements
-    ) {
-        const index = this.boxIndex(boxes);
-        if (index !== false) return index;
+    pushElements(indicesBox: Coordinate) {
+        const index = this.getBox(indicesBox);
+        if (index !== undefined) return index;
         const coordinateOfBoxes = this.getCoordinateOfBoxes(boxes);
         const newElements = new Elements({
             initial: coordinateOfBoxes,

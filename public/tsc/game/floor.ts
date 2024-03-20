@@ -13,11 +13,8 @@ import { Castles } from "./floor/castles.js";
 import type { MapFloor } from "./mapMatrix.js";
 import { Coordinate } from "../engine/coordinate.js";
 import { Trees } from "./floor/trees.js";
-import type { Collider } from "../engine/collider.js";
 
 export class Floor {
-    canvas: Canvas;
-    map: Map;
     water: Water;
     foams: Foams;
     flatsSand: FlatsSand;
@@ -33,28 +30,53 @@ export class Floor {
         canvas: Canvas,
         map: Map,
     }) {
-        this.canvas = props.canvas;
-        this.map = props.map;
         this.water = new Water({
-            map: this.map,
-            canvas: this.canvas
+            map: props.map,
+            canvas: props.canvas
         });
         this.foams = new Foams({
-            map: this.map,
-            canvas: this.canvas
+            map: props.map,
+            canvas: props.canvas
         });
-        this.flatsSand = new FlatsSand(this.map, this.canvas);
-        this.elevations = new Elevations(this.map, this.canvas);
-        this.flatsGrass = new FlatsGrass(this.map, this.canvas);
-        this.shadows = new Shadows(this.map, this.canvas);
-        this.wallElevations = new WallElevations(this.map, this.canvas);
-        this.stairsElevation = new StairsElevations(this.map, this.canvas);
-        this.flatElevations = new FlatElevations(this.map, this.canvas);
-        this.castles = new Castles(this.map, this.canvas);
-        this.trees = new Trees(this.map, this.canvas);
+        this.flatsSand = new FlatsSand({
+            map: props.map,
+            canvas: props.canvas
+        });
+        this.elevations = new Elevations({
+            map: props.map,
+            canvas: props.canvas
+        });
+        this.flatsGrass = new FlatsGrass({
+            map: props.map,
+            canvas: props.canvas
+        });
+        this.shadows = new Shadows({
+            map: props.map,
+            canvas: props.canvas
+        });
+        this.wallElevations = new WallElevations({
+            map: props.map,
+            canvas: props.canvas
+        });
+        this.stairsElevation = new StairsElevations({
+            map: props.map,
+            canvas: props.canvas
+        });
+        this.flatElevations = new FlatElevations({
+            map: props.map,
+            canvas: props.canvas
+        });
+        this.castles = new Castles({
+            map: props.map,
+            canvas: props.canvas
+        });
+        this.trees = new Trees({
+            map: props.map,
+            canvas: props.canvas
+        });
     }
 
-    insideFloor(collider: Collider) {
+    insideFloor(position: Position) {
         const flatSandInside = this.flatsSand.collision(collider);
         const elevationInside = this.elevations.collision(collider);
         const stairElevationInside = this.stairsElevation.collision(collider);
