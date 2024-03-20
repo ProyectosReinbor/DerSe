@@ -1,120 +1,170 @@
-import type { Box } from "./box";
+import { Box } from "./box";
 import type { Canvas } from "./canvas";
-import { Collider } from "./collider";
 import { Coordinate } from "./coordinate";
+import type { Plane } from "./plane";
+import { Position } from "./position";
 import { Size } from "./size";
 
+export type BoxesOccupied = true | boolean[][];
+
 export class Boxes extends Coordinate {
-    indices: number[][] = [];
+
+    boxes: Box[][] = [];
+    references: Position[] = [];
+
     canvas: Canvas;
-    boxDefault: Box;
+    size: Size;
+    length: Plane;
+    occupied: BoxesOccupied;
+
     constructor(props: {
-        x: number,
-        y: number,
-        canvas: Canvas,
-        boxDefault: Box,
+        x: number;
+        y: number;
+        canvas: Canvas;
+        size: Size;
+        length: Plane;
+        occupied: BoxesOccupied;
     }) {
         super(props);
         this.canvas = props.canvas;
-        this.boxDefault = props.boxDefault;
+        this.size = props.size;
+        this.length = props.length;
+        this.occupied = props.occupied;
     }
 
-    collision(collider: Collider): boolean {
-        const boxes = this.getBoxesOfCoordinate(collider.initial);
-        const boxesEnd = this.getBoxesOfCoordinate(collider.end);
-        for (let yIndex = boxes.y; yIndex < boxesEnd.y; yIndex++) {
-            for (let xIndex = boxes.x; xIndex < boxesEnd.x; xIndex++) {
-                const boxes = new Coordinate({ x: xIndex, y: yIndex });
-                const index = this.boxIndex(boxes);
-                if (index === false)
+    collision(position: Position): Box | false {
+        const indicesBoxInitial = this.indicesBox(position.initial);
+        const indicesBoxEnd = this.indicesBox(position.end);
+        const indicesBox = new Coordinate({ x: 0, y: 0 });
+        for (
+            indicesBox.y = indicesBoxInitial.x;
+            indicesBox.y <= indicesBoxEnd.y;
+            indicesBox.y++
+        ) {
+            for (
+                indicesBox.x = indicesBoxInitial.y;
+                indicesBox.x <= indicesBoxEnd.x;
+                indicesBox.x++
+            ) {
+                const box = this.getBox(indicesBox);
+                if (box === undefined)
                     continue;
 
-                const boxCollider = this.getColliderOfBoxes(boxes);
-                if (boxCollider.collision(collider) === false)
+                if (box.collision(position) === false)
                     continue;
 
-                return true;
+                return box;
             }
         }
         return false;
     }
 
-    getBoxesOfCoordinate(coordinate: Coordinate) {
-        const boxX = Math.floor(coordinate.x / this.boxDefault.size.width);
-        const boxY = Math.floor(coordinate.y / this.boxDefault.size.height);
+    reference(indicesBox: Coordinate): Position {
+        return new Position({
+            initial: new Coordinate({
+                x: indicesBox.x * this.size.width,
+                y: indicesBox.y * this.size.height
+            }),
+            size: new Size({
+                width: this.size.width * this.length.horizontal,
+                height: this.size.height * this.length.vertical
+            })
+        });
+    }
+
+    getBox(indicesBox: Coordinate): Box | undefined {
+        const boxesRow = this.boxes[indicesBox.y];
+        if (boxesRow === undefined)
+            return undefined;
+
+        const box = boxesRow[indicesBox.x];
+        return box;
+    }
+
+    indicesBox(coordinate: Coordinate) {
+        const boxX = Math.floor(coordinate.x / this.size.width);
+        const boxY = Math.floor(coordinate.y / this.size.height);
         return new Coordinate({ x: boxX, y: boxY });
     }
 
-    getCoordinateOfBoxes(boxes: Coordinate) {
-        const distanceBoxX = boxes.x * this.boxDefault.size.width;
-        const distanceBoxY = boxes.y * this.boxDefault.size.height;
-        return new Coordinate({
-            x: this.x + distanceBoxX,
-            y: this.y + distanceBoxY,
-        });
+    private boxesIndices(
+        indicesBox: Coordinate,
+        box: Box
+    ) {
+        let row = this.boxes[indicesBox.y];
+        if (row === undefined) row = [];
+        row[indicesBox.x] = box;
+        this.boxes[indicesBox.y] = row;
     }
 
-    getColliderOfBoxes(boxes: Coordinate): Collider {
-        const initial = this.getCoordinateOfBoxes(boxes);
-        return new Collider({
-            canvas: this.canvas,
-            initial,
-            size: new Size({
-                width: this.boxDefault.size.width,
-                height: this.boxDefault.size.height
+    private setBox(
+        indicesBox: Coordinate,
+        referenceIndex: number,
+    ) {
+        const size = new Size({
+            width: this.size.width,
+            height: this.size.height
+        });
+        const distanceX = indicesBox.x * size.width;
+        const distanceY = indicesBox.y * size.height;
+        const box = new Box({
+            initial: new Coordinate({
+                x: this.x + distanceX,
+                y: this.y + distanceY,
             }),
-            fillStyle: false,
-            strokeStyle: false,
-            lineWidth: 0,
+            size,
+            referenceIndex
         });
+        this.boxesIndices(indicesBox, box);
     }
 
-    boxIndex(boxes: Coordinate) {
-        if (this.indices[boxes.y] === undefined)
-            this.indices[boxes.y] = [];
-
-        const index = this.indices[boxes.y][boxes.x];
-        if (index === undefined) return false;
-        return index;
-    }
-
-    setOccupiedBox(
-        boxes: Coordinate,
-        indices: Coordinate,
-        index: number,
+    private occupiedBoxes(
+        indicesBoxInitial: Coordinate,
+        indicesOccupied: Coordinate,
+        referenceIndex: number,
     ) {
-        const y = boxes.y + indices.y;
-        const x = boxes.x + indices.x;
-        if (this.indices[y] === undefined)
-            this.indices[y] = [];
-        this.indices[y][x] = index;
+        const indicesBox = new Coordinate({
+            x: indicesBoxInitial.x + indicesOccupied.y,
+            y: indicesBoxInitial.y + indicesOccupied.x
+        });
+        let boxesRow = this.boxes[indicesBox.y];
+        if (boxesRow === undefined)
+            boxesRow = [];
+
+        let box = this.getBox(indicesBox);
+        if (box === undefined)
+            this.setBox(indicesBox, referenceIndex);
+
+        throw new Error("invalid box");
     }
 
-    setBoxIndex(
-        index: number,
-        boxes: Coordinate,
+    pushReference(
+        indicesBoxInitial: Coordinate,
+        reference: Position
     ) {
-        if (this.boxDefault.occupiedBoxes === true) {
-            for (let y = 0; y < this.boxDefault.length.vertical; y++) {
-                for (let x = 0; x < this.boxDefault.length.horizontal; x++) {
-                    this.setOccupiedBox(
-                        boxes,
+        const referenceIndex = this.references.push(reference) - 1;
+        if (this.occupied === true) {
+            for (let y = 0; y < this.length.vertical; y++) {
+                for (let x = 0; x < this.length.horizontal; x++) {
+                    this.occupiedBoxes(
+                        indicesBoxInitial,
                         new Coordinate({ x, y }),
-                        index,
+                        referenceIndex,
                     );
                 }
             }
-            return;
-        }
-        this.boxDefault.occupiedBoxes.forEach((row, y) => {
-            row.forEach((value, x) => {
-                if (value === false) return;
-                this.setOccupiedBox(
-                    boxes,
-                    new Coordinate({ x, y }),
-                    index
-                );
+        } else {
+            this.occupied.forEach((row, y) => {
+                row.forEach((value, x) => {
+                    if (value === false) return;
+                    this.occupiedBoxes(
+                        indicesBoxInitial,
+                        new Coordinate({ x, y }),
+                        referenceIndex,
+                    );
+                });
             });
-        });
+        }
+        return referenceIndex;
     }
 }

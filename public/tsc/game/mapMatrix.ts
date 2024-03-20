@@ -164,20 +164,21 @@ export const BoxFloor0 = (
 }
 
 export type MapFloor = Box[][];
-export const FloorLength = new Plane(21, 21);
+export const FloorLength = new Plane({ horizontal: 21, vertical: 21 });
 
 export const MapMatrix = (): MapFloor[] => {
     const floor0: MapFloor = [];
     const floor1: MapFloor = [];
 
     for (let y = 0; y < FloorLength.vertical; y++) {
-        floor0[y] = [];
-        floor1[y] = [];
-
+        const floor0Y: Box[] = [];
+        const floor1Y: Box[] = [];
         for (let x = 0; x < FloorLength.horizontal; x++) {
-            floor0[y][x] = BoxFloor0(x, y);
-            floor1[y][x] = BoxFloor1(x, y);
+            floor0Y[x] = BoxFloor0(x, y);
+            floor1Y[x] = BoxFloor1(x, y);
         }
+        floor0[y] = floor0Y;
+        floor1[y] = floor1Y;
     }
 
     return [

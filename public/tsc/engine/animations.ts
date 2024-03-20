@@ -4,6 +4,7 @@ import type { Coordinate } from "./coordinate.js";
 import { Elements } from "./elements.js";
 import type { Element } from "./element.js";
 import type { Size } from "./size.js";
+import type { ImageRoute } from "./image.js";
 
 export class Animations extends Elements {
   timerNextFrame: number = 0;
@@ -12,7 +13,7 @@ export class Animations extends Elements {
     initial: Coordinate,
     size: Size,
     canvas: Canvas,
-    route: string,
+    route: ImageRoute,
     element: Element,
     animation: Animation
   }) {

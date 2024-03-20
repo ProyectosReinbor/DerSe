@@ -45,5 +45,25 @@ export class Position {
       this.end.x >= position.end.x &&
       this.end.y >= position.end.y;
   }
+
+  collision(position: Position): boolean {
+    const collision = position.collision(this);
+    if (collision === true) return true;
+    const coordinateLeftUp = position.initial;
+    const coordinateRightUp = new Coordinate({
+      x: position.end.x,
+      y: position.initial.y
+    });
+    const coordinateLeftDown = new Coordinate({
+      x: position.initial.x,
+      y: position.end.y
+    });
+    const coordinateRightDown = position.end;
+    if (this.insideCoordinate(coordinateLeftUp) === true) return true;
+    if (this.insideCoordinate(coordinateRightUp) === true) return true;
+    if (this.insideCoordinate(coordinateLeftDown) === true) return true;
+    if (this.insideCoordinate(coordinateRightDown) === true) return true;
+    return false;
+  }
 }
 

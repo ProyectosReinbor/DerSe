@@ -29,14 +29,20 @@ export class Floor {
     flatElevations: FlatElevations;
     castles: Castles;
     trees: Trees;
-    constructor(
+    constructor(props: {
         canvas: Canvas,
         map: Map,
-    ) {
-        this.canvas = canvas;
-        this.map = map;
-        this.water = new Water(this.map, this.canvas);
-        this.foams = new Foams(this.map, this.canvas);
+    }) {
+        this.canvas = props.canvas;
+        this.map = props.map;
+        this.water = new Water({
+            map: this.map,
+            canvas: this.canvas
+        });
+        this.foams = new Foams({
+            map: this.map,
+            canvas: this.canvas
+        });
         this.flatsSand = new FlatsSand(this.map, this.canvas);
         this.elevations = new Elevations(this.map, this.canvas);
         this.flatsGrass = new FlatsGrass(this.map, this.canvas);

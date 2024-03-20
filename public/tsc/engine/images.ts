@@ -1,3 +1,5 @@
+import type { ImageRoute } from "./image";
+
 export class Images {
   notFound: string[] = [];
   routes: string[] = [];
@@ -5,26 +7,30 @@ export class Images {
     [key: string]: HTMLImageElement;
   } = {};
 
-  imageExists(route: string): boolean {
+  imageExists(route: ImageRoute): false | HTMLImageElement | undefined {
+    if (route === false) return false;
+
     if (this.notFound.includes(route))
-      throw new Error(`image ${route} is not found`);
-
-    if (this.images[route] === undefined)
-      return false;
-
-    return true;
-  }
-
-  getImage(route: string): HTMLImageElement {
-    if (this.imageExists(route) === false)
       throw new Error(`image ${route} is not found`);
 
     return this.images[route];
   }
 
-  addRoute(route: string) {
+  getImage(route: ImageRoute): HTMLImageElement | false {
+    const image = this.imageExists(route);
+    if (image === undefined)
+      throw new Error(`image ${route} is not found`);
+
+    return image;
+  }
+
+  addRoute(route: ImageRoute) {
+    if (route === false)
+      return;
+
     if (this.routes.includes(route) === true)
       return;
+
     this.routes.push(route);
   }
 
@@ -34,17 +40,19 @@ export class Images {
     }
   }
 
-  load(route: string): Promise<HTMLImageElement> {
+  load(route: string): Promise<HTMLImageElement | false> {
     return new Promise((resolve) => {
-      if (this.imageExists(route) === true)
-        return resolve(this.images[route]);
+      const imageExists = this.imageExists(route);
+
+      if (imageExists !== undefined)
+        return resolve(imageExists);
 
       const image = new Image();
       image.addEventListener(
         "load",
         () => {
           this.images[route] = image;
-          resolve(this.images[route]);
+          resolve(image);
         }
       );
       image.addEventListener(

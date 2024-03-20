@@ -3,32 +3,38 @@ import type { Coordinate } from "../../engine/coordinate";
 import { Image } from "../../engine/image.js";
 import { Size } from "../../engine/size.js";
 
-export type State = "construction" | "ready" | "destroyed";
-export type Color = "blue" | "purple" | "red" | "yellow";
+export type CastleState = "construction" | "ready" | "destroyed";
+export type CastleColor = "blue" | "purple" | "red" | "yellow";
 
 export class Castle extends Image {
-    state: State;
-    color: Color;
+    state: CastleState = "construction";
+    color: CastleColor = "blue";
     constructor(props: {
         initial: Coordinate;
         size: Size;
         canvas: Canvas;
-        state: State;
-        color: Color;
+        state: CastleState;
+        color: CastleColor;
     }) {
         super({
             initial: props.initial,
             size: props.size,
             canvas: props.canvas,
-            route: "",
+            route: false,
         });
-        this.state = props.state;
-        this.color = props.color;
-        this.imageCastle();
+        this.imageCastle(
+            props.state,
+            props.color
+        );
     }
 
-    imageCastle() {
-        let file: State | Color = this.state;
+    imageCastle(
+        newState: CastleState,
+        newColor: CastleColor
+    ) {
+        this.state = newState;
+        this.color = newColor;
+        let file: CastleState | CastleColor = this.state;
         if (this.state === "ready") file = this.color;
         this.image = `images/factions/knights/buildings/castle/${file}.png`;
     }

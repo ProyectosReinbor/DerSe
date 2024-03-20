@@ -1,14 +1,16 @@
 
-import { Box } from "../../engine/box.js";
 import type { Canvas } from "../../engine/canvas.js";
 import { Coordinate } from "../../engine/coordinate.js";
 import { ImageBoxes } from "../../engine/imageBoxes.js";
 import { Plane } from "../../engine/plane.js";
 import { Size } from "../../engine/size.js";
 import type { Map } from "../map.js";
-import { Castle, type Color, type State } from "./castle.js";
+import { Castle, type CastleColor, type CastleState } from "./castle.js";
 
 export class Castles extends ImageBoxes {
+
+    override references: Castle[] = [];
+
     constructor(props: {
         map: Map,
         canvas: Canvas,
@@ -17,33 +19,35 @@ export class Castles extends ImageBoxes {
             x: props.map.initial.x,
             y: props.map.initial.y,
             canvas: props.canvas,
-            boxDefault: new Box({
-                size: new Size({
-                    width: props.map.boxes.width,
-                    height: props.map.boxes.height
-                }),
-                length: new Plane({ horizontal: 4, vertical: 3 }),
-                occupiedBoxes: true
+            size: new Size({
+                width: props.map.boxes.width,
+                height: props.map.boxes.height
             }),
+            length: new Plane({ horizontal: 4, vertical: 3 }),
+            occupied: true,
+            route: false
         });
     }
 
-    setCastle(
-        boxes: Coordinate,
-        state: State,
-        color: Color,
-    ) {
-        const castleDefault = new Castle({
-            initial: new Coordinate({ x: 0, y: 0 }),
-            size: new Size({ width: 0, height: 0 }),
+    pushCastle(
+        indicesBox: Coordinate,
+        state: CastleState,
+        color: CastleColor,
+    ): Castle | undefined {
+        const box = this.getBox(indicesBox);
+        if (box !== undefined)
+            return undefined;
+
+        const reference = this.reference(indicesBox);
+        const castle = new Castle({
+            initial: reference.initial,
+            size: reference.size,
             canvas: this.canvas,
             state,
             color
         });
-        return this.setImage(
-            boxes,
-            castleDefault
-        );
+        this.pushReference(indicesBox, castle);
+        return castle;
     }
 
 

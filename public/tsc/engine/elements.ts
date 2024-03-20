@@ -3,7 +3,7 @@
 import type { Canvas } from "./canvas.js";
 import type { Coordinate } from "./coordinate.js";
 import { Element } from "./element.js";
-import { Image } from "./image.js";
+import { Image, type ImageRoute } from "./image.js";
 import type { Size } from "./size.js";
 
 export class Elements extends Image {
@@ -12,7 +12,7 @@ export class Elements extends Image {
     initial: Coordinate,
     size: Size,
     canvas: Canvas,
-    route: string,
+    route: ImageRoute,
     element: Element
   }) {
     super(props);
@@ -20,12 +20,15 @@ export class Elements extends Image {
   }
 
   drawElement() {
+    const image = this.image;
+    if (image === false) return;
+
     const positionOnCanvas = this.canvas.positionOnCanvas(this);
     if (positionOnCanvas === false) return;
 
     this.canvas.context.imageSmoothingEnabled = false;
     this.canvas.context.drawImage(
-      this.image,
+      image,
       this.element.initial.x,
       this.element.initial.y,
       this.element.size.width,

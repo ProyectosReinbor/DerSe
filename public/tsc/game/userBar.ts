@@ -8,39 +8,41 @@ import { Text } from "../engine/text";
 export class UserBar extends Rect {
     photo: Image;
     name: Text;
-    constructor(
+    constructor(props: {
         size: Size,
         canvas: Canvas,
         photoRoute: string,
         nickname: string,
-    ) {
-        super(
-            new Coordinate,
-            size,
-            canvas,
-            "#416177",
-            "#fff",
-            0.5,
-        );
-        this.photo = new Image(
-            new Coordinate,
-            new Size(
-                this.size.width * 0.3,
-                this.size.height,
-            ),
-            this.canvas,
-            photoRoute,
-        );
-        this.name = new Text(
-            new Coordinate,
-            new Size(
-                this.size.width * 0.7,
-                9,
-            ),
-            this.canvas,
-            nickname,
-            "#fff",
-        );
+    }) {
+        super({
+            initial: new Coordinate({ x: 0, y: 0 }),
+            size: props.size,
+            canvas: props.canvas,
+            fillStyle: "#416177",
+            strokeStyle: "#fff",
+            lineWidth: 0.5,
+        });
+        this.photo = new Image({
+            initial: new Coordinate({ x: 0, y: 0 }),
+            size: new Size({
+                width: this.size.width * 0.3,
+                height: this.size.height,
+            }),
+            canvas: this.canvas,
+            route: props.photoRoute,
+        });
+        this.name = new Text({
+            initial: new Coordinate({ x: 0, y: 0 }),
+            size: this.size.percentage(new Coordinate({
+                x: 70,
+                y: 100
+            })),
+            canvas: this.canvas,
+            value: props.nickname,
+            fillStyle: "#fff",
+            strokeStyle: false,
+            dungeonFont: false,
+        });
     }
 
     drawUserBar(initial: Coordinate) {

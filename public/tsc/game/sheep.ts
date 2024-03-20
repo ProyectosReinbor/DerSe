@@ -1,71 +1,79 @@
-import { AnimationBoxes } from "../engine/animationBoxes";
-import type { Animations } from "../engine/animations";
-import { Animation } from "../engine/animations/animation";
+import { Animation } from "../engine/animation";
 import type { Canvas } from "../engine/canvas";
 import { Character } from "../engine/character";
 import { Collider } from "../engine/collider";
 import { Coordinate } from "../engine/coordinate";
-import { Element } from "../engine/elements/element";
+import { Element } from "../engine/element";
 import { Plane } from "../engine/plane";
-import { Rect } from "../engine/rect";
 import { Size } from "../engine/size";
 import type { Map } from "./map";
 
+export type SheepState = "move" | "jump";
+export type SheepCharacter = {
+    [key in SheepState]: {
+        animation: Animation;
+        element: {
+            indices: Plane;
+        };
+    }
+}
+
 export class Sheep extends Character {
-    state: "move" | "jump" = "move";
-    sheepDefault: {
-        move: Character;
-        jump: Character;
+    state: SheepState = "move";
+    character: SheepCharacter = {
+        move: {
+            animation: new Animation({
+                frames: 8,
+                framesPerSecond: 8
+            }),
+            element: {
+                indices: new Plane({ horizontal: 0, vertical: 0 })
+            }
+        },
+        jump: {
+            animation: new Animation({
+                frames: 6,
+                framesPerSecond: 6
+            }),
+            element: {
+                indices: new Plane({ horizontal: 0, vertical: 1 })
+            }
+        }
     };
     jumpTimer: number = 0;
     map: Map;
-    constructor(
+    constructor(props: {
         initial: Coordinate,
         map: Map,
         canvas: Canvas,
-    ) {
-        const SheepDefault = (
-            plane: Plane,
-            animation: Animation
-        ) => {
-            return new Character(
-                new Coordinate,
-                new Size,
-                canvas,
-                "images/resources/sheep.png",
-                new Element(
-                    new Size(128, 128),
-                    plane
-                ),
-                animation,
-                new Coordinate(2, 2),
-                new Collider(new Coordinate, new Size(64, 64), canvas),
-            );
-        }
-        super(
-            initial,
-            new Size(map.boxes.width * 3, map.boxes.height * 3),
-            canvas,
-            "images/resources/sheep.png",
-            new Element(
-                new Size(128, 128),
-                new Plane
-            ),
-            new Animation(8, 8),
-            new Coordinate(2, 2),
-            new Collider(new Coordinate, new Size(64, 64), canvas),
-        );
-        this.map = map;
-        this.sheepDefault = {
-            move: SheepDefault(
-                new Plane,
-                new Animation(8, 8)
-            ),
-            jump: SheepDefault(
-                new Plane(0, 1),
-                new Animation(6, 6)
-            )
-        }
+    }) {
+        super({
+            initial: props.initial,
+            size: new Size({
+                width: props.map.boxes.width * 3,
+                height: props.map.boxes.height * 3
+            }),
+            canvas: props.canvas,
+            route: "images/resources/sheep.png",
+            element: new Element({
+                size: new Size({ width: 128, height: 128 }),
+                indices: new Plane({ horizontal: 0, vertical: 0 })
+            }),
+            animation: new Animation({
+                frames: 8,
+                framesPerSecond: 8
+            }),
+            speed: new Coordinate({ x: 2, y: 2 }),
+            collider: new Collider({
+                canvas: props.canvas,
+                initial: new Coordinate({ x: 0, y: 0 }),
+                size: new Size({ width: 64, height: 64 }),
+                fillStyle: false,
+                strokeStyle: false,
+                lineWidth: 0,
+            }),
+        });
+        this.map = props.map;
         this.state = "move";
         this.address.x = -1;
     }
@@ -93,12 +101,12 @@ export class Sheep extends Character {
     }
 
     refreshState() {
-        let stateDefault = this.sheepDefault[this.state];
-        if (this.element.vertical === stateDefault.element.vertical) return;
-        this.element.vertical = stateDefault.element.vertical;
-        this.element.horizontal = stateDefault.element.horizontal;
-        this.animation.frames = stateDefault.animation.frames;
-        this.animation.framesPerSecond = stateDefault.animation.framesPerSecond;
+        let character = this.character[this.state];
+        if (this.element.indices.vertical === character.element.indices.vertical) return;
+        this.element.indices.vertical = character.element.indices.vertical;
+        this.element.indices.horizontal = character.element.indices.horizontal;
+        this.animation.frames = character.animation.frames;
+        this.animation.framesPerSecond = character.animation.framesPerSecond;
     }
 
     drawSheep() {

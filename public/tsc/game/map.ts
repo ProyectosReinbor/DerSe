@@ -14,14 +14,20 @@ export class Map extends Position {
     matrix: MapFloor[] = MapMatrix();
     boxes: Size;
     floors: Floor[];
-    constructor(canvas: Canvas) {
-        super(new Coordinate, new Size(100, 100));
-        this.boxes = new Size(
-            this.size.width / FloorLength.horizontal,
-            this.size.height / FloorLength.vertical,
-        );
+    constructor(props: { canvas: Canvas }) {
+        super({
+            initial: new Coordinate({ x: 0, y: 0 }),
+            size: new Size({
+                width: 100,
+                height: 100
+            })
+        });
+        this.boxes = new Size({
+            width: this.size.width / FloorLength.horizontal,
+            height: this.size.height / FloorLength.vertical,
+        });
         this.floors = [
-            new Floor(canvas, this),
+            new Floor({ canvas, this}),
             new Floor(canvas, this),
         ];
         this.floors.forEach((floor, index) => {

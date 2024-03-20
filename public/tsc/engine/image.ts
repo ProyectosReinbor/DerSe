@@ -3,14 +3,16 @@ import type { Coordinate } from "./coordinate";
 import { Position } from "./position";
 import type { Size } from "./size";
 
+export type ImageRoute = `images/${string}.png` | false;
+
 export class Image extends Position {
   canvas: Canvas;
-  route: string;
+  route: ImageRoute;
   constructor(props: {
     initial: Coordinate,
     size: Size,
     canvas: Canvas,
-    route: string,
+    route: ImageRoute,
   }) {
     super(props);
     this.canvas = props.canvas;
@@ -18,21 +20,24 @@ export class Image extends Position {
     this.canvas.images.addRoute(this.route);
   }
 
-  set image(route: string) {
+  set image(route: ImageRoute) {
     this.route = route;
   }
 
-  get image(): HTMLImageElement {
+  get image(): HTMLImageElement | false {
     return this.canvas.images.getImage(this.route);
   }
 
   drawImage() {
+    const image = this.image;
+    if (image === false) return;
+
     const positionOnCanvas = this.canvas.positionOnCanvas(this);
     if (positionOnCanvas === false) return;
 
     this.canvas.context.imageSmoothingEnabled = false;
     this.canvas.context.drawImage(
-      this.image,
+      image,
       positionOnCanvas.initial.x,
       positionOnCanvas.initial.y,
       positionOnCanvas.size.width,

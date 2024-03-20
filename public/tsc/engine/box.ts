@@ -1,19 +1,17 @@
-import type { Plane } from "./plane";
+import { Coordinate } from "./coordinate";
+import { Position } from "./position";
 import type { Size } from "./size";
 
-export type OccupiedBoxes = true | boolean[][];
+export class Box extends Position {
 
-export class Box {
-    size: Size;
-    length: Plane;
-    occupiedBoxes: OccupiedBoxes;
+    referenceIndex: number;
+
     constructor(props: {
+        initial: Coordinate;
         size: Size;
-        length: Plane;
-        occupiedBoxes: OccupiedBoxes;
+        referenceIndex: number;
     }) {
-        this.size = props.size;
-        this.length = props.length;
-        this.occupiedBoxes = props.occupiedBoxes;
+        super(props);
+        this.referenceIndex = props.referenceIndex;
     }
 }

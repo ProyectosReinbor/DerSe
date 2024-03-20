@@ -18,8 +18,8 @@ export class AnimationBoxes extends Boxes {
         const newAnimations = new Animations({
             initial: coordinateOfBoxes,
             size: new Size({
-                width: this.boxDefault.size.width * this.boxDefault.length.horizontal,
-                height: this.boxDefault.size.height * this.boxDefault.length.vertical,
+                width: this.default.size.width * this.default.length.horizontal,
+                height: this.default.size.height * this.default.length.vertical,
             }),
             canvas: this.canvas,
             route: animationsDefault.route,
@@ -28,9 +28,9 @@ export class AnimationBoxes extends Boxes {
                     width: animationsDefault.element.size.width,
                     height: animationsDefault.element.size.height
                 }),
-                plane: new Plane({
+                indices: new Plane({
                     horizontal: 0,
-                    vertical: animationsDefault.element.vertical
+                    vertical: animationsDefault.element.indices.vertical
                 })
             }),
             animation: animationsDefault.animation
