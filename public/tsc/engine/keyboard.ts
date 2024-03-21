@@ -79,7 +79,9 @@ export class Keyboard extends Rect {
   }
 
   getKeys(keys: string[]): Keys[] {
-    const size = this.size.percentage(new Coordinate({ x: 97, y: 80 }));
+    const size = this.size.percentage(
+      new Size({ width: 97, height: 80 })
+    );
     size.height /= keys.length;
     return keys.map((characters, index) => {
       const left = size.aPercent.width * index;

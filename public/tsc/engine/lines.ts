@@ -26,7 +26,7 @@ export class Lines extends Position {
     this.lineWidth = props.lineWidth;
   }
 
-  addLine(percentage: Coordinate) {
+  addLine(percentage: Size) {
     this.lines.push(
       new Line({
         initial: this.endPercentage(percentage),
