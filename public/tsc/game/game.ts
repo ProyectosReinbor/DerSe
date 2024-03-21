@@ -1,28 +1,30 @@
 import type { Canvas } from "../engine/canvas.js";
 import { Coordinate } from "../engine/coordinate.js";
 import { Scene } from "../engine/scene.js";
+import { Size } from "../engine/size.js";
 import { Map } from "./map.js";
 import { Pawn } from "./pawn.js";
 import { Sheep } from "./sheep.js";
+import { UserBar } from "./userBar.js";
 
 export class Game extends Scene {
     map: Map;
     pawns: Pawn[] = [];
     sheepGroup: Sheep[] = [];
-    constructor(
+    constructor(props: {
         canvas: Canvas
-    ) {
-        super(canvas);
-        this.map = new Map(this.canvas);
+    }) {
+        super({ canvas: props.canvas });
+        this.map = new Map({ canvas: props.canvas });
         this.sheepGroup = [
-            new Sheep(
-                new Coordinate(10, 10
-                    // Math.floor(Math.random() * this.map.size.width),
-                    // Math.floor(Math.random() * this.map.size.height)
-                ),
-                this.map,
-                this.canvas
-            )
+            new Sheep({
+                initial: new Coordinate({ x: 10, y: 10 }),
+                // Math.floor(Math.random() * this.map.size.width),
+                // Math.floor(Math.random() * this.map.size.height)
+                // }),
+                map: this.map,
+                canvas: props.canvas
+            })
         ];
     }
 
@@ -36,19 +38,22 @@ export class Game extends Scene {
         const exist = this.pawns.some((pawn) => pawn.nickname === gift.nickname);
         if (exist === true) return;
         this.pawns.push(
-            new Pawn(
-                new Coordinate(
-                    Math.floor(Math.random() * this.map.size.width),
-                    Math.floor(Math.random() * this.map.size.height),
-                ),
-                this.map,
-                this.canvas,
-                "blue",
-                gift.nickname,
-                {
-                    photoRoute: gift.profilePictureUrl
-                }
-            )
+            new Pawn({
+                initial: new Coordinate({
+                    x: Math.floor(Math.random() * this.map.size.width),
+                    y: Math.floor(Math.random() * this.map.size.height),
+                }),
+                map: this.map,
+                canvas: this.canvas,
+                color: "blue",
+                nickname: gift.nickname,
+                userBar: new UserBar({
+                    size: new Size({ width: 0, height: 0 }),
+                    canvas: this.canvas,
+                    photoRoute: gift.profilePictureUrl,
+                    nickname: gift.nickname
+                })
+            })
         );
     }
 
@@ -60,7 +65,7 @@ export class Game extends Scene {
         console.log(chat);
     }
 
-    override draw() {
+    override draw = () => {
         this.map.drawMap();
         this.pawns.forEach(
             pawn => pawn.drawPawn()

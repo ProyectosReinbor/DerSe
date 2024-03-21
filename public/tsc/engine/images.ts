@@ -2,7 +2,7 @@ import type { ImageRoute } from "./image";
 
 export class Images {
   notFound: string[] = [];
-  routes: string[] = [];
+  routes: ImageRoute[] = [];
   images: {
     [key: string]: HTMLImageElement;
   } = {};
@@ -40,8 +40,11 @@ export class Images {
     }
   }
 
-  load(route: string): Promise<HTMLImageElement | false> {
+  load(route: ImageRoute): Promise<HTMLImageElement | false> {
     return new Promise((resolve) => {
+      if (route === false)
+        return resolve(false);
+
       const imageExists = this.imageExists(route);
 
       if (imageExists !== undefined)

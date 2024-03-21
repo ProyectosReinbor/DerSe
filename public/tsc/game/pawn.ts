@@ -2,7 +2,6 @@
 import { Animation } from "../engine/animation.js";
 import type { Canvas } from "../engine/canvas.js";
 import { Character } from "../engine/character.js";
-import { Collider } from "../engine/collider.js";
 import { Coordinate } from "../engine/coordinate.js";
 import { Element } from "../engine/element.js";
 import { Plane } from "../engine/plane.js";
@@ -38,14 +37,6 @@ export class Pawn extends Character {
             }),
             animation: new Animation({ frames: 6, framesPerSecond: 6 }),
             speed: new Coordinate({ x: 2, y: 2 }),
-            collider: new Collider({
-                initial: new Coordinate({ x: 0, y: 0 }),
-                size: new Size({ width: 64, height: 64 }),
-                canvas: props.canvas,
-                fillStyle: false,
-                strokeStyle: false,
-                lineWidth: 0,
-            }),
         });
         this.map = props.map;
         this.nickname = props.nickname;

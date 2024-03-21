@@ -1,5 +1,3 @@
-import type { Coordinate } from "./coordinate";
-
 export class Size {
     width: number;
     height: number;
@@ -18,10 +16,10 @@ export class Size {
         });
     }
 
-    percentage(percentage: Coordinate) {
+    percentage(percentage: Size) {
         return new Size({
-            width: this.aPercent.width * percentage.x,
-            height: this.aPercent.height * percentage.y,
+            width: this.aPercent.width * percentage.width,
+            height: this.aPercent.height * percentage.height,
         });
     }
 }

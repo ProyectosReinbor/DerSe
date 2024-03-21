@@ -19,7 +19,7 @@ export class Position {
     });
   }
 
-  endPercentage(percentage: Coordinate) {
+  endPercentage(percentage: Size) {
     const size = this.size.percentage(percentage);
     return new Coordinate({
       x: this.initial.x + size.width,

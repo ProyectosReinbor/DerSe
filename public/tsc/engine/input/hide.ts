@@ -4,6 +4,7 @@ import { Coordinate } from "../coordinate";
 import { Curves } from "../curves";
 import type { Input } from "../input";
 import { Rect } from "../rect";
+import { Size } from "../size";
 
 
 export class Hide extends Rect {
@@ -19,8 +20,12 @@ export class Hide extends Rect {
   }) {
     super({
       canvas: props.canvas,
-      initial: props.input.endPercentage(new Coordinate({ x: 88, y: 20 })),
-      size: props.input.size.percentage(new Coordinate({ x: 10, y: 60 })),
+      initial: props.input.endPercentage(
+        new Size({ width: 88, height: 20 })
+      ),
+      size: props.input.size.percentage(
+        new Size({ width: 10, height: 60 })
+      ),
       fillStyle: "#AED6F1",
       strokeStyle: "#EAF2F8",
       lineWidth: 0.5,
@@ -34,18 +39,33 @@ export class Hide extends Rect {
       lineWidth: 0.5
     });
     this.eyelid.addCurve(
-      props.input.endPercentage(new Coordinate({ x: 89, y: 50 })),
-      props.input.endPercentage(new Coordinate({ x: 97, y: 50 })),
-      props.input.endPercentage(new Coordinate({ x: 93, y: 70 }))
+      props.input.endPercentage(
+        new Size({ width: 89, height: 50 })
+      ),
+      props.input.endPercentage(
+        new Size({ width: 97, height: 50 })
+      ),
+      props.input.endPercentage(
+        new Size({ width: 93, height: 70 }))
     );
     this.eyelid.addCurve(
-      props.input.endPercentage(new Coordinate({ x: 89, y: 50 })),
-      props.input.endPercentage(new Coordinate({ x: 97, y: 50 })),
-      props.input.endPercentage(new Coordinate({ x: 93, y: 20 }))
+      props.input.endPercentage(
+        new Size({ width: 89, height: 50 })
+      ),
+      props.input.endPercentage(
+        new Size({ width: 97, height: 50 })
+      ),
+      props.input.endPercentage(
+        new Size({ width: 93, height: 20 })
+      )
     );
     this.iris = new Circle({
-      initial: props.input.endPercentage(new Coordinate({ x: 87, y: 36 })),
-      size: props.input.size.percentage(new Coordinate({ x: 12, y: 26 })),
+      initial: props.input.endPercentage(
+        new Size({ width: 87, height: 36 })
+      ),
+      size: props.input.size.percentage(
+        new Size({ width: 12, height: 26 })
+      ),
       canvas: props.canvas,
       startingDegrees: 0,
       finalDegrees: 360,
@@ -72,7 +92,9 @@ export class Hide extends Rect {
     if (this.value.length === this.input.value.length) return this.value;
     const words = this.input.value.split(" ");
     for (const index in words) {
-      words[index] = new Array(words[index].length).fill("*").join("");
+      const word = words[index];
+      if (word === undefined) continue;
+      words[index] = new Array(word.length).fill("*").join("");
     }
     this.value = words.join(" ");
     return this.value;

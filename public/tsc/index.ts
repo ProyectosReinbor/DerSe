@@ -8,6 +8,6 @@ window.addEventListener("load", () => {
         initial: new Coordinate({ x: 0, y: 0 }),
         framesPerSecond: 24
     });
-    const game = new Game(canvas);
+    const game = new Game({ canvas });
     game.start();
 });
