@@ -1,61 +1,59 @@
 
-import { Box } from "../../engine/box.js";
 import type { Canvas } from "../../engine/canvas.js";
 import { Coordinate } from "../../engine/coordinate.js";
 import { ElementBoxes } from "../../engine/elementBoxes.js";
 import { Elements } from "../../engine/elements.js";
-import { Element } from "../../engine/elements/element.js";
+import { Element } from "../../engine/element.js";
 import { Plane } from "../../engine/plane.js";
 import { Size } from "../../engine/size.js";
 import type { Map } from "../map.js";
 
+export type FlatElevationState = "grass" | "sand";
+export type FlatElevationElementIndices = {
+    [key in FlatElevationState]: Plane;
+}
+
 export class FlatElevations extends ElementBoxes {
-    flatElevationsDefault: {
-        grass: Elements;
-        sand: Elements;
-    };
-    constructor(
+    elementIndices: FlatElevationElementIndices;
+    constructor(props: {
         map: Map,
         canvas: Canvas,
-    ) {
-        super(
-            map.initial.x,
-            map.initial.y,
-            canvas,
-            new Box(
-                new Size(map.boxes.width, map.boxes.height),
-                new Plane(1, 1),
-                true,
-            ),
-        );
-        const FlatElevationsDefault = (plane: Plane) => new Elements(
-            new Coordinate,
-            new Size,
-            canvas,
-            "images/terrain/ground/flat.png",
-            new Element(
-                new Size(64, 64),
-                plane
-            )
-        );
-        this.flatElevationsDefault = {
-            grass: FlatElevationsDefault(new Plane(4, 0)),
-            sand: FlatElevationsDefault(new Plane(9, 0))
+    }) {
+        super({
+            x: props.map.initial.x,
+            y: props.map.initial.y,
+            canvas: props.canvas,
+            size: new Size({
+                width: props.map.boxes.width,
+                height: props.map.boxes.height
+            }),
+            length: new Plane({
+                horizontal: 1,
+                vertical: 1
+            }),
+            occupied: true,
+            route: "images/terrain/ground/flat.png",
+            element: new Element({
+                size: new Size({ width: 64, height: 64 }),
+                indices: new Plane({ horizontal: 0, vertical: 0 })
+            })
+        });
+        this.elementIndices = {
+            grass: new Plane({ horizontal: 4, vertical: 0 }),
+            sand: new Plane({ horizontal: 9, vertical: 0 })
         };
     }
 
     setFlatElevation(
-        boxes: Coordinate,
-        plane: "grass" | "sand"
-    ) {
-        const elementsDefault = this.flatElevationsDefault[plane];
-        this.setElements(
-            boxes,
-            elementsDefault
-        );
+        indicesBox: Coordinate,
+        state: FlatElevationState
+    ): Elements | undefined {
+        const indices = this.elementIndices[state];
+        this.element.indices = indices;
+        return this.referencePush(indicesBox);
     }
 
-    drawFlatElevations() {
+    drawFlatElevations(): void {
         this.drawElements();
     }
 }           

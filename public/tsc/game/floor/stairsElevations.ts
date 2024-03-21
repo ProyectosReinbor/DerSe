@@ -1,100 +1,99 @@
 
-import { Box } from "../../engine/box.js";
 import type { Canvas } from "../../engine/canvas.js";
 import { Coordinate } from "../../engine/coordinate.js";
 import { ElementBoxes } from "../../engine/elementBoxes.js";
-import { Elements } from "../../engine/elements.js";
-import { Element } from "../../engine/elements/element.js";
+import { Element } from "../../engine/element.js";
 import { Plane } from "../../engine/plane.js";
 import { Size } from "../../engine/size.js";
 import type { Map } from "../map.js";
+import type { Elements } from "../../engine/elements.js";
+
+export type StairElevationState = "left" | "center" | "right" | "only";
+export type StairElevationElementIndices = {
+    [key in StairElevationState]: Plane;
+};
 
 export class StairsElevations extends ElementBoxes {
-    stairsElevationsDefault: {
-        left: Elements;
-        center: Elements;
-        right: Elements;
-        only: Elements;
-    };
-    constructor(
+    elementIndices: StairElevationElementIndices;
+    constructor(props: {
         map: Map,
         canvas: Canvas,
-    ) {
-        super(
-            map.initial.x,
-            map.initial.y,
-            canvas,
-            new Box(
-                new Size(map.boxes.width, map.boxes.height),
-                new Plane(1, 1),
-                true,
-            )
-        );
-        const StairsElevationsDefault = (plane: Plane) => new Elements(
-            new Coordinate,
-            new Size,
-            canvas,
-            "images/terrain/ground/elevation.png",
-            new Element(
-                new Size(64, 64),
-                plane
-            )
-        );
-        this.stairsElevationsDefault = {
-            left: StairsElevationsDefault(new Plane(0, 7)),
-            center: StairsElevationsDefault(new Plane(1, 7)),
-            right: StairsElevationsDefault(new Plane(2, 7)),
-            only: StairsElevationsDefault(new Plane(3, 7))
+    }) {
+        super({
+            x: props.map.initial.x,
+            y: props.map.initial.y,
+            canvas: props.canvas,
+            size: new Size({
+                width: props.map.boxes.width,
+                height: props.map.boxes.height
+            }),
+            length: new Plane({
+                horizontal: 1,
+                vertical: 1
+            }),
+            occupied: true,
+            route: "images/terrain/ground/elevation.png",
+            element: new Element({
+                size: new Size({ width: 64, height: 64 }),
+                indices: new Plane({ horizontal: 0, vertical: 0 })
+            })
+        });
+        this.elementIndices = {
+            left: new Plane({ horizontal: 0, vertical: 7 }),
+            center: new Plane({ horizontal: 1, vertical: 7 }),
+            right: new Plane({ horizontal: 2, vertical: 7 }),
+            only: new Plane({ horizontal: 3, vertical: 7 })
         };
     }
 
-    getElementFromBox(boxes: Coordinate) {
-        const leftBoxes = new Coordinate(
-            boxes.x - 1,
-            boxes.y,
-        );
-        const rightBoxes = new Coordinate(
-            boxes.x + 1,
-            boxes.y,
-        );
+    positionStairElevation(indicesBox: Coordinate): StairElevationState {
+        const leftIndicesBox = new Coordinate({
+            x: indicesBox.x - 1,
+            y: indicesBox.y,
+        });
+        const rightIndicesBox = new Coordinate({
+            x: indicesBox.x + 1,
+            y: indicesBox.y,
+        });
 
-        const left = this.boxIndex(leftBoxes) !== false;
-        const right = this.boxIndex(rightBoxes) !== false;
+        const left = this.indicesBox(leftIndicesBox) !== undefined;
+        const right = this.indicesBox(rightIndicesBox) !== undefined;
 
         const isLeft = !left && right;
-        if (isLeft) return this.stairsElevationsDefault.left;
+        if (isLeft) return "left";
 
         const isCenter = left && right;
-        if (isCenter) return this.stairsElevationsDefault.center;
+        if (isCenter) return "center";
 
         const isRight = left && !right;
-        if (isRight) return this.stairsElevationsDefault.right;
+        if (isRight) return "right";
 
         const isOnly = !left && !right;
-        if (isOnly) return this.stairsElevationsDefault.only;
+        if (isOnly) return "only";
 
         throw new Error("invalid element");
     }
 
-    refreshElements() {
-        this.groupElements.forEach(elements => {
-            const boxes = this.getBoxesOfCoordinate(elements.initial);
-            const elementsDefault = this.getElementFromBox(boxes);
-            elements.element.horizontal = elementsDefault.element.horizontal;
-            elements.element.vertical = elementsDefault.element.vertical;
+    refreshElements(): void {
+        this.references.forEach(elements => {
+            const indicesBox = this.indicesBox(elements.initial);
+            const position = this.positionStairElevation(indicesBox);
+            const indices = this.elementIndices[position];
+            elements.element.indices.horizontal = indices.horizontal;
+            elements.element.indices.vertical = indices.vertical;
         });
     }
 
-    setStairsElevations(boxes: Coordinate) {
-        const elementsDefault = this.getElementFromBox(boxes);
-        this.setElements(
-            boxes,
-            elementsDefault
-        );
+    setStairsElevations(indicesBox: Coordinate): Elements | undefined {
+        const stairElevation = this.referencePush(indicesBox);
+        if (stairElevation === undefined)
+            return undefined;
+
         this.refreshElements();
+        return stairElevation;
     }
 
-    drawStairsElevations() {
+    drawStairsElevations(): void {
         this.drawElements();
     }
 }

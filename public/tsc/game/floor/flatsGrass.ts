@@ -4,53 +4,40 @@ import { Coordinate } from "../../engine/coordinate.js";
 import { Plane } from "../../engine/plane.js";
 import { Grounds } from "./grounds";
 import type { Map } from "../map";
-import { Size } from "../../engine/size.js";
-import { Elements } from "../../engine/elements.js";
-import { Element } from "../../engine/elements/element.js";
+import type { Elements } from "../../engine/elements.js";
 
 export class FlatsGrass extends Grounds {
-    constructor(
+    constructor(props: {
         map: Map,
         canvas: Canvas,
-    ) {
-        const GroundsDefault = (plane: Plane) => new Elements(
-            new Coordinate,
-            new Size,
-            canvas,
-            "images/terrain/ground/flat.png",
-            new Element(
-                new Size(64, 64),
-                plane
-            )
-        );
-        super(
-            map.initial.x,
-            map.initial.y,
-            canvas,
-            map,
-            {
-                leftUp: GroundsDefault(new Plane(0, 0)),
-                up: GroundsDefault(new Plane(1, 0)),
-                rightUp: GroundsDefault(new Plane(2, 0)),
-                left: GroundsDefault(new Plane(0, 1)),
-                center: GroundsDefault(new Plane(1, 1)),
-                right: GroundsDefault(new Plane(2, 1)),
-                leftDown: GroundsDefault(new Plane(0, 2)),
-                down: GroundsDefault(new Plane(1, 2)),
-                rightDown: GroundsDefault(new Plane(2, 2)),
-                horizontalLeft: GroundsDefault(new Plane(0, 3)),
-                horizontalCenter: GroundsDefault(new Plane(1, 3)),
-                horizontalRight: GroundsDefault(new Plane(2, 3)),
-                verticalUp: GroundsDefault(new Plane(3, 0)),
-                verticalCenter: GroundsDefault(new Plane(3, 1)),
-                verticalDown: GroundsDefault(new Plane(3, 2)),
-                only: GroundsDefault(new Plane(3, 3))
+    }) {
+        super({
+            canvas: props.canvas,
+            map: props.map,
+            route: "images/terrain/ground/flat.png",
+            elementIndices: {
+                leftUp: new Plane({ horizontal: 0, vertical: 0 }),
+                up: new Plane({ horizontal: 1, vertical: 0 }),
+                rightUp: new Plane({ horizontal: 2, vertical: 0 }),
+                left: new Plane({ horizontal: 0, vertical: 1 }),
+                center: new Plane({ horizontal: 1, vertical: 1 }),
+                right: new Plane({ horizontal: 2, vertical: 1 }),
+                leftDown: new Plane({ horizontal: 0, vertical: 2 }),
+                down: new Plane({ horizontal: 1, vertical: 2 }),
+                rightDown: new Plane({ horizontal: 2, vertical: 2 }),
+                horizontalLeft: new Plane({ horizontal: 0, vertical: 3 }),
+                horizontalCenter: new Plane({ horizontal: 1, vertical: 3 }),
+                horizontalRight: new Plane({ horizontal: 2, vertical: 3 }),
+                verticalUp: new Plane({ horizontal: 3, vertical: 0 }),
+                verticalCenter: new Plane({ horizontal: 3, vertical: 1 }),
+                verticalDown: new Plane({ horizontal: 3, vertical: 2 }),
+                only: new Plane({ horizontal: 3, vertical: 3 })
             }
-        );
+        });
     }
 
-    setFlatGrass(boxes: Coordinate) {
-        this.setGround(boxes);
+    pushFlatGrass(indicesBox: Coordinate): Elements | undefined {
+        return this.pushGround(indicesBox);
     }
 
     drawFlatsGrass() {

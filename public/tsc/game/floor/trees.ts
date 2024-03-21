@@ -1,25 +1,26 @@
 import { AnimationBoxes } from "../../engine/animationBoxes";
 import { Animations } from "../../engine/animations";
-import { Animation } from "../../engine/animations/animation";
+import { Animation } from "../../engine/animation";
 import { Box } from "../../engine/box";
 import type { Canvas } from "../../engine/canvas";
 import { Coordinate } from "../../engine/coordinate";
-import { Element } from "../../engine/elements/element";
+import { Element } from "../../engine/element";
 import { Plane } from "../../engine/plane";
 import { Size } from "../../engine/size";
 import { Map } from "../map";
 
+export type TreeState = "motion" | "attacked" | "felled";
+export type TreeElementIndices = {
+    [key in TreeState]: Plane;
+};
+
 export class Trees extends AnimationBoxes {
-    treesDefault: {
-        motion: Animations,
-        attacked: Animations,
-        felled: Animations,
-    }
-    constructor(
+    elementIndices: TreeElementIndices;
+    constructor(props: {
         map: Map,
         canvas: Canvas
-    ) {
-        super(
+    }) {
+        super({
             map.initial.x,
             map.initial.y,
             canvas,
@@ -32,7 +33,7 @@ export class Trees extends AnimationBoxes {
                     [false, false, false]
                 ]
             )
-        );
+        });
         const TreesDefault = (
             plane: Plane,
             animation: Animation

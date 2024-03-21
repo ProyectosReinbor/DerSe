@@ -14,7 +14,7 @@ export class FlatsSand extends Grounds {
             canvas: props.canvas,
             map: props.map,
             route: "images/terrain/ground/flat.png",
-            indices: {
+            elementIndices: {
                 leftUp: new Plane({
                     horizontal: 5,
                     vertical: 0

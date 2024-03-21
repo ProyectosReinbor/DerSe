@@ -14,7 +14,7 @@ export class Elevations extends Grounds {
             canvas: props.canvas,
             map: props.map,
             route: "images/terrain/ground/elevation.png",
-            indices: {
+            elementIndices: {
                 leftUp: new Plane({ horizontal: 0, vertical: 0 }),
                 up: new Plane({ horizontal: 1, vertical: 0 }),
                 rightUp: new Plane({ horizontal: 2, vertical: 0 }),

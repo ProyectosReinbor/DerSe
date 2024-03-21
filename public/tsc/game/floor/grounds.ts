@@ -9,27 +9,27 @@ import { Plane } from "../../engine/plane.js";
 import { Size } from "../../engine/size.js";
 import type { Map } from "../map.js";
 
-export type GroundPositions = "leftUp" | "up" | "rightUp" |
+export type GroundState = "leftUp" | "up" | "rightUp" |
     "left" | "center" | "right" |
     "leftDown" | "down" | "rightDown" |
     "horizontalLeft" | "horizontalCenter" | "horizontalRight" |
     "verticalUp" | "verticalCenter" | "verticalDown" |
     "only";
 
-export type GroundIndices = {
-    [key in GroundPositions]: Plane;
+export type GroundElementIndices = {
+    [key in GroundState]: Plane;
 };
 
 export class Grounds extends ElementBoxes {
 
     override references: Elements[] = [];
-    indices: GroundIndices;
+    elementIndices: GroundElementIndices;
 
     constructor(props: {
         canvas: Canvas;
         map: Map;
         route: ImageRoute;
-        indices: GroundIndices;
+        elementIndices: GroundElementIndices;
     }) {
         super({
             x: props.map.initial.x,
@@ -47,17 +47,19 @@ export class Grounds extends ElementBoxes {
             route: props.route,
             element: new Element({
                 size: new Size({ width: 64, height: 64 }),
-                indices: props.indices.only
+                indices: props.elementIndices.only
             })
         });
-        this.indices = props.indices;
+        this.elementIndices = props.elementIndices;
     }
 
     refreshElements() {
         this.references.forEach(elements => {
             const indicesBox = this.indicesBox(elements.initial);
             const groundPosition = this.groundPosition(indicesBox);
-            elements.element.indices = this.indices[groundPosition];
+            const indices = this.elementIndices[groundPosition];
+            elements.element.indices.horizontal = indices.horizontal;
+            elements.element.indices.vertical = indices.vertical;
         });
     }
 
@@ -67,7 +69,7 @@ export class Grounds extends ElementBoxes {
         return ground;
     }
 
-    groundPosition(indicesBox: Coordinate): GroundPositions {
+    groundPosition(indicesBox: Coordinate): GroundState {
         const leftBoxes = new Coordinate({
             x: indicesBox.x - 1,
             y: indicesBox.y

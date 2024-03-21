@@ -8,42 +8,37 @@ import { Size } from "../../engine/size.js";
 import type { Map } from "../map.js";
 
 export class Shadows extends ImageBoxes {
-    imageDefault: Image;
-    constructor(
+    constructor(props: {
         map: Map,
         canvas: Canvas,
-    ) {
-        super(
-            map.initial.x,
-            map.initial.y,
-            canvas,
-            {
-                size: new Size(map.boxes.width, map.boxes.height),
-                length: new Plane(3, 3),
-                occupiedBoxes: [
-                    [true, false, false],
-                    [false, false, false],
-                    [false, false, false]
-                ]
-            }
-        );
-        this.imageDefault = new Image(
-            new Coordinate,
-            new Size,
-            this.canvas,
-            "images/terrain/ground/shadows.png",
-        );
+    }) {
+        super({
+            x: props.map.initial.x,
+            y: props.map.initial.y,
+            canvas: props.canvas,
+            size: new Size({
+                width: props.map.boxes.width,
+                height: props.map.boxes.height
+            }),
+            length: new Plane({
+                horizontal: 3,
+                vertical: 3
+            }),
+            occupied: [
+                [true, false, false],
+                [false, false, false],
+                [false, false, false]
+            ],
+            route: "images/terrain/ground/shadows.png",
+        });
     }
 
-    setShadow(boxes: Coordinate) {
-        const index = this.setImage(
-            boxes,
-            this.imageDefault
-        );
-        if (index === false) return false;
-        const shadow = this.images[index];
-        shadow.initial.x -= this.boxDefault.size.width;
-        shadow.initial.y -= this.boxDefault.size.height;
+    pushShadow(indicesBox: Coordinate): Image | undefined {
+        const shadow = this.referencePush(indicesBox);
+        if (shadow === undefined) return undefined;
+        shadow.initial.x -= this.size.width;
+        shadow.initial.y -= this.size.height;
+        return shadow;
     }
 
     drawShadows() {

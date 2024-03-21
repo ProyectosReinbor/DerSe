@@ -7,10 +7,9 @@ import { Size } from "../../engine/size.js";
 import type { Map } from "../map.js";
 import { Castle, type CastleColor, type CastleState } from "./castle.js";
 
+
 export class Castles extends ImageBoxes {
-
     override references: Castle[] = [];
-
     constructor(props: {
         map: Map,
         canvas: Canvas,
@@ -29,29 +28,31 @@ export class Castles extends ImageBoxes {
         });
     }
 
-    pushCastle(
+    override referencePush(): Castle | undefined { return undefined; }
+
+    castlePush(
         indicesBox: Coordinate,
         state: CastleState,
-        color: CastleColor,
+        color: CastleColor
     ): Castle | undefined {
-        const box = this.getBox(indicesBox);
-        if (box !== undefined)
+        const position = this.getPosition(indicesBox);
+        const newReference = new Castle({
+            initial: position.initial,
+            size: position.size,
+            canvas: this.canvas,
+            state: state,
+            color: color
+        });
+
+        const indexReference = this.referencesPush(indicesBox, newReference);
+        if (indexReference === undefined)
             return undefined;
 
-        const reference = this.reference(indicesBox);
-        const castle = new Castle({
-            initial: reference.initial,
-            size: reference.size,
-            canvas: this.canvas,
-            state,
-            color
-        });
-        this.pushReference(indicesBox, castle);
-        return castle;
+        return this.references[indexReference];
     }
 
 
-    drawCastles() {
+    drawCastles(): void {
         this.drawImages();
     }
 }
