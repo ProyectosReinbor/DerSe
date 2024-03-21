@@ -13,8 +13,12 @@ export class CloseQuestion extends Button {
   }) {
     super({
       canvas: props.canvas,
-      initial: props.keyboard.endPercentage(new Coordinate({ x: 78, y: 3 })),
-      size: props.keyboard.size.percentage(new Coordinate({ x: 7, y: 14 })),
+      initial: props.keyboard.endPercentage(
+        new Size({ width: 78, height: 3 })
+      ),
+      size: props.keyboard.size.percentage(
+        new Size({ width: 7, height: 14 })
+      ),
       fillStyle: "#21618C",
       strokeStyle: "#fff",
       lineWidth: 0.5,

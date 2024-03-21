@@ -3,6 +3,7 @@ import { Coordinate } from "../coordinate";
 import type { Keyboard } from "../keyboard";
 import { Lines } from "../lines";
 import { Rect } from "../rect";
+import { Size } from "../size";
 
 
 export class Shift extends Rect {
@@ -15,8 +16,12 @@ export class Shift extends Rect {
   }) {
     super({
       canvas: props.canvas,
-      initial: props.keyboard.endPercentage(new Coordinate({ x: 2, y: 3 })),
-      size: props.keyboard.size.percentage(new Coordinate({ x: 9, y: 14 })),
+      initial: props.keyboard.endPercentage(
+        new Size({ width: 2, height: 3 })
+      ),
+      size: props.keyboard.size.percentage(
+        new Size({ width: 9, height: 14 })
+      ),
       fillStyle: "#21618C",
       strokeStyle: "#AED6F1",
       lineWidth: 0.5,

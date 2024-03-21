@@ -3,6 +3,7 @@ import { Coordinate } from "../coordinate";
 import type { Keyboard } from "../keyboard";
 import { Lines } from "../lines";
 import { Position } from "../position";
+import { Size } from "../size";
 import { Text } from "../text";
 
 export class Delete extends Position {
@@ -15,8 +16,12 @@ export class Delete extends Position {
     keyboard: Keyboard;
   }) {
     super({
-      initial: props.keyboard.endPercentage(new Coordinate({ x: 63, y: 0, })),
-      size: props.keyboard.size.percentage(new Coordinate({ x: 15, y: 20, })),
+      initial: props.keyboard.endPercentage(
+        new Size({ width: 63, height: 0, })
+      ),
+      size: props.keyboard.size.percentage(
+        new Size({ width: 15, height: 20, })
+      ),
     });
     this.lines = new Lines({
       initial: this.initial,
@@ -33,8 +38,12 @@ export class Delete extends Position {
     this.lines.addLine(new Coordinate({ x: 30, y: 80 }));
     this.lines.addLine(new Coordinate({ x: 10, y: 50 }));
     this.character = new Text({
-      initial: this.endPercentage(new Coordinate({ x: 50, y: 15 })),
-      size: this.size.percentage(new Coordinate({ x: 15, y: 100 })),
+      initial: this.endPercentage(
+        new Size({ width: 50, height: 15 })
+      ),
+      size: this.size.percentage(
+        new Size({ width: 15, height: 100 })
+      ),
       canvas: props.canvas,
       value: "X",
       fillStyle: "#fff",

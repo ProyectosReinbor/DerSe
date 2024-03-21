@@ -21,6 +21,7 @@ export class Keys extends Coordinate {
     this.keyDefault.size.width /= props.characters.length;
     for (let index = 0; index < props.characters.length; index++) {
       const character = props.characters[index];
+      if (character === undefined) continue;
       this.setKey(
         index,
         new Coordinate({ x: index, y: 0 }),

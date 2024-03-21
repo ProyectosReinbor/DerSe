@@ -3,6 +3,7 @@ import { Coordinate } from "../coordinate";
 import type { Keyboard } from "../keyboard";
 import { Lines } from "../lines";
 import { Rect } from "../rect";
+import { Size } from "../size";
 
 
 export class Enter extends Rect {
@@ -15,8 +16,12 @@ export class Enter extends Rect {
   }) {
     super({
       canvas: props.canvas,
-      initial: props.keyboard.endPercentage(new Coordinate({ x: 13, y: 3 })),
-      size: props.keyboard.size.percentage(new Coordinate({ x: 12, y: 14 })),
+      initial: props.keyboard.endPercentage(
+        new Size({ width: 13, height: 3 })
+      ),
+      size: props.keyboard.size.percentage(
+        new Size({ width: 12, height: 14 })
+      ),
       fillStyle: "#21618C",
       strokeStyle: "#fff",
       lineWidth: 0.5,
