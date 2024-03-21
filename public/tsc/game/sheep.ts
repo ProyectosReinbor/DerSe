@@ -1,7 +1,6 @@
 import { Animation } from "../engine/animation";
 import type { Canvas } from "../engine/canvas";
 import { Character } from "../engine/character";
-import { Collider } from "../engine/collider";
 import { Coordinate } from "../engine/coordinate";
 import { Element } from "../engine/element";
 import { Plane } from "../engine/plane";
@@ -64,14 +63,6 @@ export class Sheep extends Character {
                 framesPerSecond: 8
             }),
             speed: new Coordinate({ x: 2, y: 2 }),
-            collider: new Collider({
-                canvas: props.canvas,
-                initial: new Coordinate({ x: 0, y: 0 }),
-                size: new Size({ width: 64, height: 64 }),
-                fillStyle: false,
-                strokeStyle: false,
-                lineWidth: 0,
-            }),
         });
         this.map = props.map;
         this.state = "move";
@@ -79,12 +70,16 @@ export class Sheep extends Character {
     }
 
     moveSheep() {
-        const nextCollider = this.nextCollider();
-        if (nextCollider === false) return false;
-        const collision = this.map.collision(this.collider, nextCollider);
-        if (collision === true) return false;
-        this.initial.x = nextCollider.initial.x;
-        this.initial.y = nextCollider.initial.y;
+        const nextPosition = this.nextPosition();
+        if (nextPosition === false)
+            return false;
+
+        const collision = this.map.mapCollision(this, nextPosition);
+        if (collision === true)
+            return false;
+
+        this.initial.x = nextPosition.initial.x;
+        this.initial.y = nextPosition.initial.y;
         return true;
     }
 

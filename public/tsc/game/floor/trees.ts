@@ -1,70 +1,97 @@
 import { AnimationBoxes } from "../../engine/animationBoxes";
-import { Animations } from "../../engine/animations";
 import { Animation } from "../../engine/animation";
-import { Box } from "../../engine/box";
 import type { Canvas } from "../../engine/canvas";
 import { Coordinate } from "../../engine/coordinate";
 import { Element } from "../../engine/element";
 import { Plane } from "../../engine/plane";
 import { Size } from "../../engine/size";
 import { Map } from "../map";
+import type { Animations } from "../../engine/animations";
 
 export type TreeState = "motion" | "attacked" | "felled";
-export type TreeElementIndices = {
-    [key in TreeState]: Plane;
+export type TreeStates = {
+    [key in TreeState]: {
+        animation: Animation;
+        element: {
+            indices: Plane;
+        }
+    };
 };
 
 export class Trees extends AnimationBoxes {
-    elementIndices: TreeElementIndices;
+    states: TreeStates;
     constructor(props: {
         map: Map,
         canvas: Canvas
     }) {
         super({
-            map.initial.x,
-            map.initial.y,
-            canvas,
-            new Box(
-                new Size(map.boxes.width, map.boxes.height),
-                new Plane(3, 3),
-                [
-                    [true, false, false],
-                    [true, false, false],
-                    [false, false, false]
-                ]
-            )
+            x: props.map.initial.x,
+            y: props.map.initial.y,
+            canvas: props.canvas,
+            size: new Size({
+                width: props.map.boxes.width,
+                height: props.map.boxes.height
+            }),
+            length: new Plane({
+                horizontal: 3,
+                vertical: 3
+            }),
+            occupied: [
+                [true, false, false],
+                [true, false, false],
+                [false, false, false]
+            ],
+            route: "images/resources/tree.png",
+            element: new Element({
+                size: new Size({ width: 192, height: 192 }),
+                indices: new Plane({ horizontal: 0, vertical: 0 })
+            }),
+            animation: new Animation({ frames: 4, framesPerSecond: 4 })
         });
-        const TreesDefault = (
-            plane: Plane,
-            animation: Animation
-        ) => new Animations(
-            new Coordinate,
-            new Size,
-            canvas,
-            "images/resources/tree.png",
-            new Element(
-                new Size(192, 192),
-                plane
-            ),
-            animation
-        );
-
-        this.treesDefault = {
-            motion: TreesDefault(new Plane, new Animation(4, 4)),
-            attacked: TreesDefault(new Plane(0, 1), new Animation(2, 2)),
-            felled: TreesDefault(new Plane(0, 2), new Animation(1, 1))
+        this.states = {
+            motion: {
+                animation: new Animation({
+                    frames: 4,
+                    framesPerSecond: 4
+                }),
+                element: {
+                    indices: new Plane({ horizontal: 0, vertical: 0 })
+                }
+            },
+            attacked: {
+                animation: new Animation({
+                    frames: 2,
+                    framesPerSecond: 2
+                }),
+                element: {
+                    indices: new Plane({ horizontal: 0, vertical: 1 })
+                }
+            },
+            felled: {
+                animation: new Animation({
+                    frames: 1,
+                    framesPerSecond: 1
+                }),
+                element: {
+                    indices: new Plane({ horizontal: 0, vertical: 2 })
+                }
+            }
         }
     }
 
-    setTrees(
-        boxes: Coordinate,
-        animation: "motion" | "attacked" | "felled"
-    ) {
-        const animations = this.treesDefault[animation];
-        this.setAnimations(
-            boxes,
-            animations
-        );
+    pushTree(
+        indicesBox: Coordinate,
+        state: TreeState
+    ): Animations | undefined {
+        const tree = this.states[state];
+        const animations = this.referencePush(indicesBox);
+        if (animations === undefined) return undefined;
+        animations.element.indices = tree.element.indices;
+        animations.animation = new Animation({
+            frames: tree.animation.frames,
+            framesPerSecond: tree.animation.framesPerSecond
+        });
+        return animations;
     }
 
     drawTrees() {

@@ -34,22 +34,30 @@ export class Enter extends Rect {
       strokeStyle: false,
       lineWidth: 0
     });
-    this.triangle.addLine(new Coordinate({
-      x: this.initial.x + (this.size.width * 0.1),
-      y: this.initial.y + (this.size.height * 0.6),
-    }));
-    this.triangle.addLine(new Coordinate({
-      x: this.initial.x + (this.size.width * 0.3),
-      y: this.initial.y + (this.size.height * 0.4),
-    }));
-    this.triangle.addLine(new Coordinate({
-      x: this.initial.x + (this.size.width * 0.3),
-      y: this.initial.y + (this.size.height * 0.8),
-    }));
-    this.triangle.addLine(new Coordinate({
-      x: this.initial.x + (this.size.width * 0.1),
-      y: this.initial.y + (this.size.height * 0.6),
-    }));
+    this.triangle.addLine(
+      new Size({
+        width: 10,
+        height: 60
+      })
+    );
+    this.triangle.addLine(
+      new Size({
+        width: 30,
+        height: 40,
+      })
+    );
+    this.triangle.addLine(
+      new Size({
+        width: 30,
+        height: 80,
+      })
+    );
+    this.triangle.addLine(
+      new Size({
+        width: 10,
+        height: 60
+      })
+    );
     this.lines = new Lines({
       initial: this.initial,
       size: this.size,
@@ -58,18 +66,24 @@ export class Enter extends Rect {
       strokeStyle: "#fff",
       lineWidth: 0.5,
     });
-    this.lines.addLine(new Coordinate({
-      x: this.initial.x + (this.size.width * 0.2),
-      y: this.initial.y + (this.size.height * 0.6),
-    }));
-    this.lines.addLine(new Coordinate({
-      x: this.initial.x + (this.size.width * 0.8),
-      y: this.initial.y + (this.size.height * 0.6),
-    }));
-    this.lines.addLine(new Coordinate({
-      x: this.initial.x + (this.size.width * 0.8),
-      y: this.initial.y + (this.size.height * 0.2),
-    }));
+    this.lines.addLine(
+      new Size({
+        width: 20,
+        height: 60
+      })
+    );
+    this.lines.addLine(
+      new Size({
+        width: 80,
+        height: 60
+      })
+    );
+    this.lines.addLine(
+      new Size({
+        width: 80,
+        height: 20
+      })
+    );
     this.keyboard = props.keyboard;
   }
 

@@ -31,12 +31,24 @@ export class Delete extends Position {
       strokeStyle: "#fff",
       lineWidth: 0.5
     });
-    this.lines.addLine(new Coordinate({ x: 10, y: 50 }));
-    this.lines.addLine(new Coordinate({ x: 30, y: 20 }));
-    this.lines.addLine(new Coordinate({ x: 90, y: 20 }));
-    this.lines.addLine(new Coordinate({ x: 90, y: 80 }));
-    this.lines.addLine(new Coordinate({ x: 30, y: 80 }));
-    this.lines.addLine(new Coordinate({ x: 10, y: 50 }));
+    this.lines.addLine(
+      new Size({ width: 10, height: 50 })
+    );
+    this.lines.addLine(
+      new Size({ width: 30, height: 20 })
+    );
+    this.lines.addLine(
+      new Size({ width: 90, height: 20 })
+    );
+    this.lines.addLine(
+      new Size({ width: 90, height: 80 })
+    );
+    this.lines.addLine(
+      new Size({ width: 30, height: 80 })
+    );
+    this.lines.addLine(
+      new Size({ width: 10, height: 50 })
+    );
     this.character = new Text({
       initial: this.endPercentage(
         new Size({ width: 50, height: 15 })

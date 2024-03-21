@@ -35,10 +35,18 @@ export class Shift extends Rect {
       strokeStyle: false,
       lineWidth: 0
     });
-    this.triangle.addLine(new Coordinate({ x: 50, y: 20 }));
-    this.triangle.addLine(new Coordinate({ x: 10, y: 50 }));
-    this.triangle.addLine(new Coordinate({ x: 90, y: 50 }));
-    this.triangle.addLine(new Coordinate({ x: 50, y: 20 }));
+    this.triangle.addLine(
+      new Size({ width: 50, height: 20 })
+    );
+    this.triangle.addLine(
+      new Size({ width: 10, height: 50 })
+    );
+    this.triangle.addLine(
+      new Size({ width: 90, height: 50 })
+    );
+    this.triangle.addLine(
+      new Size({ width: 50, height: 20 })
+    );
     this.lines = new Lines({
       initial: this.initial,
       size: this.size,
@@ -47,8 +55,12 @@ export class Shift extends Rect {
       strokeStyle: "#fff",
       lineWidth: 2,
     });
-    this.lines.addLine(new Coordinate({ x: 50, y: 50 }));
-    this.lines.addLine(new Coordinate({ x: 50, y: 80 }));
+    this.lines.addLine(
+      new Size({ width: 50, height: 50 })
+    );
+    this.lines.addLine(
+      new Size({ width: 50, height: 80 })
+    );
   }
 
   touchendShift(touch: Coordinate) {

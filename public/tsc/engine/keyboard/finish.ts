@@ -33,9 +33,15 @@ export class Finish extends Rect {
       strokeStyle: "#fff",
       lineWidth: 0.5
     });
-    this.seen.addLine(new Coordinate({ x: 30, y: 50 }));
-    this.seen.addLine(new Coordinate({ x: 50, y: 80 }));
-    this.seen.addLine(new Coordinate({ x: 70, y: 20 }));
+    this.seen.addLine(
+      new Size({ width: 30, height: 50 })
+    );
+    this.seen.addLine(
+      new Size({ width: 50, height: 80 })
+    );
+    this.seen.addLine(
+      new Size({ width: 70, height: 20 })
+    );
     this.keyboard = props.keyboard;
   }
 

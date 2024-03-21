@@ -1,5 +1,6 @@
 import type { Canvas } from "../engine/canvas.js";
 import { Coordinate } from "../engine/coordinate.js";
+import type { ImageRoute } from "../engine/image.js";
 import { Scene } from "../engine/scene.js";
 import { Size } from "../engine/size.js";
 import { Map } from "./map.js";
@@ -33,7 +34,7 @@ export class Game extends Scene {
         giftPictureUrl: string;
         repeatCount: number;
         nickname: string;
-        profilePictureUrl: string;
+        profilePictureUrl: ImageRoute;
     }) {
         const exist = this.pawns.some((pawn) => pawn.nickname === gift.nickname);
         if (exist === true) return;

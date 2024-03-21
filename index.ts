@@ -2,7 +2,7 @@
 
 Bun.serve({
     port: 3000,
-    async fetch(request, response) {
+    async fetch(request) {
         const url = new URL(request.url);
         if (url.pathname === "/") {
             await Bun.build({

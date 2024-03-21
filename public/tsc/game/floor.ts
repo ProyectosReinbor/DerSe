@@ -13,6 +13,7 @@ import { Castles } from "./floor/castles.js";
 import type { MapFloor } from "./mapMatrix.js";
 import { Coordinate } from "../engine/coordinate.js";
 import { Trees } from "./floor/trees.js";
+import { Position } from "../engine/position.js";
 
 export class Floor {
     water: Water;
@@ -77,44 +78,44 @@ export class Floor {
     }
 
     insideFloor(position: Position) {
-        const flatSandInside = this.flatsSand.collision(collider);
-        const elevationInside = this.elevations.collision(collider);
-        const stairElevationInside = this.stairsElevation.collision(collider);
-        return flatSandInside === true ||
-            elevationInside === true ||
-            stairElevationInside === true;
+        const flatSandInside = this.flatsSand.collision(position);
+        const elevationInside = this.elevations.collision(position);
+        const stairElevationInside = this.stairsElevation.collision(position);
+        return flatSandInside !== false ||
+            elevationInside !== false ||
+            stairElevationInside !== false;
     }
 
-    collision(collider: Collider, nextCollider: Collider) {
-        const flatSandInside = this.flatsSand.collision(collider);
-        const elevationInside = this.elevations.collision(collider);
-        const wallElevationInside = this.wallElevations.collision(collider);
-        const stairElevationInside = this.stairsElevation.collision(collider);
-        const nextFlatSandInside = this.flatsSand.collision(nextCollider);
-        const nextElevationInside = this.elevations.collision(nextCollider);
-        const nextWallElevationInside = this.wallElevations.collision(nextCollider);
-        const nextStairElevationInside = this.stairsElevation.collision(nextCollider);
+    collision(position: Position, nextPosition: Position) {
+        const flatSandInside = this.flatsSand.collision(position);
+        const elevationInside = this.elevations.collision(position);
+        const wallElevationInside = this.wallElevations.collision(position);
+        const stairElevationInside = this.stairsElevation.collision(position);
+        const nextFlatSandInside = this.flatsSand.collision(nextPosition);
+        const nextElevationInside = this.elevations.collision(nextPosition);
+        const nextWallElevationInside = this.wallElevations.collision(nextPosition);
+        const nextStairElevationInside = this.stairsElevation.collision(nextPosition);
 
-        if (flatSandInside === true) {
-            if (nextFlatSandInside === true) return false;
-            if (nextElevationInside === true) return true;
-            if (nextWallElevationInside === true) return true;
-            if (nextStairElevationInside === true) return false;
+        if (flatSandInside !== false) {
+            if (nextFlatSandInside !== false) return false;
+            if (nextElevationInside !== false) return true;
+            if (nextWallElevationInside !== false) return true;
+            if (nextStairElevationInside !== false) return false;
             return true;
         }
-        if (elevationInside === true) {
-            if (nextFlatSandInside === true) return true;
-            if (nextElevationInside === true) return false;
-            if (nextWallElevationInside === true) return true;
-            if (nextStairElevationInside === true) return false;
+        if (elevationInside !== false) {
+            if (nextFlatSandInside !== false) return true;
+            if (nextElevationInside !== false) return false;
+            if (nextWallElevationInside !== false) return true;
+            if (nextStairElevationInside !== false) return false;
             return true;
         }
-        if (wallElevationInside === true) throw new Error("inside wall elevation");
-        if (stairElevationInside === true) {
-            if (nextFlatSandInside === true) return false;
-            if (nextElevationInside === true) return false;
-            if (nextWallElevationInside === true) return true;
-            if (nextStairElevationInside === true) return false;
+        if (wallElevationInside !== false) throw new Error("inside wall elevation");
+        if (stairElevationInside !== false) {
+            if (nextFlatSandInside !== false) return false;
+            if (nextElevationInside !== false) return false;
+            if (nextWallElevationInside !== false) return true;
+            if (nextStairElevationInside !== false) return false;
             return true;
         }
 
@@ -124,62 +125,62 @@ export class Floor {
     setFloor(floor: MapFloor) {
         floor.forEach((row, y) => {
             row.forEach((box, x) => {
-                const boxes = new Coordinate(x, y);
+                const indicesBox = new Coordinate({ x, y });
                 if (box.water === true)
-                    this.water.setWater(boxes);
+                    this.water.pushWater(indicesBox);
 
                 if (box.foam !== false) {
-                    this.foams.setFoam(boxes);
+                    this.foams.pushFoam(indicesBox);
                     if (box.foam.flatSand === true)
-                        this.flatsSand.setFlatSand(boxes);
+                        this.flatsSand.setFlatSand(indicesBox);
                 }
 
                 if (box.elevation !== false) {
                     if (box.elevation.shadow === true)
-                        this.shadows.setShadow(boxes);
+                        this.shadows.pushShadow(indicesBox);
 
                     if (box.elevation.flatGrass === true)
-                        this.flatsGrass.setFlatGrass(boxes);
+                        this.flatsGrass.pushFlatGrass(indicesBox);
 
-                    this.elevations.setElevation(boxes);
+                    this.elevations.setElevation(indicesBox);
                 }
 
                 if (box.wallElevation !== false) {
                     if (box.wallElevation.shadow === true)
-                        this.shadows.setShadow(boxes);
+                        this.shadows.pushShadow(indicesBox);
 
-                    this.wallElevations.setWallElevations(boxes);
+                    this.wallElevations.pushWallElevation(indicesBox);
                     if (box.wallElevation.flatElevation !== false)
                         this.flatElevations.setFlatElevation(
-                            boxes,
+                            indicesBox,
                             box.wallElevation.flatElevation
                         );
                 }
 
                 if (box.stairElevation !== false) {
                     if (box.stairElevation.shadow === true)
-                        this.shadows.setShadow(boxes);
+                        this.shadows.pushShadow(indicesBox);
 
-                    this.stairsElevation.setStairsElevations(boxes);
+                    this.stairsElevation.setStairsElevations(indicesBox);
 
                     if (box.stairElevation.flatElevation !== false)
                         this.flatElevations.setFlatElevation(
-                            boxes,
+                            indicesBox,
                             box.stairElevation.flatElevation
                         );
                 }
 
                 if (box.castle !== false) {
-                    this.castles.setCastle(
-                        boxes,
+                    this.castles.castlePush(
+                        indicesBox,
                         box.castle.state,
                         box.castle.color,
                     );
                 }
 
                 if (box.trees !== false) {
-                    this.trees.setTrees(
-                        boxes,
+                    this.trees.pushTree(
+                        indicesBox,
                         box.trees.animation
                     );
                 }

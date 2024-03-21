@@ -1,6 +1,6 @@
 import { Canvas } from "../engine/canvas";
 import { Coordinate } from "../engine/coordinate";
-import { Image } from "../engine/image";
+import { Image, type ImageRoute } from "../engine/image";
 import { Rect } from "../engine/rect";
 import { Size } from "../engine/size";
 import { Text } from "../engine/text";
@@ -11,7 +11,7 @@ export class UserBar extends Rect {
     constructor(props: {
         size: Size,
         canvas: Canvas,
-        photoRoute: string,
+        photoRoute: ImageRoute,
         nickname: string,
     }) {
         super({
@@ -33,10 +33,12 @@ export class UserBar extends Rect {
         });
         this.name = new Text({
             initial: new Coordinate({ x: 0, y: 0 }),
-            size: this.size.percentage(new Coordinate({
-                x: 70,
-                y: 100
-            })),
+            size: this.size.percentage(
+                new Size({
+                    width: 70,
+                    height: 100
+                })
+            ),
             canvas: this.canvas,
             value: props.nickname,
             fillStyle: "#fff",
