@@ -74,10 +74,6 @@ export class Sheep extends Character {
         if (nextPosition === false)
             return false;
 
-        const collision = this.map.mapCollision(this, nextPosition);
-        if (collision === true)
-            return false;
-
         this.initial.x = nextPosition.initial.x;
         this.initial.y = nextPosition.initial.y;
         return true;

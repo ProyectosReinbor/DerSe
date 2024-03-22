@@ -132,16 +132,16 @@ export class Boxes extends Coordinate {
             boxesRow = [];
 
         let box = this.getBox(indicesBox);
-        if (box === undefined)
-            this.setBox(indicesBox, referenceIndex);
+        if (box !== undefined)
+            return;
 
-        throw new Error("invalid box");
+        this.setBox(indicesBox, referenceIndex);
     }
 
     referencePush(indicesBox: Coordinate): Position | undefined {
         const position = this.getPosition(indicesBox);
         const referenceIndex = this.referencesPush(indicesBox, position);
-        if(referenceIndex === undefined)
+        if (referenceIndex === undefined)
             return undefined;
 
         return this.references[referenceIndex];

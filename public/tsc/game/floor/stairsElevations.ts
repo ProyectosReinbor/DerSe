@@ -79,8 +79,7 @@ export class StairsElevations extends ElementBoxes {
             const indicesBox = this.indicesBox(elements.initial);
             const position = this.positionStairElevation(indicesBox);
             const indices = this.elementIndices[position];
-            elements.element.indices.horizontal = indices.horizontal;
-            elements.element.indices.vertical = indices.vertical;
+            elements.element.indices = indices;
         });
     }
 

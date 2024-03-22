@@ -37,30 +37,11 @@ export class Map extends Position {
         ];
         this.floors.forEach((floor, index) => {
             const matrixFloor = this.matrix[index];
-            if (matrixFloor === undefined) return;
-            floor.setFloor(matrixFloor);
+            if (matrixFloor === undefined)
+                return;
+
+            floor.pushFloor(matrixFloor);
         });
-    }
-
-    mapCollision(
-        position: Position,
-        nextPosition: Position
-    ): boolean {
-        for (let index = this.floors.length - 1; index >= 0; index--) {
-            const floor = this.floors[index];
-            if (floor === undefined)
-                continue;
-
-            if (floor.insideFloor(position) === false)
-                continue;
-
-            console.log("inside floor")
-            if (floor.collision(position, nextPosition) === true)
-                return true;
-
-        }
-        return false;
-        throw new Error("no floor");
     }
 
     drawMap() {

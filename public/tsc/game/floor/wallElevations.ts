@@ -78,8 +78,7 @@ export class WallElevations extends ElementBoxes {
             const indicesBox = this.indicesBox(elements.initial);
             const position = this.wallElevationPosition(indicesBox);
             const indices = this.elementIndices[position];
-            elements.element.indices.horizontal = indices.horizontal;
-            elements.element.indices.vertical = indices.vertical;
+            elements.element.indices = indices;
         });
     }
 

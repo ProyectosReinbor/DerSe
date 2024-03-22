@@ -58,8 +58,7 @@ export class Grounds extends ElementBoxes {
             const indicesBox = this.indicesBox(elements.initial);
             const groundPosition = this.groundPosition(indicesBox);
             const indices = this.elementIndices[groundPosition];
-            elements.element.indices.horizontal = indices.horizontal;
-            elements.element.indices.vertical = indices.vertical;
+            elements.element.indices = indices;
         });
     }
 
