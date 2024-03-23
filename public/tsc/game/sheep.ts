@@ -66,13 +66,27 @@ export class Sheep extends Character {
                 }),
                 animation: new Animation({ frames: 8, framesPerSecond: 8 })
             },
-            speed: new Coordinate({ x: 4, y: 4 }),
+            speed: new Coordinate({ x: 40, y: 40 }),
             address: new Address({ x: 0, y: 0 }),
         });
         this.map = props.map;
         this.state = "move";
-        this.address.x = 1;
-        this.address.y = 1;
+        this.randomAddress();
+    }
+
+    randomAddress() {
+        const randomX = Math.round(Math.random() * 1);
+        if (randomX === 0) {
+            this.address.x = - 1;
+        } else {
+            this.address.x = 1;
+        }
+        const randomY = Math.round(Math.random() * 1);
+        if (randomY === 0) {
+            this.address.y = - 1;
+        } else {
+            this.address.y = 1;
+        }
     }
 
     moveSheep() {
@@ -80,9 +94,11 @@ export class Sheep extends Character {
         if (movedCharacter === false)
             return false;
 
-        const collision = this.map.collisionMap(this, movedCharacter, 0);
-        if (collision === true)
+        const collision = this.map.collisionMap(this, movedCharacter);
+        if (collision === true) {
+            this.randomAddress();
             return false;
+        }
 
         this.initial.x = movedCharacter.initial.x;
         this.initial.y = movedCharacter.initial.y;

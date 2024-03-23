@@ -42,13 +42,95 @@ export class Map extends Position {
     collisionMap(
         character: Character,
         movedCharacter: Character,
-        floorIndex: number
     ): boolean {
-        const floor = this.floors[floorIndex];
-        if (floor === undefined)
-            return false;
+        for (
+            let floorIndex = this.floors.length - 1;
+            floorIndex >= 0;
+            floorIndex--
+        ) {
+            const floor = this.floors[floorIndex];
+            if (floor === undefined)
+                continue;
 
-        return floor.collisionFloor(character, movedCharacter);
+            if (floor.aboveFloor(character) === false)
+                continue;
+
+            if (floor.collisionFloor(character, movedCharacter) === true)
+                return true;
+
+            const nextFloorIndex = floorIndex + 1;
+            const nextFloor = this.floors[nextFloorIndex];
+            if (nextFloor === undefined)
+                return false;
+
+            const flatSand = floor.flatsSand.collision(character) !== false;
+            const elevations = floor.elevations.collision(character) !== false;
+            const wallElevations = floor.wallElevations.collision(character) !== false;
+            const stairsElevations = floor.stairsElevation.collision(character) !== false;
+
+            const nextFlatSand = nextFloor.flatsSand.collision(movedCharacter) !== false;
+            const nextElevations = nextFloor.elevations.collision(movedCharacter) !== false;
+            const nextWallElevations = nextFloor.wallElevations.collision(movedCharacter) !== false;
+            const nextStairsElevations = nextFloor.stairsElevation.collision(movedCharacter) !== false;
+
+            if (flatSand === true) {
+                if (nextFlatSand === true)
+                    return true;
+
+                if (nextElevations === true)
+                    return true;
+
+                if (nextWallElevations === true)
+                    return true;
+
+                if (nextStairsElevations === true)
+                    return false;
+            }
+
+            if (elevations === true) {
+                if (nextFlatSand === true)
+                    return true;
+
+                if (nextElevations === true)
+                    return true;
+
+                if (nextWallElevations === true)
+                    return true;
+
+                if (nextStairsElevations === true)
+                    return false;
+            }
+
+            if (wallElevations === true) {
+                if (nextFlatSand === true)
+                    return true;
+
+                if (nextElevations === true)
+                    return true;
+
+                if (nextWallElevations === true)
+                    return true;
+
+                if (nextStairsElevations === true)
+                    return false;
+            }
+
+            if (stairsElevations === true) {
+                if (nextFlatSand === true)
+                    return false;
+
+                if (nextElevations === true)
+                    return false;
+
+                if (nextWallElevations === true)
+                    return false;
+
+                if (nextStairsElevations === true)
+                    return false;
+            }
+            return false;
+        }
+        return true;
     }
 
     drawMap() {

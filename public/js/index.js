@@ -1678,23 +1678,46 @@ class Floor {
       });
     });
   }
+  aboveFloor(character) {
+    const flatSand = this.flatsSand.collision(character) !== false;
+    const elevations2 = this.elevations.collision(character) !== false;
+    const stairsElevations2 = this.stairsElevation.collision(character) !== false;
+    if (flatSand === true)
+      return true;
+    if (elevations2 === true)
+      return true;
+    if (stairsElevations2 === true)
+      return true;
+    return false;
+  }
   collisionFloor(character, movedCharacter) {
+    const flatSand = this.flatsSand.collision(character) !== false;
     const elevations2 = this.elevations.collision(character) !== false;
     const wallElevations2 = this.wallElevations.collision(character) !== false;
     const stairsElevations2 = this.stairsElevation.collision(character) !== false;
+    const nextFlatSand = this.flatsSand.collision(movedCharacter) !== false;
     const nextElevations = this.elevations.collision(movedCharacter) !== false;
     const nextWallElevations = this.wallElevations.collision(movedCharacter) !== false;
     const nextStairsElevations = this.stairsElevation.collision(movedCharacter) !== false;
+    if (flatSand === true) {
+      if (nextFlatSand === true)
+        return false;
+      if (nextElevations === true)
+        return true;
+      if (nextWallElevations === true)
+        return true;
+      if (nextStairsElevations === true)
+        return false;
+      return true;
+    }
     if (elevations2 === true) {
       if (nextElevations === true) {
-        console.log("next elevations");
         return false;
       }
       if (nextWallElevations === true)
         return true;
       if (nextStairsElevations === true)
         return false;
-      console.log("elevations");
       return true;
     }
     if (wallElevations2 === true) {
@@ -1753,11 +1776,70 @@ class Map extends Position {
       return floor2;
     });
   }
-  collisionMap(character, movedCharacter, floorIndex) {
-    const floor2 = this.floors[floorIndex];
-    if (floor2 === undefined)
+  collisionMap(character, movedCharacter) {
+    for (let floorIndex = this.floors.length - 1;floorIndex >= 0; floorIndex--) {
+      const floor2 = this.floors[floorIndex];
+      if (floor2 === undefined)
+        continue;
+      if (floor2.aboveFloor(character) === false)
+        continue;
+      if (floor2.collisionFloor(character, movedCharacter) === true)
+        return true;
+      const nextFloorIndex = floorIndex + 1;
+      const nextFloor = this.floors[nextFloorIndex];
+      if (nextFloor === undefined)
+        return false;
+      const flatSand = floor2.flatsSand.collision(character) !== false;
+      const elevations2 = floor2.elevations.collision(character) !== false;
+      const wallElevations2 = floor2.wallElevations.collision(character) !== false;
+      const stairsElevations2 = floor2.stairsElevation.collision(character) !== false;
+      const nextFlatSand = nextFloor.flatsSand.collision(movedCharacter) !== false;
+      const nextElevations = nextFloor.elevations.collision(movedCharacter) !== false;
+      const nextWallElevations = nextFloor.wallElevations.collision(movedCharacter) !== false;
+      const nextStairsElevations = nextFloor.stairsElevation.collision(movedCharacter) !== false;
+      if (flatSand === true) {
+        if (nextFlatSand === true)
+          return true;
+        if (nextElevations === true)
+          return true;
+        if (nextWallElevations === true)
+          return true;
+        if (nextStairsElevations === true)
+          return false;
+      }
+      if (elevations2 === true) {
+        if (nextFlatSand === true)
+          return true;
+        if (nextElevations === true)
+          return true;
+        if (nextWallElevations === true)
+          return true;
+        if (nextStairsElevations === true)
+          return false;
+      }
+      if (wallElevations2 === true) {
+        if (nextFlatSand === true)
+          return true;
+        if (nextElevations === true)
+          return true;
+        if (nextWallElevations === true)
+          return true;
+        if (nextStairsElevations === true)
+          return false;
+      }
+      if (stairsElevations2 === true) {
+        if (nextFlatSand === true)
+          return false;
+        if (nextElevations === true)
+          return false;
+        if (nextWallElevations === true)
+          return false;
+        if (nextStairsElevations === true)
+          return false;
+      }
       return false;
-    return floor2.collisionFloor(character, movedCharacter);
+    }
+    return true;
   }
   drawMap() {
     this.floors.forEach((floor2) => floor2.drawMap());
@@ -1961,21 +2043,36 @@ class Sheep extends Character {
         }),
         animation: new Animation({ frames: 8, framesPerSecond: 8 })
       },
-      speed: new Coordinate({ x: 4, y: 4 }),
+      speed: new Coordinate({ x: 40, y: 40 }),
       address: new Address({ x: 0, y: 0 })
     });
     this.map = props.map;
     this.state = "move";
-    this.address.x = 1;
-    this.address.y = 1;
+    this.randomAddress();
+  }
+  randomAddress() {
+    const randomX = Math.round(Math.random() * 1);
+    if (randomX === 0) {
+      this.address.x = -1;
+    } else {
+      this.address.x = 1;
+    }
+    const randomY = Math.round(Math.random() * 1);
+    if (randomY === 0) {
+      this.address.y = -1;
+    } else {
+      this.address.y = 1;
+    }
   }
   moveSheep() {
     const movedCharacter = this.movedCharacter();
     if (movedCharacter === false)
       return false;
-    const collision = this.map.collisionMap(this, movedCharacter, 0);
-    if (collision === true)
+    const collision = this.map.collisionMap(this, movedCharacter);
+    if (collision === true) {
+      this.randomAddress();
       return false;
+    }
     this.initial.x = movedCharacter.initial.x;
     this.initial.y = movedCharacter.initial.y;
     return true;
@@ -2113,7 +2210,7 @@ class Game extends Scene {
     this.map = new Map({ canvas: props.canvas });
     this.sheepGroup = [
       new Sheep({
-        initial: new Coordinate({ x: 20, y: 20 }),
+        initial: new Coordinate({ x: 35, y: 50 }),
         map: this.map,
         canvas: props.canvas
       })

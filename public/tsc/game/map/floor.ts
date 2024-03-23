@@ -161,18 +161,50 @@ export class Floor {
         });
     }
 
+    aboveFloor(character: Character): boolean {
+        const flatSand = this.flatsSand.collision(character) !== false;
+        const elevations = this.elevations.collision(character) !== false;
+        const stairsElevations = this.stairsElevation.collision(character) !== false;
+        if (flatSand === true)
+            return true;
+
+        if (elevations === true)
+            return true;
+
+        if (stairsElevations === true)
+            return true;
+
+        return false;
+    }
+
     collisionFloor(character: Character, movedCharacter: Character): boolean {
+        const flatSand = this.flatsSand.collision(character) !== false;
         const elevations = this.elevations.collision(character) !== false;
         const wallElevations = this.wallElevations.collision(character) !== false;
         const stairsElevations = this.stairsElevation.collision(character) !== false;
 
+        const nextFlatSand = this.flatsSand.collision(movedCharacter) !== false;
         const nextElevations = this.elevations.collision(movedCharacter) !== false;
         const nextWallElevations = this.wallElevations.collision(movedCharacter) !== false;
         const nextStairsElevations = this.stairsElevation.collision(movedCharacter) !== false;
 
+        if (flatSand === true) {
+            if (nextFlatSand === true)
+                return false;
+
+            if (nextElevations === true)
+                return true;
+
+            if (nextWallElevations === true)
+                return true;
+
+            if (nextStairsElevations === true)
+                return false;
+            return true;
+        }
+
         if (elevations === true) {
             if (nextElevations === true) {
-                console.log("next elevations");
                 return false;
             }
 
@@ -181,9 +213,6 @@ export class Floor {
 
             if (nextStairsElevations === true)
                 return false;
-
-            console.log("elevations");
-
 
             return true;
         }

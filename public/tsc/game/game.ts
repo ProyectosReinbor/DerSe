@@ -19,7 +19,7 @@ export class Game extends Scene {
         this.map = new Map({ canvas: props.canvas });
         this.sheepGroup = [
             new Sheep({
-                initial: new Coordinate({ x: 20, y: 20 }),
+                initial: new Coordinate({ x: 35, y: 50 }),
                 // Math.floor(Math.random() * this.map.size.width),
                 // Math.floor(Math.random() * this.map.size.height)
                 // }),
