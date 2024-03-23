@@ -42,7 +42,7 @@ export class AnimationBoxes extends ElementBoxes {
                 }),
                 indices: new Plane({
                     horizontal: 0,
-                    vertical: this.element.indices.vertical
+                    vertical: this.element.getIndices().vertical
                 })
             }),
             animation: new Animation({

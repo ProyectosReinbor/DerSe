@@ -83,8 +83,8 @@ export class FlatsSand extends Grounds {
         });
     }
 
-    setFlatSand(indicesBox: Coordinate) {
-        this.pushGround(indicesBox);
+    pushFlatSand(indicesBox: Coordinate) {
+        return this.pushGround(indicesBox);
     }
 
     drawFlatsSand() {

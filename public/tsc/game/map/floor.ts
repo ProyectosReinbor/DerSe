@@ -1,20 +1,24 @@
-import { type Canvas } from "../engine/canvas.js";
-import type { Map } from "./map.js";
-import { Water } from "./floor/water.js";
-import { Foams } from "./floor/foams.js";
-import { FlatsSand } from "./floor/flatsSand.js";
-import { Elevations } from "./floor/elevations.js";
-import { FlatsGrass } from "./floor/flatsGrass.js";
-import { Shadows } from "./floor/shadows.js";
-import { WallElevations } from "./floor/wallElevations.js";
-import { StairsElevations } from "./floor/stairsElevations.js";
-import { FlatElevations } from "./floor/flatElevations.js";
-import { Castles } from "./floor/castles.js";
-import type { MapFloor } from "./mapMatrix.js";
-import { Coordinate } from "../engine/coordinate.js";
-import { Trees } from "./floor/trees.js";
+import type { Canvas } from "../../engine/canvas";
+import { Castles } from "./castles";
+import { Elevations } from "./elevations";
+import { FlatElevations } from "./flatElevations";
+import { FlatsGrass } from "./flatsGrass";
+import { Shadows } from "./shadows";
+import { StairsElevations } from "./stairsElevations";
+import { Trees } from "./trees";
+import { WallElevations } from "./wallElevations";
+import type { Map } from "../map";
+import type { MapFloorMatrix } from "../mapMatrix";
+import { Coordinate } from "../../engine/coordinate";
+import type { Character } from "../../engine/character";
+import { Water } from "./water";
+import { Foams } from "./foams";
+import { FlatsSand } from "./flatsSand";
 
 export class Floor {
+    map: Map;
+    canvas: Canvas;
+
     water: Water;
     foams: Foams;
     flatsSand: FlatsSand;
@@ -26,67 +30,82 @@ export class Floor {
     flatElevations: FlatElevations;
     castles: Castles;
     trees: Trees;
+
     constructor(props: {
-        canvas: Canvas,
         map: Map,
+        canvas: Canvas,
     }) {
+        this.map = props.map;
+        this.canvas = props.canvas;
+
         this.water = new Water({
-            map: props.map,
-            canvas: props.canvas
+            map: this.map,
+            canvas: this.canvas
         });
+
         this.foams = new Foams({
-            map: props.map,
-            canvas: props.canvas
+            map: this.map,
+            canvas: this.canvas
         });
+
         this.flatsSand = new FlatsSand({
-            map: props.map,
-            canvas: props.canvas
-        });
+            map: this.map,
+            canvas: this.canvas
+        })
+
         this.elevations = new Elevations({
-            map: props.map,
-            canvas: props.canvas
+            map: this.map,
+            canvas: this.canvas,
         });
+
         this.flatsGrass = new FlatsGrass({
-            map: props.map,
-            canvas: props.canvas
+            map: this.map,
+            canvas: this.canvas,
         });
+
         this.shadows = new Shadows({
-            map: props.map,
-            canvas: props.canvas
+            map: this.map,
+            canvas: this.canvas,
         });
+
         this.wallElevations = new WallElevations({
-            map: props.map,
-            canvas: props.canvas
+            map: this.map,
+            canvas: this.canvas,
         });
+
         this.stairsElevation = new StairsElevations({
-            map: props.map,
-            canvas: props.canvas
+            map: this.map,
+            canvas: this.canvas,
         });
+
         this.flatElevations = new FlatElevations({
-            map: props.map,
-            canvas: props.canvas
+            map: this.map,
+            canvas: this.canvas,
         });
+
         this.castles = new Castles({
-            map: props.map,
-            canvas: props.canvas
+            map: this.map,
+            canvas: this.canvas,
         });
+
         this.trees = new Trees({
-            map: props.map,
-            canvas: props.canvas
+            map: this.map,
+            canvas: this.canvas,
         });
     }
 
-    pushFloor(floor: MapFloor) {
-        floor.forEach((row, y) => {
+    pushFloor(matrix: MapFloorMatrix) {
+        matrix.forEach((row, y) => {
             row.forEach((box, x) => {
                 const indicesBox = new Coordinate({ x, y });
+
                 if (box.water === true)
                     this.water.pushWater(indicesBox);
 
                 if (box.foam !== false) {
                     this.foams.pushFoam(indicesBox);
                     if (box.foam.flatSand === true)
-                        this.flatsSand.setFlatSand(indicesBox);
+                        this.flatsSand.pushFlatSand(indicesBox);
                 }
 
                 if (box.elevation !== false) {
@@ -96,7 +115,7 @@ export class Floor {
                     if (box.elevation.flatGrass === true)
                         this.flatsGrass.pushFlatGrass(indicesBox);
 
-                    this.elevations.setElevation(indicesBox);
+                    this.elevations.pushElevation(indicesBox);
                 }
 
                 if (box.wallElevation !== false) {
@@ -142,15 +161,61 @@ export class Floor {
         });
     }
 
-    drawFloor() {
-        this.water.drawWaters();
+    collisionFloor(character: Character, movedCharacter: Character): boolean {
+        const elevations = this.elevations.collision(character) !== false;
+        const wallElevations = this.wallElevations.collision(character) !== false;
+        const stairsElevations = this.stairsElevation.collision(character) !== false;
+
+        const nextElevations = this.elevations.collision(movedCharacter) !== false;
+        const nextWallElevations = this.wallElevations.collision(movedCharacter) !== false;
+        const nextStairsElevations = this.stairsElevation.collision(movedCharacter) !== false;
+
+        if (elevations === true) {
+            if (nextElevations === true) {
+                console.log("next elevations");
+                return false;
+            }
+
+            if (nextWallElevations === true)
+                return true;
+
+            if (nextStairsElevations === true)
+                return false;
+
+            console.log("elevations");
+
+
+            return true;
+        }
+        if (wallElevations === true) {
+            return true;
+        }
+        else if (stairsElevations === true) {
+
+            if (nextElevations === true)
+                return false;
+
+            if (nextWallElevations === true)
+                return true;
+
+            if (nextStairsElevations === true)
+                return false;
+
+            return true;
+        }
+
+        return true;
+    }
+
+    drawMap() {
+        this.water.drawWater();
         this.foams.drawFoams();
         this.flatsSand.drawFlatsSand();
         this.shadows.drawShadows();
-        this.stairsElevation.drawStairsElevations();
         this.elevations.drawElevations();
-        this.flatsGrass.drawFlatsGrass();
         this.wallElevations.drawWallElevations();
+        this.flatsGrass.drawFlatsGrass();
+        this.stairsElevation.drawStairsElevations();
         this.flatElevations.drawFlatElevations();
         this.castles.drawCastles();
         this.trees.drawTrees();

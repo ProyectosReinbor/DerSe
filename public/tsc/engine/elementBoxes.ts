@@ -41,12 +41,12 @@ export class ElementBoxes extends ImageBoxes {
                     height: this.element.size.height
                 }),
                 indices: new Plane({
-                    horizontal: this.element.indices.horizontal,
-                    vertical: this.element.indices.vertical
+                    horizontal: this.element.getIndices().horizontal,
+                    vertical: this.element.getIndices().vertical
                 })
             })
         });
-        
+
         const indexReference = this.referencesPush(indicesBox, newElements);
         if (indexReference === undefined)
             return undefined;

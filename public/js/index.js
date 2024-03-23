@@ -67,10 +67,10 @@ class Position {
     return this.initial.x <= position.initial.x && this.initial.y <= position.initial.y && this.end.x >= position.end.x && this.end.y >= position.end.y;
   }
   collision(position) {
-    const collision = position.collision(this);
-    if (collision === true)
-      return true;
-    const coordinateLeftUp = position.initial;
+    const coordinateLeftUp = new Coordinate({
+      x: position.initial.x,
+      y: position.initial.y
+    });
     const coordinateRightUp = new Coordinate({
       x: position.end.x,
       y: position.initial.y
@@ -79,7 +79,10 @@ class Position {
       x: position.initial.x,
       y: position.end.y
     });
-    const coordinateRightDown = position.end;
+    const coordinateRightDown = new Coordinate({
+      x: position.end.x,
+      y: position.end.y
+    });
     if (this.insideCoordinate(coordinateLeftUp) === true)
       return true;
     if (this.insideCoordinate(coordinateRightUp) === true)
@@ -352,6 +355,153 @@ class Scene {
   }
 }
 
+// public/tsc/engine/plane.ts
+class Plane {
+  horizontal;
+  vertical;
+  constructor(props) {
+    this.horizontal = props.horizontal;
+    this.vertical = props.vertical;
+  }
+}
+
+// public/tsc/game/mapMatrix.ts
+var BoxFalse = () => ({
+  water: false,
+  foam: false,
+  elevation: false,
+  wallElevation: false,
+  stairElevation: false,
+  castle: false,
+  trees: false
+});
+var GetBoxFloors = [
+  (indicesBox) => {
+    const box = BoxFalse();
+    box.water = true;
+    if (indicesBox.y >= 3 && indicesBox.y <= 19 && indicesBox.x >= 1 && indicesBox.x <= 19)
+      box.foam = {
+        flatSand: true
+      };
+    if (indicesBox.y === 14 && indicesBox.x >= 11 && indicesBox.x <= 13)
+      box.stairElevation = {
+        shadow: true,
+        flatElevation: indicesBox.x === 11 ? "sand" : false
+      };
+    return box;
+  },
+  (indicesBox) => {
+    const box = BoxFalse();
+    if (indicesBox.x >= 2 && indicesBox.x <= 17 && indicesBox.y >= 2 && indicesBox.y <= 13)
+      box.elevation = {
+        floor: 1,
+        shadow: indicesBox.y >= 3,
+        flatGrass: true
+      };
+    if (indicesBox.x >= 2 && indicesBox.x <= 10 && indicesBox.y === 14)
+      box.elevation = {
+        floor: 1,
+        shadow: true,
+        flatGrass: true
+      };
+    if (indicesBox.x >= 14 && indicesBox.x <= 17 && indicesBox.y === 14)
+      box.elevation = {
+        floor: 1,
+        shadow: true,
+        flatGrass: true
+      };
+    if (indicesBox.y === 15 && indicesBox.x >= 2 && indicesBox.x <= 10) {
+      const flatElevationRandom = Math.round(Math.random());
+      box.wallElevation = {
+        shadow: true,
+        flatElevation: flatElevationRandom === 0 ? "sand" : false
+      };
+    }
+    if (indicesBox.y === 15 && indicesBox.x >= 14 && indicesBox.x <= 17) {
+      const flatElevationRandom = Math.round(Math.random());
+      box.wallElevation = {
+        shadow: true,
+        flatElevation: flatElevationRandom === 0 ? "sand" : false
+      };
+    }
+    if (indicesBox.y === 7 && indicesBox.x >= 11 && indicesBox.x <= 13) {
+      box.stairElevation = {
+        shadow: true,
+        flatElevation: indicesBox.x === 9 ? "grass" : false
+      };
+    }
+    if (indicesBox.y === 3 && indicesBox.x === 14) {
+      box.trees = {
+        animation: "felled"
+      };
+    }
+    return box;
+  },
+  (indicesBox) => {
+    const box = BoxFalse();
+    if (indicesBox.x >= 6 && indicesBox.x <= 14 && indicesBox.y >= 1 && indicesBox.y <= 6) {
+      box.elevation = {
+        floor: 2,
+        shadow: indicesBox.y >= 3,
+        flatGrass: true
+      };
+    }
+    if (indicesBox.x >= 6 && indicesBox.x <= 10 && indicesBox.y === 7) {
+      box.elevation = {
+        floor: 2,
+        shadow: true,
+        flatGrass: true
+      };
+    }
+    if (indicesBox.x >= 14 && indicesBox.x <= 14 && indicesBox.y === 7) {
+      box.elevation = {
+        floor: 2,
+        shadow: true,
+        flatGrass: true
+      };
+    }
+    if (indicesBox.y === 8 && indicesBox.x >= 6 && indicesBox.x <= 10) {
+      const flatElevationRandom = Math.round(Math.random());
+      box.wallElevation = {
+        shadow: true,
+        flatElevation: flatElevationRandom === 0 ? "grass" : false
+      };
+    }
+    if (indicesBox.y === 8 && indicesBox.x === 14) {
+      const flatElevationRandom = Math.round(Math.random());
+      box.wallElevation = {
+        shadow: true,
+        flatElevation: flatElevationRandom === 0 ? "grass" : false
+      };
+    }
+    return box;
+  }
+];
+var MapLength = new Plane({ horizontal: 21, vertical: 21 });
+var GetMapMatrix = () => {
+  const map = [];
+  for (let floor = 0;floor < GetBoxFloors.length; floor++) {
+    map[floor] = [];
+    const floorMatrix = map[floor];
+    if (floorMatrix === undefined)
+      continue;
+    const indicesBox = new Coordinate({ x: 0, y: 0 });
+    for (indicesBox.y = 0;indicesBox.y < MapLength.vertical; indicesBox.y++) {
+      floorMatrix[indicesBox.y] = [];
+      const row = floorMatrix[indicesBox.y];
+      if (row === undefined)
+        continue;
+      for (indicesBox.x = 0;indicesBox.x < MapLength.horizontal; indicesBox.x++) {
+        const getBoxFloor = GetBoxFloors[floor];
+        if (getBoxFloor === undefined)
+          continue;
+        row[indicesBox.x] = getBoxFloor(indicesBox);
+      }
+    }
+  }
+  return map;
+};
+
 // public/tsc/engine/box.ts
 class Box extends Position {
   referenceIndex;
@@ -376,16 +526,28 @@ class Boxes extends Coordinate {
     this.length = props.length;
     this.occupied = props.occupied;
   }
-  collision(position5) {
-    const indicesBoxInitial = this.indicesBox(position5.initial);
-    const indicesBoxEnd = this.indicesBox(position5.end);
+  collision(character) {
+    const size5 = new Size({
+      width: this.size.width * character.address.x,
+      height: this.size.height * character.address.y
+    });
+    const initial = new Coordinate({
+      x: character.initial.x + size5.width,
+      y: character.initial.y + size5.height
+    });
+    const end = new Coordinate({
+      x: character.end.x + size5.width,
+      y: character.end.y + size5.height
+    });
+    const indicesBoxInitial = this.indicesBox(initial);
+    const indicesBoxEnd = this.indicesBox(end);
     const indicesBox = new Coordinate({ x: 0, y: 0 });
-    for (indicesBox.y = indicesBoxInitial.x;indicesBox.y <= indicesBoxEnd.y; indicesBox.y++) {
-      for (indicesBox.x = indicesBoxInitial.y;indicesBox.x <= indicesBoxEnd.x; indicesBox.x++) {
+    for (indicesBox.y = indicesBoxInitial.y;indicesBox.y <= indicesBoxEnd.y; indicesBox.y++) {
+      for (indicesBox.x = indicesBoxInitial.x;indicesBox.x <= indicesBoxEnd.x; indicesBox.x++) {
         const box2 = this.getBox(indicesBox);
         if (box2 === undefined)
           continue;
-        if (box2.collision(position5) === false)
+        if (box2.collision(character) === false)
           continue;
         return box2;
       }
@@ -411,9 +573,9 @@ class Boxes extends Coordinate {
     const box2 = boxesRow[indicesBox.x];
     return box2;
   }
-  indicesBox(coordinate5) {
-    const boxX = Math.floor(coordinate5.x / this.size.width);
-    const boxY = Math.floor(coordinate5.y / this.size.height);
+  indicesBox(coordinate6) {
+    const boxX = Math.floor(coordinate6.x / this.size.width);
+    const boxY = Math.floor(coordinate6.y / this.size.height);
     return new Coordinate({ x: boxX, y: boxY });
   }
   boxesIndices(indicesBox, box2) {
@@ -538,18 +700,32 @@ class ImageBoxes extends Boxes {
   }
 }
 
-// public/tsc/engine/plane.ts
-class Plane {
-  horizontal;
-  vertical;
+// public/tsc/game/map/castle.ts
+class Castle extends Image2 {
+  state = "construction";
+  color = "blue";
   constructor(props) {
-    this.horizontal = props.horizontal;
-    this.vertical = props.vertical;
+    super({
+      initial: props.initial,
+      size: props.size,
+      canvas: props.canvas,
+      route: false
+    });
+    this.imageCastle(props.state, props.color);
+  }
+  imageCastle(newState, newColor) {
+    this.state = newState;
+    this.color = newColor;
+    let file = this.state;
+    if (this.state === "ready")
+      file = this.color;
+    this.image = `images/factions/knights/buildings/castle/${file}.png`;
   }
 }
 
-// public/tsc/game/floor/water.ts
-class Water extends ImageBoxes {
+// public/tsc/game/map/castles.ts
+class Castles extends ImageBoxes {
+  references = [];
   constructor(props) {
     super({
       x: props.map.initial.x,
@@ -559,35 +735,62 @@ class Water extends ImageBoxes {
         width: props.map.boxes.width,
         height: props.map.boxes.height
       }),
-      length: new Plane({
-        horizontal: 1,
-        vertical: 1
-      }),
+      length: new Plane({ horizontal: 4, vertical: 3 }),
       occupied: true,
-      route: "images/terrain/water/water.png"
+      route: false
     });
   }
-  pushWater(indicesBoxes) {
-    return this.referencePush(indicesBoxes);
+  referencePush() {
+    return;
   }
-  drawWaters() {
+  castlePush(indicesBox, state, color) {
+    const position6 = this.getPosition(indicesBox);
+    const newReference = new Castle({
+      initial: position6.initial,
+      size: position6.size,
+      canvas: this.canvas,
+      state,
+      color
+    });
+    const indexReference = this.referencesPush(indicesBox, newReference);
+    if (indexReference === undefined)
+      return;
+    return this.references[indexReference];
+  }
+  drawCastles() {
     this.drawImages();
   }
 }
 
-// public/tsc/engine/animation.ts
-class Animation {
-  frames;
-  intervalBetweenFrame = 0;
+// public/tsc/engine/element.ts
+class Element extends Position {
   constructor(props) {
-    this.frames = props.frames;
-    this.framesPerSecond = props.framesPerSecond;
+    super({
+      initial: new Coordinate({ x: 0, y: 0 }),
+      size: props.size
+    });
+    this.setIndices(props.indices);
   }
-  get framesPerSecond() {
-    return 1000 / this.intervalBetweenFrame;
+  setIndices(newIndices) {
+    this.initial.x = this.size.width * newIndices.horizontal;
+    this.initial.y = this.size.height * newIndices.vertical;
   }
-  set framesPerSecond(value) {
-    this.intervalBetweenFrame = 1000 / value;
+  getIndices() {
+    return new Plane({
+      horizontal: this.initial.x / this.size.width,
+      vertical: this.initial.y / this.size.height
+    });
+  }
+  nextFrame(frames) {
+    this.setIndices(new Plane({
+      horizontal: this.getIndices().horizontal + 1,
+      vertical: this.getIndices().vertical
+    }));
+    if (this.getIndices().horizontal >= frames)
+      this.setIndices(new Plane({
+        horizontal: 0,
+        vertical: this.getIndices().vertical
+      }));
   }
 }
 
@@ -599,61 +802,14 @@ class Elements extends Image2 {
     this.element = props.element;
   }
   drawElement() {
-    const image3 = this.image;
-    if (image3 === false)
+    const image4 = this.image;
+    if (image4 === false)
       return;
     const positionOnCanvas = this.canvas.positionOnCanvas(this);
     if (positionOnCanvas === false)
       return;
     this.canvas.context.imageSmoothingEnabled = false;
-    this.canvas.context.drawImage(image3, this.element.initial.x, this.element.initial.y, this.element.size.width, this.element.size.height, positionOnCanvas.initial.x, positionOnCanvas.initial.y, positionOnCanvas.size.width, positionOnCanvas.size.height);
-  }
-}
-
-// public/tsc/engine/animations.ts
-class Animations extends Elements {
-  timerNextFrame = 0;
-  animation;
-  constructor(props) {
-    super(props);
-    this.animation = props.animation;
-  }
-  nextFrame() {
-    this.timerNextFrame += this.canvas.timeBetweenFrames;
-    if (this.timerNextFrame < this.animation.intervalBetweenFrame)
-      return;
-    this.timerNextFrame = 0;
-    this.element.nextFrame(this.animation.frames);
-  }
-  drawAnimation() {
-    this.nextFrame();
-    this.drawElement();
-  }
-}
-
-// public/tsc/engine/element.ts
-class Element extends Position {
-  constructor(props) {
-    super({
-      initial: new Coordinate({ x: 0, y: 0 }),
-      size: props.size
-    });
-    this.indices = props.indices;
-  }
-  set indices(newIndices) {
-    this.initial.x = this.size.width * newIndices.horizontal;
-    this.initial.y = this.size.height * newIndices.vertical;
-  }
-  get indices() {
-    return new Plane({
-      horizontal: this.initial.x / this.size.width,
-      vertical: this.initial.y / this.size.height
-    });
-  }
-  nextFrame(frames) {
-    this.indices.horizontal++;
-    if (this.indices.horizontal >= frames)
-      this.indices.horizontal = 0;
+    this.canvas.context.drawImage(image4, this.element.initial.x, this.element.initial.y, this.element.size.width, this.element.size.height, positionOnCanvas.initial.x, positionOnCanvas.initial.y, positionOnCanvas.size.width, positionOnCanvas.size.height);
   }
 }
 
@@ -679,8 +835,8 @@ class ElementBoxes extends ImageBoxes {
           height: this.element.size.height
         }),
         indices: new Plane({
-          horizontal: this.element.indices.horizontal,
-          vertical: this.element.indices.vertical
+          horizontal: this.element.getIndices().horizontal,
+          vertical: this.element.getIndices().vertical
         })
       })
     });
@@ -690,92 +846,11 @@ class ElementBoxes extends ImageBoxes {
     return this.references[indexReference];
   }
   drawElements() {
-    this.references.forEach((elements3) => elements3.drawElement());
+    this.references.forEach((elements2) => elements2.drawElement());
   }
 }
 
-// public/tsc/engine/animationBoxes.ts
-class AnimationBoxes extends ElementBoxes {
-  references = [];
-  animation;
-  constructor(props) {
-    super(props);
-    this.animation = props.animation;
-  }
-  referencePush(indicesBox) {
-    const position7 = this.getPosition(indicesBox);
-    const newAnimations = new Animations({
-      initial: position7.initial,
-      size: position7.size,
-      canvas: this.canvas,
-      route: this.route,
-      element: new Element({
-        size: new Size({
-          width: this.element.size.width,
-          height: this.element.size.height
-        }),
-        indices: new Plane({
-          horizontal: 0,
-          vertical: this.element.indices.vertical
-        })
-      }),
-      animation: new Animation({
-        frames: this.animation.frames,
-        framesPerSecond: this.animation.framesPerSecond
-      })
-    });
-    const indexReference = this.referencesPush(indicesBox, newAnimations);
-    if (indexReference === undefined)
-      return;
-    return this.references[indexReference];
-  }
-  drawAnimations() {
-    this.references.forEach((animations2) => animations2.drawAnimation());
-  }
-}
-
-// public/tsc/game/floor/foams.ts
-class Foams extends AnimationBoxes {
-  constructor(props) {
-    super({
-      x: props.map.initial.x,
-      y: props.map.initial.y,
-      canvas: props.canvas,
-      size: new Size({
-        width: props.map.boxes.width,
-        height: props.map.boxes.height
-      }),
-      length: new Plane({
-        horizontal: 3,
-        vertical: 3
-      }),
-      occupied: [
-        [true, false, false],
-        [false, false, false],
-        [false, false, false]
-      ],
-      route: "images/terrain/water/foam.png",
-      element: new Element({
-        size: new Size({ width: 192, height: 192 }),
-        indices: new Plane({ horizontal: 0, vertical: 0 })
-      }),
-      animation: new Animation({ frames: 8, framesPerSecond: 8 })
-    });
-  }
-  pushFoam(indicesBox) {
-    const foam = this.referencePush(indicesBox);
-    if (foam === undefined)
-      return;
-    foam.initial.x -= this.size.width;
-    foam.initial.y -= this.size.height;
-    return foam;
-  }
-  drawFoams() {
-    this.drawAnimations();
-  }
-}
-
-// public/tsc/game/floor/grounds.ts
+// public/tsc/game/map/grounds.ts
 class Grounds extends ElementBoxes {
   references = [];
   elementIndices;
@@ -802,11 +877,14 @@ class Grounds extends ElementBoxes {
     this.elementIndices = props.elementIndices;
   }
   refreshElements() {
-    this.references.forEach((elements3) => {
-      const indicesBox = this.indicesBox(elements3.initial);
+    this.references.forEach((elements2) => {
+      const indicesBox = this.indicesBox(elements2.initial);
       const groundPosition = this.groundPosition(indicesBox);
       const indices = this.elementIndices[groundPosition];
-      elements3.element.indices = indices;
+      elements2.element.setIndices(new Plane({
+        horizontal: indices.horizontal,
+        vertical: indices.vertical
+      }));
     });
   }
   pushGround(indicesBox) {
@@ -887,7 +965,533 @@ class Grounds extends ElementBoxes {
   }
 }
 
-// public/tsc/game/floor/flatsSand.ts
+// public/tsc/game/map/elevations.ts
+class Elevations extends Grounds {
+  constructor(props) {
+    super({
+      canvas: props.canvas,
+      map: props.map,
+      route: "images/terrain/ground/elevation.png",
+      elementIndices: {
+        leftUp: new Plane({ horizontal: 0, vertical: 0 }),
+        up: new Plane({ horizontal: 1, vertical: 0 }),
+        rightUp: new Plane({ horizontal: 2, vertical: 0 }),
+        left: new Plane({ horizontal: 0, vertical: 1 }),
+        center: new Plane({ horizontal: 1, vertical: 1 }),
+        right: new Plane({ horizontal: 2, vertical: 1 }),
+        leftDown: new Plane({ horizontal: 0, vertical: 2 }),
+        down: new Plane({ horizontal: 1, vertical: 2 }),
+        rightDown: new Plane({ horizontal: 2, vertical: 2 }),
+        horizontalLeft: new Plane({ horizontal: 0, vertical: 4 }),
+        horizontalCenter: new Plane({ horizontal: 1, vertical: 4 }),
+        horizontalRight: new Plane({ horizontal: 2, vertical: 4 }),
+        verticalUp: new Plane({ horizontal: 3, vertical: 0 }),
+        verticalCenter: new Plane({ horizontal: 3, vertical: 1 }),
+        verticalDown: new Plane({ horizontal: 3, vertical: 2 }),
+        only: new Plane({ horizontal: 3, vertical: 4 })
+      }
+    });
+  }
+  pushElevation(indicesBox) {
+    this.pushGround(indicesBox);
+  }
+  drawElevations() {
+    this.drawGrounds();
+  }
+}
+
+// public/tsc/game/map/flatElevations.ts
+class FlatElevations extends ElementBoxes {
+  elementIndices;
+  constructor(props) {
+    super({
+      x: props.map.initial.x,
+      y: props.map.initial.y,
+      canvas: props.canvas,
+      size: new Size({
+        width: props.map.boxes.width,
+        height: props.map.boxes.height
+      }),
+      length: new Plane({
+        horizontal: 1,
+        vertical: 1
+      }),
+      occupied: true,
+      route: "images/terrain/ground/flat.png",
+      element: new Element({
+        size: new Size({ width: 64, height: 64 }),
+        indices: new Plane({ horizontal: 0, vertical: 0 })
+      })
+    });
+    this.elementIndices = {
+      grass: new Plane({ horizontal: 4, vertical: 0 }),
+      sand: new Plane({ horizontal: 9, vertical: 0 })
+    };
+  }
+  setFlatElevation(indicesBox, state) {
+    const indices = this.elementIndices[state];
+    this.element.setIndices(new Plane({
+      horizontal: indices.horizontal,
+      vertical: indices.vertical
+    }));
+    return this.referencePush(indicesBox);
+  }
+  drawFlatElevations() {
+    this.drawElements();
+  }
+}
+
+// public/tsc/game/map/flatsGrass.ts
+class FlatsGrass extends Grounds {
+  constructor(props) {
+    super({
+      canvas: props.canvas,
+      map: props.map,
+      route: "images/terrain/ground/flat.png",
+      elementIndices: {
+        leftUp: new Plane({ horizontal: 0, vertical: 0 }),
+        up: new Plane({ horizontal: 1, vertical: 0 }),
+        rightUp: new Plane({ horizontal: 2, vertical: 0 }),
+        left: new Plane({ horizontal: 0, vertical: 1 }),
+        center: new Plane({ horizontal: 1, vertical: 1 }),
+        right: new Plane({ horizontal: 2, vertical: 1 }),
+        leftDown: new Plane({ horizontal: 0, vertical: 2 }),
+        down: new Plane({ horizontal: 1, vertical: 2 }),
+        rightDown: new Plane({ horizontal: 2, vertical: 2 }),
+        horizontalLeft: new Plane({ horizontal: 0, vertical: 3 }),
+        horizontalCenter: new Plane({ horizontal: 1, vertical: 3 }),
+        horizontalRight: new Plane({ horizontal: 2, vertical: 3 }),
+        verticalUp: new Plane({ horizontal: 3, vertical: 0 }),
+        verticalCenter: new Plane({ horizontal: 3, vertical: 1 }),
+        verticalDown: new Plane({ horizontal: 3, vertical: 2 }),
+        only: new Plane({ horizontal: 3, vertical: 3 })
+      }
+    });
+  }
+  pushFlatGrass(indicesBox) {
+    return this.pushGround(indicesBox);
+  }
+  drawFlatsGrass() {
+    this.drawGrounds();
+  }
+}
+
+// public/tsc/game/map/shadows.ts
+class Shadows extends ImageBoxes {
+  constructor(props) {
+    super({
+      x: props.map.initial.x,
+      y: props.map.initial.y,
+      canvas: props.canvas,
+      size: new Size({
+        width: props.map.boxes.width,
+        height: props.map.boxes.height
+      }),
+      length: new Plane({
+        horizontal: 3,
+        vertical: 3
+      }),
+      occupied: [
+        [true, false, false],
+        [false, false, false],
+        [false, false, false]
+      ],
+      route: "images/terrain/ground/shadows.png"
+    });
+  }
+  pushShadow(indicesBox) {
+    const shadow = this.referencePush(indicesBox);
+    if (shadow === undefined)
+      return;
+    shadow.initial.x -= this.size.width;
+    shadow.initial.y -= this.size.height;
+    return shadow;
+  }
+  drawShadows() {
+    this.drawImages();
+  }
+}
+
+// public/tsc/game/map/stairsElevations.ts
+class StairsElevations extends ElementBoxes {
+  elementIndices;
+  constructor(props) {
+    super({
+      x: props.map.initial.x,
+      y: props.map.initial.y,
+      canvas: props.canvas,
+      size: new Size({
+        width: props.map.boxes.width,
+        height: props.map.boxes.height
+      }),
+      length: new Plane({
+        horizontal: 1,
+        vertical: 1
+      }),
+      occupied: true,
+      route: "images/terrain/ground/elevation.png",
+      element: new Element({
+        size: new Size({ width: 64, height: 64 }),
+        indices: new Plane({ horizontal: 0, vertical: 0 })
+      })
+    });
+    this.elementIndices = {
+      left: new Plane({ horizontal: 0, vertical: 7 }),
+      center: new Plane({ horizontal: 1, vertical: 7 }),
+      right: new Plane({ horizontal: 2, vertical: 7 }),
+      only: new Plane({ horizontal: 3, vertical: 7 })
+    };
+  }
+  positionStairElevation(indicesBox) {
+    const leftIndicesBox = new Coordinate({
+      x: indicesBox.x - 1,
+      y: indicesBox.y
+    });
+    const rightIndicesBox = new Coordinate({
+      x: indicesBox.x + 1,
+      y: indicesBox.y
+    });
+    const left = this.indicesBox(leftIndicesBox) !== undefined;
+    const right = this.indicesBox(rightIndicesBox) !== undefined;
+    const isLeft = !left && right;
+    if (isLeft)
+      return "left";
+    const isCenter = left && right;
+    if (isCenter)
+      return "center";
+    const isRight = left && !right;
+    if (isRight)
+      return "right";
+    const isOnly = !left && !right;
+    if (isOnly)
+      return "only";
+    throw new Error("invalid element");
+  }
+  refreshElements() {
+    this.references.forEach((elements2) => {
+      const indicesBox = this.indicesBox(elements2.initial);
+      const position7 = this.positionStairElevation(indicesBox);
+      const indices = this.elementIndices[position7];
+      elements2.element.setIndices(new Plane({
+        horizontal: indices.horizontal,
+        vertical: indices.vertical
+      }));
+    });
+  }
+  setStairsElevations(indicesBox) {
+    const stairElevation = this.referencePush(indicesBox);
+    if (stairElevation === undefined)
+      return;
+    this.refreshElements();
+    return stairElevation;
+  }
+  drawStairsElevations() {
+    this.drawElements();
+  }
+}
+
+// public/tsc/engine/animation.ts
+class Animation {
+  frames;
+  intervalBetweenFrame = 0;
+  constructor(props) {
+    this.frames = props.frames;
+    this.framesPerSecond = props.framesPerSecond;
+  }
+  get framesPerSecond() {
+    return 1000 / this.intervalBetweenFrame;
+  }
+  set framesPerSecond(value) {
+    this.intervalBetweenFrame = 1000 / value;
+  }
+}
+
+// public/tsc/engine/animations.ts
+class Animations extends Elements {
+  timerNextFrame = 0;
+  animation;
+  constructor(props) {
+    super(props);
+    this.animation = props.animation;
+  }
+  nextFrame() {
+    this.timerNextFrame += this.canvas.timeBetweenFrames;
+    if (this.timerNextFrame < this.animation.intervalBetweenFrame)
+      return;
+    this.timerNextFrame = 0;
+    this.element.nextFrame(this.animation.frames);
+  }
+  drawAnimation() {
+    this.nextFrame();
+    this.drawElement();
+  }
+}
+
+// public/tsc/engine/animationBoxes.ts
+class AnimationBoxes extends ElementBoxes {
+  references = [];
+  animation;
+  constructor(props) {
+    super(props);
+    this.animation = props.animation;
+  }
+  referencePush(indicesBox) {
+    const position7 = this.getPosition(indicesBox);
+    const newAnimations = new Animations({
+      initial: position7.initial,
+      size: position7.size,
+      canvas: this.canvas,
+      route: this.route,
+      element: new Element({
+        size: new Size({
+          width: this.element.size.width,
+          height: this.element.size.height
+        }),
+        indices: new Plane({
+          horizontal: 0,
+          vertical: this.element.getIndices().vertical
+        })
+      }),
+      animation: new Animation({
+        frames: this.animation.frames,
+        framesPerSecond: this.animation.framesPerSecond
+      })
+    });
+    const indexReference = this.referencesPush(indicesBox, newAnimations);
+    if (indexReference === undefined)
+      return;
+    return this.references[indexReference];
+  }
+  drawAnimations() {
+    this.references.forEach((animations2) => animations2.drawAnimation());
+  }
+}
+
+// public/tsc/game/map/trees.ts
+class Trees extends AnimationBoxes {
+  states;
+  constructor(props) {
+    super({
+      x: props.map.initial.x,
+      y: props.map.initial.y,
+      canvas: props.canvas,
+      size: new Size({
+        width: props.map.boxes.width,
+        height: props.map.boxes.height
+      }),
+      length: new Plane({
+        horizontal: 3,
+        vertical: 3
+      }),
+      occupied: [
+        [true, false, false],
+        [true, false, false],
+        [false, false, false]
+      ],
+      route: "images/resources/tree.png",
+      element: new Element({
+        size: new Size({ width: 192, height: 192 }),
+        indices: new Plane({ horizontal: 0, vertical: 0 })
+      }),
+      animation: new Animation({ frames: 4, framesPerSecond: 4 })
+    });
+    this.states = {
+      motion: {
+        animation: new Animation({
+          frames: 4,
+          framesPerSecond: 4
+        }),
+        element: {
+          indices: new Plane({ horizontal: 0, vertical: 0 })
+        }
+      },
+      attacked: {
+        animation: new Animation({
+          frames: 2,
+          framesPerSecond: 2
+        }),
+        element: {
+          indices: new Plane({ horizontal: 0, vertical: 1 })
+        }
+      },
+      felled: {
+        animation: new Animation({
+          frames: 1,
+          framesPerSecond: 1
+        }),
+        element: {
+          indices: new Plane({ horizontal: 0, vertical: 2 })
+        }
+      }
+    };
+  }
+  pushTree(indicesBox, state) {
+    const tree = this.states[state];
+    const animations2 = this.referencePush(indicesBox);
+    if (animations2 === undefined)
+      return;
+    animations2.element.setIndices(new Plane({
+      horizontal: tree.element.indices.horizontal,
+      vertical: tree.element.indices.vertical
+    }));
+    animations2.animation = new Animation({
+      frames: tree.animation.frames,
+      framesPerSecond: tree.animation.framesPerSecond
+    });
+    return animations2;
+  }
+  drawTrees() {
+    this.drawAnimations();
+  }
+}
+
+// public/tsc/game/map/wallElevations.ts
+class WallElevations extends ElementBoxes {
+  elementIndices;
+  constructor(props) {
+    super({
+      x: props.map.initial.x,
+      y: props.map.initial.y,
+      canvas: props.canvas,
+      size: new Size({
+        width: props.map.boxes.width,
+        height: props.map.boxes.height
+      }),
+      length: new Plane({
+        horizontal: 1,
+        vertical: 1
+      }),
+      occupied: true,
+      route: "images/terrain/ground/elevation.png",
+      element: new Element({
+        size: new Size({ width: 64, height: 64 }),
+        indices: new Plane({ horizontal: 0, vertical: 0 })
+      })
+    });
+    this.elementIndices = {
+      left: new Plane({ horizontal: 0, vertical: 3 }),
+      center: new Plane({ horizontal: 1, vertical: 3 }),
+      right: new Plane({ horizontal: 2, vertical: 3 }),
+      only: new Plane({ horizontal: 3, vertical: 5 })
+    };
+  }
+  wallElevationPosition(indicesBox) {
+    const leftBoxes = new Coordinate({
+      x: indicesBox.x - 1,
+      y: indicesBox.y
+    });
+    const rightBoxes = new Coordinate({
+      x: indicesBox.x + 1,
+      y: indicesBox.y
+    });
+    const left = this.getBox(leftBoxes) !== undefined;
+    const right = this.getBox(rightBoxes) !== undefined;
+    const isLeft = !left && right;
+    if (isLeft)
+      return "left";
+    const isCenter = left && right;
+    if (isCenter)
+      return "center";
+    const isRight = left && !right;
+    if (isRight)
+      return "right";
+    const isVertical = !left && !right;
+    if (isVertical)
+      return "only";
+    throw new Error("invalid element");
+  }
+  refreshElements() {
+    this.references.forEach((elements3) => {
+      const indicesBox = this.indicesBox(elements3.initial);
+      const position7 = this.wallElevationPosition(indicesBox);
+      const indices = this.elementIndices[position7];
+      elements3.element.setIndices(new Plane({
+        horizontal: indices.horizontal,
+        vertical: indices.vertical
+      }));
+    });
+  }
+  pushWallElevation(indicesBox) {
+    const wallElevation = this.referencePush(indicesBox);
+    if (wallElevation === undefined)
+      return;
+    this.refreshElements();
+    return wallElevation;
+  }
+  drawWallElevations() {
+    this.drawElements();
+  }
+}
+
+// public/tsc/game/map/water.ts
+class Water extends ImageBoxes {
+  constructor(props) {
+    super({
+      x: props.map.initial.x,
+      y: props.map.initial.y,
+      canvas: props.canvas,
+      size: new Size({
+        width: props.map.boxes.width,
+        height: props.map.boxes.height
+      }),
+      length: new Plane({
+        horizontal: 1,
+        vertical: 1
+      }),
+      occupied: true,
+      route: "images/terrain/water/water.png"
+    });
+  }
+  pushWater(indicesBoxes) {
+    return this.referencePush(indicesBoxes);
+  }
+  drawWater() {
+    this.drawImages();
+  }
+}
+
+// public/tsc/game/map/foams.ts
+class Foams extends AnimationBoxes {
+  constructor(props) {
+    super({
+      x: props.map.initial.x,
+      y: props.map.initial.y,
+      canvas: props.canvas,
+      size: new Size({
+        width: props.map.boxes.width,
+        height: props.map.boxes.height
+      }),
+      length: new Plane({
+        horizontal: 3,
+        vertical: 3
+      }),
+      occupied: [
+        [true, false, false],
+        [false, false, false],
+        [false, false, false]
+      ],
+      route: "images/terrain/water/foam.png",
+      element: new Element({
+        size: new Size({ width: 192, height: 192 }),
+        indices: new Plane({ horizontal: 0, vertical: 0 })
+      }),
+      animation: new Animation({ frames: 8, framesPerSecond: 8 })
+    });
+  }
+  pushFoam(indicesBox) {
+    const foam = this.referencePush(indicesBox);
+    if (foam === undefined)
+      return;
+    foam.initial.x -= this.size.width;
+    foam.initial.y -= this.size.height;
+    return foam;
+  }
+  drawFoams() {
+    this.drawAnimations();
+  }
+}
+
+// public/tsc/game/map/flatsSand.ts
 class FlatsSand extends Grounds {
   constructor(props) {
     super({
@@ -962,447 +1566,18 @@ class FlatsSand extends Grounds {
       }
     });
   }
-  setFlatSand(indicesBox) {
-    this.pushGround(indicesBox);
+  pushFlatSand(indicesBox) {
+    return this.pushGround(indicesBox);
   }
   drawFlatsSand() {
     this.drawGrounds();
   }
 }
 
-// public/tsc/game/floor/elevations.ts
-class Elevations extends Grounds {
-  constructor(props) {
-    super({
-      canvas: props.canvas,
-      map: props.map,
-      route: "images/terrain/ground/elevation.png",
-      elementIndices: {
-        leftUp: new Plane({ horizontal: 0, vertical: 0 }),
-        up: new Plane({ horizontal: 1, vertical: 0 }),
-        rightUp: new Plane({ horizontal: 2, vertical: 0 }),
-        left: new Plane({ horizontal: 0, vertical: 1 }),
-        center: new Plane({ horizontal: 1, vertical: 1 }),
-        right: new Plane({ horizontal: 2, vertical: 1 }),
-        leftDown: new Plane({ horizontal: 0, vertical: 2 }),
-        down: new Plane({ horizontal: 1, vertical: 2 }),
-        rightDown: new Plane({ horizontal: 2, vertical: 2 }),
-        horizontalLeft: new Plane({ horizontal: 0, vertical: 4 }),
-        horizontalCenter: new Plane({ horizontal: 1, vertical: 4 }),
-        horizontalRight: new Plane({ horizontal: 2, vertical: 4 }),
-        verticalUp: new Plane({ horizontal: 3, vertical: 0 }),
-        verticalCenter: new Plane({ horizontal: 3, vertical: 1 }),
-        verticalDown: new Plane({ horizontal: 3, vertical: 2 }),
-        only: new Plane({ horizontal: 3, vertical: 4 })
-      }
-    });
-  }
-  setElevation(indicesBox) {
-    this.pushGround(indicesBox);
-  }
-  drawElevations() {
-    this.drawGrounds();
-  }
-}
-
-// public/tsc/game/floor/flatsGrass.ts
-class FlatsGrass extends Grounds {
-  constructor(props) {
-    super({
-      canvas: props.canvas,
-      map: props.map,
-      route: "images/terrain/ground/flat.png",
-      elementIndices: {
-        leftUp: new Plane({ horizontal: 0, vertical: 0 }),
-        up: new Plane({ horizontal: 1, vertical: 0 }),
-        rightUp: new Plane({ horizontal: 2, vertical: 0 }),
-        left: new Plane({ horizontal: 0, vertical: 1 }),
-        center: new Plane({ horizontal: 1, vertical: 1 }),
-        right: new Plane({ horizontal: 2, vertical: 1 }),
-        leftDown: new Plane({ horizontal: 0, vertical: 2 }),
-        down: new Plane({ horizontal: 1, vertical: 2 }),
-        rightDown: new Plane({ horizontal: 2, vertical: 2 }),
-        horizontalLeft: new Plane({ horizontal: 0, vertical: 3 }),
-        horizontalCenter: new Plane({ horizontal: 1, vertical: 3 }),
-        horizontalRight: new Plane({ horizontal: 2, vertical: 3 }),
-        verticalUp: new Plane({ horizontal: 3, vertical: 0 }),
-        verticalCenter: new Plane({ horizontal: 3, vertical: 1 }),
-        verticalDown: new Plane({ horizontal: 3, vertical: 2 }),
-        only: new Plane({ horizontal: 3, vertical: 3 })
-      }
-    });
-  }
-  pushFlatGrass(indicesBox) {
-    return this.pushGround(indicesBox);
-  }
-  drawFlatsGrass() {
-    this.drawGrounds();
-  }
-}
-
-// public/tsc/game/floor/shadows.ts
-class Shadows extends ImageBoxes {
-  constructor(props) {
-    super({
-      x: props.map.initial.x,
-      y: props.map.initial.y,
-      canvas: props.canvas,
-      size: new Size({
-        width: props.map.boxes.width,
-        height: props.map.boxes.height
-      }),
-      length: new Plane({
-        horizontal: 3,
-        vertical: 3
-      }),
-      occupied: [
-        [true, false, false],
-        [false, false, false],
-        [false, false, false]
-      ],
-      route: "images/terrain/ground/shadows.png"
-    });
-  }
-  pushShadow(indicesBox) {
-    const shadow = this.referencePush(indicesBox);
-    if (shadow === undefined)
-      return;
-    shadow.initial.x -= this.size.width;
-    shadow.initial.y -= this.size.height;
-    return shadow;
-  }
-  drawShadows() {
-    this.drawImages();
-  }
-}
-
-// public/tsc/game/floor/wallElevations.ts
-class WallElevations extends ElementBoxes {
-  elementIndices;
-  constructor(props) {
-    super({
-      x: props.map.initial.x,
-      y: props.map.initial.y,
-      canvas: props.canvas,
-      size: new Size({
-        width: props.map.boxes.width,
-        height: props.map.boxes.height
-      }),
-      length: new Plane({
-        horizontal: 1,
-        vertical: 1
-      }),
-      occupied: true,
-      route: "images/terrain/ground/elevation.png",
-      element: new Element({
-        size: new Size({ width: 64, height: 64 }),
-        indices: new Plane({ horizontal: 0, vertical: 0 })
-      })
-    });
-    this.elementIndices = {
-      left: new Plane({ horizontal: 0, vertical: 3 }),
-      center: new Plane({ horizontal: 1, vertical: 3 }),
-      right: new Plane({ horizontal: 2, vertical: 3 }),
-      only: new Plane({ horizontal: 3, vertical: 5 })
-    };
-  }
-  wallElevationPosition(indicesBox) {
-    const leftBoxes = new Coordinate({
-      x: indicesBox.x - 1,
-      y: indicesBox.y
-    });
-    const rightBoxes = new Coordinate({
-      x: indicesBox.x + 1,
-      y: indicesBox.y
-    });
-    const left = this.getBox(leftBoxes) !== undefined;
-    const right = this.getBox(rightBoxes) !== undefined;
-    const isLeft = !left && right;
-    if (isLeft)
-      return "left";
-    const isCenter = left && right;
-    if (isCenter)
-      return "center";
-    const isRight = left && !right;
-    if (isRight)
-      return "right";
-    const isVertical = !left && !right;
-    if (isVertical)
-      return "only";
-    throw new Error("invalid element");
-  }
-  refreshElements() {
-    this.references.forEach((elements3) => {
-      const indicesBox = this.indicesBox(elements3.initial);
-      const position7 = this.wallElevationPosition(indicesBox);
-      const indices = this.elementIndices[position7];
-      elements3.element.indices = indices;
-    });
-  }
-  pushWallElevation(indicesBox) {
-    const wallElevation = this.referencePush(indicesBox);
-    if (wallElevation === undefined)
-      return;
-    this.refreshElements();
-    return wallElevation;
-  }
-  drawWallElevations() {
-    this.drawElements();
-  }
-}
-
-// public/tsc/game/floor/stairsElevations.ts
-class StairsElevations extends ElementBoxes {
-  elementIndices;
-  constructor(props) {
-    super({
-      x: props.map.initial.x,
-      y: props.map.initial.y,
-      canvas: props.canvas,
-      size: new Size({
-        width: props.map.boxes.width,
-        height: props.map.boxes.height
-      }),
-      length: new Plane({
-        horizontal: 1,
-        vertical: 1
-      }),
-      occupied: true,
-      route: "images/terrain/ground/elevation.png",
-      element: new Element({
-        size: new Size({ width: 64, height: 64 }),
-        indices: new Plane({ horizontal: 0, vertical: 0 })
-      })
-    });
-    this.elementIndices = {
-      left: new Plane({ horizontal: 0, vertical: 7 }),
-      center: new Plane({ horizontal: 1, vertical: 7 }),
-      right: new Plane({ horizontal: 2, vertical: 7 }),
-      only: new Plane({ horizontal: 3, vertical: 7 })
-    };
-  }
-  positionStairElevation(indicesBox) {
-    const leftIndicesBox = new Coordinate({
-      x: indicesBox.x - 1,
-      y: indicesBox.y
-    });
-    const rightIndicesBox = new Coordinate({
-      x: indicesBox.x + 1,
-      y: indicesBox.y
-    });
-    const left = this.indicesBox(leftIndicesBox) !== undefined;
-    const right = this.indicesBox(rightIndicesBox) !== undefined;
-    const isLeft = !left && right;
-    if (isLeft)
-      return "left";
-    const isCenter = left && right;
-    if (isCenter)
-      return "center";
-    const isRight = left && !right;
-    if (isRight)
-      return "right";
-    const isOnly = !left && !right;
-    if (isOnly)
-      return "only";
-    throw new Error("invalid element");
-  }
-  refreshElements() {
-    this.references.forEach((elements3) => {
-      const indicesBox = this.indicesBox(elements3.initial);
-      const position7 = this.positionStairElevation(indicesBox);
-      const indices = this.elementIndices[position7];
-      elements3.element.indices = indices;
-    });
-  }
-  setStairsElevations(indicesBox) {
-    const stairElevation = this.referencePush(indicesBox);
-    if (stairElevation === undefined)
-      return;
-    this.refreshElements();
-    return stairElevation;
-  }
-  drawStairsElevations() {
-    this.drawElements();
-  }
-}
-
-// public/tsc/game/floor/flatElevations.ts
-class FlatElevations extends ElementBoxes {
-  elementIndices;
-  constructor(props) {
-    super({
-      x: props.map.initial.x,
-      y: props.map.initial.y,
-      canvas: props.canvas,
-      size: new Size({
-        width: props.map.boxes.width,
-        height: props.map.boxes.height
-      }),
-      length: new Plane({
-        horizontal: 1,
-        vertical: 1
-      }),
-      occupied: true,
-      route: "images/terrain/ground/flat.png",
-      element: new Element({
-        size: new Size({ width: 64, height: 64 }),
-        indices: new Plane({ horizontal: 0, vertical: 0 })
-      })
-    });
-    this.elementIndices = {
-      grass: new Plane({ horizontal: 4, vertical: 0 }),
-      sand: new Plane({ horizontal: 9, vertical: 0 })
-    };
-  }
-  setFlatElevation(indicesBox, state) {
-    const indices = this.elementIndices[state];
-    this.element.indices = indices;
-    return this.referencePush(indicesBox);
-  }
-  drawFlatElevations() {
-    this.drawElements();
-  }
-}
-
-// public/tsc/game/floor/castle.ts
-class Castle extends Image2 {
-  state = "construction";
-  color = "blue";
-  constructor(props) {
-    super({
-      initial: props.initial,
-      size: props.size,
-      canvas: props.canvas,
-      route: false
-    });
-    this.imageCastle(props.state, props.color);
-  }
-  imageCastle(newState, newColor) {
-    this.state = newState;
-    this.color = newColor;
-    let file = this.state;
-    if (this.state === "ready")
-      file = this.color;
-    this.image = `images/factions/knights/buildings/castle/${file}.png`;
-  }
-}
-
-// public/tsc/game/floor/castles.ts
-class Castles extends ImageBoxes {
-  references = [];
-  constructor(props) {
-    super({
-      x: props.map.initial.x,
-      y: props.map.initial.y,
-      canvas: props.canvas,
-      size: new Size({
-        width: props.map.boxes.width,
-        height: props.map.boxes.height
-      }),
-      length: new Plane({ horizontal: 4, vertical: 3 }),
-      occupied: true,
-      route: false
-    });
-  }
-  referencePush() {
-    return;
-  }
-  castlePush(indicesBox, state, color) {
-    const position7 = this.getPosition(indicesBox);
-    const newReference = new Castle({
-      initial: position7.initial,
-      size: position7.size,
-      canvas: this.canvas,
-      state,
-      color
-    });
-    const indexReference = this.referencesPush(indicesBox, newReference);
-    if (indexReference === undefined)
-      return;
-    return this.references[indexReference];
-  }
-  drawCastles() {
-    this.drawImages();
-  }
-}
-
-// public/tsc/game/floor/trees.ts
-class Trees extends AnimationBoxes {
-  states;
-  constructor(props) {
-    super({
-      x: props.map.initial.x,
-      y: props.map.initial.y,
-      canvas: props.canvas,
-      size: new Size({
-        width: props.map.boxes.width,
-        height: props.map.boxes.height
-      }),
-      length: new Plane({
-        horizontal: 3,
-        vertical: 3
-      }),
-      occupied: [
-        [true, false, false],
-        [true, false, false],
-        [false, false, false]
-      ],
-      route: "images/resources/tree.png",
-      element: new Element({
-        size: new Size({ width: 192, height: 192 }),
-        indices: new Plane({ horizontal: 0, vertical: 0 })
-      }),
-      animation: new Animation({ frames: 4, framesPerSecond: 4 })
-    });
-    this.states = {
-      motion: {
-        animation: new Animation({
-          frames: 4,
-          framesPerSecond: 4
-        }),
-        element: {
-          indices: new Plane({ horizontal: 0, vertical: 0 })
-        }
-      },
-      attacked: {
-        animation: new Animation({
-          frames: 2,
-          framesPerSecond: 2
-        }),
-        element: {
-          indices: new Plane({ horizontal: 0, vertical: 1 })
-        }
-      },
-      felled: {
-        animation: new Animation({
-          frames: 1,
-          framesPerSecond: 1
-        }),
-        element: {
-          indices: new Plane({ horizontal: 0, vertical: 2 })
-        }
-      }
-    };
-  }
-  pushTree(indicesBox, state) {
-    const tree = this.states[state];
-    const animations2 = this.referencePush(indicesBox);
-    if (animations2 === undefined)
-      return;
-    animations2.element.indices = tree.element.indices;
-    animations2.animation = new Animation({
-      frames: tree.animation.frames,
-      framesPerSecond: tree.animation.framesPerSecond
-    });
-    return animations2;
-  }
-  drawTrees() {
-    this.drawAnimations();
-  }
-}
-
-// public/tsc/game/floor.ts
+// public/tsc/game/map/floor.ts
 class Floor {
+  map;
+  canvas;
   water;
   foams;
   flatsSand;
@@ -1415,53 +1590,55 @@ class Floor {
   castles;
   trees;
   constructor(props) {
+    this.map = props.map;
+    this.canvas = props.canvas;
     this.water = new Water({
-      map: props.map,
-      canvas: props.canvas
+      map: this.map,
+      canvas: this.canvas
     });
     this.foams = new Foams({
-      map: props.map,
-      canvas: props.canvas
+      map: this.map,
+      canvas: this.canvas
     });
     this.flatsSand = new FlatsSand({
-      map: props.map,
-      canvas: props.canvas
+      map: this.map,
+      canvas: this.canvas
     });
     this.elevations = new Elevations({
-      map: props.map,
-      canvas: props.canvas
+      map: this.map,
+      canvas: this.canvas
     });
     this.flatsGrass = new FlatsGrass({
-      map: props.map,
-      canvas: props.canvas
+      map: this.map,
+      canvas: this.canvas
     });
     this.shadows = new Shadows({
-      map: props.map,
-      canvas: props.canvas
+      map: this.map,
+      canvas: this.canvas
     });
     this.wallElevations = new WallElevations({
-      map: props.map,
-      canvas: props.canvas
+      map: this.map,
+      canvas: this.canvas
     });
     this.stairsElevation = new StairsElevations({
-      map: props.map,
-      canvas: props.canvas
+      map: this.map,
+      canvas: this.canvas
     });
     this.flatElevations = new FlatElevations({
-      map: props.map,
-      canvas: props.canvas
+      map: this.map,
+      canvas: this.canvas
     });
     this.castles = new Castles({
-      map: props.map,
-      canvas: props.canvas
+      map: this.map,
+      canvas: this.canvas
     });
     this.trees = new Trees({
-      map: props.map,
-      canvas: props.canvas
+      map: this.map,
+      canvas: this.canvas
     });
   }
-  pushFloor(floor) {
-    floor.forEach((row, y) => {
+  pushFloor(matrix) {
+    matrix.forEach((row, y) => {
       row.forEach((box2, x) => {
         const indicesBox = new Coordinate({ x, y });
         if (box2.water === true)
@@ -1469,14 +1646,14 @@ class Floor {
         if (box2.foam !== false) {
           this.foams.pushFoam(indicesBox);
           if (box2.foam.flatSand === true)
-            this.flatsSand.setFlatSand(indicesBox);
+            this.flatsSand.pushFlatSand(indicesBox);
         }
         if (box2.elevation !== false) {
           if (box2.elevation.shadow === true)
             this.shadows.pushShadow(indicesBox);
           if (box2.elevation.flatGrass === true)
             this.flatsGrass.pushFlatGrass(indicesBox);
-          this.elevations.setElevation(indicesBox);
+          this.elevations.pushElevation(indicesBox);
         }
         if (box2.wallElevation !== false) {
           if (box2.wallElevation.shadow === true)
@@ -1501,149 +1678,59 @@ class Floor {
       });
     });
   }
-  drawFloor() {
-    this.water.drawWaters();
+  collisionFloor(character, movedCharacter) {
+    const elevations2 = this.elevations.collision(character) !== false;
+    const wallElevations2 = this.wallElevations.collision(character) !== false;
+    const stairsElevations2 = this.stairsElevation.collision(character) !== false;
+    const nextElevations = this.elevations.collision(movedCharacter) !== false;
+    const nextWallElevations = this.wallElevations.collision(movedCharacter) !== false;
+    const nextStairsElevations = this.stairsElevation.collision(movedCharacter) !== false;
+    if (elevations2 === true) {
+      if (nextElevations === true) {
+        console.log("next elevations");
+        return false;
+      }
+      if (nextWallElevations === true)
+        return true;
+      if (nextStairsElevations === true)
+        return false;
+      console.log("elevations");
+      return true;
+    }
+    if (wallElevations2 === true) {
+      return true;
+    } else if (stairsElevations2 === true) {
+      if (nextElevations === true)
+        return false;
+      if (nextWallElevations === true)
+        return true;
+      if (nextStairsElevations === true)
+        return false;
+      return true;
+    }
+    return true;
+  }
+  drawMap() {
+    this.water.drawWater();
     this.foams.drawFoams();
     this.flatsSand.drawFlatsSand();
     this.shadows.drawShadows();
-    this.stairsElevation.drawStairsElevations();
     this.elevations.drawElevations();
-    this.flatsGrass.drawFlatsGrass();
     this.wallElevations.drawWallElevations();
+    this.flatsGrass.drawFlatsGrass();
+    this.stairsElevation.drawStairsElevations();
     this.flatElevations.drawFlatElevations();
     this.castles.drawCastles();
     this.trees.drawTrees();
   }
 }
 
-// public/tsc/game/mapMatrix.ts
-var BoxFalse = () => ({
-  water: false,
-  foam: false,
-  elevation: false,
-  wallElevation: false,
-  stairElevation: false,
-  castle: false,
-  trees: false
-});
-var BoxFloor1 = (x, y) => {
-  const box2 = BoxFalse();
-  if (x >= 6 && x <= 14 && y >= 1 && y <= 6) {
-    box2.elevation = {
-      shadow: y >= 3,
-      flatGrass: true
-    };
-  }
-  if (x >= 6 && x <= 10 && y === 7) {
-    box2.elevation = {
-      shadow: true,
-      flatGrass: true
-    };
-  }
-  if (x >= 14 && x <= 14 && y === 7) {
-    box2.elevation = {
-      shadow: true,
-      flatGrass: true
-    };
-  }
-  if (y === 7 && x >= 11 && x <= 13)
-    box2.stairElevation = {
-      shadow: true,
-      flatElevation: x === 9 ? "grass" : false
-    };
-  if (y === 8 && x >= 6 && x <= 10) {
-    const flatElevationRandom = Math.round(Math.random());
-    box2.wallElevation = {
-      shadow: true,
-      flatElevation: flatElevationRandom === 0 ? "grass" : false
-    };
-  }
-  if (y === 8 && x === 14) {
-    const flatElevationRandom = Math.round(Math.random());
-    box2.wallElevation = {
-      shadow: true,
-      flatElevation: flatElevationRandom === 0 ? "grass" : false
-    };
-  }
-  if (y === 3 && x === 14) {
-    box2.trees = {
-      animation: "felled"
-    };
-  }
-  return box2;
-};
-var BoxFloor0 = (x, y) => {
-  const box2 = BoxFalse();
-  box2.water = true;
-  if (y >= 3 && y <= 19 && x >= 1 && x <= 19)
-    box2.foam = {
-      flatSand: true
-    };
-  if (x >= 2 && x <= 17 && y >= 2 && y <= 13)
-    box2.elevation = {
-      shadow: y >= 3,
-      flatGrass: true
-    };
-  if (x >= 2 && x <= 10 && y === 14)
-    box2.elevation = {
-      shadow: true,
-      flatGrass: true
-    };
-  if (x >= 14 && x <= 17 && y === 14)
-    box2.elevation = {
-      shadow: true,
-      flatGrass: true
-    };
-  if (y === 14 && x >= 11 && x <= 13)
-    box2.stairElevation = {
-      shadow: true,
-      flatElevation: x === 11 ? "sand" : false
-    };
-  else if (y === 15 && x >= 9 && x <= 11)
-    box2.foam = {
-      flatSand: true
-    };
-  if (y === 15 && x >= 2 && x <= 10) {
-    const flatElevationRandom = Math.round(Math.random());
-    box2.wallElevation = {
-      shadow: true,
-      flatElevation: flatElevationRandom === 0 ? "sand" : false
-    };
-  }
-  if (y === 15 && x >= 14 && x <= 17) {
-    const flatElevationRandom = Math.round(Math.random());
-    box2.wallElevation = {
-      shadow: true,
-      flatElevation: flatElevationRandom === 0 ? "sand" : false
-    };
-  }
-  return box2;
-};
-var FloorLength = new Plane({ horizontal: 21, vertical: 21 });
-var MapMatrix = () => {
-  const floor0 = [];
-  const floor1 = [];
-  for (let y = 0;y < FloorLength.vertical; y++) {
-    const floor0Y = [];
-    const floor1Y = [];
-    for (let x = 0;x < FloorLength.horizontal; x++) {
-      floor0Y[x] = BoxFloor0(x, y);
-      floor1Y[x] = BoxFloor1(x, y);
-    }
-    floor0[y] = floor0Y;
-    floor1[y] = floor1Y;
-  }
-  return [
-    floor0,
-    floor1
-  ];
-};
-
 // public/tsc/game/map.ts
 class Map extends Position {
-  matrix = MapMatrix();
-  boxes;
+  matrix = GetMapMatrix();
   floors;
+  boxes;
+  canvas;
   constructor(props) {
     super({
       initial: new Coordinate({ x: 0, y: 0 }),
@@ -1652,29 +1739,28 @@ class Map extends Position {
         height: 100
       })
     });
+    this.canvas = props.canvas;
     this.boxes = new Size({
-      width: this.size.width / FloorLength.horizontal,
-      height: this.size.height / FloorLength.vertical
+      width: this.size.width / MapLength.horizontal,
+      height: this.size.height / MapLength.vertical
     });
-    this.floors = [
-      new Floor({
-        canvas: props.canvas,
-        map: this
-      }),
-      new Floor({
-        canvas: props.canvas,
-        map: this
-      })
-    ];
-    this.floors.forEach((floor2, index) => {
-      const matrixFloor = this.matrix[index];
-      if (matrixFloor === undefined)
-        return;
-      floor2.pushFloor(matrixFloor);
+    this.floors = this.matrix.map((matrix) => {
+      const floor2 = new Floor({
+        map: this,
+        canvas: this.canvas
+      });
+      floor2.pushFloor(matrix);
+      return floor2;
     });
   }
+  collisionMap(character, movedCharacter, floorIndex) {
+    const floor2 = this.floors[floorIndex];
+    if (floor2 === undefined)
+      return false;
+    return floor2.collisionFloor(character, movedCharacter);
+  }
   drawMap() {
-    this.floors.forEach((floor2) => floor2.drawFloor());
+    this.floors.forEach((floor2) => floor2.drawMap());
   }
 }
 
@@ -1691,16 +1777,64 @@ class Address {
   }
 }
 
+// public/tsc/engine/rect.ts
+class Rect extends Position {
+  canvas;
+  fillStyle;
+  strokeStyle;
+  lineWidth;
+  constructor(props) {
+    super(props);
+    this.canvas = props.canvas;
+    this.fillStyle = props.fillStyle;
+    this.strokeStyle = props.strokeStyle;
+    this.lineWidth = props.lineWidth;
+  }
+  drawRect() {
+    const positionOnCanvas = this.canvas.positionOnCanvas(this);
+    if (positionOnCanvas === false)
+      return;
+    if (this.fillStyle !== false) {
+      this.canvas.context.fillStyle = this.fillStyle;
+      this.canvas.context.fillRect(positionOnCanvas.initial.x, positionOnCanvas.initial.y, positionOnCanvas.size.width, positionOnCanvas.size.height);
+    }
+    if (this.strokeStyle !== false) {
+      this.canvas.context.lineWidth = this.lineWidth;
+      this.canvas.context.strokeStyle = this.strokeStyle;
+      this.canvas.context.strokeRect(positionOnCanvas.initial.x, positionOnCanvas.initial.y, positionOnCanvas.size.width, positionOnCanvas.size.height);
+    }
+  }
+}
+
 // public/tsc/engine/character.ts
-class Character extends Animations {
+class Character extends Rect {
+  scale;
+  animations;
   speed;
   address;
   constructor(props) {
-    super(props);
+    super({
+      initial: props.initial,
+      size: props.size,
+      canvas: props.canvas,
+      fillStyle: "#fff",
+      strokeStyle: false,
+      lineWidth: 0
+    });
+    this.scale = props.scale;
+    this.canvas = props.canvas;
+    this.animations = new Animations({
+      initial: new Coordinate({ x: 0, y: 0 }),
+      size: new Size({ width: 0, height: 0 }),
+      canvas: props.canvas,
+      route: props.animations.route,
+      element: props.animations.element,
+      animation: props.animations.animation
+    });
     this.speed = props.speed;
-    this.address = new Address({ x: 0, y: 0 });
+    this.address = props.address;
   }
-  nextPosition() {
+  movedCharacter() {
     if (this.address.equals(new Address({ x: 0, y: 0 })))
       return false;
     const secondsBetweenFrames = this.canvas.timeBetweenFrames / 1000;
@@ -1710,16 +1844,34 @@ class Character extends Animations {
     const distanceY = speedY * this.address.y;
     const newX = this.initial.x + distanceX;
     const newY = this.initial.y + distanceY;
-    return new Position({
+    return new Character({
       initial: new Coordinate({ x: newX, y: newY }),
       size: new Size({
         width: this.size.width,
         height: this.size.height
-      })
+      }),
+      canvas: this.canvas,
+      scale: this.scale,
+      animations: {
+        route: this.animations.route,
+        element: this.animations.element,
+        animation: this.animations.animation
+      },
+      speed: this.speed,
+      address: this.address
     });
   }
   drawCharacter() {
-    this.drawAnimation();
+    this.drawRect();
+    this.animations.size = new Size({
+      width: this.scale.width * this.size.width,
+      height: this.scale.height * this.size.height
+    });
+    this.animations.initial = new Coordinate({
+      x: this.initial.x + this.size.width / 2 - this.animations.size.width / 2,
+      y: this.initial.y + this.size.height / 2 - this.animations.size.height / 2
+    });
+    this.animations.drawAnimation();
   }
 }
 
@@ -1732,17 +1884,24 @@ class Pawn extends Character {
     super({
       initial: props.initial,
       size: new Size({
-        width: props.map.boxes.width * 3,
-        height: props.map.boxes.height * 3
+        width: props.map.boxes.width,
+        height: props.map.boxes.height
       }),
       canvas: props.canvas,
-      route: `images/factions/knights/troops/pawn/${props.color}.png`,
-      element: new Element({
-        size: new Size({ width: 192, height: 192 }),
-        indices: new Plane({ horizontal: 6, vertical: 6 })
+      scale: new Size({
+        width: 3,
+        height: 3
       }),
-      animation: new Animation({ frames: 6, framesPerSecond: 6 }),
-      speed: new Coordinate({ x: 2, y: 2 })
+      animations: {
+        route: `images/factions/knights/troops/pawn/${props.color}.png`,
+        element: new Element({
+          size: new Size({ width: 192, height: 192 }),
+          indices: new Plane({ horizontal: 6, vertical: 6 })
+        }),
+        animation: new Animation({ frames: 6, framesPerSecond: 6 })
+      },
+      speed: new Coordinate({ x: 2, y: 2 }),
+      address: new Address({ x: 0, y: 0 })
     });
     this.map = props.map;
     this.nickname = props.nickname;
@@ -1786,31 +1945,39 @@ class Sheep extends Character {
     super({
       initial: props.initial,
       size: new Size({
-        width: props.map.boxes.width * 3,
-        height: props.map.boxes.height * 3
+        width: props.map.boxes.width,
+        height: props.map.boxes.height
       }),
       canvas: props.canvas,
-      route: "images/resources/sheep.png",
-      element: new Element({
-        size: new Size({ width: 128, height: 128 }),
-        indices: new Plane({ horizontal: 0, vertical: 0 })
+      scale: new Size({
+        width: 3,
+        height: 3
       }),
-      animation: new Animation({
-        frames: 8,
-        framesPerSecond: 8
-      }),
-      speed: new Coordinate({ x: 2, y: 2 })
+      animations: {
+        route: "images/resources/sheep.png",
+        element: new Element({
+          size: new Size({ width: 128, height: 128 }),
+          indices: new Plane({ horizontal: 0, vertical: 0 })
+        }),
+        animation: new Animation({ frames: 8, framesPerSecond: 8 })
+      },
+      speed: new Coordinate({ x: 4, y: 4 }),
+      address: new Address({ x: 0, y: 0 })
     });
     this.map = props.map;
     this.state = "move";
-    this.address.x = -1;
+    this.address.x = 1;
+    this.address.y = 1;
   }
   moveSheep() {
-    const nextPosition = this.nextPosition();
-    if (nextPosition === false)
+    const movedCharacter = this.movedCharacter();
+    if (movedCharacter === false)
       return false;
-    this.initial.x = nextPosition.initial.x;
-    this.initial.y = nextPosition.initial.y;
+    const collision = this.map.collisionMap(this, movedCharacter, 0);
+    if (collision === true)
+      return false;
+    this.initial.x = movedCharacter.initial.x;
+    this.initial.y = movedCharacter.initial.y;
     return true;
   }
   jumpSheep() {
@@ -1818,7 +1985,7 @@ class Sheep extends Character {
       return;
     const secondsBetweenFrames = this.canvas.timeBetweenFrames / 1000;
     this.jumpTimer += secondsBetweenFrames;
-    const seconds = this.animation.frames / this.animation.framesPerSecond;
+    const seconds = this.animations.animation.frames / this.animations.animation.framesPerSecond;
     if (this.jumpTimer >= seconds) {
       this.state = "move";
       this.jumpTimer = 0;
@@ -1827,47 +1994,20 @@ class Sheep extends Character {
   }
   refreshState() {
     let character3 = this.character[this.state];
-    if (this.element.indices.vertical === character3.element.indices.vertical)
+    if (this.animations.element.getIndices().vertical === character3.element.indices.vertical)
       return;
-    this.element.indices.vertical = character3.element.indices.vertical;
-    this.element.indices.horizontal = character3.element.indices.horizontal;
-    this.animation.frames = character3.animation.frames;
-    this.animation.framesPerSecond = character3.animation.framesPerSecond;
+    this.animations.element.setIndices(new Plane({
+      horizontal: character3.element.indices.horizontal,
+      vertical: character3.element.indices.vertical
+    }));
+    this.animations.animation.frames = character3.animation.frames;
+    this.animations.animation.framesPerSecond = character3.animation.framesPerSecond;
   }
   drawSheep() {
     this.refreshState();
     this.moveSheep();
     this.jumpSheep();
     this.drawCharacter();
-  }
-}
-
-// public/tsc/engine/rect.ts
-class Rect extends Position {
-  canvas;
-  fillStyle;
-  strokeStyle;
-  lineWidth;
-  constructor(props) {
-    super(props);
-    this.canvas = props.canvas;
-    this.fillStyle = props.fillStyle;
-    this.strokeStyle = props.strokeStyle;
-    this.lineWidth = props.lineWidth;
-  }
-  drawRect() {
-    const positionOnCanvas = this.canvas.positionOnCanvas(this);
-    if (positionOnCanvas === false)
-      return;
-    if (this.fillStyle !== false) {
-      this.canvas.context.fillStyle = this.fillStyle;
-      this.canvas.context.fillRect(positionOnCanvas.initial.x, positionOnCanvas.initial.y, positionOnCanvas.size.width, positionOnCanvas.size.height);
-    }
-    if (this.strokeStyle !== false) {
-      this.canvas.context.lineWidth = this.lineWidth;
-      this.canvas.context.strokeStyle = this.strokeStyle;
-      this.canvas.context.strokeRect(positionOnCanvas.initial.x, positionOnCanvas.initial.y, positionOnCanvas.size.width, positionOnCanvas.size.height);
-    }
   }
 }
 
@@ -1973,7 +2113,7 @@ class Game extends Scene {
     this.map = new Map({ canvas: props.canvas });
     this.sheepGroup = [
       new Sheep({
-        initial: new Coordinate({ x: 10, y: 10 }),
+        initial: new Coordinate({ x: 20, y: 20 }),
         map: this.map,
         canvas: props.canvas
       })

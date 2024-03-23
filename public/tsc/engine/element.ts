@@ -12,15 +12,15 @@ export class Element extends Position {
             initial: new Coordinate({ x: 0, y: 0 }),
             size: props.size,
         });
-        this.indices = props.indices;
+        this.setIndices(props.indices);
     }
 
-    set indices(newIndices: Plane) {
+    setIndices(newIndices: Plane) {
         this.initial.x = this.size.width * newIndices.horizontal;
         this.initial.y = this.size.height * newIndices.vertical;
     }
 
-    get indices(): Plane {
+    getIndices(): Plane {
         return new Plane({
             horizontal: this.initial.x / this.size.width,
             vertical: this.initial.y / this.size.height,
@@ -28,7 +28,18 @@ export class Element extends Position {
     }
 
     nextFrame(frames: number) {
-        this.indices.horizontal++;
-        if (this.indices.horizontal >= frames) this.indices.horizontal = 0;
+        this.setIndices(
+            new Plane({
+                horizontal: this.getIndices().horizontal + 1,
+                vertical: this.getIndices().vertical
+            })
+        );
+        if (this.getIndices().horizontal >= frames)
+            this.setIndices(
+                new Plane({
+                    horizontal: 0,
+                    vertical: this.getIndices().vertical
+                })
+            );
     }
 }

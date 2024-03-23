@@ -86,7 +86,12 @@ export class Trees extends AnimationBoxes {
         const tree = this.states[state];
         const animations = this.referencePush(indicesBox);
         if (animations === undefined) return undefined;
-        animations.element.indices = tree.element.indices;
+        animations.element.setIndices(
+            new Plane({
+                horizontal: tree.element.indices.horizontal,
+                vertical: tree.element.indices.vertical
+            })
+        );
         animations.animation = new Animation({
             frames: tree.animation.frames,
             framesPerSecond: tree.animation.framesPerSecond

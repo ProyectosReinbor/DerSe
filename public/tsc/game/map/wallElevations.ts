@@ -1,20 +1,20 @@
-
-import type { Canvas } from "../../engine/canvas.js";
-import { Coordinate } from "../../engine/coordinate.js";
 import { ElementBoxes } from "../../engine/elementBoxes.js";
-import { Element } from "../../engine/element.js";
+import type { Map } from "../map.js";
 import { Plane } from "../../engine/plane.js";
 import { Size } from "../../engine/size.js";
-import type { Map } from "../map.js";
+import { Coordinate } from "../../engine/coordinate.js";
+import type { Canvas } from "../../engine/canvas.js";
+import { Element } from "../../engine/element.js";
 import type { Elements } from "../../engine/elements.js";
 
-export type StairElevationState = "left" | "center" | "right" | "only";
-export type StairElevationElementIndices = {
-    [key in StairElevationState]: Plane;
+export type WallElevationState = "left" | "center" | "right" | "only";
+
+export type WallElevationElementIndices = {
+    [key in WallElevationState]: Plane;
 };
 
-export class StairsElevations extends ElementBoxes {
-    elementIndices: StairElevationElementIndices;
+export class WallElevations extends ElementBoxes {
+    elementIndices: WallElevationElementIndices;
     constructor(props: {
         map: Map,
         canvas: Canvas,
@@ -39,25 +39,24 @@ export class StairsElevations extends ElementBoxes {
             })
         });
         this.elementIndices = {
-            left: new Plane({ horizontal: 0, vertical: 7 }),
-            center: new Plane({ horizontal: 1, vertical: 7 }),
-            right: new Plane({ horizontal: 2, vertical: 7 }),
-            only: new Plane({ horizontal: 3, vertical: 7 })
+            left: new Plane({ horizontal: 0, vertical: 3 }),
+            center: new Plane({ horizontal: 1, vertical: 3 }),
+            right: new Plane({ horizontal: 2, vertical: 3 }),
+            only: new Plane({ horizontal: 3, vertical: 5 })
         };
     }
 
-    positionStairElevation(indicesBox: Coordinate): StairElevationState {
-        const leftIndicesBox = new Coordinate({
+    wallElevationPosition(indicesBox: Coordinate): WallElevationState {
+        const leftBoxes = new Coordinate({
             x: indicesBox.x - 1,
             y: indicesBox.y,
         });
-        const rightIndicesBox = new Coordinate({
+        const rightBoxes = new Coordinate({
             x: indicesBox.x + 1,
             y: indicesBox.y,
         });
-
-        const left = this.indicesBox(leftIndicesBox) !== undefined;
-        const right = this.indicesBox(rightIndicesBox) !== undefined;
+        const left = this.getBox(leftBoxes) !== undefined;
+        const right = this.getBox(rightBoxes) !== undefined;
 
         const isLeft = !left && right;
         if (isLeft) return "left";
@@ -68,31 +67,36 @@ export class StairsElevations extends ElementBoxes {
         const isRight = left && !right;
         if (isRight) return "right";
 
-        const isOnly = !left && !right;
-        if (isOnly) return "only";
+        const isVertical = !left && !right;
+        if (isVertical) return "only";
 
         throw new Error("invalid element");
     }
 
-    refreshElements(): void {
+    refreshElements() {
         this.references.forEach(elements => {
             const indicesBox = this.indicesBox(elements.initial);
-            const position = this.positionStairElevation(indicesBox);
+            const position = this.wallElevationPosition(indicesBox);
             const indices = this.elementIndices[position];
-            elements.element.indices = indices;
+            elements.element.setIndices(
+                new Plane({
+                    horizontal: indices.horizontal,
+                    vertical: indices.vertical
+                })
+            );
         });
     }
 
-    setStairsElevations(indicesBox: Coordinate): Elements | undefined {
-        const stairElevation = this.referencePush(indicesBox);
-        if (stairElevation === undefined)
+    pushWallElevation(indicesBox: Coordinate): Elements | undefined {
+        const wallElevation = this.referencePush(indicesBox);
+        if (wallElevation === undefined)
             return undefined;
 
         this.refreshElements();
-        return stairElevation;
+        return wallElevation;
     }
 
-    drawStairsElevations(): void {
+    drawWallElevations() {
         this.drawElements();
     }
-}
+} 

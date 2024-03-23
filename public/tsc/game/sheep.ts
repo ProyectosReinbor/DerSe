@@ -1,6 +1,7 @@
 import { Animation } from "../engine/animation";
 import type { Canvas } from "../engine/canvas";
 import { Character } from "../engine/character";
+import { Address } from "../engine/character/address";
 import { Coordinate } from "../engine/coordinate";
 import { Element } from "../engine/element";
 import { Plane } from "../engine/plane";
@@ -49,33 +50,42 @@ export class Sheep extends Character {
         super({
             initial: props.initial,
             size: new Size({
-                width: props.map.boxes.width * 3,
-                height: props.map.boxes.height * 3
+                width: props.map.boxes.width,
+                height: props.map.boxes.height
             }),
             canvas: props.canvas,
-            route: "images/resources/sheep.png",
-            element: new Element({
-                size: new Size({ width: 128, height: 128 }),
-                indices: new Plane({ horizontal: 0, vertical: 0 })
+            scale: new Size({
+                width: 3,
+                height: 3
             }),
-            animation: new Animation({
-                frames: 8,
-                framesPerSecond: 8
-            }),
-            speed: new Coordinate({ x: 2, y: 2 }),
+            animations: {
+                route: "images/resources/sheep.png",
+                element: new Element({
+                    size: new Size({ width: 128, height: 128 }),
+                    indices: new Plane({ horizontal: 0, vertical: 0 })
+                }),
+                animation: new Animation({ frames: 8, framesPerSecond: 8 })
+            },
+            speed: new Coordinate({ x: 4, y: 4 }),
+            address: new Address({ x: 0, y: 0 }),
         });
         this.map = props.map;
         this.state = "move";
-        this.address.x = -1;
+        this.address.x = 1;
+        this.address.y = 1;
     }
 
     moveSheep() {
-        const nextPosition = this.nextPosition();
-        if (nextPosition === false)
+        const movedCharacter = this.movedCharacter();
+        if (movedCharacter === false)
             return false;
 
-        this.initial.x = nextPosition.initial.x;
-        this.initial.y = nextPosition.initial.y;
+        const collision = this.map.collisionMap(this, movedCharacter, 0);
+        if (collision === true)
+            return false;
+
+        this.initial.x = movedCharacter.initial.x;
+        this.initial.y = movedCharacter.initial.y;
         return true;
     }
 
@@ -83,7 +93,7 @@ export class Sheep extends Character {
         if (this.state !== "jump") return;
         const secondsBetweenFrames = this.canvas.timeBetweenFrames / 1000;
         this.jumpTimer += secondsBetweenFrames;
-        const seconds = this.animation.frames / this.animation.framesPerSecond;
+        const seconds = this.animations.animation.frames / this.animations.animation.framesPerSecond;
         if (this.jumpTimer >= seconds) {
             this.state = "move";
             this.jumpTimer = 0;
@@ -93,11 +103,17 @@ export class Sheep extends Character {
 
     refreshState() {
         let character = this.character[this.state];
-        if (this.element.indices.vertical === character.element.indices.vertical) return;
-        this.element.indices.vertical = character.element.indices.vertical;
-        this.element.indices.horizontal = character.element.indices.horizontal;
-        this.animation.frames = character.animation.frames;
-        this.animation.framesPerSecond = character.animation.framesPerSecond;
+        if (this.animations.element.getIndices().vertical === character.element.indices.vertical)
+            return;
+
+        this.animations.element.setIndices(
+            new Plane({
+                horizontal: character.element.indices.horizontal,
+                vertical: character.element.indices.vertical
+            })
+        );
+        this.animations.animation.frames = character.animation.frames;
+        this.animations.animation.framesPerSecond = character.animation.framesPerSecond;
     }
 
     drawSheep() {

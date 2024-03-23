@@ -47,9 +47,10 @@ export class Position {
   }
 
   collision(position: Position): boolean {
-    const collision = position.collision(this);
-    if (collision === true) return true;
-    const coordinateLeftUp = position.initial;
+    const coordinateLeftUp = new Coordinate({
+      x: position.initial.x,
+      y: position.initial.y
+    });
     const coordinateRightUp = new Coordinate({
       x: position.end.x,
       y: position.initial.y
@@ -58,11 +59,22 @@ export class Position {
       x: position.initial.x,
       y: position.end.y
     });
-    const coordinateRightDown = position.end;
-    if (this.insideCoordinate(coordinateLeftUp) === true) return true;
-    if (this.insideCoordinate(coordinateRightUp) === true) return true;
-    if (this.insideCoordinate(coordinateLeftDown) === true) return true;
-    if (this.insideCoordinate(coordinateRightDown) === true) return true;
+    const coordinateRightDown = new Coordinate({
+      x: position.end.x,
+      y: position.end.y
+    });
+    if (this.insideCoordinate(coordinateLeftUp) === true)
+      return true;
+
+    if (this.insideCoordinate(coordinateRightUp) === true)
+      return true;
+
+    if (this.insideCoordinate(coordinateLeftDown) === true)
+      return true;
+
+    if (this.insideCoordinate(coordinateRightDown) === true)
+      return true;
+
     return false;
   }
 }

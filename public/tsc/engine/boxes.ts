@@ -1,5 +1,6 @@
 import { Box } from "./box";
 import type { Canvas } from "./canvas";
+import type { Character } from "./character";
 import { Coordinate } from "./coordinate";
 import type { Plane } from "./plane";
 import { Position } from "./position";
@@ -32,17 +33,41 @@ export class Boxes extends Coordinate {
         this.occupied = props.occupied;
     }
 
-    collision(position: Position): Box | false {
-        const indicesBoxInitial = this.indicesBox(position.initial);
-        const indicesBoxEnd = this.indicesBox(position.end);
+    collision(
+        character: Character
+    ): Box | false {
+        const size = new Size({
+            width: this.size.width * character.address.x,
+            height: this.size.height * character.address.y
+        });
+        const initial = new Coordinate({
+            x: character.initial.x + size.width,
+            y: character.initial.y + size.height
+        });
+        const end = new Coordinate({
+            x: character.end.x + size.width,
+            y: character.end.y + size.height
+        });
+        const indicesBoxInitial = this.indicesBox(initial);
+        const indicesBoxEnd = this.indicesBox(end);
+        // if (indicesBoxInitial.x - indicesBoxEnd.x === 1) {
+        //     const box = this.getBox(indicesBoxInitial);
+        //     if (box === undefined)
+        //         return false;
+
+        //     if (box.collision(position) === false)
+        //         return false;
+
+        //     return box;
+        // }
         const indicesBox = new Coordinate({ x: 0, y: 0 });
         for (
-            indicesBox.y = indicesBoxInitial.x;
+            indicesBox.y = indicesBoxInitial.y;
             indicesBox.y <= indicesBoxEnd.y;
             indicesBox.y++
         ) {
             for (
-                indicesBox.x = indicesBoxInitial.y;
+                indicesBox.x = indicesBoxInitial.x;
                 indicesBox.x <= indicesBoxEnd.x;
                 indicesBox.x++
             ) {
@@ -50,7 +75,7 @@ export class Boxes extends Coordinate {
                 if (box === undefined)
                     continue;
 
-                if (box.collision(position) === false)
+                if (box.collision(character) === false)
                     continue;
 
                 return box;

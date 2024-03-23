@@ -35,7 +35,7 @@ export class Elevations extends Grounds {
         });
     }
 
-    setElevation(indicesBox: Coordinate) {
+    pushElevation(indicesBox: Coordinate) {
         this.pushGround(indicesBox);
     }
 

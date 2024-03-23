@@ -49,7 +49,12 @@ export class FlatElevations extends ElementBoxes {
         state: FlatElevationState
     ): Elements | undefined {
         const indices = this.elementIndices[state];
-        this.element.indices = indices;
+        this.element.setIndices(
+            new Plane({
+                horizontal: indices.horizontal,
+                vertical: indices.vertical
+            })
+        );
         return this.referencePush(indicesBox);
     }
 
