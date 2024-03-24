@@ -34,13 +34,12 @@ export class Finish extends Rect {
       lineWidth: 0.5
     });
     this.seen.addLine(
-      new Size({ width: 30, height: 50 })
-    );
-    this.seen.addLine(
+      new Size({ width: 30, height: 50 }),
       new Size({ width: 50, height: 80 })
     );
     this.seen.addLine(
-      new Size({ width: 70, height: 20 })
+      new Size({ width: 70, height: 20 }),
+      new Size({ width: 0, height: 0 })
     );
     this.keyboard = props.keyboard;
   }

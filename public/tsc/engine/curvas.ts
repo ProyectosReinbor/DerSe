@@ -1,12 +1,10 @@
 
 
-import type { Canvas } from "./canvas.js";
 import type { FillStyle, StrokeStyle } from "./context.js";
-import type { Coordinate } from "./coordinate.js";
 import { Curve } from "./curve.js";
 
-export class Curves {
-  curves: Curve[] = [];
+export class Curvas {
+  curvas: Curva[] = [];
   canvas: Canvas;
   fillStyle: FillStyle;
   strokeStyle: StrokeStyle;

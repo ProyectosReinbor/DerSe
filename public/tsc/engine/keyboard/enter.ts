@@ -35,28 +35,12 @@ export class Enter extends Rect {
       lineWidth: 0
     });
     this.triangle.addLine(
-      new Size({
-        width: 10,
-        height: 60
-      })
+      new Size({ width: 10, height: 60 }),
+      new Size({ width: 30, height: 40, })
     );
     this.triangle.addLine(
-      new Size({
-        width: 30,
-        height: 40,
-      })
-    );
-    this.triangle.addLine(
-      new Size({
-        width: 30,
-        height: 80,
-      })
-    );
-    this.triangle.addLine(
-      new Size({
-        width: 10,
-        height: 60
-      })
+      new Size({ width: 30, height: 80, }),
+      new Size({ width: 10, height: 60 })
     );
     this.lines = new Lines({
       initial: this.initial,
@@ -67,22 +51,12 @@ export class Enter extends Rect {
       lineWidth: 0.5,
     });
     this.lines.addLine(
-      new Size({
-        width: 20,
-        height: 60
-      })
+      new Size({ width: 20, height: 60 }),
+      new Size({ width: 80, height: 60 })
     );
     this.lines.addLine(
-      new Size({
-        width: 80,
-        height: 60
-      })
-    );
-    this.lines.addLine(
-      new Size({
-        width: 80,
-        height: 20
-      })
+      new Size({ width: 80, height: 20 }),
+      new Size({ width: 0, height: 0 })
     );
     this.keyboard = props.keyboard;
   }

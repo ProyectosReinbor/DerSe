@@ -1,23 +1,23 @@
-import type { Canvas } from "./canvas";
-import type { Coordinate } from "./coordinate";
-import { Position } from "./position";
-import type { Size } from "./size";
+import type { Coordenada } from "./coordenada";
+import type { Lienzo } from "./lienzo";
+import type { Medidas } from "./medidas";
+import { Posicion } from "./posicion";
 
-export type ImageRoute = `images/${string}.png` | false;
+export type ImagenRuta = `images/${string}.png` | false;
 
-export class Image extends Position {
-  canvas: Canvas;
-  route: ImageRoute;
-  constructor(props: {
-    initial: Coordinate,
-    size: Size,
-    canvas: Canvas,
-    route: ImageRoute,
+export class Imagen extends Posicion {
+  lienzo: Lienzo;
+  ruta: ImagenRuta;
+  constructor(parametros: {
+    izquierdaSuperior: Coordenada,
+    medidas: Medidas,
+    lienzo: Lienzo,
+    ruta: ImagenRuta,
   }) {
-    super(props);
-    this.canvas = props.canvas;
-    this.route = props.route;
-    this.canvas.images.addRoute(this.route);
+    super(parametros);
+    this.lienzo = parametros.lienzo;
+    this.ruta = parametros.ruta;
+    this.lienzo.images.addRoute(this.ruta);
   }
 
   set image(route: ImageRoute) {

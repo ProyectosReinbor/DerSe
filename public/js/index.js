@@ -1998,8 +1998,49 @@ class Pawn extends Character {
   }
 }
 
+// public/tsc/engine/line.ts
+class Line extends Position {
+  canvas;
+  fillStyle;
+  strokeStyle;
+  lineWidth;
+  constructor(props) {
+    const size20 = new Size({
+      width: props.end.x - props.initial.x,
+      height: props.end.y - props.initial.y
+    });
+    super({
+      initial: props.initial,
+      size: size20
+    });
+    this.canvas = props.canvas;
+    this.fillStyle = props.fillStyle;
+    this.strokeStyle = props.strokeStyle;
+    this.lineWidth = props.lineWidth;
+  }
+  drawLine() {
+    const positionOnCanvas = this.canvas.positionOnCanvas(this);
+    if (positionOnCanvas === false)
+      return;
+    this.canvas.context.beginPath();
+    this.canvas.context.lineTo(positionOnCanvas.initial.x, positionOnCanvas.initial.y);
+    this.canvas.context.lineTo(positionOnCanvas.end.x, positionOnCanvas.end.y);
+    if (this.strokeStyle !== false) {
+      this.canvas.context.lineWidth = this.lineWidth;
+      this.canvas.context.strokeStyle = this.strokeStyle;
+      this.canvas.context.stroke();
+    }
+    if (this.fillStyle !== false) {
+      this.canvas.context.fillStyle = this.fillStyle;
+      this.canvas.context.fill();
+    }
+    this.canvas.context.closePath();
+  }
+}
+
 // public/tsc/game/sheep.ts
 class Sheep extends Character {
+  sightline;
   state = "move";
   character = {
     move: {
@@ -2048,21 +2089,17 @@ class Sheep extends Character {
     });
     this.map = props.map;
     this.state = "move";
-    this.randomAddress();
-  }
-  randomAddress() {
-    const randomX = Math.round(Math.random() * 1);
-    if (randomX === 0) {
-      this.address.x = -1;
-    } else {
-      this.address.x = 1;
-    }
-    const randomY = Math.round(Math.random() * 1);
-    if (randomY === 0) {
-      this.address.y = -1;
-    } else {
-      this.address.y = 1;
-    }
+    this.sightline = new Line({
+      initial: new Coordinate({
+        x: this.initial.x + this.size.width / 2,
+        y: this.initial.y + this.size.height / 2
+      }),
+      end: this.endPercentage(new Size({ width: 200, height: 50 })),
+      canvas: this.canvas,
+      fillStyle: false,
+      strokeStyle: "#333",
+      lineWidth: 2
+    });
   }
   moveSheep() {
     const movedCharacter = this.movedCharacter();
@@ -2070,7 +2107,6 @@ class Sheep extends Character {
       return false;
     const collision = this.map.collisionMap(this, movedCharacter);
     if (collision === true) {
-      this.randomAddress();
       return false;
     }
     this.initial.x = movedCharacter.initial.x;
@@ -2105,6 +2141,7 @@ class Sheep extends Character {
     this.moveSheep();
     this.jumpSheep();
     this.drawCharacter();
+    this.sightline.drawLine();
   }
 }
 

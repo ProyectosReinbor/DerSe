@@ -4,6 +4,7 @@ import { Character } from "../engine/character";
 import { Address } from "../engine/character/address";
 import { Coordinate } from "../engine/coordinate";
 import { Element } from "../engine/element";
+import { Line } from "../engine/line";
 import { Plane } from "../engine/plane";
 import { Size } from "../engine/size";
 import type { Map } from "./map";
@@ -19,6 +20,7 @@ export type SheepCharacter = {
 }
 
 export class Sheep extends Character {
+    sightline: Line;
     state: SheepState = "move";
     character: SheepCharacter = {
         move: {
@@ -71,22 +73,17 @@ export class Sheep extends Character {
         });
         this.map = props.map;
         this.state = "move";
-        this.randomAddress();
-    }
-
-    randomAddress() {
-        const randomX = Math.round(Math.random() * 1);
-        if (randomX === 0) {
-            this.address.x = - 1;
-        } else {
-            this.address.x = 1;
-        }
-        const randomY = Math.round(Math.random() * 1);
-        if (randomY === 0) {
-            this.address.y = - 1;
-        } else {
-            this.address.y = 1;
-        }
+        this.sightline = new Line({
+            initial: new Coordinate({
+                x: this.initial.x + this.size.width / 2,
+                y: this.initial.y + this.size.height / 2
+            }),
+            end: this.endPercentage(new Size({ width: 200, height: 50 })),
+            canvas: this.canvas,
+            fillStyle: false,
+            strokeStyle: "#333",
+            lineWidth: 2,
+        });
     }
 
     moveSheep() {
@@ -96,9 +93,12 @@ export class Sheep extends Character {
 
         const collision = this.map.collisionMap(this, movedCharacter);
         if (collision === true) {
-            this.randomAddress();
             return false;
         }
+
+
+        this.map.collison
+        this.sightline.end
 
         this.initial.x = movedCharacter.initial.x;
         this.initial.y = movedCharacter.initial.y;
@@ -137,5 +137,6 @@ export class Sheep extends Character {
         this.moveSheep();
         this.jumpSheep();
         this.drawCharacter();
+        this.sightline.drawLine();
     }
 }

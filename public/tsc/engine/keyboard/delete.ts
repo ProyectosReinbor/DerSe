@@ -32,21 +32,15 @@ export class Delete extends Position {
       lineWidth: 0.5
     });
     this.lines.addLine(
-      new Size({ width: 10, height: 50 })
-    );
-    this.lines.addLine(
+      new Size({ width: 10, height: 50 }),
       new Size({ width: 30, height: 20 })
     );
     this.lines.addLine(
-      new Size({ width: 90, height: 20 })
-    );
-    this.lines.addLine(
+      new Size({ width: 90, height: 20 }),
       new Size({ width: 90, height: 80 })
     );
     this.lines.addLine(
-      new Size({ width: 30, height: 80 })
-    );
-    this.lines.addLine(
+      new Size({ width: 30, height: 80 }),
       new Size({ width: 10, height: 50 })
     );
     this.character = new Text({

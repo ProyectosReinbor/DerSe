@@ -36,15 +36,11 @@ export class Shift extends Rect {
       lineWidth: 0
     });
     this.triangle.addLine(
-      new Size({ width: 50, height: 20 })
-    );
-    this.triangle.addLine(
+      new Size({ width: 50, height: 20 }),
       new Size({ width: 10, height: 50 })
     );
     this.triangle.addLine(
-      new Size({ width: 90, height: 50 })
-    );
-    this.triangle.addLine(
+      new Size({ width: 90, height: 50 }),
       new Size({ width: 50, height: 20 })
     );
     this.lines = new Lines({
@@ -56,9 +52,7 @@ export class Shift extends Rect {
       lineWidth: 2,
     });
     this.lines.addLine(
-      new Size({ width: 50, height: 50 })
-    );
-    this.lines.addLine(
+      new Size({ width: 50, height: 50 }),
       new Size({ width: 50, height: 80 })
     );
   }

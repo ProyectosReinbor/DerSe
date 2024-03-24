@@ -39,6 +39,30 @@ export class Map extends Position {
         });
     }
 
+    indexFloorOn(
+        coordinate: Coordinate
+    ) {
+        for (
+            let floorIndex = this.floors.length - 1;
+            floorIndex >= 0;
+            floorIndex--
+        ) {
+
+            const floor = this.floors[floorIndex];
+            if (floor === undefined)
+                continue;
+
+            if (floor.aboveFloor(character) === false)
+                continue;
+        }
+    }
+
+    boxesInsideCoordinate(
+        coordinate: Coordinate
+    ) {
+        this.floor
+    }
+
     collisionMap(
         character: Character,
         movedCharacter: Character,

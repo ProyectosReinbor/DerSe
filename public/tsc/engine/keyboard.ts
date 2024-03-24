@@ -1,7 +1,3 @@
-import type { Canvas } from "./canvas";
-import { Coordinate } from "./coordinate";
-import { Size } from "./size";
-import { Rect } from "./rect";
 import type { Input } from "./input";
 import { Keys } from "./keyboard/keys";
 import { Shift } from "./keyboard/shift";
@@ -11,10 +7,11 @@ import { Delete } from "./keyboard/delete";
 import { CloseQuestion } from "./keyboard/closeQuestion";
 import { Finish } from "./keyboard/finish";
 import { Key } from "./keyboard/key";
-import { Text } from "./text";
+import { Cuadrado } from "./cuadrado";
 
-export class Keyboard extends Rect {
-  target: Input | false = false;
+export class Keyboard extends Cuadrado {
+
+  entrada: Input | false = false;
   shiftKeys: Keys[];
   keys: Keys[];
   shift: Shift;
@@ -23,6 +20,7 @@ export class Keyboard extends Rect {
   delete: Delete;
   closeQuestion: CloseQuestion;
   finish: Finish;
+
   constructor(props: {
     canvas: Canvas;
   }) {

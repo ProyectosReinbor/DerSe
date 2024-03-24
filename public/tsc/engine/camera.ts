@@ -1,52 +1,54 @@
-import { Coordinate } from "./coordinate";
-import { Position } from "./position";
-import { Size } from "./size";
+import { Coordenada } from "./coordenada";
+import { Medidas } from "./medidas";
+import { Posicion } from "./posicion";
 
-export class Camera extends Position {
-    constructor(props: { initial: Coordinate }) {
+export class Camara extends Posicion {
+    constructor(props: { izquierdaSuperior: Coordenada }) {
         super({
-            initial: props.initial,
-            size: new Size({ width: 100, height: 100 })
+            izquierdaSuperior: props.izquierdaSuperior,
+            medidas: new Medidas({ ancho: 100, alto: 100 })
         });
     }
 
-    insideCamera(position: Position) {
-        const vision = new Position({
-            initial: new Coordinate({
-                x: this.initial.x - position.size.width,
-                y: this.initial.y - position.size.height,
+    posicionDentroCamara(posicion: Posicion) {
+        const vision = new Posicion({
+            izquierdaSuperior: new Coordenada({
+                x: this.izquierdaSuperior.x - posicion.medidas.ancho,
+                y: this.izquierdaSuperior.y - posicion.medidas.alto,
             }),
-            size: new Size({
-                width: this.size.width + (position.size.width * 2),
-                height: this.size.height + (position.size.height * 2),
+            medidas: new Medidas({
+                ancho: this.medidas.ancho + (posicion.medidas.ancho * 2),
+                alto: this.medidas.alto + (posicion.medidas.alto * 2),
             })
         });
-        return vision.inside(position);
+        return vision.posicionDentroPosicion(posicion);
     }
 
-    positionOnCamera(position: Position) {
-        const appearsInCamera = this.insideCamera(position);
-        if (appearsInCamera === false) return false;
-        return new Position({
-            initial: new Coordinate({
-                x: position.initial.x - this.initial.x,
-                y: position.initial.y - this.initial.y,
+    posicionEnCamara(posicion: Posicion) {
+        const posicionDentroCamara = this.posicionDentroCamara(posicion);
+        if (posicionDentroCamara === false)
+            return false;
+
+        return new Posicion({
+            izquierdaSuperior: new Coordenada({
+                x: posicion.izquierdaSuperior.x - this.izquierdaSuperior.x,
+                y: posicion.izquierdaSuperior.y - this.izquierdaSuperior.y,
             }),
-            size: new Size({
-                width: position.size.width,
-                height: position.size.height
+            medidas: new Medidas({
+                ancho: posicion.medidas.ancho,
+                alto: posicion.medidas.alto
             })
         });
     }
 
-    focusPosition(position: Position) {
-        let x = position.initial.x - (this.size.width / 2);
-        x += position.size.width / 2;
+    enfocarPosicion(posicion: Posicion) {
+        let x = posicion.izquierdaSuperior.x - (this.medidas.ancho / 2);
+        x += posicion.medidas.ancho / 2;
 
-        let y = position.initial.y - (this.size.height / 2);
-        y += position.size.height / 2;
+        let y = posicion.izquierdaSuperior.y - (this.medidas.alto / 2);
+        y += posicion.medidas.alto / 2;
 
-        this.initial.x = x;
-        this.initial.y = y;
+        this.izquierdaSuperior.x = x;
+        this.izquierdaSuperior.y = y;
     }
 }

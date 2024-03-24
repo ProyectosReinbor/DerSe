@@ -1,18 +1,16 @@
 
-import type { Canvas } from "./canvas.js";
 import type { FillStyle, StrokeStyle } from "./context.js";
-import { Coordinate } from "./coordinate.js";
+import { Cuadrado } from "./cuadrado.js";
 import { Hide } from "./input/hide.js";
-import { Rect } from "./rect.js";
-import { Size } from "./size.js";
-import { Text } from "./text.js";
 
-export class Input extends Rect {
-    value: string = "";
-    hide: Hide;
+export class Entrada extends Cuadrado {
+
+    valor: string = "";
+    esconder: Hide;
     textDefault: Text;
     informationDefault: Text;
     text: Text;
+
     constructor(props: {
         canvas: Canvas;
         initial: Coordinate;

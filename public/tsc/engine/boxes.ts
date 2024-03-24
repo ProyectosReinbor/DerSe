@@ -3,7 +3,6 @@ import type { Canvas } from "./canvas";
 import type { Character } from "./character";
 import { Coordinate } from "./coordinate";
 import type { Plane } from "./plane";
-import { Position } from "./position";
 import { Size } from "./size";
 
 export type BoxesOccupied = true | boolean[][];
@@ -33,6 +32,8 @@ export class Boxes extends Coordinate {
         this.occupied = props.occupied;
     }
 
+
+
     collision(
         character: Character
     ): Box | false {
@@ -50,16 +51,6 @@ export class Boxes extends Coordinate {
         });
         const indicesBoxInitial = this.indicesBox(initial);
         const indicesBoxEnd = this.indicesBox(end);
-        // if (indicesBoxInitial.x - indicesBoxEnd.x === 1) {
-        //     const box = this.getBox(indicesBoxInitial);
-        //     if (box === undefined)
-        //         return false;
-
-        //     if (box.collision(position) === false)
-        //         return false;
-
-        //     return box;
-        // }
         const indicesBox = new Coordinate({ x: 0, y: 0 });
         for (
             indicesBox.y = indicesBoxInitial.y;

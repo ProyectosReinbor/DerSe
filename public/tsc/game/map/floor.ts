@@ -165,6 +165,7 @@ export class Floor {
         const flatSand = this.flatsSand.collision(character) !== false;
         const elevations = this.elevations.collision(character) !== false;
         const stairsElevations = this.stairsElevation.collision(character) !== false;
+
         if (flatSand === true)
             return true;
 

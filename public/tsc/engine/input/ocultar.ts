@@ -1,37 +1,42 @@
-import type { Canvas } from "../canvas";
 import { Circle } from "../circle";
-import { Coordinate } from "../coordinate";
+import { Cuadrado } from "../cuadrado";
 import { Curves } from "../curves";
-import type { Input } from "../input";
-import { Rect } from "../rect";
-import { Size } from "../size";
+import type { Entrada } from "../entrada";
+import type { Lienzo } from "../lienzo";
+import { Medidas } from "../medidas";
 
+export class Ocultar extends Cuadrado {
 
-export class Hide extends Rect {
-  value: string = "";
-  input: Input;
-  turnOn: boolean;
-  eyelid: Curves;
+  valor: string = "";
+  entrada: Entrada;
+  encendido: boolean;
+  parpado: Curves;
   iris: Circle;
-  constructor(props: {
-    canvas: Canvas,
-    input: Input,
-    turnOn: boolean,
+
+  constructor(parametros: {
+    lienzo: Lienzo,
+    entrada: Entrada,
+    encendido: boolean,
   }) {
     super({
-      canvas: props.canvas,
-      initial: props.input.endPercentage(
-        new Size({ width: 88, height: 20 })
+      lienzo: parametros.lienzo,
+      izquierdaSuperior: parametros.entrada.izquierdaSuperiorMasMedidasPorcentaje(
+        new Medidas({ ancho: 88, alto: 20 })
       ),
-      size: props.input.size.percentage(
-        new Size({ width: 10, height: 60 })
+      medidas: parametros.entrada.medidas.porcentaje(
+        new Medidas({ ancho: 10, alto: 60 })
       ),
       fillStyle: "#AED6F1",
       strokeStyle: "#EAF2F8",
-      lineWidth: 0.5,
     });
-    this.input = props.input;
-    this.turnOn = props.turnOn;
+    this.entrada = parametros.entrada;
+    this.encendido = parametros.encendido;
+    this.parpado = new Curves({
+      lienzo: this.lienzo,
+      fillStyle: false,
+      strokeStyle: "#fff",
+      lineWidth: 0.5
+    });
     this.eyelid = new Curves({
       canvas: props.canvas,
       fillStyle: false,
