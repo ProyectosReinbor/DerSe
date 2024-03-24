@@ -1,23 +1,21 @@
 import { Animation } from "./animation";
 import { Animations } from "./animations";
 import type { BoxesOccupied } from "./boxes";
-import type { Canvas } from "./canvas";
-import type { Coordinate } from "./coordinate";
+import type { Canvas_ENGINE } from "./canvas";
 import { Element } from "./element";
 import { ElementBoxes } from "./elementBoxes";
-import type { ImageRoute } from "./image";
-import { Plane } from "./plane";
-import { Size } from "./size";
+import type { Size_ENGINE } from "./size";
 
-export class AnimationBoxes extends ElementBoxes {
+export class AnimationBoxes_ENGINE extends ElementBoxes {
+
     override references: Animations[] = [];
     animation: Animation;
 
     constructor(props: {
         x: number;
         y: number;
-        canvas: Canvas;
-        size: Size;
+        canvas: Canvas_ENGINE;
+        size: Size_ENGINE;
         length: Plane;
         occupied: BoxesOccupied;
         route: ImageRoute;

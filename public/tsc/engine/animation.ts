@@ -1,6 +1,8 @@
 export class Animation {
+
   frames: number;
   intervalBetweenFrame: number = 0;
+
   constructor(props: {
     frames: number,
     framesPerSecond: number,

@@ -1,18 +1,18 @@
 
 
-import type { Canvas } from "./canvas.js";
-import type { Coordinate } from "./coordinate.js";
+import type { Canvas_ENGINE } from "./canvas.js";
+import type { Coordinate_ENGINE } from "./coordinate.js";
 import { Element } from "./element.js";
-import { Image, type ImageRoute } from "./image.js";
-import type { Size } from "./size.js";
+import { Image_ENGINE, type ImagePath } from "./image.js";
+import type { Size_ENGINE } from "./size.js";
 
-export class Elements extends Image {
+export class Elements extends Image_ENGINE {
   element: Element;
   constructor(props: {
-    initial: Coordinate,
-    size: Size,
-    canvas: Canvas,
-    route: ImageRoute,
+    leftUp: Coordinate_ENGINE,
+    size: Size_ENGINE,
+    canvas: Canvas_ENGINE,
+    route: ImagePath,
     element: Element
   }) {
     super(props);
@@ -23,20 +23,20 @@ export class Elements extends Image {
     const image = this.image;
     if (image === false) return;
 
-    const positionOnCanvas = this.canvas.positionOnCanvas(this);
-    if (positionOnCanvas === false) return;
+    const positionOnTheCanvas = this.canvas.positionOnTheCanvas(this);
+    if (positionOnTheCanvas === false) return;
 
     this.canvas.context.imageSmoothingEnabled = false;
     this.canvas.context.drawImage(
       image,
-      this.element.initial.x,
-      this.element.initial.y,
+      this.element.leftUp.x,
+      this.element.leftUp.y,
       this.element.size.width,
       this.element.size.height,
-      positionOnCanvas.initial.x,
-      positionOnCanvas.initial.y,
-      positionOnCanvas.size.width,
-      positionOnCanvas.size.height
+      positionOnTheCanvas.leftUp.x,
+      positionOnTheCanvas.leftUp.y,
+      positionOnTheCanvas.size.width,
+      positionOnTheCanvas.size.height
     );
   }
 }

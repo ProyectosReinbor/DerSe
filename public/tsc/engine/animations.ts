@@ -1,19 +1,21 @@
 import { Animation } from "./animation.js";
-import type { Canvas } from "./canvas.js";
-import type { Coordinate } from "./coordinate.js";
 import { Elements } from "./elements.js";
 import type { Element } from "./element.js";
-import type { Size } from "./size.js";
-import type { ImageRoute } from "./image.js";
+import type { Coordinate_ENGINE } from "./coordinate.js";
+import type { Size_ENGINE } from "./size.js";
+import type { Canvas_ENGINE } from "./canvas.js";
+import type { ImagePath } from "./image.js";
 
 export class Animations extends Elements {
+
   timerNextFrame: number = 0;
   animation: Animation;
+
   constructor(props: {
-    initial: Coordinate,
-    size: Size,
-    canvas: Canvas,
-    route: ImageRoute,
+    initial: Coordinate_ENGINE,
+    size: Size_ENGINE,
+    canvas: Canvas_ENGINE,
+    route: ImagePath,
     element: Element,
     animation: Animation
   }) {

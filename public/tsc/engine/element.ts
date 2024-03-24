@@ -1,12 +1,10 @@
-import { Coordinate } from "./coordinate";
-import { Plane } from "./plane";
-import { Position } from "./position";
-import { Size } from "./size";
+import { Position_ENGINE } from "./position";
+import type { Size_ENGINE } from "./size";
 
-export class Element extends Position {
+export class Element extends Position_ENGINE {
     constructor(props: {
-        size: Size,
-        indices: Plane,
+        size: Size_ENGINE,
+        indices: Plane_engine,
     }) {
         super({
             initial: new Coordinate({ x: 0, y: 0 }),

@@ -1,4 +1,4 @@
-export class Plano {
+export class Plane_ENGINE {
 
     horizontal: number;
     vertical: number;
