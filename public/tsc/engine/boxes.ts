@@ -1,29 +1,30 @@
-import { Box } from "./box";
-import type { Canvas } from "./canvas";
-import type { Character } from "./character";
-import { Coordinate } from "./coordinate";
-import type { Plane } from "./plane";
-import { Size } from "./size";
+import { Box_ENGINE } from "./box";
+import type { Canvas_ENGINE } from "./canvas";
+import type { Character_ENGINE } from "./character";
+import { Coordinate_ENGINE } from "./coordinate";
+import type { Plane_ENGINE } from "./plane";
+import { Position_ENGINE } from "./position";
+import { Size_ENGINE } from "./size";
 
-export type BoxesOccupied = true | boolean[][];
+export type OccupiedBoxes = true | boolean[][];
 
-export class Boxes extends Coordinate {
+export class Boxes_ENGINE extends Coordinate_ENGINE {
 
-    boxes: Box[][] = [];
-    references: Position[] = [];
+    boxes: Box_ENGINE[][] = [];
+    references: Position_ENGINE[] = [];
 
-    canvas: Canvas;
-    size: Size;
-    length: Plane;
-    occupied: BoxesOccupied;
+    canvas: Canvas_ENGINE;
+    size: Size_ENGINE;
+    length: Plane_ENGINE;
+    occupied: OccupiedBoxes;
 
     constructor(props: {
         x: number;
         y: number;
-        canvas: Canvas;
-        size: Size;
-        length: Plane;
-        occupied: BoxesOccupied;
+        canvas: Canvas_ENGINE;
+        size: Size_ENGINE;
+        length: Plane_ENGINE;
+        occupied: OccupiedBoxes;
     }) {
         super(props);
         this.canvas = props.canvas;
@@ -32,41 +33,39 @@ export class Boxes extends Coordinate {
         this.occupied = props.occupied;
     }
 
-
-
-    collision(
-        character: Character
-    ): Box | false {
-        const size = new Size({
-            width: this.size.width * character.address.x,
-            height: this.size.height * character.address.y
+    collision(props: {
+        character: Character_ENGINE
+    }): Box_ENGINE | false {
+        const size = new Size_ENGINE({
+            width: this.size.width * props.character.address.x,
+            height: this.size.height * props.character.address.y
         });
-        const initial = new Coordinate({
-            x: character.initial.x + size.width,
-            y: character.initial.y + size.height
+        const leftUp = new Coordinate_ENGINE({
+            x: props.character.leftUp.x + size.width,
+            y: props.character.leftUp.y + size.height
         });
-        const end = new Coordinate({
-            x: character.end.x + size.width,
-            y: character.end.y + size.height
+        const rightDown = new Coordinate_ENGINE({
+            x: props.character.rightDown.x + size.width,
+            y: props.character.rightDown.y + size.height
         });
-        const indicesBoxInitial = this.indicesBox(initial);
-        const indicesBoxEnd = this.indicesBox(end);
-        const indicesBox = new Coordinate({ x: 0, y: 0 });
+        const boxIndicesLeftUp = this.getBoxIndices({ coordinate: leftUp });
+        const boxIndicesRightDown = this.getBoxIndices({ coordinate: rightDown });
+        const boxIndices = new Coordinate_ENGINE({ x: 0, y: 0 });
         for (
-            indicesBox.y = indicesBoxInitial.y;
-            indicesBox.y <= indicesBoxEnd.y;
-            indicesBox.y++
+            boxIndices.y = boxIndicesLeftUp.y;
+            boxIndices.y <= boxIndicesRightDown.y;
+            boxIndices.y++
         ) {
             for (
-                indicesBox.x = indicesBoxInitial.x;
-                indicesBox.x <= indicesBoxEnd.x;
-                indicesBox.x++
+                boxIndices.x = boxIndicesLeftUp.x;
+                boxIndices.x <= boxIndicesRightDown.x;
+                boxIndices.x++
             ) {
-                const box = this.getBox(indicesBox);
+                const box = this.getBox({ boxIndices });
                 if (box === undefined)
                     continue;
 
-                if (box.collision(character) === false)
+                if (box.someVertexInside({ position: props.character }) === false)
                     continue;
 
                 return box;
@@ -75,32 +74,38 @@ export class Boxes extends Coordinate {
         return false;
     }
 
-    getPosition(indicesBox: Coordinate): Position {
-        return new Position({
-            initial: new Coordinate({
-                x: indicesBox.x * this.size.width,
-                y: indicesBox.y * this.size.height
+    getPosition(props: {
+        boxIndices: Coordinate_ENGINE
+    }): Position_ENGINE {
+        return new Position_ENGINE({
+            leftUp: new Coordinate_ENGINE({
+                x: props.boxIndices.x * this.size.width,
+                y: props.boxIndices.y * this.size.height
             }),
-            size: new Size({
+            size: new Size_ENGINE({
                 width: this.size.width * this.length.horizontal,
                 height: this.size.height * this.length.vertical
             })
         });
     }
 
-    getBox(indicesBox: Coordinate): Box | undefined {
-        const boxesRow = this.boxes[indicesBox.y];
+    getBox(props: {
+        boxIndices: Coordinate_ENGINE
+    }): Box_ENGINE | undefined {
+        const boxesRow = this.boxes[props.boxIndices.y];
         if (boxesRow === undefined)
             return undefined;
 
-        const box = boxesRow[indicesBox.x];
+        const box = boxesRow[props.boxIndices.x];
         return box;
     }
 
-    indicesBox(coordinate: Coordinate) {
-        const boxX = Math.floor(coordinate.x / this.size.width);
-        const boxY = Math.floor(coordinate.y / this.size.height);
-        return new Coordinate({ x: boxX, y: boxY });
+    getBoxIndices(props: {
+        coordinate: Coordinate_ENGINE
+    }): Coordinate_ENGINE {
+        const boxX = Math.floor(props.coordinate.x / this.size.width);
+        const boxY = Math.floor(props.coordinate.y / this.size.height);
+        return new Coordinate_ENGINE({ x: boxX, y: boxY });
     }
 
     private boxesIndices(

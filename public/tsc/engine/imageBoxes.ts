@@ -1,22 +1,21 @@
-import { Boxes, type BoxesOccupied } from "./boxes";
-import type { Canvas } from "./canvas";
-import { Coordinate } from "./coordinate";
-import { Image, type ImageRoute } from "./image";
-import type { Plane } from "./plane";
-import { Size } from "./size";
+import { Boxes_ENGINE, type OccupiedSquares } from "./boxes";
+import type { Canvas_ENGINE } from "./canvas";
+import type { ImagePath, Image_ENGINE } from "./image";
+import type { Plane_ENGINE } from "./plane";
+import type { Size_ENGINE } from "./size";
 
-export class ImageBoxes extends Boxes {
-    override references: Image[] = [];
-    route: ImageRoute;
+export class ImageBoxes extends Boxes_ENGINE {
+    override references: Image_ENGINE[] = [];
+    route: ImagePath;
 
     constructor(props: {
         x: number;
         y: number;
-        canvas: Canvas;
-        size: Size;
-        length: Plane;
-        occupied: BoxesOccupied;
-        route: ImageRoute;
+        canvas: Canvas_ENGINE;
+        size: Size_ENGINE;
+        length: Plane_ENGINE;
+        occupied: OccupiedSquares;
+        route: ImagePath;
     }) {
         super(props);
         this.route = props.route;

@@ -35,39 +35,55 @@ export class Position_ENGINE {
     });
   }
 
-  topLeftPlusPercentageOfMeasurements(percentages: Size_ENGINE) {
-    const size = this.size.getPercentages(percentages);
+  leftUpPlusSizePercentages(props: {
+    percentages: Size_ENGINE;
+  }) {
+    const size = this.size.getPercentages(props);
     return new Coordinate_ENGINE({
       x: this.leftUp.x + size.width,
       y: this.leftUp.y + size.height,
     });
   }
 
-  coordinateWithinPosition(coordinate: Coordinate_ENGINE) {
-    return this.leftUp.x <= coordinate.x &&
-      this.leftUp.y <= coordinate.y &&
-      this.rightDown.x >= coordinate.x &&
-      this.rightDown.y >= coordinate.y;
+  insidePositionCoordinate(props: {
+    coordinate: Coordinate_ENGINE;
+  }) {
+    return this.leftUp.x <= props.coordinate.x &&
+      this.leftUp.y <= props.coordinate.y &&
+      this.rightDown.x >= props.coordinate.x &&
+      this.rightDown.y >= props.coordinate.y;
   }
 
-  positionWithinPosition(position: Position_ENGINE) {
-    return this.leftUp.x <= position.leftUp.x &&
-      this.leftUp.y <= position.leftUp.y &&
-      this.rightDown.x >= position.rightDown.x &&
-      this.rightDown.y >= position.rightDown.y;
+  insidePosition(props: {
+    position: Position_ENGINE;
+  }) {
+    return this.leftUp.x <= props.position.leftUp.x &&
+      this.leftUp.y <= props.position.leftUp.y &&
+      this.rightDown.x >= props.position.rightDown.x &&
+      this.rightDown.y >= props.position.rightDown.y;
   }
 
-  someVertexOfThePositionWithinThePosition(position: Position_ENGINE): boolean {
-    if (this.coordinateWithinPosition(position.leftUp) === true)
+  someVertexInside(props: {
+    position: Position_ENGINE
+  }): boolean {
+    if (this.insidePositionCoordinate({
+      coordinate: props.position.leftUp
+    }) === true)
       return true;
 
-    if (this.coordinateWithinPosition(position.leftDown) === true)
+    if (this.insidePositionCoordinate({
+      coordinate: props.position.leftDown
+    }) === true)
       return true;
 
-    if (this.coordinateWithinPosition(position.rightUp) === true)
+    if (this.insidePositionCoordinate({
+      coordinate: props.position.rightUp
+    }) === true)
       return true;
 
-    if (this.coordinateWithinPosition(position.rightDown) === true)
+    if (this.insidePositionCoordinate({
+      coordinate: props.position.rightDown
+    }) === true)
       return true;
 
     return false;

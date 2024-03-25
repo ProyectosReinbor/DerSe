@@ -1,24 +1,25 @@
-import { Button } from "../button";
-import type { Canvas } from "../canvas";
-import { Coordinate } from "../coordinate";
-import type { Keyboard } from "../keyboard";
-import { Size } from "../size";
-import { Text } from "../text";
+import { Button_ENGINE } from "../button";
+import type { Canvas_ENGINE } from "../canvas";
+import type { Keyboard_ENGINE } from "../keyboard";
+import { Size_ENGINE } from "../size";
 
-export class CloseQuestion extends Button {
-  keyboard: Keyboard;
+export class CloseQuestion_KEYBOARD extends Button_ENGINE {
+  keyboard: Keyboard_ENGINE;
   constructor(props: {
-    canvas: Canvas;
-    keyboard: Keyboard;
+    canvas: Canvas_ENGINE;
+    keyboard: Keyboard_ENGINE;
   }) {
     super({
       canvas: props.canvas,
-      initial: props.keyboard.endPercentage(
-        new Size({ width: 78, height: 3 })
-      ),
-      size: props.keyboard.size.percentage(
+      initial: props.keyboard.leftUpPlusSizePercentages({
+        percentages: new Size_ENGINE({
+          width: 78,
+          height: 3
+        })
+      }),
+      size: props.keyboard.size.getPercentages({
         new Size({ width: 7, height: 14 })
-      ),
+      }),
       fillStyle: "#21618C",
       strokeStyle: "#fff",
       lineWidth: 0.5,

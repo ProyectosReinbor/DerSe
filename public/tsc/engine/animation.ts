@@ -1,4 +1,4 @@
-export class Animation {
+export class Animation_ENGINE {
 
   frames: number;
   intervalBetweenFrame: number = 0;

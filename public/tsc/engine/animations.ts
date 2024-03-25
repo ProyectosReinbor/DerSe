@@ -1,23 +1,23 @@
-import { Animation } from "./animation.js";
-import { Elements } from "./elements.js";
-import type { Element } from "./element.js";
+import { Animation_ENGINE } from "./animation.js";
+import { Elements_ENGINE } from "./elements.js";
+import type { Element_ENGINE } from "./element.js";
 import type { Coordinate_ENGINE } from "./coordinate.js";
 import type { Size_ENGINE } from "./size.js";
 import type { Canvas_ENGINE } from "./canvas.js";
 import type { ImagePath } from "./image.js";
 
-export class Animations extends Elements {
+export class Animations_ENGINE extends Elements_ENGINE {
 
   timerNextFrame: number = 0;
-  animation: Animation;
+  animation: Animation_ENGINE;
 
   constructor(props: {
-    initial: Coordinate_ENGINE,
+    leftUp: Coordinate_ENGINE,
     size: Size_ENGINE,
     canvas: Canvas_ENGINE,
     route: ImagePath,
-    element: Element,
-    animation: Animation
+    element: Element_ENGINE,
+    animation: Animation_ENGINE
   }) {
     super(props);
     this.animation = props.animation;

@@ -1,16 +1,18 @@
 
 
+import type { Canvas_ENGINE } from "./canvas.js";
 import type { FillStyle, StrokeStyle } from "./context.js";
-import { Curve } from "./curve.js";
+import type { Coordinate_ENGINE } from "./coordinate.js";
+import { Curve_ENGINE } from "./curve.js";
 
-export class Curvas {
-  curvas: Curva[] = [];
-  canvas: Canvas;
+export class Curves_ENGINE {
+  curves: Curve_ENGINE[] = [];
+  canvas: Canvas_ENGINE;
   fillStyle: FillStyle;
   strokeStyle: StrokeStyle;
   lineWidth: number;
   constructor(props: {
-    canvas: Canvas;
+    canvas: Canvas_ENGINE;
     fillStyle: FillStyle;
     strokeStyle: StrokeStyle;
     lineWidth: number;
@@ -21,17 +23,17 @@ export class Curvas {
     this.lineWidth = props.lineWidth;
   }
 
-  addCurve(
-    initial: Coordinate,
-    end: Coordinate,
-    controlPoint: Coordinate,
-  ) {
+  addCurve(props: {
+    leftUp: Coordinate_ENGINE,
+    rightDown: Coordinate_ENGINE,
+    checkPoint: Coordinate_ENGINE,
+  }) {
     this.curves.push(
-      new Curve({
-        initial,
-        end,
+      new Curve_ENGINE({
+        leftUp: props.leftUp,
+        rightDown: props.rightDown,
         canvas: this.canvas,
-        controlPoint,
+        checkPoint: props.checkPoint,
       })
     );
   }

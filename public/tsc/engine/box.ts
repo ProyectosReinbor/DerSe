@@ -1,14 +1,13 @@
-import { Coordinate } from "./coordinate";
-import { Position } from "./position";
-import type { Size } from "./size";
-
-export class Box extends Position {
+import type { Coordinate_ENGINE } from "./coordinate";
+import { Position_ENGINE } from "./position";
+import type { Size_ENGINE } from "./size";
+export class Box_ENGINE extends Position_ENGINE {
 
     referenceIndex: number;
 
     constructor(props: {
-        initial: Coordinate;
-        size: Size;
+        leftUp: Coordinate_ENGINE;
+        size: Size_ENGINE;
         referenceIndex: number;
     }) {
         super(props);

@@ -1,45 +1,44 @@
-import { Animations } from "./animations";
-import { Address } from "./character/address";
-import { Coordinate } from "./coordinate";
-import { Size } from "./size";
-import type { Canvas } from "./canvas";
-import { Rect } from "./rect";
-import type { ImageRoute } from "./image";
-import type { Element } from "./element";
-import type { Animation } from "./animation";
+import type { Animation_ENGINE } from "./animation";
+import { Animations_ENGINE } from "./animations";
+import type { Canvas_ENGINE } from "./canvas";
+import { CharacterDirection } from "./character/direction";
+import { Coordinate_ENGINE } from "./coordinate";
+import type { Element_ENGINE } from "./element";
+import type { ImagePath } from "./image";
+import { Size_ENGINE } from "./size";
+import { Square_ENGINE } from "./square";
 
-export class Character extends Rect {
-    scale: Size;
-    animations: Animations;
-    speed: Coordinate;
-    address: Address;
+export class Character_ENGINE extends Square_ENGINE {
+    scale: Size_ENGINE;
+    animations: Animations_ENGINE;
+    speed: Coordinate_ENGINE;
+    address: CharacterDirection;
 
     constructor(props: {
-        initial: Coordinate,
-        size: Size,
-        canvas: Canvas;
-        scale: Size,
+        leftUp: Coordinate_ENGINE,
+        size: Size_ENGINE,
+        canvas: Canvas_ENGINE;
+        scale: Size_ENGINE,
         animations: {
-            route: ImageRoute,
-            element: Element,
-            animation: Animation,
+            route: ImagePath,
+            element: Element_ENGINE,
+            animation: Animation_ENGINE,
         },
-        speed: Coordinate,
-        address: Address,
+        speed: Coordinate_ENGINE,
+        address: CharacterDirection,
     }) {
         super({
-            initial: props.initial,
+            leftUp: props.leftUp,
             size: props.size,
             canvas: props.canvas,
             fillStyle: "#fff",
             strokeStyle: false,
-            lineWidth: 0,
         });
         this.scale = props.scale;
         this.canvas = props.canvas;
-        this.animations = new Animations({
-            initial: new Coordinate({ x: 0, y: 0 }),
-            size: new Size({ width: 0, height: 0 }),
+        this.animations = new Animations_ENGINE({
+            leftUp: new Coordinate_ENGINE({ x: 0, y: 0 }),
+            size: new Size_ENGINE({ width: 0, height: 0 }),
             canvas: props.canvas,
             route: props.animations.route,
             element: props.animations.element,
@@ -49,18 +48,22 @@ export class Character extends Rect {
         this.address = props.address;
     }
 
-    movedCharacter(): Character | false {
-        if (this.address.equals(new Address({ x: 0, y: 0 }))) return false;
+    movedCharacter(): Character_ENGINE | false {
+        if (this.address.isEqualTo(
+            new CharacterDirection({ x: 0, y: 0 })
+        ))
+            return false;
+
         const secondsBetweenFrames = this.canvas.timeBetweenFrames / 1000;
         const speedX = this.speed.x * secondsBetweenFrames;
         const speedY = this.speed.y * secondsBetweenFrames;
         const distanceX = speedX * this.address.x;
         const distanceY = speedY * this.address.y;
-        const newX = this.initial.x + distanceX;
-        const newY = this.initial.y + distanceY;
-        return new Character({
-            initial: new Coordinate({ x: newX, y: newY }),
-            size: new Size({
+        const newX = this.leftUp.x + distanceX;
+        const newY = this.leftUp.y + distanceY;
+        return new Character_ENGINE({
+            leftUp: new Coordinate_ENGINE({ x: newX, y: newY }),
+            size: new Size_ENGINE({
                 width: this.size.width,
                 height: this.size.height,
             }),
@@ -77,14 +80,14 @@ export class Character extends Rect {
     }
 
     drawCharacter() {
-        this.drawRect();
-        this.animations.size = new Size({
+        this.drawSquare();
+        this.animations.size = new Size_ENGINE({
             width: this.scale.width * this.size.width,
             height: this.scale.height * this.size.height
         });
-        this.animations.initial = new Coordinate({
-            x: this.initial.x + (this.size.width / 2) - (this.animations.size.width / 2),
-            y: this.initial.y + (this.size.height / 2) - (this.animations.size.height / 2)
+        this.animations.leftUp = new Coordinate_ENGINE({
+            x: this.leftUp.x + (this.size.width / 2) - (this.animations.size.width / 2),
+            y: this.leftUp.y + (this.size.height / 2) - (this.animations.size.height / 2)
         });
         this.animations.drawAnimation();
     }

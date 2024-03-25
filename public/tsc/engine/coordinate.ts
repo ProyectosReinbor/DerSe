@@ -9,8 +9,10 @@ export class Coordinate_ENGINE {
         this.y = props.y;
     }
 
-    isEqualTo(coordinate: Coordinate_ENGINE) {
-        return this.x === coordinate.x &&
-            this.y === coordinate.y;
+    isEqualTo(props: {
+        coordinate: Coordinate_ENGINE;
+    }) {
+        return this.x === props.coordinate.x &&
+            this.y === props.coordinate.y;
     }
 }

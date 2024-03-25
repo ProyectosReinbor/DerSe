@@ -168,7 +168,7 @@ export class Canvas_ENGINE extends Camera_ENGINE {
     }
   }
 
-  positionOnTheCanvas(position: Position_ENGINE) {
+  positionOnCanvas(position: Position_ENGINE) {
     const positionOnCamera = this.positionOnCamera(position);
     if (positionOnCamera === false)
       return false;

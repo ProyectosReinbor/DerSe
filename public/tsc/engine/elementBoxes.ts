@@ -1,11 +1,3 @@
-import { type BoxesOccupied } from "./boxes";
-import type { Canvas } from "./canvas";
-import { Coordinate } from "./coordinate";
-import { Elements } from "./elements";
-import { Element } from "./element";
-import { Plane } from "./plane";
-import { Size } from "./size";
-import type { ImageRoute } from "./image";
 import { ImageBoxes } from "./imageBoxes";
 
 export class ElementBoxes extends ImageBoxes {

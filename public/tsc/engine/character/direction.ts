@@ -1,4 +1,4 @@
-export class Address {
+export class CharacterDirection {
     x: 0 | 1 | -1;
     y: 0 | 1 | -1;
     constructor(props: {
@@ -9,8 +9,8 @@ export class Address {
         this.y = props.y;
     }
 
-    equals(address: Address) {
-        return this.x === address.x &&
-            this.y === address.y;
+    isEqualTo(direction: CharacterDirection) {
+        return this.x === direction.x &&
+            this.y === direction.y;
     }
 }

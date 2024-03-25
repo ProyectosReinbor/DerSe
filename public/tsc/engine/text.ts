@@ -4,7 +4,7 @@ import type { Coordinate_ENGINE } from "./coordinate";
 import { Position_ENGINE } from "./position";
 import type { Size_ENGINE } from "./size";
 
-export class Text extends Position_ENGINE {
+export class Text_ENGINE extends Position_ENGINE {
 
     canvas: Canvas_ENGINE;
     value: string;
@@ -40,24 +40,24 @@ export class Text extends Position_ENGINE {
     drawText() {
         if (this.value.length === 0) return;
 
-        const positionOnTheCanvas = this.canvas.positionOnTheCanvas(this);
-        if (positionOnTheCanvas === false)
+        const positionOnCamera = this.canvas.positionOnCamera(this);
+        if (positionOnCamera === false)
             return;
 
         this.canvas.context.font = this.font;
         this.canvas.context.textAlign = "left";
         this.canvas.context.textBaseline = "top";
 
-        positionOnTheCanvas.size.width = this.canvas.context.measureText(this.value).width;
-        positionOnTheCanvas.leftUp.x += this.size.width / 2;
-        positionOnTheCanvas.leftUp.x -= positionOnTheCanvas.size.width / 2;
+        positionOnCamera.size.width = this.canvas.context.measureText(this.value).width;
+        positionOnCamera.leftUp.x += this.size.width / 2;
+        positionOnCamera.leftUp.x -= positionOnCamera.size.width / 2;
 
         if (this.fillStyle !== false) {
             this.canvas.context.fillStyle = this.fillStyle;
             this.canvas.context.fillText(
                 this.value,
-                positionOnTheCanvas.leftUp.x,
-                positionOnTheCanvas.leftUp.y,
+                positionOnCamera.leftUp.x,
+                positionOnCamera.leftUp.y,
             );
         }
 
@@ -65,8 +65,8 @@ export class Text extends Position_ENGINE {
             this.canvas.context.strokeStyle = this.strokeStyle;
             this.canvas.context.strokeText(
                 this.value,
-                positionOnTheCanvas.leftUp.x,
-                positionOnTheCanvas.leftUp.y
+                positionOnCamera.leftUp.x,
+                positionOnCamera.leftUp.y
             );
         }
     }

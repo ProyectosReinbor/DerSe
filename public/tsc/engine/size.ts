@@ -18,10 +18,12 @@ export class Size_ENGINE {
         });
     }
 
-    getPercentages(percentages: Size_ENGINE) {
+    getPercentages(props: {
+        percentages: Size_ENGINE;
+    }) {
         return new Size_ENGINE({
-            width: this.aPercent.width * percentages.width,
-            height: this.aPercent.height * percentages.height,
+            width: this.aPercent.width * props.percentages.width,
+            height: this.aPercent.height * props.percentages.height,
         });
     }
 }

@@ -3,11 +3,11 @@ export class Plane_ENGINE {
     horizontal: number;
     vertical: number;
 
-    constructor(parametros: {
+    constructor(props: {
         horizontal: number;
         vertical: number;
     }) {
-        this.horizontal = parametros.horizontal;
-        this.vertical = parametros.vertical;
+        this.horizontal = props.horizontal;
+        this.vertical = props.vertical;
     }
 }
