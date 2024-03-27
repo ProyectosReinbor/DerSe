@@ -1,7 +1,9 @@
 import { Button_ENGINE } from "../button";
 import type { Canvas_ENGINE } from "../canvas";
+import { Coordinate_ENGINE } from "../coordinate";
 import type { Keyboard_ENGINE } from "../keyboard";
 import { Size_ENGINE } from "../size";
+import { Text_ENGINE } from "../text";
 
 export class CloseQuestion_KEYBOARD extends Button_ENGINE {
   keyboard: Keyboard_ENGINE;
@@ -18,15 +20,24 @@ export class CloseQuestion_KEYBOARD extends Button_ENGINE {
         })
       }),
       size: props.keyboard.size.getPercentages({
-        new Size({ width: 7, height: 14 })
+        percentages: new Size_ENGINE({
+          width: 7,
+          height: 14
+        })
       }),
       fillStyle: "#21618C",
       strokeStyle: "#fff",
       lineWidth: 0.5,
-      text: new Text({
+      text: new Text_ENGINE({
         canvas: props.canvas,
-        initial: new Coordinate({ x: 0, y: 0 }),
-        size: new Size({ width: 0, height: 10 }),
+        leftUp: new Coordinate_ENGINE({
+          x: 0,
+          y: 0
+        }),
+        size: new Size_ENGINE({
+          width: 0,
+          height: 10
+        }),
         value: "?",
         fillStyle: "#fff",
         strokeStyle: false,
@@ -36,7 +47,9 @@ export class CloseQuestion_KEYBOARD extends Button_ENGINE {
     this.keyboard = props.keyboard;
   }
 
-  touchendCloseQuestion(touch: Coordinate) {
+  touchendCloseQuestion(props: {
+    touch: Coordinate_ENGINE;
+  }) {
     if (this.insideCoordinate(touch) === false) return false;
     if (this.keyboard.target === false) return false;
     this.keyboard.target.addChar("?");

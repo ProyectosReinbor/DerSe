@@ -10,33 +10,46 @@ export class Camera_ENGINE extends Position_ENGINE {
         });
     }
 
-    positionInsideTheChamber(position: Position_ENGINE) {
+    insideCamera(props: {
+        position: Position_ENGINE;
+    }) {
+        const doubleSize = new Size_ENGINE({
+            width: props.position.size.width * 2,
+            height: props.position.size.height * 2
+        });
+
         const vision = new Position_ENGINE({
             leftUp: new Coordinate_ENGINE({
-                x: this.leftUp.x - position.size.width,
-                y: this.leftUp.y - position.size.height,
+                x: this.leftUp.x - props.position.size.width,
+                y: this.leftUp.y - props.position.size.height,
             }),
             size: new Size_ENGINE({
-                width: this.size.width + (position.size.width * 2),
-                height: this.size.height + (position.size.height * 2),
+                width: this.size.width + doubleSize.width,
+                height: this.size.height + doubleSize.height,
             })
         });
-        return vision.positionWithinPosition(position);
+        return vision.insidePosition({
+            position: props.position
+        });
     }
 
-    positionOnCamera(position: Position_ENGINE) {
-        const positionInsideTheChamber = this.positionInsideTheChamber(position);
-        if (positionInsideTheChamber === false)
+    positionOnCamera(props: {
+        position: Position_ENGINE;
+    }) {
+        const insideCamera = this.insideCamera({
+            position: props.position
+        });
+        if (insideCamera === false)
             return false;
 
         return new Position_ENGINE({
             leftUp: new Coordinate_ENGINE({
-                x: position.leftUp.x - this.leftUp.x,
-                y: position.leftUp.y - this.leftUp.y,
+                x: props.position.leftUp.x - this.leftUp.x,
+                y: props.position.leftUp.y - this.leftUp.y,
             }),
             size: new Size_ENGINE({
-                width: position.size.width,
-                height: position.size.height
+                width: props.position.size.width,
+                height: props.position.size.height
             })
         });
     }

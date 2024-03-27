@@ -1,21 +1,23 @@
-import type { Canvas } from "./canvas";
+import type { Canvas_ENGINE } from "./canvas";
 import type { FillStyle, StrokeStyle } from "./context";
-import type { Coordinate } from "./coordinate";
-import { Position } from "./position";
-import type { Size } from "./size";
+import type { Coordinate_ENGINE } from "./coordinate";
+import { Position_ENGINE } from "./position";
+import type { Size_ENGINE } from "./size";
 
-export class Circle extends Position {
-  canvas: Canvas;
+export class Circle extends Position_ENGINE {
+
+  canvas: Canvas_ENGINE;
   startingDegrees: number;
   finalDegrees: number;
   counterclockwise: boolean;
   fillStyle: FillStyle;
   strokeStyle: StrokeStyle;
   lineWidth: number;
+
   constructor(props: {
-    initial: Coordinate,
-    size: Size,
-    canvas: Canvas,
+    leftUp: Coordinate_ENGINE,
+    size: Size_ENGINE,
+    canvas: Canvas_ENGINE,
     startingDegrees: number,
     finalDegrees: number,
     counterclockwise: boolean,
@@ -23,7 +25,10 @@ export class Circle extends Position {
     strokeStyle: StrokeStyle,
     lineWidth: number,
   }) {
-    super(props);
+    super({
+      leftUp: props.leftUp,
+      size: props.size,
+    });
     this.canvas = props.canvas;
     this.startingDegrees = props.startingDegrees;
     this.finalDegrees = props.finalDegrees;
@@ -43,7 +48,8 @@ export class Circle extends Position {
 
   drawCircle() {
     const positionOnCanvas = this.canvas.positionOnCanvas(this);
-    if (positionOnCanvas === false) return;
+    if (positionOnCanvas === false)
+      return;
 
     this.canvas.context.beginPath();
 
@@ -53,8 +59,8 @@ export class Circle extends Position {
     const radius = Math.min(radiusWidth, radiusHeight);
 
     this.canvas.context.arc(
-      positionOnCanvas.initial.x + radiusWidth,
-      positionOnCanvas.initial.y + radiusHeight,
+      positionOnCanvas.leftUp.x + radiusWidth,
+      positionOnCanvas.leftUp.y + radiusHeight,
       radius,
       this.startingRadians,
       this.finalRadians,

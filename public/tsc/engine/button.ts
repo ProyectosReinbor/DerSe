@@ -18,7 +18,14 @@ export class Button_ENGINE extends Square_ENGINE {
     lineWidth: number,
     text: Text_ENGINE,
   }) {
-    super(props);
+    super({
+      leftUp: props.leftUp,
+      size: props.size,
+      canvas: props.canvas,
+      fillStyle: props.fillStyle,
+      strokeStyle: props.strokeStyle,
+      lineWidth: props.lineWidth,
+    });
     this.text = props.text;
   }
 

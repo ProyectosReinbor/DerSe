@@ -1,7 +1,5 @@
-import type { Coordenada } from "./coordenada";
-import type { Lienzo } from "./lienzo";
 
-export class Escena {
+export class Scene {
 
     lienzo: Lienzo;
     dibujar: () => void = () => { }

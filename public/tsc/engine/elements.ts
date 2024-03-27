@@ -26,8 +26,10 @@ export class Elements_ENGINE extends Image_ENGINE {
     if (image === false)
       return;
 
-    const positionOnTheCanvas = this.canvas.positionOnTheCanvas(this);
-    if (positionOnTheCanvas === false)
+    const positionOnCanvas = this.canvas.positionOnCanvas({
+      position: this
+    });
+    if (positionOnCanvas === false)
       return;
 
     this.canvas.context.imageSmoothingEnabled = false;
@@ -37,10 +39,10 @@ export class Elements_ENGINE extends Image_ENGINE {
       this.element.leftUp.y,
       this.element.size.width,
       this.element.size.height,
-      positionOnTheCanvas.leftUp.x,
-      positionOnTheCanvas.leftUp.y,
-      positionOnTheCanvas.size.width,
-      positionOnTheCanvas.size.height
+      positionOnCanvas.leftUp.x,
+      positionOnCanvas.leftUp.y,
+      positionOnCanvas.size.width,
+      positionOnCanvas.size.height
     );
   }
 }

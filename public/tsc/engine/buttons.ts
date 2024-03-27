@@ -1,60 +1,79 @@
-import { Button } from "./button";
-import type { Canvas } from "./canvas";
-import { Coordinate } from "./coordinate";
-import { Position } from "./position";
-import { Size } from "./size";
-import { Text } from "./text";
+import { Button_ENGINE } from "./button";
+import type { Canvas_ENGINE } from "./canvas";
+import type { FillStyle, StrokeStyle } from "./context";
+import { Coordinate_ENGINE } from "./coordinate";
+import type { Plane_ENGINE } from "./plane";
+import { Position_ENGINE } from "./position";
+import { Size_ENGINE } from "./size";
+import { Text_ENGINE } from "./text";
 
+export class Buttons extends Position_ENGINE {
 
-export class Buttons extends Position {
-  buttons: Button[] = [];
-  canvas: Canvas;
-  buttonDefault: Button;
+  buttons: Button_ENGINE[] = [];
+  canvas: Canvas_ENGINE;
+  buttonDefault: Button_ENGINE;
+
   constructor(props: {
-    initial: Coordinate;
-    size: Size;
-    canvas: Canvas;
-    buttonDefault: Button;
+    leftUp: Coordinate_ENGINE;
+    size: Size_ENGINE;
+    canvas: Canvas_ENGINE;
+    buttonDefault: Button_ENGINE;
   }) {
-    super(props);
+    super({
+      leftUp: props.leftUp,
+      size: props.size,
+    });
     this.canvas = props.canvas;
     this.buttonDefault = props.buttonDefault;
   }
 
-  setButton(
-    index: number,
-    boxes: Coordinate,
-    newButton: Button
-  ) {
-    const size = new Size({
+  pushButton(props: {
+    boxes: Plane_ENGINE;
+    button: {
+      fillStyle: FillStyle;
+      strokeStyle: StrokeStyle;
+      lineWidth: number;
+      text: {
+        value: string;
+        fillStyle: FillStyle;
+        strokeStyle: StrokeStyle;
+        dungeonFont: boolean;
+      };
+    };
+  }) {
+    const size = new Size_ENGINE({
       width: this.buttonDefault.size.width,
       height: this.buttonDefault.size.height,
     });
-    const left = size.width * boxes.x;
-    const top = size.height * boxes.y;
-    this.buttons[index] = new Button({
-      initial: new Coordinate({
-        x: this.initial.x + top,
-        y: this.initial.y + left,
+    const left = size.width * props.boxes.horizontal;
+    const top = size.height * props.boxes.vertical;
+    const button = new Button_ENGINE({
+      leftUp: new Coordinate_ENGINE({
+        x: this.leftUp.x + top,
+        y: this.leftUp.y + left,
       }),
       size,
       canvas: this.canvas,
-      fillStyle: newButton.fillStyle,
-      strokeStyle: newButton.strokeStyle,
-      lineWidth: newButton.lineWidth,
-      text: new Text({
+      fillStyle: props.button.fillStyle,
+      strokeStyle: props.button.strokeStyle,
+      lineWidth: props.button.lineWidth,
+      text: new Text_ENGINE({
         canvas: this.canvas,
-        initial: new Coordinate({ x: 0, y: 0 }),
-        size: new Size({
+        leftUp: new Coordinate_ENGINE({
+          x: 0,
+          y: 0
+        }),
+        size: new Size_ENGINE({
           width: 0,
           height: this.buttonDefault.text.size.height
         }),
-        value: newButton.text.value,
-        fillStyle: newButton.text.fillStyle,
-        strokeStyle: newButton.text.strokeStyle,
-        dungeonFont: false
+        value: props.button.text.value,
+        fillStyle: props.button.text.fillStyle,
+        strokeStyle: props.button.text.strokeStyle,
+        dungeonFont: props.button.text.dungeonFont
       })
     });
+    this.buttons.push(button);
   }
 
   drawButtons() {

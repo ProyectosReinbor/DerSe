@@ -2,6 +2,7 @@ import type { Animation_ENGINE } from "./animation";
 import { Animations_ENGINE } from "./animations";
 import type { Canvas_ENGINE } from "./canvas";
 import { CharacterDirection } from "./character/direction";
+import type { FillStyle, StrokeStyle } from "./context";
 import { Coordinate_ENGINE } from "./coordinate";
 import type { Element_ENGINE } from "./element";
 import type { ImagePath } from "./image";
@@ -18,6 +19,9 @@ export class Character_ENGINE extends Square_ENGINE {
         leftUp: Coordinate_ENGINE,
         size: Size_ENGINE,
         canvas: Canvas_ENGINE;
+        fillStyle: FillStyle;
+        strokeStyle: StrokeStyle;
+        lineWidth: number;
         scale: Size_ENGINE,
         animations: {
             route: ImagePath,
@@ -31,8 +35,9 @@ export class Character_ENGINE extends Square_ENGINE {
             leftUp: props.leftUp,
             size: props.size,
             canvas: props.canvas,
-            fillStyle: "#fff",
-            strokeStyle: false,
+            fillStyle: props.fillStyle,
+            strokeStyle: props.strokeStyle,
+            lineWidth: props.lineWidth,
         });
         this.scale = props.scale;
         this.canvas = props.canvas;
@@ -68,6 +73,9 @@ export class Character_ENGINE extends Square_ENGINE {
                 height: this.size.height,
             }),
             canvas: this.canvas,
+            fillStyle: this.fillStyle,
+            strokeStyle: this.strokeStyle,
+            lineWidth: this.lineWidth,
             scale: this.scale,
             animations: {
                 route: this.animations.route,

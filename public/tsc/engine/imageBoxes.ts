@@ -1,6 +1,6 @@
-import { Boxes_ENGINE, type OccupiedSquares } from "./boxes";
+import { Boxes_ENGINE, type OccupiedBoxes } from "./boxes";
 import type { Canvas_ENGINE } from "./canvas";
-import type { ImagePath, Image_ENGINE } from "./image";
+import { Image_ENGINE, type ImagePath } from "./image";
 import type { Plane_ENGINE } from "./plane";
 import type { Size_ENGINE } from "./size";
 
@@ -14,23 +14,37 @@ export class ImageBoxes extends Boxes_ENGINE {
         canvas: Canvas_ENGINE;
         size: Size_ENGINE;
         length: Plane_ENGINE;
-        occupied: OccupiedSquares;
+        occupied: OccupiedBoxes;
         route: ImagePath;
     }) {
-        super(props);
+        super({
+            x: props.x,
+            y: props.y,
+            canvas: props.canvas,
+            size: props.size,
+            length: props.length,
+            occupied: props.occupied,
+        });
         this.route = props.route;
     }
 
-    override referencePush(indicesBox: Coordinate): Image | undefined {
-        const position = this.getPosition(indicesBox);
-        const newReference = new Image({
-            initial: position.initial,
+    override referencePush(props: {
+        boxIndices: Plane_ENGINE;
+    }): Image_ENGINE | undefined {
+        const position = this.getPosition({
+            boxIndices: props.boxIndices
+        });
+        const reference = new Image_ENGINE({
+            leftUp: position.leftUp,
             size: position.size,
             canvas: this.canvas,
             route: this.route,
         });
 
-        const indexReference = this.referencesPush(indicesBox, newReference);
+        const indexReference = this.referencesPush({
+            boxIndices: props.boxIndices,
+            reference
+        });
         if (indexReference === undefined)
             return undefined;
 

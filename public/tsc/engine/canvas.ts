@@ -168,36 +168,56 @@ export class Canvas_ENGINE extends Camera_ENGINE {
     }
   }
 
-  positionOnCanvas(position: Position_ENGINE) {
-    const positionOnCamera = this.positionOnCamera(position);
+  positionOnCanvas(props: {
+    position: Position_ENGINE;
+  }) {
+    const positionOnCamera = this.positionOnCamera({
+      position: props.position
+    });
     if (positionOnCamera === false)
       return false;
 
     return new Position_ENGINE({
       leftUp: new Coordinate_ENGINE({
-        x: this.getWidthInPixels(positionOnCamera.leftUp.x),
-        y: this.getHeightInPixels(positionOnCamera.leftUp.y),
+        x: this.getWidthInPixels({
+          percentage: positionOnCamera.leftUp.x
+        }),
+        y: this.getHeightInPixels({
+          percentage: positionOnCamera.leftUp.y
+        }),
       }),
       size: new Size_ENGINE({
-        width: this.getWidthInPixels(positionOnCamera.size.width),
-        height: this.getHeightInPixels(positionOnCamera.size.height)
+        width: this.getWidthInPixels({
+          percentage: positionOnCamera.size.width
+        }),
+        height: this.getHeightInPixels({
+          percentage: positionOnCamera.size.height
+        })
       })
     });
   }
 
-  getWidthInPercentages(pixels: number) {
-    return pixels / this.aPercent.width;
+  getWidthInPercentages(props: {
+    pixels: number;
+  }) {
+    return props.pixels / this.aPercent.width;
   }
 
-  getWidthInPixels(percentage: number) {
-    return percentage * this.aPercent.width;
+  getWidthInPixels(props: {
+    percentage: number;
+  }) {
+    return props.percentage * this.aPercent.width;
   }
 
-  getHeightInPercentages(pixels: number) {
-    return pixels / this.aPercent.height;
+  getHeightInPercentages(props: {
+    pixels: number;
+  }) {
+    return props.pixels / this.aPercent.height;
   }
 
-  getHeightInPixels(percentage: number) {
-    return percentage * this.aPercent.height;
+  getHeightInPixels(props: {
+    percentage: number;
+  }) {
+    return props.percentage * this.aPercent.height;
   }
 }
