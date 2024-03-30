@@ -6,7 +6,7 @@ import { Position_ENGINE } from "../position";
 import { Size_ENGINE } from "../size";
 import { Text_ENGINE } from "../text";
 
-export class Delete_KEYBOARD extends Position_ENGINE {
+export class Delete_ENGINE extends Position_ENGINE {
 
   startTouch: number | false = false;
   lines: Lines_ENGINE;

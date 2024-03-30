@@ -1,7 +1,7 @@
 import type { Animation_ENGINE } from "./animation";
 import { Animations_ENGINE } from "./animations";
 import type { Canvas_ENGINE } from "./canvas";
-import { CharacterDirection } from "./character/direction";
+import { Direction_ENGINE } from "./character/direction";
 import type { FillStyle, StrokeStyle } from "./context";
 import { Coordinate_ENGINE } from "./coordinate";
 import type { Element_ENGINE } from "./element";
@@ -13,7 +13,7 @@ export class Character_ENGINE extends Square_ENGINE {
     scale: Size_ENGINE;
     animations: Animations_ENGINE;
     speed: Coordinate_ENGINE;
-    address: CharacterDirection;
+    address: Direction_ENGINE;
 
     constructor(props: {
         leftUp: Coordinate_ENGINE,
@@ -29,7 +29,7 @@ export class Character_ENGINE extends Square_ENGINE {
             animation: Animation_ENGINE,
         },
         speed: Coordinate_ENGINE,
-        address: CharacterDirection,
+        address: Direction_ENGINE,
     }) {
         super({
             leftUp: props.leftUp,
@@ -55,7 +55,7 @@ export class Character_ENGINE extends Square_ENGINE {
 
     movedCharacter(): Character_ENGINE | false {
         if (this.address.isEqualTo(
-            new CharacterDirection({ x: 0, y: 0 })
+            new Direction_ENGINE({ x: 0, y: 0 })
         ))
             return false;
 

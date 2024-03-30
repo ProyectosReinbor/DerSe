@@ -5,7 +5,7 @@ import { Lines_ENGINE } from "../lines";
 import { Size_ENGINE } from "../size";
 import { Square_ENGINE } from "../square";
 
-export class Enter_KEYBOARD extends Square_ENGINE {
+export class Enter_ENGINE extends Square_ENGINE {
 
   triangle: Lines_ENGINE;
   lines: Lines_ENGINE;

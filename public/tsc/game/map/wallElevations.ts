@@ -4,7 +4,7 @@ import { ElementBoxes_ENGINE } from "../../engine/elementBoxes";
 import type { Elements_ENGINE } from "../../engine/elements";
 import { Plane_ENGINE } from "../../engine/plane";
 import { Size_ENGINE } from "../../engine/size";
-import type { Map_GAME } from "../map";
+import type { Map_ENGINE } from "../map";
 
 export type WallElevationState = "left" | "center" | "right" | "only";
 
@@ -12,12 +12,12 @@ export type WallElevationElementIndices = {
     [key in WallElevationState]: Plane_ENGINE;
 };
 
-export class WallElevations_FLOOR extends ElementBoxes_ENGINE {
+export class WallElevations_ENGINE extends ElementBoxes_ENGINE {
 
     elementIndices: WallElevationElementIndices;
 
     constructor(props: {
-        map: Map_GAME,
+        map: Map_ENGINE,
         canvas: Canvas_ENGINE,
     }) {
         super({

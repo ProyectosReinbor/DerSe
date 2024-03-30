@@ -3,12 +3,12 @@ import type { Image_ENGINE } from "../../engine/image";
 import { ImageBoxes_ENGINE } from "../../engine/imageBoxes";
 import { Plane_ENGINE } from "../../engine/plane";
 import { Size_ENGINE } from "../../engine/size";
-import type { Map_GAME } from "../map";
+import type { Map_ENGINE } from "../map";
 
 
-export class Shadows_FLOOR extends ImageBoxes_ENGINE {
+export class Shadows_ENGINE extends ImageBoxes_ENGINE {
     constructor(props: {
-        map: Map_GAME,
+        map: Map_ENGINE,
         canvas: Canvas_ENGINE,
     }) {
         super({

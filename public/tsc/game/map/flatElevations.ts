@@ -4,17 +4,17 @@ import { ElementBoxes_ENGINE } from "../../engine/elementBoxes";
 import type { Elements_ENGINE } from "../../engine/elements";
 import { Plane_ENGINE } from "../../engine/plane";
 import { Size_ENGINE } from "../../engine/size";
-import type { Map_GAME } from "../map";
+import type { Map_ENGINE } from "../map";
 
 export type FlatElevationState = "grass" | "sand";
 export type FlatElevationElementIndices = {
     [key in FlatElevationState]: Plane_ENGINE;
 }
 
-export class FlatElevations_FLOOR extends ElementBoxes_ENGINE {
+export class FlatElevations_ENGINE extends ElementBoxes_ENGINE {
     elementIndices: FlatElevationElementIndices;
     constructor(props: {
-        map: Map_GAME,
+        map: Map_ENGINE,
         canvas: Canvas_ENGINE,
     }) {
         super({

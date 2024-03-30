@@ -6,7 +6,7 @@ import type { Size_ENGINE } from "../../engine/size";
 export type CastleState = "construction" | "ready" | "destroyed";
 export type CastleColor = "blue" | "purple" | "red" | "yellow";
 
-export class Castle_FLOOR extends Image_ENGINE {
+export class Castle_ENGINE extends Image_ENGINE {
 
     state: CastleState = "construction";
     color: CastleColor = "blue";

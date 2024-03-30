@@ -1,7 +1,6 @@
 import {
-    GetMapMatrix,
-    MapLength,
-    type MapFloorMatrix,
+    type FloorMatrix_MapMatrix,
+    MapMatrix_ENGINE
 } from "./mapMatrix.js";
 import { Floor_ENGINE } from "./map/floor.js";
 import { Position_ENGINE } from "../engine/position.js";
@@ -11,7 +10,7 @@ import { Coordinate_ENGINE } from "../engine/coordinate.js";
 import type { Character_ENGINE } from "../engine/character.js";
 
 export class Map_ENGINE extends Position_ENGINE {
-    matrix: MapFloorMatrix[] = GetMapMatrix();
+    matrix: FloorMatrix_MapMatrix[] = MapMatrix_ENGINE.get();
     floors: Floor_ENGINE[];
     boxes: Size_ENGINE;
     canvas: Canvas_ENGINE;
@@ -28,8 +27,8 @@ export class Map_ENGINE extends Position_ENGINE {
         });
         this.canvas = props.canvas;
         this.boxes = new Size_ENGINE({
-            width: this.size.width / MapLength.horizontal,
-            height: this.size.height / MapLength.vertical,
+            width: this.size.width / MapMatrix_ENGINE.length.horizontal,
+            height: this.size.height / MapMatrix_ENGINE.length.vertical,
         });
         this.floors = this.matrix.map((matrix) => {
             const floor = new Floor_ENGINE({

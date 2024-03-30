@@ -5,7 +5,7 @@ import type { Canvas_ENGINE } from "../../engine/canvas";
 import { Element_ENGINE } from "../../engine/element";
 import { Plane_ENGINE } from "../../engine/plane";
 import { Size_ENGINE } from "../../engine/size";
-import type { Map_GAME } from "../map";
+import type { Map_ENGINE } from "../map";
 
 export type TreeState = "motion" | "attacked" | "felled";
 export type TreeStates = {
@@ -17,12 +17,12 @@ export type TreeStates = {
     };
 };
 
-export class Trees_FLOOR extends AnimationBoxes_ENGINE {
+export class Trees_ENGINE extends AnimationBoxes_ENGINE {
 
     states: TreeStates;
 
     constructor(props: {
-        map: Map_GAME,
+        map: Map_ENGINE,
         canvas: Canvas_ENGINE
     }) {
         super({

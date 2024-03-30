@@ -5,7 +5,7 @@ import type { Elements_ENGINE } from "../../engine/elements";
 import type { ImagePath } from "../../engine/image";
 import { Plane_ENGINE } from "../../engine/plane";
 import { Size_ENGINE } from "../../engine/size";
-import type { Map_GAME } from "../map";
+import type { Map_ENGINE } from "../map";
 
 export type GroundState = "leftUp" | "up" | "rightUp" |
     "left" | "center" | "right" |
@@ -18,14 +18,14 @@ export type GroundElementIndices = {
     [key in GroundState]: Plane_ENGINE;
 };
 
-export class Grounds_FLOOR extends ElementBoxes_ENGINE {
+export class Grounds_ENGINE extends ElementBoxes_ENGINE {
 
     override references: Elements_ENGINE[] = [];
     elementIndices: GroundElementIndices;
 
     constructor(props: {
         canvas: Canvas_ENGINE;
-        map: Map_GAME;
+        map: Map_ENGINE;
         route: ImagePath;
         elementIndices: GroundElementIndices;
     }) {

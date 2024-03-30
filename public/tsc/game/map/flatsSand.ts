@@ -1,12 +1,12 @@
 import type { Canvas_ENGINE } from "../../engine/canvas";
 import { Plane_ENGINE } from "../../engine/plane";
-import type { Map_GAME } from "../map";
-import { Grounds_FLOOR } from "./grounds";
+import type { Map_ENGINE } from "../map";
+import { Grounds_ENGINE } from "./grounds";
 
 
-export class FlatsSand_FLOOR extends Grounds_FLOOR {
+export class FlatsSand_ENGINE extends Grounds_ENGINE {
     constructor(props: {
-        map: Map_GAME,
+        map: Map_ENGINE,
         canvas: Canvas_ENGINE
     }) {
         super({

@@ -5,12 +5,12 @@ import type { Canvas_ENGINE } from "../../engine/canvas";
 import { Element_ENGINE } from "../../engine/element";
 import { Plane_ENGINE } from "../../engine/plane";
 import { Size_ENGINE } from "../../engine/size";
-import type { Map_GAME } from "../map";
+import type { Map_ENGINE } from "../map";
 
 
-export class Foams_FLOOR extends AnimationBoxes_ENGINE {
+export class Foams_ENGINE extends AnimationBoxes_ENGINE {
     constructor(props: {
-        map: Map_GAME,
+        map: Map_ENGINE,
         canvas: Canvas_ENGINE,
     }) {
         super({

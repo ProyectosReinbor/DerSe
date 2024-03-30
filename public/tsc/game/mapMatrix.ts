@@ -1,4 +1,3 @@
-import { Coordinate_ENGINE } from "../engine/coordinate";
 import { Plane_ENGINE } from "../engine/plane";
 
 type Foam = {
@@ -30,7 +29,7 @@ type Trees = {
     animation: "motion" | "attacked" | "felled";
 };
 
-export type Box = {
+type Box = {
     water: boolean;
     foam: false | Foam;
     elevation: false | Elevation;
@@ -67,7 +66,7 @@ export class MapMatrix_ENGINE {
     static getFloor0Box(props: {
         boxIndices: Plane_ENGINE;
     }): Box {
-        const box = this.getEmptyBox();
+        const box = MapMatrix_ENGINE.getEmptyBox();
         box.water = true;
         if (props.boxIndices.vertical >= 3 && props.boxIndices.vertical <= 19 &&
             props.boxIndices.horizontal >= 1 && props.boxIndices.horizontal <= 19)
@@ -90,7 +89,7 @@ export class MapMatrix_ENGINE {
     static getFloor1Box(props: {
         boxIndices: Plane_ENGINE;
     }): Box {
-        const box = this.getEmptyBox();
+        const box = MapMatrix_ENGINE.getEmptyBox();
 
         if (
             props.boxIndices.horizontal >= 2 && props.boxIndices.horizontal <= 17 &&
@@ -166,32 +165,21 @@ export class MapMatrix_ENGINE {
     static getFloor2Box(props: {
         boxIndices: Plane_ENGINE;
     }): Box {
-        const box = this.getEmptyBox();
+        const box = MapMatrix_ENGINE.getEmptyBox();
 
         if (
-            props.boxIndices.horizontal >= 6 && indicesBox.x <= 14 &&
-            indicesBox.y >= 1 && indicesBox.y <= 6
+            props.boxIndices.horizontal >= 6 && props.boxIndices.horizontal <= 14 &&
+            props.boxIndices.vertical >= 1 && props.boxIndices.vertical <= 6
         ) {
             box.elevation = {
                 floor: 2,
-                shadow: indicesBox.y >= 3,
+                shadow: props.boxIndices.vertical >= 3,
                 flatGrass: true
             };
         }
         if (
-            indicesBox.x >= 6 && indicesBox.x <= 10 &&
-            indicesBox.y === 7
-        ) {
-            box.elevation = {
-                floor: 2,
-                shadow: true,
-                flatGrass: true
-            };
-        }
-
-        if (
-            indicesBox.x >= 14 && indicesBox.x <= 14 &&
-            indicesBox.y === 7
+            props.boxIndices.horizontal >= 6 && props.boxIndices.horizontal <= 10 &&
+            props.boxIndices.vertical === 7
         ) {
             box.elevation = {
                 floor: 2,
@@ -201,8 +189,19 @@ export class MapMatrix_ENGINE {
         }
 
         if (
-            indicesBox.y === 8 &&
-            indicesBox.x >= 6 && indicesBox.x <= 10
+            props.boxIndices.horizontal >= 14 && props.boxIndices.horizontal <= 14 &&
+            props.boxIndices.vertical === 7
+        ) {
+            box.elevation = {
+                floor: 2,
+                shadow: true,
+                flatGrass: true
+            };
+        }
+
+        if (
+            props.boxIndices.vertical === 8 &&
+            props.boxIndices.horizontal >= 6 && props.boxIndices.horizontal <= 10
         ) {
             const flatElevationRandom = Math.round(Math.random());
             box.wallElevation = {
@@ -211,7 +210,7 @@ export class MapMatrix_ENGINE {
             };
         }
 
-        if (indicesBox.y === 8 && indicesBox.x === 14) {
+        if (props.boxIndices.vertical === 8 && props.boxIndices.horizontal === 14) {
             const flatElevationRandom = Math.round(Math.random());
             box.wallElevation = {
                 shadow: true,
@@ -223,16 +222,16 @@ export class MapMatrix_ENGINE {
     }
 
     static getBoxFloors: GetBoxFloor[] = [
-        this.getFloor0Box,
-        this.getFloor1Box,
-
+        MapMatrix_ENGINE.getFloor0Box,
+        MapMatrix_ENGINE.getFloor1Box,
+        MapMatrix_ENGINE.getFloor2Box,
     ];
 
     static get(): FloorMatrix_MapMatrix[] {
         const map: FloorMatrix_MapMatrix[] = [];
         for (
             let floor = 0;
-            floor < GetBoxFloors.length;
+            floor < MapMatrix_ENGINE.getBoxFloors.length;
             floor++
         ) {
             map[floor] = [];
@@ -240,31 +239,33 @@ export class MapMatrix_ENGINE {
             if (floorMatrix === undefined)
                 continue;
 
-            const indicesBox = new Coordinate_ENGINE({
-                x: 0,
-                y: 0
+            const boxIndices = new Plane_ENGINE({
+                horizontal: 0,
+                vertical: 0
             });
 
             for (
-                indicesBox.y = 0;
-                indicesBox.y < MapLength.vertical;
-                indicesBox.y++
+                boxIndices.vertical = 0;
+                boxIndices.vertical < MapMatrix_ENGINE.length.vertical;
+                boxIndices.vertical++
             ) {
-                floorMatrix[indicesBox.y] = [];
-                const row = floorMatrix[indicesBox.y];
+                floorMatrix[boxIndices.vertical] = [];
+                const row = floorMatrix[boxIndices.vertical];
                 if (row === undefined)
                     continue;
 
                 for (
-                    indicesBox.x = 0;
-                    indicesBox.x < MapLength.horizontal;
-                    indicesBox.x++
+                    boxIndices.horizontal = 0;
+                    boxIndices.horizontal < MapMatrix_ENGINE.length.horizontal;
+                    boxIndices.horizontal++
                 ) {
-                    const getBoxFloor = GetBoxFloors[floor];
+                    const getBoxFloor = MapMatrix_ENGINE.getBoxFloors[floor];
                     if (getBoxFloor === undefined)
                         continue;
 
-                    row[indicesBox.x] = getBoxFloor(indicesBox);
+                    row[boxIndices.horizontal] = getBoxFloor({
+                        boxIndices
+                    });
                 }
             }
         }

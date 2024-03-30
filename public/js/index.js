@@ -373,7 +373,7 @@ class Canvas_ENGINE extends Camera_ENGINE {
 }
 
 // public/tsc/engine/scene.ts
-class Scene {
+class Scene_ENGINE {
   canvas;
   draw = () => {
   };
@@ -407,108 +407,114 @@ class Plane_ENGINE {
 }
 
 // public/tsc/game/mapMatrix.ts
-var BoxFalse = () => ({
-  water: false,
-  foam: false,
-  elevation: false,
-  wallElevation: false,
-  stairElevation: false,
-  castle: false,
-  trees: false
-});
-var GetBoxFloors = [
-  (indicesBox) => {
-    const box = BoxFalse();
+class MapMatrix_ENGINE {
+  static length = new Plane_ENGINE({
+    horizontal: 21,
+    vertical: 21
+  });
+  static getEmptyBox() {
+    return {
+      water: false,
+      foam: false,
+      elevation: false,
+      wallElevation: false,
+      stairElevation: false,
+      castle: false,
+      trees: false
+    };
+  }
+  static getFloor0Box(props) {
+    const box = MapMatrix_ENGINE.getEmptyBox();
     box.water = true;
-    if (indicesBox.y >= 3 && indicesBox.y <= 19 && indicesBox.x >= 1 && indicesBox.x <= 19)
+    if (props.boxIndices.vertical >= 3 && props.boxIndices.vertical <= 19 && props.boxIndices.horizontal >= 1 && props.boxIndices.horizontal <= 19)
       box.foam = {
         flatSand: true
       };
-    if (indicesBox.y === 14 && indicesBox.x >= 11 && indicesBox.x <= 13)
+    if (props.boxIndices.vertical === 14 && props.boxIndices.horizontal >= 11 && props.boxIndices.horizontal <= 13)
       box.stairElevation = {
         shadow: true,
-        flatElevation: indicesBox.x === 11 ? "sand" : false
+        flatElevation: props.boxIndices.horizontal === 11 ? "sand" : false
       };
     return box;
-  },
-  (indicesBox) => {
-    const box = BoxFalse();
-    if (indicesBox.x >= 2 && indicesBox.x <= 17 && indicesBox.y >= 2 && indicesBox.y <= 13)
+  }
+  static getFloor1Box(props) {
+    const box = MapMatrix_ENGINE.getEmptyBox();
+    if (props.boxIndices.horizontal >= 2 && props.boxIndices.horizontal <= 17 && props.boxIndices.vertical >= 2 && props.boxIndices.vertical <= 13)
       box.elevation = {
         floor: 1,
-        shadow: indicesBox.y >= 3,
+        shadow: props.boxIndices.vertical >= 3,
         flatGrass: true
       };
-    if (indicesBox.x >= 2 && indicesBox.x <= 10 && indicesBox.y === 14)
-      box.elevation = {
-        floor: 1,
-        shadow: true,
-        flatGrass: true
-      };
-    if (indicesBox.x >= 14 && indicesBox.x <= 17 && indicesBox.y === 14)
+    if (props.boxIndices.horizontal >= 2 && props.boxIndices.horizontal <= 10 && props.boxIndices.vertical === 14)
       box.elevation = {
         floor: 1,
         shadow: true,
         flatGrass: true
       };
-    if (indicesBox.y === 15 && indicesBox.x >= 2 && indicesBox.x <= 10) {
+    if (props.boxIndices.horizontal >= 14 && props.boxIndices.horizontal <= 17 && props.boxIndices.vertical === 14)
+      box.elevation = {
+        floor: 1,
+        shadow: true,
+        flatGrass: true
+      };
+    if (props.boxIndices.vertical === 15 && props.boxIndices.horizontal >= 2 && props.boxIndices.horizontal <= 10) {
       const flatElevationRandom = Math.round(Math.random());
       box.wallElevation = {
         shadow: true,
         flatElevation: flatElevationRandom === 0 ? "sand" : false
       };
     }
-    if (indicesBox.y === 15 && indicesBox.x >= 14 && indicesBox.x <= 17) {
+    if (props.boxIndices.vertical === 15 && props.boxIndices.horizontal >= 14 && props.boxIndices.horizontal <= 17) {
       const flatElevationRandom = Math.round(Math.random());
       box.wallElevation = {
         shadow: true,
         flatElevation: flatElevationRandom === 0 ? "sand" : false
       };
     }
-    if (indicesBox.y === 7 && indicesBox.x >= 11 && indicesBox.x <= 13) {
+    if (props.boxIndices.vertical === 7 && props.boxIndices.horizontal >= 11 && props.boxIndices.horizontal <= 13) {
       box.stairElevation = {
         shadow: true,
-        flatElevation: indicesBox.x === 9 ? "grass" : false
+        flatElevation: props.boxIndices.horizontal === 9 ? "grass" : false
       };
     }
-    if (indicesBox.y === 3 && indicesBox.x === 14) {
+    if (props.boxIndices.vertical === 3 && props.boxIndices.horizontal === 14) {
       box.trees = {
         animation: "felled"
       };
     }
     return box;
-  },
-  (indicesBox) => {
-    const box = BoxFalse();
-    if (indicesBox.x >= 6 && indicesBox.x <= 14 && indicesBox.y >= 1 && indicesBox.y <= 6) {
+  }
+  static getFloor2Box(props) {
+    const box = MapMatrix_ENGINE.getEmptyBox();
+    if (props.boxIndices.horizontal >= 6 && props.boxIndices.horizontal <= 14 && props.boxIndices.vertical >= 1 && props.boxIndices.vertical <= 6) {
       box.elevation = {
         floor: 2,
-        shadow: indicesBox.y >= 3,
+        shadow: props.boxIndices.vertical >= 3,
         flatGrass: true
       };
     }
-    if (indicesBox.x >= 6 && indicesBox.x <= 10 && indicesBox.y === 7) {
-      box.elevation = {
-        floor: 2,
-        shadow: true,
-        flatGrass: true
-      };
-    }
-    if (indicesBox.x >= 14 && indicesBox.x <= 14 && indicesBox.y === 7) {
+    if (props.boxIndices.horizontal >= 6 && props.boxIndices.horizontal <= 10 && props.boxIndices.vertical === 7) {
       box.elevation = {
         floor: 2,
         shadow: true,
         flatGrass: true
       };
     }
-    if (indicesBox.y === 8 && indicesBox.x >= 6 && indicesBox.x <= 10) {
+    if (props.boxIndices.horizontal >= 14 && props.boxIndices.horizontal <= 14 && props.boxIndices.vertical === 7) {
+      box.elevation = {
+        floor: 2,
+        shadow: true,
+        flatGrass: true
+      };
+    }
+    if (props.boxIndices.vertical === 8 && props.boxIndices.horizontal >= 6 && props.boxIndices.horizontal <= 10) {
       const flatElevationRandom = Math.round(Math.random());
       box.wallElevation = {
         shadow: true,
         flatElevation: flatElevationRandom === 0 ? "grass" : false
       };
     }
-    if (indicesBox.y === 8 && indicesBox.x === 14) {
+    if (props.boxIndices.vertical === 8 && props.boxIndices.horizontal === 14) {
       const flatElevationRandom = Math.round(Math.random());
       box.wallElevation = {
         shadow: true,
@@ -517,37 +523,40 @@ var GetBoxFloors = [
     }
     return box;
   }
-];
-var MapLength = new Plane_ENGINE({
-  horizontal: 21,
-  vertical: 21
-});
-var GetMapMatrix = () => {
-  const map = [];
-  for (let floor = 0;floor < GetBoxFloors.length; floor++) {
-    map[floor] = [];
-    const floorMatrix = map[floor];
-    if (floorMatrix === undefined)
-      continue;
-    const indicesBox = new Coordinate_ENGINE({
-      x: 0,
-      y: 0
-    });
-    for (indicesBox.y = 0;indicesBox.y < MapLength.vertical; indicesBox.y++) {
-      floorMatrix[indicesBox.y] = [];
-      const row = floorMatrix[indicesBox.y];
-      if (row === undefined)
+  static getBoxFloors = [
+    MapMatrix_ENGINE.getFloor0Box,
+    MapMatrix_ENGINE.getFloor1Box,
+    MapMatrix_ENGINE.getFloor2Box
+  ];
+  static get() {
+    const map = [];
+    for (let floor = 0;floor < MapMatrix_ENGINE.getBoxFloors.length; floor++) {
+      map[floor] = [];
+      const floorMatrix = map[floor];
+      if (floorMatrix === undefined)
         continue;
-      for (indicesBox.x = 0;indicesBox.x < MapLength.horizontal; indicesBox.x++) {
-        const getBoxFloor = GetBoxFloors[floor];
-        if (getBoxFloor === undefined)
+      const boxIndices = new Plane_ENGINE({
+        horizontal: 0,
+        vertical: 0
+      });
+      for (boxIndices.vertical = 0;boxIndices.vertical < MapMatrix_ENGINE.length.vertical; boxIndices.vertical++) {
+        floorMatrix[boxIndices.vertical] = [];
+        const row = floorMatrix[boxIndices.vertical];
+        if (row === undefined)
           continue;
-        row[indicesBox.x] = getBoxFloor(indicesBox);
+        for (boxIndices.horizontal = 0;boxIndices.horizontal < MapMatrix_ENGINE.length.horizontal; boxIndices.horizontal++) {
+          const getBoxFloor = MapMatrix_ENGINE.getBoxFloors[floor];
+          if (getBoxFloor === undefined)
+            continue;
+          row[boxIndices.horizontal] = getBoxFloor({
+            boxIndices
+          });
+        }
       }
     }
+    return map;
   }
-  return map;
-};
+}
 
 // public/tsc/engine/element.ts
 class Element_ENGINE extends Position_ENGINE {
@@ -906,7 +915,7 @@ class ElementBoxes_ENGINE extends ImageBoxes_ENGINE {
 }
 
 // public/tsc/game/map/grounds.ts
-class Grounds_FLOOR extends ElementBoxes_ENGINE {
+class Grounds_ENGINE extends ElementBoxes_ENGINE {
   references = [];
   elementIndices;
   constructor(props) {
@@ -1038,7 +1047,7 @@ class Grounds_FLOOR extends ElementBoxes_ENGINE {
 }
 
 // public/tsc/game/map/flatsSand.ts
-class FlatsSand_FLOOR extends Grounds_FLOOR {
+class FlatsSand_ENGINE extends Grounds_ENGINE {
   constructor(props) {
     super({
       canvas: props.canvas,
@@ -1123,7 +1132,7 @@ class FlatsSand_FLOOR extends Grounds_FLOOR {
 }
 
 // public/tsc/game/map/elevations.ts
-class Elevations_FLOOR extends Grounds_FLOOR {
+class Elevations_ENGINE extends Grounds_ENGINE {
   constructor(props) {
     super({
       canvas: props.canvas,
@@ -1208,7 +1217,7 @@ class Elevations_FLOOR extends Grounds_FLOOR {
 }
 
 // public/tsc/game/map/wallElevations.ts
-class WallElevations_FLOOR extends ElementBoxes_ENGINE {
+class WallElevations_ENGINE extends ElementBoxes_ENGINE {
   elementIndices;
   constructor(props) {
     super({
@@ -1314,7 +1323,7 @@ class WallElevations_FLOOR extends ElementBoxes_ENGINE {
 }
 
 // public/tsc/game/map/castle.ts
-class Castle_FLOOR extends Image_ENGINE {
+class Castle_ENGINE extends Image_ENGINE {
   state = "construction";
   color = "blue";
   constructor(props) {
@@ -1337,7 +1346,7 @@ class Castle_FLOOR extends Image_ENGINE {
 }
 
 // public/tsc/game/map/castles.ts
-class Castles_FLOOR extends ImageBoxes_ENGINE {
+class Castles_ENGINE extends ImageBoxes_ENGINE {
   references = [];
   constructor(props) {
     super({
@@ -1360,7 +1369,7 @@ class Castles_FLOOR extends ImageBoxes_ENGINE {
     const position7 = this.getPosition({
       boxIndices: props.boxIndices
     });
-    const reference = new Castle_FLOOR({
+    const reference = new Castle_ENGINE({
       leftUp: position7.leftUp,
       size: position7.size,
       canvas: this.canvas,
@@ -1381,7 +1390,7 @@ class Castles_FLOOR extends ImageBoxes_ENGINE {
 }
 
 // public/tsc/game/map/water.ts
-class Water_FLOOR extends ImageBoxes_ENGINE {
+class Water_ENGINE extends ImageBoxes_ENGINE {
   constructor(props) {
     super({
       x: props.map.leftUp.x,
@@ -1501,7 +1510,7 @@ class AnimationBoxes_ENGINE extends ElementBoxes_ENGINE {
 }
 
 // public/tsc/game/map/foams.ts
-class Foams_FLOOR extends AnimationBoxes_ENGINE {
+class Foams_ENGINE extends AnimationBoxes_ENGINE {
   constructor(props) {
     super({
       x: props.map.leftUp.x,
@@ -1553,7 +1562,7 @@ class Foams_FLOOR extends AnimationBoxes_ENGINE {
 }
 
 // public/tsc/game/map/flatsGrass.ts
-class FlatsGrass_FLOOR extends Grounds_FLOOR {
+class FlatsGrass_ENGINE extends Grounds_ENGINE {
   constructor(props) {
     super({
       canvas: props.canvas,
@@ -1638,7 +1647,7 @@ class FlatsGrass_FLOOR extends Grounds_FLOOR {
 }
 
 // public/tsc/game/map/shadows.ts
-class Shadows_FLOOR extends ImageBoxes_ENGINE {
+class Shadows_ENGINE extends ImageBoxes_ENGINE {
   constructor(props) {
     super({
       x: props.map.leftUp.x,
@@ -1676,7 +1685,7 @@ class Shadows_FLOOR extends ImageBoxes_ENGINE {
 }
 
 // public/tsc/game/map/stairsElevations.ts
-class StairsElevations_FLOOR extends ElementBoxes_ENGINE {
+class StairsElevations_ENGINE extends ElementBoxes_ENGINE {
   elementIndices;
   constructor(props) {
     super({
@@ -1782,7 +1791,7 @@ class StairsElevations_FLOOR extends ElementBoxes_ENGINE {
 }
 
 // public/tsc/game/map/flatElevations.ts
-class FlatElevations_FLOOR extends ElementBoxes_ENGINE {
+class FlatElevations_ENGINE extends ElementBoxes_ENGINE {
   elementIndices;
   constructor(props) {
     super({
@@ -1837,7 +1846,7 @@ class FlatElevations_FLOOR extends ElementBoxes_ENGINE {
 }
 
 // public/tsc/game/map/trees.ts
-class Trees_FLOOR extends AnimationBoxes_ENGINE {
+class Trees_ENGINE extends AnimationBoxes_ENGINE {
   states;
   constructor(props) {
     super({
@@ -1926,7 +1935,7 @@ class Trees_FLOOR extends AnimationBoxes_ENGINE {
 }
 
 // public/tsc/game/map/floor.ts
-class Floor_GAME {
+class Floor_ENGINE {
   map;
   canvas;
   water;
@@ -1943,47 +1952,47 @@ class Floor_GAME {
   constructor(props) {
     this.map = props.map;
     this.canvas = props.canvas;
-    this.water = new Water_FLOOR({
+    this.water = new Water_ENGINE({
       map: this.map,
       canvas: this.canvas
     });
-    this.foams = new Foams_FLOOR({
+    this.foams = new Foams_ENGINE({
       map: this.map,
       canvas: this.canvas
     });
-    this.flatsSand = new FlatsSand_FLOOR({
+    this.flatsSand = new FlatsSand_ENGINE({
       map: this.map,
       canvas: this.canvas
     });
-    this.elevations = new Elevations_FLOOR({
+    this.elevations = new Elevations_ENGINE({
       map: this.map,
       canvas: this.canvas
     });
-    this.flatsGrass = new FlatsGrass_FLOOR({
+    this.flatsGrass = new FlatsGrass_ENGINE({
       map: this.map,
       canvas: this.canvas
     });
-    this.shadows = new Shadows_FLOOR({
+    this.shadows = new Shadows_ENGINE({
       map: this.map,
       canvas: this.canvas
     });
-    this.wallElevations = new WallElevations_FLOOR({
+    this.wallElevations = new WallElevations_ENGINE({
       map: this.map,
       canvas: this.canvas
     });
-    this.stairsElevation = new StairsElevations_FLOOR({
+    this.stairsElevation = new StairsElevations_ENGINE({
       map: this.map,
       canvas: this.canvas
     });
-    this.flatElevations = new FlatElevations_FLOOR({
+    this.flatElevations = new FlatElevations_ENGINE({
       map: this.map,
       canvas: this.canvas
     });
-    this.castles = new Castles_FLOOR({
+    this.castles = new Castles_ENGINE({
       map: this.map,
       canvas: this.canvas
     });
-    this.trees = new Trees_FLOOR({
+    this.trees = new Trees_ENGINE({
       map: this.map,
       canvas: this.canvas
     });
@@ -2158,8 +2167,8 @@ class Floor_GAME {
 }
 
 // public/tsc/game/map.ts
-class Map_GAME extends Position_ENGINE {
-  matrix = GetMapMatrix();
+class Map_ENGINE extends Position_ENGINE {
+  matrix = MapMatrix_ENGINE.get();
   floors;
   boxes;
   canvas;
@@ -2173,11 +2182,11 @@ class Map_GAME extends Position_ENGINE {
     });
     this.canvas = props.canvas;
     this.boxes = new Size_ENGINE({
-      width: this.size.width / MapLength.horizontal,
-      height: this.size.height / MapLength.vertical
+      width: this.size.width / MapMatrix_ENGINE.length.horizontal,
+      height: this.size.height / MapMatrix_ENGINE.length.vertical
     });
     this.floors = this.matrix.map((matrix) => {
-      const floor2 = new Floor_GAME({
+      const floor2 = new Floor_ENGINE({
         map: this,
         canvas: this.canvas
       });
@@ -2288,7 +2297,7 @@ class Map_GAME extends Position_ENGINE {
 }
 
 // public/tsc/engine/character/direction.ts
-class CharacterDirection {
+class Direction_ENGINE {
   x;
   y;
   constructor(props) {
@@ -2366,7 +2375,7 @@ class Character_ENGINE extends Square_ENGINE {
     this.address = props.address;
   }
   movedCharacter() {
-    if (this.address.isEqualTo(new CharacterDirection({ x: 0, y: 0 })))
+    if (this.address.isEqualTo(new Direction_ENGINE({ x: 0, y: 0 })))
       return false;
     const secondsBetweenFrames = this.canvas.timeBetweenFrames / 1000;
     const speedX = this.speed.x * secondsBetweenFrames;
@@ -2456,7 +2465,7 @@ class Text_ENGINE extends Position_ENGINE {
 }
 
 // public/tsc/game/userBar.ts
-class UserBar_PAWN extends Square_ENGINE {
+class UserBar_ENGINE extends Square_ENGINE {
   pawn;
   photo;
   name;
@@ -2517,7 +2526,7 @@ class UserBar_PAWN extends Square_ENGINE {
 }
 
 // public/tsc/game/pawn.ts
-class Pawn_GAME extends Character_ENGINE {
+class Pawn_ENGINE extends Character_ENGINE {
   map;
   nickname;
   userBar;
@@ -2557,14 +2566,14 @@ class Pawn_GAME extends Character_ENGINE {
         x: 2,
         y: 2
       }),
-      address: new CharacterDirection({
+      address: new Direction_ENGINE({
         x: 0,
         y: 0
       })
     });
     this.map = props.map;
     this.nickname = props.nickname;
-    this.userBar = new UserBar_PAWN({
+    this.userBar = new UserBar_ENGINE({
       pawn: this,
       size: new Size_ENGINE({
         width: 0,
@@ -2624,7 +2633,7 @@ class Line_ENGINE extends Position_ENGINE {
 }
 
 // public/tsc/game/sheep.ts
-class Sheep_MAP extends Character_ENGINE {
+class Sheep_ENGINE extends Character_ENGINE {
   lineSight;
   state = "move";
   states = {
@@ -2691,7 +2700,7 @@ class Sheep_MAP extends Character_ENGINE {
         x: 40,
         y: 40
       }),
-      address: new CharacterDirection({
+      address: new Direction_ENGINE({
         x: 0,
         y: 0
       })
@@ -2714,6 +2723,7 @@ class Sheep_MAP extends Character_ENGINE {
       strokeStyle: "#333",
       lineWidth: 2
     });
+    this.address.x = -1;
   }
   moveSheep() {
     const moved = this.movedCharacter();
@@ -2763,7 +2773,7 @@ class Sheep_MAP extends Character_ENGINE {
 }
 
 // public/tsc/game/game.ts
-class Game_ENGINE extends Scene {
+class Game_ENGINE extends Scene_ENGINE {
   map;
   pawns = [];
   sheepGroup = [];
@@ -2771,11 +2781,11 @@ class Game_ENGINE extends Scene {
     super({
       canvas: props.canvas
     });
-    this.map = new Map_GAME({
+    this.map = new Map_ENGINE({
       canvas: props.canvas
     });
     this.sheepGroup = [
-      new Sheep_MAP({
+      new Sheep_ENGINE({
         leftUp: new Coordinate_ENGINE({
           x: 35,
           y: 50
@@ -2789,7 +2799,7 @@ class Game_ENGINE extends Scene {
     const exist = this.pawns.some((pawn2) => pawn2.nickname === gift.nickname);
     if (exist === true)
       return;
-    this.pawns.push(new Pawn_GAME({
+    this.pawns.push(new Pawn_ENGINE({
       leftUp: new Coordinate_ENGINE({
         x: Math.floor(Math.random() * this.map.size.width),
         y: Math.floor(Math.random() * this.map.size.height)

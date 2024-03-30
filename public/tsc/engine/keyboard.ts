@@ -1,11 +1,11 @@
-import { Keys_KEYBOARD } from "./keyboard/keys";
-import { Shift_KEYBOARD } from "./keyboard/shift";
-import { Enter_KEYBOARD } from "./keyboard/enter";
-import { Space_KEYBOARD } from "./keyboard/space";
-import { Delete_KEYBOARD } from "./keyboard/delete";
-import { CloseQuestion_KEYBOARD } from "./keyboard/closeQuestion";
-import { Finish_KEYBOARD } from "./keyboard/finish";
-import { Key_KEYBOARD } from "./keyboard/key";
+import { Keys_ENGINE } from "./keyboard/keys";
+import { Shift_ENGINE } from "./keyboard/shift";
+import { Enter_ENGINE } from "./keyboard/enter";
+import { Space_ENGINE } from "./keyboard/space";
+import { Delete_ENGINE } from "./keyboard/delete";
+import { CloseQuestion_ENGINE } from "./keyboard/closeQuestion";
+import { Finish_ENGINE } from "./keyboard/finish";
+import { Key_ENGINE } from "./keyboard/key";
 import { Square_ENGINE } from "./square";
 import type { Canvas_ENGINE } from "./canvas";
 import { Coordinate_ENGINE } from "./coordinate";
@@ -16,14 +16,14 @@ import { Text_ENGINE } from "./text";
 export class Keyboard_ENGINE extends Square_ENGINE {
 
   input: Input_ENGINE | false = false;
-  shiftKeys: Keys_KEYBOARD[];
-  keys: Keys_KEYBOARD[];
-  shift: Shift_KEYBOARD;
-  enter: Enter_KEYBOARD;
-  space: Space_KEYBOARD;
-  delete: Delete_KEYBOARD;
-  closeQuestion: CloseQuestion_KEYBOARD;
-  finish: Finish_KEYBOARD;
+  shiftKeys: Keys_ENGINE[];
+  keys: Keys_ENGINE[];
+  shift: Shift_ENGINE;
+  enter: Enter_ENGINE;
+  space: Space_ENGINE;
+  delete: Delete_ENGINE;
+  closeQuestion: CloseQuestion_ENGINE;
+  finish: Finish_ENGINE;
 
   constructor(props: {
     canvas: Canvas_ENGINE;
@@ -58,27 +58,27 @@ export class Keyboard_ENGINE extends Square_ENGINE {
         "zxcvbnm@.,"
       ]
     });
-    this.shift = new Shift_KEYBOARD({
+    this.shift = new Shift_ENGINE({
       canvas: props.canvas,
       keyboard: this
     });
-    this.enter = new Enter_KEYBOARD({
+    this.enter = new Enter_ENGINE({
       canvas: props.canvas,
       keyboard: this,
     });
-    this.space = new Space_KEYBOARD({
+    this.space = new Space_ENGINE({
       canvas: props.canvas,
       keyboard: this,
     });
-    this.delete = new Delete_KEYBOARD({
+    this.delete = new Delete_ENGINE({
       canvas: props.canvas,
       keyboard: this,
     });
-    this.closeQuestion = new CloseQuestion_KEYBOARD({
+    this.closeQuestion = new CloseQuestion_ENGINE({
       canvas: props.canvas,
       keyboard: this,
     });
-    this.finish = new Finish_KEYBOARD({
+    this.finish = new Finish_ENGINE({
       canvas: props.canvas,
       keyboard: this,
     });
@@ -86,7 +86,7 @@ export class Keyboard_ENGINE extends Square_ENGINE {
 
   getKeys(props: {
     keys: string[];
-  }): Keys_KEYBOARD[] {
+  }): Keys_ENGINE[] {
     const size = this.size.getPercentages({
       percentages: new Size_ENGINE({
         width: 97,
@@ -98,12 +98,12 @@ export class Keyboard_ENGINE extends Square_ENGINE {
       const left = size.aPercent.width * index;
       const nextIndex = index + 1;
       const top = size.height * nextIndex;
-      return new Keys_KEYBOARD({
+      return new Keys_ENGINE({
         x: this.leftUp.x + left,
         y: this.leftUp.y + top,
         canvas: this.canvas,
         characters,
-        keyDefault: new Key_KEYBOARD({
+        keyDefault: new Key_ENGINE({
           canvas: this.canvas,
           leftUp: new Coordinate_ENGINE({ x: 0, y: 0 }),
           size,

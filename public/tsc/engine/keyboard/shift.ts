@@ -5,7 +5,7 @@ import { Lines_ENGINE } from "../lines";
 import { Size_ENGINE } from "../size";
 import { Square_ENGINE } from "../square";
 
-export class Shift_KEYBOARD extends Square_ENGINE {
+export class Shift_ENGINE extends Square_ENGINE {
 
   uppercase: boolean;
   triangle: Lines_ENGINE;

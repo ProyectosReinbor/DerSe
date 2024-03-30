@@ -5,7 +5,7 @@ import type { Keyboard_ENGINE } from "../keyboard";
 import { Size_ENGINE } from "../size";
 import { Text_ENGINE } from "../text";
 
-export class CloseQuestion_KEYBOARD extends Button_ENGINE {
+export class CloseQuestion_ENGINE extends Button_ENGINE {
   keyboard: Keyboard_ENGINE;
   constructor(props: {
     canvas: Canvas_ENGINE;

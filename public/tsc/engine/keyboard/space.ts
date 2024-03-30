@@ -5,7 +5,7 @@ import type { Keyboard_ENGINE } from "../keyboard";
 import { Size_ENGINE } from "../size";
 import { Text_ENGINE } from "../text";
 
-export class Space_KEYBOARD extends Button_ENGINE {
+export class Space_ENGINE extends Button_ENGINE {
 
   keyboard: Keyboard_ENGINE;
 

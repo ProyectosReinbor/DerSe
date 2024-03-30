@@ -2,17 +2,21 @@ import type { Canvas_ENGINE } from "../../engine/canvas";
 import { ImageBoxes_ENGINE } from "../../engine/imageBoxes";
 import { Plane_ENGINE } from "../../engine/plane";
 import { Size_ENGINE } from "../../engine/size";
-import type { Map_GAME } from "../map";
-import { Castle_FLOOR, type CastleColor, type CastleState } from "./castle";
+import type { Map_ENGINE } from "../map";
+import {
+    Castle_ENGINE,
+    type CastleColor,
+    type CastleState
+} from "./castle";
 
 
 
-export class Castles_FLOOR extends ImageBoxes_ENGINE {
+export class Castles_ENGINE extends ImageBoxes_ENGINE {
 
-    override references: Castle_FLOOR[] = [];
+    override references: Castle_ENGINE[] = [];
 
     constructor(props: {
-        map: Map_GAME,
+        map: Map_ENGINE,
         canvas: Canvas_ENGINE,
     }) {
         super({
@@ -40,7 +44,7 @@ export class Castles_FLOOR extends ImageBoxes_ENGINE {
         const position = this.getPosition({
             boxIndices: props.boxIndices
         });
-        const reference = new Castle_FLOOR({
+        const reference = new Castle_ENGINE({
             leftUp: position.leftUp,
             size: position.size,
             canvas: this.canvas,

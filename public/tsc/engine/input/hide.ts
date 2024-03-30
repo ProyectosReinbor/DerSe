@@ -6,7 +6,7 @@ import type { Input_ENGINE } from "../input";
 import { Size_ENGINE } from "../size";
 import { Square_ENGINE } from "../square";
 
-export class Hide_INPUT extends Square_ENGINE {
+export class Hide_ENGINE extends Square_ENGINE {
 
   value: string = "";
   input: Input_ENGINE;

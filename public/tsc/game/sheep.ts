@@ -1,7 +1,7 @@
 import { Animation_ENGINE } from "../engine/animation";
 import type { Canvas_ENGINE } from "../engine/canvas";
 import { Character_ENGINE } from "../engine/character";
-import { CharacterDirection } from "../engine/character/direction";
+import { Direction_ENGINE } from "../engine/character/direction";
 import { Coordinate_ENGINE } from "../engine/coordinate";
 import { Element_ENGINE } from "../engine/element";
 import { Line_ENGINE } from "../engine/line";
@@ -92,7 +92,7 @@ export class Sheep_ENGINE extends Character_ENGINE {
                 x: 40,
                 y: 40
             }),
-            address: new CharacterDirection({
+            address: new Direction_ENGINE({
                 x: 0,
                 y: 0
             }),
@@ -115,6 +115,7 @@ export class Sheep_ENGINE extends Character_ENGINE {
             strokeStyle: "#333",
             lineWidth: 2,
         });
+        this.address.x = -1;
     }
 
     moveSheep() {

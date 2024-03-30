@@ -7,7 +7,7 @@ import type { Text_ENGINE } from "../text";
 
 export type KeyPress_KEY = (character: string) => void;
 
-export class Key_KEYBOARD extends Button_ENGINE {
+export class Key_ENGINE extends Button_ENGINE {
 
     keyPress: KeyPress_KEY
 

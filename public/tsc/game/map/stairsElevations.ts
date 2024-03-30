@@ -4,19 +4,19 @@ import { ElementBoxes_ENGINE } from "../../engine/elementBoxes";
 import type { Elements_ENGINE } from "../../engine/elements";
 import { Plane_ENGINE } from "../../engine/plane";
 import { Size_ENGINE } from "../../engine/size";
-import type { Map_GAME } from "../map";
+import type { Map_ENGINE } from "../map";
 
 export type StairElevationState = "left" | "center" | "right" | "only";
 export type StairElevationElementIndices = {
     [key in StairElevationState]: Plane_ENGINE;
 };
 
-export class StairsElevations_FLOOR extends ElementBoxes_ENGINE {
+export class StairsElevations_ENGINE extends ElementBoxes_ENGINE {
 
     elementIndices: StairElevationElementIndices;
 
     constructor(props: {
-        map: Map_GAME,
+        map: Map_ENGINE,
         canvas: Canvas_ENGINE,
     }) {
         super({

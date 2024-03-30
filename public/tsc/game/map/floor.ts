@@ -1,35 +1,35 @@
-import type { MapFloorMatrix } from "../mapMatrix";
+import type { FloorMatrix_MapMatrix } from "../mapMatrix";
 import type { Map_ENGINE } from "../map";
 import type { Canvas_ENGINE } from "../../engine/canvas";
 import { Plane_ENGINE } from "../../engine/plane";
 import type { Character_ENGINE } from "../../engine/character";
-import { FlatsSand_FLOOR } from "./flatsSand";
-import { Elevations_FLOOR } from "./elevations";
-import { WallElevations_FLOOR } from "./wallElevations";
-import { Castles_FLOOR } from "./castles";
-import { Water_FLOOR } from "./water";
-import { Foams_FLOOR } from "./foams";
-import { FlatsGrass_FLOOR } from "./flatsGrass";
-import { Shadows_FLOOR } from "./shadows";
-import { StairsElevations_FLOOR } from "./stairsElevations";
-import { FlatElevations_FLOOR } from "./flatElevations";
-import { Trees_FLOOR } from "./trees";
+import { FlatsSand_ENGINE } from "./flatsSand";
+import { Elevations_ENGINE } from "./elevations";
+import { WallElevations_ENGINE } from "./wallElevations";
+import { Castles_ENGINE } from "./castles";
+import { Water_ENGINE } from "./water";
+import { Foams_ENGINE } from "./foams";
+import { FlatsGrass_ENGINE } from "./flatsGrass";
+import { Shadows_ENGINE } from "./shadows";
+import { StairsElevations_ENGINE } from "./stairsElevations";
+import { FlatElevations_ENGINE } from "./flatElevations";
+import { Trees_ENGINE } from "./trees";
 
 export class Floor_ENGINE {
 
     map: Map_ENGINE;
     canvas: Canvas_ENGINE;
-    water: Water_FLOOR;
-    foams: Foams_FLOOR;
-    flatsSand: FlatsSand_FLOOR;
-    elevations: Elevations_FLOOR;
-    flatsGrass: FlatsGrass_FLOOR;
-    shadows: Shadows_FLOOR;
-    wallElevations: WallElevations_FLOOR;
-    stairsElevation: StairsElevations_FLOOR;
-    flatElevations: FlatElevations_FLOOR;
-    castles: Castles_FLOOR;
-    trees: Trees_FLOOR;
+    water: Water_ENGINE;
+    foams: Foams_ENGINE;
+    flatsSand: FlatsSand_ENGINE;
+    elevations: Elevations_ENGINE;
+    flatsGrass: FlatsGrass_ENGINE;
+    shadows: Shadows_ENGINE;
+    wallElevations: WallElevations_ENGINE;
+    stairsElevation: StairsElevations_ENGINE;
+    flatElevations: FlatElevations_ENGINE;
+    castles: Castles_ENGINE;
+    trees: Trees_ENGINE;
 
     constructor(props: {
         map: Map_ENGINE,
@@ -38,63 +38,63 @@ export class Floor_ENGINE {
         this.map = props.map;
         this.canvas = props.canvas;
 
-        this.water = new Water_FLOOR({
+        this.water = new Water_ENGINE({
             map: this.map,
             canvas: this.canvas
         });
 
-        this.foams = new Foams_FLOOR({
+        this.foams = new Foams_ENGINE({
             map: this.map,
             canvas: this.canvas
         });
 
-        this.flatsSand = new FlatsSand_FLOOR({
+        this.flatsSand = new FlatsSand_ENGINE({
             map: this.map,
             canvas: this.canvas
         })
 
-        this.elevations = new Elevations_FLOOR({
+        this.elevations = new Elevations_ENGINE({
             map: this.map,
             canvas: this.canvas,
         });
 
-        this.flatsGrass = new FlatsGrass_FLOOR({
+        this.flatsGrass = new FlatsGrass_ENGINE({
             map: this.map,
             canvas: this.canvas,
         });
 
-        this.shadows = new Shadows_FLOOR({
+        this.shadows = new Shadows_ENGINE({
             map: this.map,
             canvas: this.canvas,
         });
 
-        this.wallElevations = new WallElevations_FLOOR({
+        this.wallElevations = new WallElevations_ENGINE({
             map: this.map,
             canvas: this.canvas,
         });
 
-        this.stairsElevation = new StairsElevations_FLOOR({
+        this.stairsElevation = new StairsElevations_ENGINE({
             map: this.map,
             canvas: this.canvas,
         });
 
-        this.flatElevations = new FlatElevations_FLOOR({
+        this.flatElevations = new FlatElevations_ENGINE({
             map: this.map,
             canvas: this.canvas,
         });
 
-        this.castles = new Castles_FLOOR({
+        this.castles = new Castles_ENGINE({
             map: this.map,
             canvas: this.canvas,
         });
 
-        this.trees = new Trees_FLOOR({
+        this.trees = new Trees_ENGINE({
             map: this.map,
             canvas: this.canvas,
         });
     }
 
-    pushFloor(matrix: MapFloorMatrix) {
+    pushFloor(matrix: FloorMatrix_MapMatrix) {
         matrix.forEach((row, vertical) => {
             row.forEach((box, horizontal) => {
                 const boxIndices = new Plane_ENGINE({

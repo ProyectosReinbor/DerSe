@@ -4,16 +4,16 @@ import { Image_ENGINE, type ImagePath } from "../engine/image";
 import { Size_ENGINE } from "../engine/size";
 import { Square_ENGINE } from "../engine/square";
 import { Text_ENGINE } from "../engine/text";
-import type { Pawn_GAME } from "./pawn";
+import type { Pawn_ENGINE } from "./pawn";
 
-export class UserBar_PAWN extends Square_ENGINE {
+export class UserBar_ENGINE extends Square_ENGINE {
 
-    pawn: Pawn_GAME;
+    pawn: Pawn_ENGINE;
     photo: Image_ENGINE;
     name: Text_ENGINE;
 
     constructor(props: {
-        pawn: Pawn_GAME,
+        pawn: Pawn_ENGINE,
         size: Size_ENGINE,
         canvas: Canvas_ENGINE,
         photoRoute: ImagePath,

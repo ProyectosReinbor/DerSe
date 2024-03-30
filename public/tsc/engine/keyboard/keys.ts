@@ -3,12 +3,12 @@ import { Coordinate_ENGINE } from "../coordinate";
 import { Plane_ENGINE } from "../plane";
 import { Size_ENGINE } from "../size";
 import { Text_ENGINE } from "../text";
-import { Key_KEYBOARD } from "./key";
+import { Key_ENGINE } from "./key";
 
-export class Keys_KEYBOARD extends Coordinate_ENGINE {
+export class Keys_ENGINE extends Coordinate_ENGINE {
 
-  keyDefault: Key_KEYBOARD;
-  keys: Key_KEYBOARD[] = [];
+  keyDefault: Key_ENGINE;
+  keys: Key_ENGINE[] = [];
   canvas: Canvas_ENGINE;
 
   constructor(props: {
@@ -16,7 +16,7 @@ export class Keys_KEYBOARD extends Coordinate_ENGINE {
     y: number;
     canvas: Canvas_ENGINE;
     characters: string;
-    keyDefault: Key_KEYBOARD;
+    keyDefault: Key_ENGINE;
   }) {
     super(props);
     this.canvas = props.canvas;
@@ -30,7 +30,7 @@ export class Keys_KEYBOARD extends Coordinate_ENGINE {
           horizontal: index,
           vertical: 0
         }),
-        newKey: new Key_KEYBOARD({
+        newKey: new Key_ENGINE({
           leftUp: new Coordinate_ENGINE({ x: 0, y: 0 }),
           size: new Size_ENGINE({ width: 0, height: 0 }),
           canvas: this.canvas,
@@ -60,7 +60,7 @@ export class Keys_KEYBOARD extends Coordinate_ENGINE {
 
   addKey(props: {
     boxes: Plane_ENGINE,
-    newKey: Key_KEYBOARD
+    newKey: Key_ENGINE
   }) {
     const size = new Size_ENGINE({
       width: this.keyDefault.size.width,
@@ -68,7 +68,7 @@ export class Keys_KEYBOARD extends Coordinate_ENGINE {
     });
     const top = size.width * props.boxes.horizontal;
     const left = size.height * props.boxes.vertical;
-    const key = new Key_KEYBOARD({
+    const key = new Key_ENGINE({
       canvas: this.canvas,
       leftUp: new Coordinate_ENGINE({
         x: this.x + top,
