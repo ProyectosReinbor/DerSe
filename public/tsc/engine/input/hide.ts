@@ -20,15 +20,16 @@ export class Hide_INPUT extends Square_ENGINE {
     switchedOn: boolean,
   }) {
     super({
-      canvas: props.canvas,
       leftUp: props.input.leftUpPlusSizePercentages({
         percentages: new Size_ENGINE({ width: 88, height: 20 })
       }),
       size: props.input.size.getPercentages({
         percentages: new Size_ENGINE({ width: 10, height: 60 })
       }),
+      canvas: props.canvas,
       fillStyle: "#AED6F1",
       strokeStyle: "#EAF2F8",
+      lineWidth: 0
     });
     this.input = props.input;
     this.switchedOn = props.switchedOn;
@@ -85,7 +86,7 @@ export class Hide_INPUT extends Square_ENGINE {
       })
     });
     this.iris = new Circle({
-      initial: props.input.leftUpPlusSizePercentages({
+      leftUp: props.input.leftUpPlusSizePercentages({
         percentages: new Size_ENGINE({
           width: 87,
           height: 36

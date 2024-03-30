@@ -1,24 +1,23 @@
-import type { Canvas } from "../../engine/canvas.js";
-import { ImageBoxes } from "../../engine/imageBoxes.js";
-import { Plane } from "../../engine/plane.js";
-import { Size } from "../../engine/size.js";
-import { Coordinate } from "../../engine/coordinate.js";
-import type { Map } from "../map.js";
+import type { Canvas_ENGINE } from "../../engine/canvas";
+import { ImageBoxes_ENGINE } from "../../engine/imageBoxes";
+import { Plane_ENGINE } from "../../engine/plane";
+import { Size_ENGINE } from "../../engine/size";
+import type { Map_GAME } from "../map";
 
-export class Water extends ImageBoxes {
+export class Water_FLOOR extends ImageBoxes_ENGINE {
     constructor(props: {
-        map: Map,
-        canvas: Canvas,
+        map: Map_GAME,
+        canvas: Canvas_ENGINE,
     }) {
         super({
-            x: props.map.initial.x,
-            y: props.map.initial.y,
+            x: props.map.leftUp.x,
+            y: props.map.leftUp.y,
             canvas: props.canvas,
-            size: new Size({
+            size: new Size_ENGINE({
                 width: props.map.boxes.width,
                 height: props.map.boxes.height
             }),
-            length: new Plane({
+            length: new Plane_ENGINE({
                 horizontal: 1,
                 vertical: 1
             }),
@@ -27,8 +26,12 @@ export class Water extends ImageBoxes {
         });
     }
 
-    pushWater(indicesBoxes: Coordinate) {
-        return this.referencePush(indicesBoxes);
+    pushWater(props: {
+        boxIndices: Plane_ENGINE;
+    }) {
+        return this.referencePush({
+            boxIndices: props.boxIndices
+        });
     }
 
     drawWater() {

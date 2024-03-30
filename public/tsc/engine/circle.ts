@@ -47,7 +47,9 @@ export class Circle extends Position_ENGINE {
   }
 
   drawCircle() {
-    const positionOnCanvas = this.canvas.positionOnCanvas(this);
+    const positionOnCanvas = this.canvas.positionOnCanvas({
+      position: this
+    });
     if (positionOnCanvas === false)
       return;
 

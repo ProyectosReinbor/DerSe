@@ -1,25 +1,30 @@
-import type { Canvas } from "../engine/canvas.js";
-import { Coordinate } from "../engine/coordinate.js";
-import type { ImageRoute } from "../engine/image.js";
-import { Scene } from "../engine/scene.js";
-import { Size } from "../engine/size.js";
-import { Map } from "./map.js";
-import { Pawn } from "./pawn.js";
-import { Sheep } from "./sheep.js";
-import { UserBar } from "./userBar.js";
+import type { Canvas_ENGINE } from "../engine/canvas.js";
+import { Coordinate_ENGINE } from "../engine/coordinate.js";
+import type { ImagePath } from "../engine/image.js";
+import { Scene_ENGINE } from "../engine/scene.js";
+import { Map_ENGINE } from "./map.js";
+import { Pawn_ENGINE } from "./pawn.js";
+import { Sheep_ENGINE } from "./sheep.js";
 
-export class Game extends Scene {
-    map: Map;
-    pawns: Pawn[] = [];
-    sheepGroup: Sheep[] = [];
+export class Game_ENGINE extends Scene_ENGINE {
+    map: Map_ENGINE;
+    pawns: Pawn_ENGINE[] = [];
+    sheepGroup: Sheep_ENGINE[] = [];
     constructor(props: {
-        canvas: Canvas
+        canvas: Canvas_ENGINE
     }) {
-        super({ canvas: props.canvas });
-        this.map = new Map({ canvas: props.canvas });
+        super({
+            canvas: props.canvas
+        });
+        this.map = new Map_ENGINE({
+            canvas: props.canvas
+        });
         this.sheepGroup = [
-            new Sheep({
-                initial: new Coordinate({ x: 35, y: 50 }),
+            new Sheep_ENGINE({
+                leftUp: new Coordinate_ENGINE({
+                    x: 35,
+                    y: 50
+                }),
                 // Math.floor(Math.random() * this.map.size.width),
                 // Math.floor(Math.random() * this.map.size.height)
                 // }),
@@ -34,13 +39,13 @@ export class Game extends Scene {
         giftPictureUrl: string;
         repeatCount: number;
         nickname: string;
-        profilePictureUrl: ImageRoute;
+        profilePictureUrl: ImagePath;
     }) {
         const exist = this.pawns.some((pawn) => pawn.nickname === gift.nickname);
         if (exist === true) return;
         this.pawns.push(
-            new Pawn({
-                initial: new Coordinate({
+            new Pawn_ENGINE({
+                leftUp: new Coordinate_ENGINE({
                     x: Math.floor(Math.random() * this.map.size.width),
                     y: Math.floor(Math.random() * this.map.size.height),
                 }),
@@ -48,12 +53,6 @@ export class Game extends Scene {
                 canvas: this.canvas,
                 color: "blue",
                 nickname: gift.nickname,
-                userBar: new UserBar({
-                    size: new Size({ width: 0, height: 0 }),
-                    canvas: this.canvas,
-                    photoRoute: gift.profilePictureUrl,
-                    nickname: gift.nickname
-                })
             })
         );
     }

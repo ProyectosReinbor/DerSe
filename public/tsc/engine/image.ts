@@ -35,7 +35,9 @@ export class Image_ENGINE extends Position_ENGINE {
     const image = this.image;
     if (image === false) return;
 
-    const positionOnTheCanvas = this.canvas.positionOnTheCanvas(this);
+    const positionOnTheCanvas = this.canvas.positionOnCanvas({
+      position: this
+    });
     if (positionOnTheCanvas === false) return;
 
     this.canvas.context.imageSmoothingEnabled = false;

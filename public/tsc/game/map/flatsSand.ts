@@ -1,81 +1,80 @@
+import type { Canvas_ENGINE } from "../../engine/canvas";
+import { Plane_ENGINE } from "../../engine/plane";
+import type { Map_GAME } from "../map";
+import { Grounds_FLOOR } from "./grounds";
 
-import type { Canvas } from "../../engine/canvas.js";
-import { Coordinate } from "../../engine/coordinate.js";
-import { Grounds } from "./grounds.js";
-import type { Map } from "../map.js";
-import { Plane } from "../../engine/plane.js";
 
-export class FlatsSand extends Grounds {
+export class FlatsSand_FLOOR extends Grounds_FLOOR {
     constructor(props: {
-        map: Map,
-        canvas: Canvas,
+        map: Map_GAME,
+        canvas: Canvas_ENGINE
     }) {
         super({
             canvas: props.canvas,
             map: props.map,
             route: "images/terrain/ground/flat.png",
             elementIndices: {
-                leftUp: new Plane({
+                leftUp: new Plane_ENGINE({
                     horizontal: 5,
                     vertical: 0
                 }),
-                up: new Plane({
+                up: new Plane_ENGINE({
                     horizontal: 6,
                     vertical: 0
                 }),
-                rightUp: new Plane({
+                rightUp: new Plane_ENGINE({
                     horizontal: 7,
                     vertical: 0
                 }),
-                left: new Plane({
+                left: new Plane_ENGINE({
                     horizontal: 5,
                     vertical: 1
                 }),
-                center: new Plane({
+                center: new Plane_ENGINE({
                     horizontal: 6,
                     vertical: 1
                 }),
-                right: new Plane({
+                right: new Plane_ENGINE({
                     horizontal: 7,
                     vertical: 1
                 }),
-                leftDown: new Plane({
+                leftDown: new Plane_ENGINE({
                     horizontal: 5,
                     vertical: 2
                 }),
-                down: new Plane({
+                down: new Plane_ENGINE({
                     horizontal: 6,
                     vertical: 2
                 }),
-                rightDown: new Plane({
+                rightDown: new Plane_ENGINE({
                     horizontal: 7,
                     vertical: 2
                 }),
-                horizontalLeft: new Plane({
+                horizontalLeft: new Plane_ENGINE({
                     horizontal: 5,
                     vertical: 3
                 }),
-                horizontalCenter: new Plane({
+                horizontalCenter: new Plane_ENGINE({
                     horizontal: 6,
                     vertical: 3
                 }),
-                horizontalRight: new Plane({
+                horizontalRight: new Plane_ENGINE({
                     horizontal: 7,
                     vertical: 3
                 }),
-                verticalUp: new Plane({
+                verticalUp: new Plane_ENGINE({
                     horizontal: 8,
                     vertical: 0
                 }),
-                verticalCenter: new Plane({
+                verticalCenter: new Plane_ENGINE({
                     horizontal: 8,
                     vertical: 1
                 }),
-                verticalDown: new Plane({
+                verticalDown: new Plane_ENGINE({
                     horizontal: 8,
                     vertical: 2
                 }),
-                only: new Plane({
+                only: new Plane_ENGINE({
                     horizontal: 8,
                     vertical: 3
                 })
@@ -83,8 +82,12 @@ export class FlatsSand extends Grounds {
         });
     }
 
-    pushFlatSand(indicesBox: Coordinate) {
-        return this.pushGround(indicesBox);
+    pushFlatSand(props: {
+        boxIndices: Plane_ENGINE;
+    }) {
+        return this.pushGround({
+            boxIndices: props.boxIndices
+        });
     }
 
     drawFlatsSand() {

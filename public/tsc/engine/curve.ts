@@ -27,14 +27,18 @@ export class Curve_ENGINE extends Position_ENGINE {
   }
 
   drawCurve() {
-    const positionOnCanvas = this.canvas.positionOnCanvas(this);
+    const positionOnCanvas = this.canvas.positionOnCanvas({
+      position: this
+    });
     if (positionOnCanvas === false)
       return;
 
-    const checkPointOnCanvas = this.canvas.positionOnCanvas(new Position_ENGINE({
-      leftUp: this.checkPoint,
-      size: new Size_ENGINE({ width: 0, height: 0 })
-    }));
+    const checkPointOnCanvas = this.canvas.positionOnCanvas({
+      position: new Position_ENGINE({
+        leftUp: this.checkPoint,
+        size: new Size_ENGINE({ width: 0, height: 0 })
+      })
+    });
     if (checkPointOnCanvas === false) return;
 
     this.canvas.context.moveTo(

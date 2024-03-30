@@ -1,13 +1,11 @@
-
-import type { Canvas } from "../../engine/canvas.js";
-import { Coordinate } from "../../engine/coordinate.js";
-import { Element } from "../../engine/element.js";
-import { ElementBoxes } from "../../engine/elementBoxes.js";
-import type { Elements } from "../../engine/elements.js";
-import type { ImageRoute } from "../../engine/image.js";
-import { Plane } from "../../engine/plane.js";
-import { Size } from "../../engine/size.js";
-import type { Map } from "../map.js";
+import type { Canvas_ENGINE } from "../../engine/canvas";
+import { Element_ENGINE } from "../../engine/element";
+import { ElementBoxes_ENGINE } from "../../engine/elementBoxes";
+import type { Elements_ENGINE } from "../../engine/elements";
+import type { ImagePath } from "../../engine/image";
+import { Plane_ENGINE } from "../../engine/plane";
+import { Size_ENGINE } from "../../engine/size";
+import type { Map_GAME } from "../map";
 
 export type GroundState = "leftUp" | "up" | "rightUp" |
     "left" | "center" | "right" |
@@ -17,36 +15,39 @@ export type GroundState = "leftUp" | "up" | "rightUp" |
     "only";
 
 export type GroundElementIndices = {
-    [key in GroundState]: Plane;
+    [key in GroundState]: Plane_ENGINE;
 };
 
-export class Grounds extends ElementBoxes {
+export class Grounds_FLOOR extends ElementBoxes_ENGINE {
 
-    override references: Elements[] = [];
+    override references: Elements_ENGINE[] = [];
     elementIndices: GroundElementIndices;
 
     constructor(props: {
-        canvas: Canvas;
-        map: Map;
-        route: ImageRoute;
+        canvas: Canvas_ENGINE;
+        map: Map_GAME;
+        route: ImagePath;
         elementIndices: GroundElementIndices;
     }) {
         super({
-            x: props.map.initial.x,
-            y: props.map.initial.y,
+            x: props.map.leftUp.x,
+            y: props.map.leftUp.y,
             canvas: props.canvas,
-            size: new Size({
+            size: new Size_ENGINE({
                 width: props.map.boxes.width,
                 height: props.map.boxes.height
             }),
-            length: new Plane({
+            length: new Plane_ENGINE({
                 horizontal: 1,
                 vertical: 1
             }),
             occupied: true,
             route: props.route,
-            element: new Element({
-                size: new Size({ width: 64, height: 64 }),
+            element: new Element_ENGINE({
+                size: new Size_ENGINE({
+                    width: 64,
+                    height: 64
+                }),
                 indices: props.elementIndices.only
             })
         });
@@ -55,11 +56,15 @@ export class Grounds extends ElementBoxes {
 
     refreshElements() {
         this.references.forEach(elements => {
-            const indicesBox = this.indicesBox(elements.initial);
-            const groundPosition = this.groundPosition(indicesBox);
+            const boxIndices = this.getBoxIndices({
+                coordinate: elements.leftUp
+            });
+            const groundPosition = this.groundPosition({
+                boxIndices
+            });
             const indices = this.elementIndices[groundPosition];
             elements.element.setIndices(
-                new Plane({
+                new Plane_ENGINE({
                     horizontal: indices.horizontal,
                     vertical: indices.vertical
                 })
@@ -67,33 +72,47 @@ export class Grounds extends ElementBoxes {
         });
     }
 
-    pushGround(indicesBox: Coordinate): Elements | undefined {
-        const ground = this.referencePush(indicesBox);
+    pushGround(props: {
+        boxIndices: Plane_ENGINE;
+    }): Elements_ENGINE | undefined {
+        const ground = this.referencePush({
+            boxIndices: props.boxIndices
+        });
         this.refreshElements();
         return ground;
     }
 
-    groundPosition(indicesBox: Coordinate): GroundState {
-        const leftBoxes = new Coordinate({
-            x: indicesBox.x - 1,
-            y: indicesBox.y
+    groundPosition(props: {
+        boxIndices: Plane_ENGINE;
+    }): GroundState {
+        const leftBoxes = new Plane_ENGINE({
+            horizontal: props.boxIndices.horizontal - 1,
+            vertical: props.boxIndices.vertical
         });
-        const rightBoxes = new Coordinate({
-            x: indicesBox.x + 1,
-            y: indicesBox.y
+        const rightBoxes = new Plane_ENGINE({
+            horizontal: props.boxIndices.horizontal + 1,
+            vertical: props.boxIndices.vertical
         });
-        const upBoxes = new Coordinate({
-            x: indicesBox.x,
-            y: indicesBox.y - 1
+        const upBoxes = new Plane_ENGINE({
+            horizontal: props.boxIndices.horizontal,
+            vertical: props.boxIndices.vertical - 1
         });
-        const downBoxes = new Coordinate({
-            x: indicesBox.x,
-            y: indicesBox.y + 1
+        const downBoxes = new Plane_ENGINE({
+            horizontal: props.boxIndices.horizontal,
+            vertical: props.boxIndices.vertical + 1
         });
-        const left = this.getBox(leftBoxes) !== undefined;
-        const right = this.getBox(rightBoxes) !== undefined;
-        const up = this.getBox(upBoxes) !== undefined;
-        const down = this.getBox(downBoxes) !== undefined;
+        const left = this.getBox({
+            boxIndices: leftBoxes
+        }) !== undefined;
+        const right = this.getBox({
+            boxIndices: rightBoxes
+        }) !== undefined;
+        const up = this.getBox({
+            boxIndices: upBoxes
+        }) !== undefined;
+        const down = this.getBox({
+            boxIndices: downBoxes
+        }) !== undefined;
 
         const isLeftUp = !up && down && !left && right;
         if (isLeftUp) return "leftUp";

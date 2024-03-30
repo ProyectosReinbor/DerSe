@@ -4,7 +4,7 @@ import { Image_ENGINE, type ImagePath } from "./image";
 import type { Plane_ENGINE } from "./plane";
 import type { Size_ENGINE } from "./size";
 
-export class ImageBoxes extends Boxes_ENGINE {
+export class ImageBoxes_ENGINE extends Boxes_ENGINE {
     override references: Image_ENGINE[] = [];
     route: ImagePath;
 

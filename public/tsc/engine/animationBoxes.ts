@@ -3,12 +3,12 @@ import { Animations_ENGINE } from "./animations";
 import type { OccupiedBoxes } from "./boxes";
 import type { Canvas_ENGINE } from "./canvas";
 import { Element_ENGINE } from "./element";
-import { ElementBoxes } from "./elementBoxes";
+import { ElementBoxes_ENGINE } from "./elementBoxes";
 import type { ImagePath } from "./image";
 import { Plane_ENGINE } from "./plane";
 import { Size_ENGINE } from "./size";
 
-export class AnimationBoxes_ENGINE extends ElementBoxes {
+export class AnimationBoxes_ENGINE extends ElementBoxes_ENGINE {
 
     override references: Animations_ENGINE[] = [];
     animation: Animation_ENGINE;

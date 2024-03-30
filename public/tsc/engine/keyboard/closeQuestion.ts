@@ -13,7 +13,7 @@ export class CloseQuestion_KEYBOARD extends Button_ENGINE {
   }) {
     super({
       canvas: props.canvas,
-      initial: props.keyboard.leftUpPlusSizePercentages({
+      leftUp: props.keyboard.leftUpPlusSizePercentages({
         percentages: new Size_ENGINE({
           width: 78,
           height: 3
@@ -50,9 +50,15 @@ export class CloseQuestion_KEYBOARD extends Button_ENGINE {
   touchendCloseQuestion(props: {
     touch: Coordinate_ENGINE;
   }) {
-    if (this.insideCoordinate(touch) === false) return false;
-    if (this.keyboard.target === false) return false;
-    this.keyboard.target.addChar("?");
+    if (this.insidePositionCoordinate({
+      coordinate: props.touch
+    }) === false)
+      return false;
+
+    if (this.keyboard.input === false)
+      return false;
+
+    this.keyboard.input.addChar("?");
     return true;
   }
 }

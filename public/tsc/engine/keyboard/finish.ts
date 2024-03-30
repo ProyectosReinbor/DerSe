@@ -1,57 +1,82 @@
-import type { Canvas } from "../canvas";
-import { Coordinate } from "../coordinate";
-import type { Keyboard } from "../keyboard";
-import { Lines } from "../lines";
-import { Rect } from "../rect";
-import { Size } from "../size";
+import type { Canvas_ENGINE } from "../canvas";
+import type { Coordinate_ENGINE } from "../coordinate";
+import type { Keyboard_ENGINE } from "../keyboard";
+import { Lines_ENGINE } from "../lines";
+import { Size_ENGINE } from "../size";
+import { Square_ENGINE } from "../square";
 
+export class Finish_KEYBOARD extends Square_ENGINE {
 
-export class Finish extends Rect {
-  seen: Lines;
-  keyboard: Keyboard;
+  seen: Lines_ENGINE;
+  keyboard: Keyboard_ENGINE;
+
   constructor(props: {
-    canvas: Canvas;
-    keyboard: Keyboard;
+    canvas: Canvas_ENGINE;
+    keyboard: Keyboard_ENGINE;
   }) {
     super({
       canvas: props.canvas,
-      initial: props.keyboard.endPercentage(
-        new Size({ width: 88, height: 3 })
-      ),
-      size: props.keyboard.size.percentage(
-        new Size({ width: 1, height: 14 })
-      ),
+      leftUp: props.keyboard.leftUpPlusSizePercentages({
+        percentages: new Size_ENGINE({
+          width: 88,
+          height: 3
+        })
+      }),
+      size: props.keyboard.size.getPercentages({
+        percentages: new Size_ENGINE({
+          width: 1,
+          height: 14
+        })
+      }),
       fillStyle: "#21618C",
       strokeStyle: "#fff",
       lineWidth: 0.5,
     });
-    this.seen = new Lines({
-      initial: this.initial,
+    this.seen = new Lines_ENGINE({
+      leftUp: this.leftUp,
       size: this.size,
       canvas: props.canvas,
       fillStyle: false,
       strokeStyle: "#fff",
       lineWidth: 0.5
     });
-    this.seen.addLine(
-      new Size({ width: 30, height: 50 }),
-      new Size({ width: 50, height: 80 })
-    );
-    this.seen.addLine(
-      new Size({ width: 70, height: 20 }),
-      new Size({ width: 0, height: 0 })
-    );
+    this.seen.addLine({
+      leftUp: new Size_ENGINE({
+        width: 30,
+        height: 50
+      }),
+      rightDown: new Size_ENGINE({
+        width: 50,
+        height: 80
+      })
+    });
+    this.seen.addLine({
+      leftUp: new Size_ENGINE({
+        width: 70,
+        height: 20
+      }),
+      rightDown: new Size_ENGINE({
+        width: 0,
+        height: 0
+      })
+    });
     this.keyboard = props.keyboard;
   }
 
-  touchendFinish(touch: Coordinate) {
-    if (this.insideCoordinate(touch) === false) return false;
-    this.keyboard.target = false;
+  touchendFinish(props: {
+    touch: Coordinate_ENGINE;
+  }) {
+    if (this.insidePositionCoordinate({
+      coordinate: props.touch
+    }) === false)
+      return false;
+
+    this.keyboard.input = false;
     return true;
   }
 
   drawFinish() {
-    this.drawRect();
+    this.drawSquare();
     this.seen.drawLines();
   }
 }

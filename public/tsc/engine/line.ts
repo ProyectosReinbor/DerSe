@@ -33,8 +33,11 @@ export class Line_ENGINE extends Position_ENGINE {
   }
 
   drawLine() {
-    const positionOnCanvas = this.canvas.positionOnCanvas(this);
-    if (positionOnCanvas === false) return;
+    const positionOnCanvas = this.canvas.positionOnCanvas({
+      position: this
+    });
+    if (positionOnCanvas === false)
+      return;
 
     this.canvas.context.beginPath();
 

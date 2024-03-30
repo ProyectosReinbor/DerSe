@@ -38,9 +38,12 @@ export class Text_ENGINE extends Position_ENGINE {
     }
 
     drawText() {
-        if (this.value.length === 0) return;
+        if (this.value.length === 0)
+            return;
 
-        const positionOnCamera = this.canvas.positionOnCamera(this);
+        const positionOnCamera = this.canvas.positionOnCamera({
+            position: this
+        });
         if (positionOnCamera === false)
             return;
 

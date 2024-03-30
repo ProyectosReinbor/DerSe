@@ -23,8 +23,12 @@ export class Canvas_ENGINE extends Camera_ENGINE {
     leftUp: Coordinate_ENGINE,
     framesPerSecond: number,
   }) {
-    super(props);
-    this.framesPerSecond = props.framesPerSecond;
+    super({
+      leftUp: props.leftUp,
+    });
+    this.setFramesPerSecond({
+      value: props.framesPerSecond
+    });
     this.element = window.document.getElementById("canvas") as HTMLCanvasElement;
     this.context = this.element.getContext("2d") as CanvasRenderingContext2D;
 
@@ -36,55 +40,71 @@ export class Canvas_ENGINE extends Camera_ENGINE {
 
     this.element.addEventListener(
       "touchstart",
-      (event) => this.touchstartCanvas(event),
+      (event) => this.touchstartCanvas({
+        event
+      }),
     );
     this.element.addEventListener(
       "touchmove",
-      (event) => this.touchmoveCanvas(event),
+      (event) => this.touchmoveCanvas({
+        event
+      }),
     );
     this.element.addEventListener(
       "touchend",
-      (event) => this.touchendCanvas(event)
+      (event) => this.touchendCanvas({
+        event
+      })
     );
 
-    this.nextFrame();
+    this.nextFrame({
+      time: 0
+    });
   }
 
-  get framesPerSecond(): number {
+  getFramesPerSecond(): number {
     return 1000 / this.intervalBetweenFrames;
   }
 
-  set framesPerSecond(value: number) {
-    this.intervalBetweenFrames = 1000 / value;
+  setFramesPerSecond(props: {
+    value: number;
+  }) {
+    this.intervalBetweenFrames = 1000 / props.value;
   }
 
-  nextFrame(time: number = 0) {
-    const difference = time - this.time;
+  nextFrame(props: {
+    time: number;
+  }) {
+    const difference = props.time - this.time;
     if (difference < this.intervalBetweenFrames) {
       requestAnimationFrame(
-        (time) => this.nextFrame(time)
+        time => this.nextFrame({
+          time
+        })
       );
       return;
     }
     this.timeBetweenFrames = difference;
-    this.time = time;
+    this.time = props.time;
     this.drawCanvas();
     requestAnimationFrame(
-      (time) => this.nextFrame(time)
+      time => this.nextFrame({
+        time
+      })
     );
   }
 
-  async start(
+  async start(props: {
     drawScene: () => void,
     touchstartScene: (touch: Coordinate_ENGINE) => void,
     touchmoveScene: (touch: Coordinate_ENGINE) => void,
     touchendScene: (touch: Coordinate_ENGINE) => void,
-  ) {
+  }) {
     await this.images.loadAll();
-    this.drawScene = drawScene;
-    this.touchstartScene = touchstartScene;
-    this.touchmoveScene = touchmoveScene;
-    this.touchendScene = touchendScene;
+    this.drawScene = props.drawScene;
+    this.touchstartScene = props.touchstartScene;
+    this.touchmoveScene = props.touchmoveScene;
+    this.touchendScene = props.touchendScene;
   }
 
   drawCanvas() {
@@ -119,24 +139,34 @@ export class Canvas_ENGINE extends Camera_ENGINE {
     this.aPercent.height = this.element.height / 100;
   }
 
-  getTouchCoordinate(touch: Touch | null) {
-    if (touch === null)
+  getTouchCoordinate(props: {
+    touch: Touch | null;
+  }) {
+    if (props.touch === null)
       return false;
 
     const left = this.margin.width / 2;
     const top = this.margin.height / 2;
     return new Coordinate_ENGINE({
-      x: touch.pageX - left,
-      y: touch.pageY - top
+      x: props.touch.pageX - left,
+      y: props.touch.pageY - top
     });
   }
 
-  touchstartCanvas(event: TouchEvent) {
-    event.preventDefault();
+  touchstartCanvas(props: {
+    event: TouchEvent;
+  }) {
+    props.event.preventDefault();
 
-    for (let index = 0; index < event.changedTouches.length; index++) {
-      const toque = event.changedTouches.item(index);
-      const coordinate = this.getTouchCoordinate(toque);
+    for (
+      let index = 0;
+      index < props.event.changedTouches.length;
+      index++
+    ) {
+      const touch = props.event.changedTouches.item(index);
+      const coordinate = this.getTouchCoordinate({
+        touch
+      });
       if (coordinate === false)
         continue;
 
@@ -144,11 +174,17 @@ export class Canvas_ENGINE extends Camera_ENGINE {
     }
   }
 
-  touchmoveCanvas(event: TouchEvent) {
-    event.preventDefault();
-    for (let index = 0; index < event.changedTouches.length; index++) {
-      const toque = event.changedTouches.item(index);
-      const coordinate = this.getTouchCoordinate(toque);
+  touchmoveCanvas(props: {
+    event: TouchEvent;
+  }) {
+    props.event.preventDefault();
+    for (
+      let index = 0;
+      index < props.event.changedTouches.length;
+      index++
+    ) {
+      const touch = props.event.changedTouches.item(index);
+      const coordinate = this.getTouchCoordinate({ touch });
       if (coordinate === false)
         continue;
 
@@ -156,11 +192,19 @@ export class Canvas_ENGINE extends Camera_ENGINE {
     }
   }
 
-  touchendCanvas(event: TouchEvent) {
-    event.preventDefault();
-    for (let index = 0; index < event.changedTouches.length; index++) {
-      const touch = event.changedTouches.item(index);
-      const coordinate = this.getTouchCoordinate(touch);
+  touchendCanvas(props: {
+    event: TouchEvent;
+  }) {
+    props.event.preventDefault();
+    for (
+      let index = 0;
+      index < props.event.changedTouches.length;
+      index++
+    ) {
+      const touch = props.event.changedTouches.item(index);
+      const coordinate = this.getTouchCoordinate({
+        touch
+      });
       if (coordinate === false)
         continue;
 

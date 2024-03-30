@@ -1,170 +1,201 @@
-import type { Canvas } from "../../engine/canvas";
-import { Castles } from "./castles";
-import { Elevations } from "./elevations";
-import { FlatElevations } from "./flatElevations";
-import { FlatsGrass } from "./flatsGrass";
-import { Shadows } from "./shadows";
-import { StairsElevations } from "./stairsElevations";
-import { Trees } from "./trees";
-import { WallElevations } from "./wallElevations";
-import type { Map } from "../map";
 import type { MapFloorMatrix } from "../mapMatrix";
-import { Coordinate } from "../../engine/coordinate";
-import type { Character } from "../../engine/character";
-import { Water } from "./water";
-import { Foams } from "./foams";
-import { FlatsSand } from "./flatsSand";
+import type { Map_ENGINE } from "../map";
+import type { Canvas_ENGINE } from "../../engine/canvas";
+import { Plane_ENGINE } from "../../engine/plane";
+import type { Character_ENGINE } from "../../engine/character";
+import { FlatsSand_FLOOR } from "./flatsSand";
+import { Elevations_FLOOR } from "./elevations";
+import { WallElevations_FLOOR } from "./wallElevations";
+import { Castles_FLOOR } from "./castles";
+import { Water_FLOOR } from "./water";
+import { Foams_FLOOR } from "./foams";
+import { FlatsGrass_FLOOR } from "./flatsGrass";
+import { Shadows_FLOOR } from "./shadows";
+import { StairsElevations_FLOOR } from "./stairsElevations";
+import { FlatElevations_FLOOR } from "./flatElevations";
+import { Trees_FLOOR } from "./trees";
 
-export class Floor {
-    map: Map;
-    canvas: Canvas;
+export class Floor_ENGINE {
 
-    water: Water;
-    foams: Foams;
-    flatsSand: FlatsSand;
-    elevations: Elevations;
-    flatsGrass: FlatsGrass;
-    shadows: Shadows;
-    wallElevations: WallElevations;
-    stairsElevation: StairsElevations;
-    flatElevations: FlatElevations;
-    castles: Castles;
-    trees: Trees;
+    map: Map_ENGINE;
+    canvas: Canvas_ENGINE;
+    water: Water_FLOOR;
+    foams: Foams_FLOOR;
+    flatsSand: FlatsSand_FLOOR;
+    elevations: Elevations_FLOOR;
+    flatsGrass: FlatsGrass_FLOOR;
+    shadows: Shadows_FLOOR;
+    wallElevations: WallElevations_FLOOR;
+    stairsElevation: StairsElevations_FLOOR;
+    flatElevations: FlatElevations_FLOOR;
+    castles: Castles_FLOOR;
+    trees: Trees_FLOOR;
 
     constructor(props: {
-        map: Map,
-        canvas: Canvas,
+        map: Map_ENGINE,
+        canvas: Canvas_ENGINE,
     }) {
         this.map = props.map;
         this.canvas = props.canvas;
 
-        this.water = new Water({
+        this.water = new Water_FLOOR({
             map: this.map,
             canvas: this.canvas
         });
 
-        this.foams = new Foams({
+        this.foams = new Foams_FLOOR({
             map: this.map,
             canvas: this.canvas
         });
 
-        this.flatsSand = new FlatsSand({
+        this.flatsSand = new FlatsSand_FLOOR({
             map: this.map,
             canvas: this.canvas
         })
 
-        this.elevations = new Elevations({
+        this.elevations = new Elevations_FLOOR({
             map: this.map,
             canvas: this.canvas,
         });
 
-        this.flatsGrass = new FlatsGrass({
+        this.flatsGrass = new FlatsGrass_FLOOR({
             map: this.map,
             canvas: this.canvas,
         });
 
-        this.shadows = new Shadows({
+        this.shadows = new Shadows_FLOOR({
             map: this.map,
             canvas: this.canvas,
         });
 
-        this.wallElevations = new WallElevations({
+        this.wallElevations = new WallElevations_FLOOR({
             map: this.map,
             canvas: this.canvas,
         });
 
-        this.stairsElevation = new StairsElevations({
+        this.stairsElevation = new StairsElevations_FLOOR({
             map: this.map,
             canvas: this.canvas,
         });
 
-        this.flatElevations = new FlatElevations({
+        this.flatElevations = new FlatElevations_FLOOR({
             map: this.map,
             canvas: this.canvas,
         });
 
-        this.castles = new Castles({
+        this.castles = new Castles_FLOOR({
             map: this.map,
             canvas: this.canvas,
         });
 
-        this.trees = new Trees({
+        this.trees = new Trees_FLOOR({
             map: this.map,
             canvas: this.canvas,
         });
     }
 
     pushFloor(matrix: MapFloorMatrix) {
-        matrix.forEach((row, y) => {
-            row.forEach((box, x) => {
-                const indicesBox = new Coordinate({ x, y });
+        matrix.forEach((row, vertical) => {
+            row.forEach((box, horizontal) => {
+                const boxIndices = new Plane_ENGINE({
+                    horizontal,
+                    vertical
+                });
 
                 if (box.water === true)
-                    this.water.pushWater(indicesBox);
+                    this.water.pushWater({
+                        boxIndices
+                    });
 
                 if (box.foam !== false) {
-                    this.foams.pushFoam(indicesBox);
+                    this.foams.pushFoam({
+                        boxIndices
+                    });
                     if (box.foam.flatSand === true)
-                        this.flatsSand.pushFlatSand(indicesBox);
+                        this.flatsSand.pushFlatSand({
+                            boxIndices: boxIndices
+                        });
                 }
 
                 if (box.elevation !== false) {
                     if (box.elevation.shadow === true)
-                        this.shadows.pushShadow(indicesBox);
+                        this.shadows.pushShadow({
+                            boxIndices
+                        });
 
                     if (box.elevation.flatGrass === true)
-                        this.flatsGrass.pushFlatGrass(indicesBox);
+                        this.flatsGrass.pushFlatGrass({
+                            boxIndices
+                        });
 
-                    this.elevations.pushElevation(indicesBox);
+                    this.elevations.pushElevation({
+                        boxIndices
+                    });
                 }
 
                 if (box.wallElevation !== false) {
                     if (box.wallElevation.shadow === true)
-                        this.shadows.pushShadow(indicesBox);
+                        this.shadows.pushShadow({
+                            boxIndices
+                        });
 
-                    this.wallElevations.pushWallElevation(indicesBox);
+                    this.wallElevations.pushWallElevation({
+                        boxIndices
+                    });
                     if (box.wallElevation.flatElevation !== false)
-                        this.flatElevations.setFlatElevation(
-                            indicesBox,
-                            box.wallElevation.flatElevation
-                        );
+                        this.flatElevations.pushFlatElevation({
+                            boxIndices,
+                            state: box.wallElevation.flatElevation
+                        });
                 }
 
                 if (box.stairElevation !== false) {
                     if (box.stairElevation.shadow === true)
-                        this.shadows.pushShadow(indicesBox);
+                        this.shadows.pushShadow({
+                            boxIndices
+                        });
 
-                    this.stairsElevation.setStairsElevations(indicesBox);
+                    this.stairsElevation.setStairsElevations({
+                        boxIndices
+                    });
 
                     if (box.stairElevation.flatElevation !== false)
-                        this.flatElevations.setFlatElevation(
-                            indicesBox,
-                            box.stairElevation.flatElevation
-                        );
+                        this.flatElevations.pushFlatElevation({
+                            boxIndices,
+                            state: box.stairElevation.flatElevation
+                        });
                 }
 
                 if (box.castle !== false) {
-                    this.castles.castlePush(
-                        indicesBox,
-                        box.castle.state,
-                        box.castle.color,
-                    );
+                    this.castles.castlePush({
+                        boxIndices,
+                        state: box.castle.state,
+                        color: box.castle.color,
+                    });
                 }
 
                 if (box.trees !== false) {
-                    this.trees.pushTree(
-                        indicesBox,
-                        box.trees.animation
-                    );
+                    this.trees.pushTree({
+                        boxIndices,
+                        state: box.trees.animation
+                    });
                 }
             });
         });
     }
 
-    aboveFloor(character: Character): boolean {
-        const flatSand = this.flatsSand.collision(character) !== false;
-        const elevations = this.elevations.collision(character) !== false;
-        const stairsElevations = this.stairsElevation.collision(character) !== false;
+    aboveFloor(props: {
+        character: Character_ENGINE;
+    }): boolean {
+        const flatSand = this.flatsSand.collision({
+            character: props.character
+        }) !== false;
+        const elevations = this.elevations.collision({
+            character: props.character
+        }) !== false;
+        const stairsElevations = this.stairsElevation.collision({
+            character: props.character
+        }) !== false;
 
         if (flatSand === true)
             return true;
@@ -178,16 +209,35 @@ export class Floor {
         return false;
     }
 
-    collisionFloor(character: Character, movedCharacter: Character): boolean {
-        const flatSand = this.flatsSand.collision(character) !== false;
-        const elevations = this.elevations.collision(character) !== false;
-        const wallElevations = this.wallElevations.collision(character) !== false;
-        const stairsElevations = this.stairsElevation.collision(character) !== false;
+    collisionFloor(props: {
+        character: Character_ENGINE;
+        moved: Character_ENGINE;
+    }): boolean {
+        const flatSand = this.flatsSand.collision({
+            character: props.character
+        }) !== false;
+        const elevations = this.elevations.collision({
+            character: props.character
+        }) !== false;
+        const wallElevations = this.wallElevations.collision({
+            character: props.character
+        }) !== false;
+        const stairsElevations = this.stairsElevation.collision({
+            character: props.character
+        }) !== false;
 
-        const nextFlatSand = this.flatsSand.collision(movedCharacter) !== false;
-        const nextElevations = this.elevations.collision(movedCharacter) !== false;
-        const nextWallElevations = this.wallElevations.collision(movedCharacter) !== false;
-        const nextStairsElevations = this.stairsElevation.collision(movedCharacter) !== false;
+        const nextFlatSand = this.flatsSand.collision({
+            character: props.moved
+        }) !== false;
+        const nextElevations = this.elevations.collision({
+            character: props.moved
+        }) !== false;
+        const nextWallElevations = this.wallElevations.collision({
+            character: props.moved
+        }) !== false;
+        const nextStairsElevations = this.stairsElevation.collision({
+            character: props.moved
+        }) !== false;
 
         if (flatSand === true) {
             if (nextFlatSand === true)

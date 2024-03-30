@@ -30,7 +30,9 @@ export class Square_ENGINE extends Position_ENGINE {
     }
 
     drawSquare() {
-        const positionOnCanvas = this.canvas.positionOnCanvas(this);
+        const positionOnCanvas = this.canvas.positionOnCanvas({
+            position: this
+        });
         if (positionOnCanvas === false)
             return;
 

@@ -1,44 +1,59 @@
-import { Canvas } from "../engine/canvas";
-import { Coordinate } from "../engine/coordinate";
-import { Image, type ImageRoute } from "../engine/image";
-import { Rect } from "../engine/rect";
-import { Size } from "../engine/size";
-import { Text } from "../engine/text";
+import type { Canvas_ENGINE } from "../engine/canvas";
+import { Coordinate_ENGINE } from "../engine/coordinate";
+import { Image_ENGINE, type ImagePath } from "../engine/image";
+import { Size_ENGINE } from "../engine/size";
+import { Square_ENGINE } from "../engine/square";
+import { Text_ENGINE } from "../engine/text";
+import type { Pawn_GAME } from "./pawn";
 
-export class UserBar extends Rect {
-    photo: Image;
-    name: Text;
+export class UserBar_PAWN extends Square_ENGINE {
+
+    pawn: Pawn_GAME;
+    photo: Image_ENGINE;
+    name: Text_ENGINE;
+
     constructor(props: {
-        size: Size,
-        canvas: Canvas,
-        photoRoute: ImageRoute,
+        pawn: Pawn_GAME,
+        size: Size_ENGINE,
+        canvas: Canvas_ENGINE,
+        photoRoute: ImagePath,
         nickname: string,
     }) {
         super({
-            initial: new Coordinate({ x: 0, y: 0 }),
+            leftUp: new Coordinate_ENGINE({
+                x: 0,
+                y: 0
+            }),
             size: props.size,
             canvas: props.canvas,
             fillStyle: "#416177",
             strokeStyle: "#fff",
             lineWidth: 0.5,
         });
-        this.photo = new Image({
-            initial: new Coordinate({ x: 0, y: 0 }),
-            size: new Size({
+        this.pawn = props.pawn;
+        this.photo = new Image_ENGINE({
+            leftUp: new Coordinate_ENGINE({
+                x: 0,
+                y: 0
+            }),
+            size: new Size_ENGINE({
                 width: this.size.width * 0.3,
                 height: this.size.height,
             }),
             canvas: this.canvas,
             route: props.photoRoute,
         });
-        this.name = new Text({
-            initial: new Coordinate({ x: 0, y: 0 }),
-            size: this.size.percentage(
-                new Size({
+        this.name = new Text_ENGINE({
+            leftUp: new Coordinate_ENGINE({
+                x: 0,
+                y: 0
+            }),
+            size: this.size.getPercentages({
+                percentages: new Size_ENGINE({
                     width: 70,
                     height: 100
                 })
-            ),
+            }),
             canvas: this.canvas,
             value: props.nickname,
             fillStyle: "#fff",
@@ -47,14 +62,14 @@ export class UserBar extends Rect {
         });
     }
 
-    drawUserBar(initial: Coordinate) {
-        this.initial.x = initial.x;
-        this.initial.y = initial.y - this.size.height;
-        this.photo.initial.x = this.initial.x;
-        this.photo.initial.y = this.initial.y;
-        this.name.initial.x = this.initial.x + this.photo.size.width;
-        this.name.initial.y = this.initial.y;
-        this.drawRect();
+    drawUserBar() {
+        this.leftUp.x = this.pawn.leftUp.x;
+        this.leftUp.y = this.pawn.leftUp.y - this.size.height;
+        this.photo.leftUp.x = this.leftUp.x;
+        this.photo.leftUp.y = this.leftUp.y;
+        this.name.leftUp.x = this.leftUp.x + this.photo.size.width;
+        this.name.leftUp.y = this.leftUp.y;
+        this.drawSquare();
         this.photo.drawImage();
         this.name.drawText();
     }

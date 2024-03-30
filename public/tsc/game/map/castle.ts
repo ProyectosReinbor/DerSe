@@ -1,23 +1,25 @@
-import type { Canvas } from "../../engine/canvas.js";
-import type { Coordinate } from "../../engine/coordinate";
-import { Image } from "../../engine/image.js";
-import { Size } from "../../engine/size.js";
+import type { Canvas_ENGINE } from "../../engine/canvas";
+import type { Coordinate_ENGINE } from "../../engine/coordinate";
+import { Image_ENGINE } from "../../engine/image";
+import type { Size_ENGINE } from "../../engine/size";
 
 export type CastleState = "construction" | "ready" | "destroyed";
 export type CastleColor = "blue" | "purple" | "red" | "yellow";
 
-export class Castle extends Image {
+export class Castle_FLOOR extends Image_ENGINE {
+
     state: CastleState = "construction";
     color: CastleColor = "blue";
+
     constructor(props: {
-        initial: Coordinate;
-        size: Size;
-        canvas: Canvas;
+        leftUp: Coordinate_ENGINE;
+        size: Size_ENGINE;
+        canvas: Canvas_ENGINE;
         state: CastleState;
         color: CastleColor;
     }) {
         super({
-            initial: props.initial,
+            leftUp: props.leftUp,
             size: props.size,
             canvas: props.canvas,
             route: false,
@@ -35,7 +37,9 @@ export class Castle extends Image {
         this.state = newState;
         this.color = newColor;
         let file: CastleState | CastleColor = this.state;
-        if (this.state === "ready") file = this.color;
+        if (this.state === "ready")
+            file = this.color;
+
         this.image = `images/factions/knights/buildings/castle/${file}.png`;
     }
 }

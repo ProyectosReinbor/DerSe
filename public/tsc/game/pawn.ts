@@ -1,61 +1,85 @@
-
-import { Animation } from "../engine/animation.js";
-import type { Canvas } from "../engine/canvas.js";
-import { Character } from "../engine/character.js";
-import { Address } from "../engine/character/address.js";
-import { Coordinate } from "../engine/coordinate.js";
-import { Element } from "../engine/element.js";
-import { Plane } from "../engine/plane.js";
-import { Size } from "../engine/size.js";
-import type { Map } from "./map.js";
-import { UserBar } from "./userBar.js";
+import { Animation_ENGINE } from "../engine/animation";
+import type { Canvas_ENGINE } from "../engine/canvas";
+import { Character_ENGINE } from "../engine/character";
+import { CharacterDirection } from "../engine/character/direction";
+import { Coordinate_ENGINE } from "../engine/coordinate";
+import { Element_ENGINE } from "../engine/element";
+import { Plane_ENGINE } from "../engine/plane";
+import { Size_ENGINE } from "../engine/size";
+import type { Map_ENGINE } from "./map";
+import { UserBar_PAWN } from "./userBar";
 
 export type PawnColor = "blue" | "purple" | "red" | "yellow";
 
-export class Pawn extends Character {
-    map: Map;
+export class Pawn_ENGINE extends Character_ENGINE {
+
+    map: Map_ENGINE;
     nickname: string;
-    userBar: UserBar;
+    userBar: UserBar_PAWN;
+
     constructor(props: {
-        initial: Coordinate,
-        map: Map,
-        canvas: Canvas,
+        leftUp: Coordinate_ENGINE,
+        map: Map_ENGINE,
+        canvas: Canvas_ENGINE,
         color: PawnColor,
         nickname: string,
-        userBar: UserBar
     }) {
         super({
-            initial: props.initial,
-            size: new Size({
+            leftUp: props.leftUp,
+            size: new Size_ENGINE({
                 width: props.map.boxes.width,
                 height: props.map.boxes.height
             }),
             canvas: props.canvas,
-            scale: new Size({
+            fillStyle: "#fff",
+            strokeStyle: false,
+            lineWidth: 0,
+            scale: new Size_ENGINE({
                 width: 3,
                 height: 3
             }),
             animations: {
                 route: `images/factions/knights/troops/pawn/${props.color}.png`,
-                element: new Element({
-                    size: new Size({ width: 192, height: 192 }),
-                    indices: new Plane({ horizontal: 6, vertical: 6 })
+                element: new Element_ENGINE({
+                    size: new Size_ENGINE({
+                        width: 192,
+                        height: 192
+                    }),
+                    indices: new Plane_ENGINE({
+                        horizontal: 6,
+                        vertical: 6
+                    })
                 }),
-                animation: new Animation({ frames: 6, framesPerSecond: 6 }),
+                animation: new Animation_ENGINE({
+                    frames: 6,
+                    framesPerSecond: 6
+                }),
             },
-            speed: new Coordinate({ x: 2, y: 2 }),
-            address: new Address({ x: 0, y: 0 }),
+            speed: new Coordinate_ENGINE({
+                x: 2,
+                y: 2
+            }),
+            address: new CharacterDirection({
+                x: 0,
+                y: 0
+            }),
         });
         this.map = props.map;
         this.nickname = props.nickname;
-        this.userBar = props.userBar;
+        this.userBar = new UserBar_PAWN({
+            pawn: this,
+            size: new Size_ENGINE({
+                width: 0,
+                height: 0
+            }),
+            canvas: this.canvas,
+            photoRoute: false,
+            nickname: this.nickname
+        })
     }
 
     drawPawn() {
         this.drawCharacter();
-        this.userBar.drawUserBar(new Coordinate({
-            x: this.initial.x + this.map.boxes.width,
-            y: this.initial.y + this.map.boxes.height
-        }));
+        this.userBar.drawUserBar();
     }
 }

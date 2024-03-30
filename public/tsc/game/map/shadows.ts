@@ -1,26 +1,25 @@
+import type { Canvas_ENGINE } from "../../engine/canvas";
+import type { Image_ENGINE } from "../../engine/image";
+import { ImageBoxes_ENGINE } from "../../engine/imageBoxes";
+import { Plane_ENGINE } from "../../engine/plane";
+import { Size_ENGINE } from "../../engine/size";
+import type { Map_GAME } from "../map";
 
-import type { Canvas } from "../../engine/canvas.js";
-import { Coordinate } from "../../engine/coordinate.js";
-import { Image } from "../../engine/image.js";
-import { ImageBoxes } from "../../engine/imageBoxes.js";
-import { Plane } from "../../engine/plane.js";
-import { Size } from "../../engine/size.js";
-import type { Map } from "../map.js";
 
-export class Shadows extends ImageBoxes {
+export class Shadows_FLOOR extends ImageBoxes_ENGINE {
     constructor(props: {
-        map: Map,
-        canvas: Canvas,
+        map: Map_GAME,
+        canvas: Canvas_ENGINE,
     }) {
         super({
-            x: props.map.initial.x,
-            y: props.map.initial.y,
+            x: props.map.leftUp.x,
+            y: props.map.leftUp.y,
             canvas: props.canvas,
-            size: new Size({
+            size: new Size_ENGINE({
                 width: props.map.boxes.width,
                 height: props.map.boxes.height
             }),
-            length: new Plane({
+            length: new Plane_ENGINE({
                 horizontal: 3,
                 vertical: 3
             }),
@@ -33,11 +32,15 @@ export class Shadows extends ImageBoxes {
         });
     }
 
-    pushShadow(indicesBox: Coordinate): Image | undefined {
-        const shadow = this.referencePush(indicesBox);
+    pushShadow(props: {
+        boxIndices: Plane_ENGINE;
+    }): Image_ENGINE | undefined {
+        const shadow = this.referencePush({
+            boxIndices: props.boxIndices
+        });
         if (shadow === undefined) return undefined;
-        shadow.initial.x -= this.size.width;
-        shadow.initial.y -= this.size.height;
+        shadow.leftUp.x -= this.size.width;
+        shadow.leftUp.y -= this.size.height;
         return shadow;
     }
 

@@ -3,8 +3,8 @@ import { Shift_KEYBOARD } from "./keyboard/shift";
 import { Enter_KEYBOARD } from "./keyboard/enter";
 import { Space_KEYBOARD } from "./keyboard/space";
 import { Delete_KEYBOARD } from "./keyboard/delete";
-import { CloseQuestion } from "./keyboard/closeQuestion";
-import { Finish } from "./keyboard/finish";
+import { CloseQuestion_KEYBOARD } from "./keyboard/closeQuestion";
+import { Finish_KEYBOARD } from "./keyboard/finish";
 import { Key_KEYBOARD } from "./keyboard/key";
 import { Square_ENGINE } from "./square";
 import type { Canvas_ENGINE } from "./canvas";
@@ -22,8 +22,8 @@ export class Keyboard_ENGINE extends Square_ENGINE {
   enter: Enter_KEYBOARD;
   space: Space_KEYBOARD;
   delete: Delete_KEYBOARD;
-  closeQuestion: CloseQuestion;
-  finish: Finish;
+  closeQuestion: CloseQuestion_KEYBOARD;
+  finish: Finish_KEYBOARD;
 
   constructor(props: {
     canvas: Canvas_ENGINE;
@@ -74,11 +74,11 @@ export class Keyboard_ENGINE extends Square_ENGINE {
       canvas: props.canvas,
       keyboard: this,
     });
-    this.closeQuestion = new CloseQuestion({
+    this.closeQuestion = new CloseQuestion_KEYBOARD({
       canvas: props.canvas,
       keyboard: this,
     });
-    this.finish = new Finish({
+    this.finish = new Finish_KEYBOARD({
       canvas: props.canvas,
       keyboard: this,
     });

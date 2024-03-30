@@ -51,17 +51,24 @@ export class Boxes_ENGINE extends Coordinate_ENGINE {
             x: props.character.rightDown.x + size.width,
             y: props.character.rightDown.y + size.height
         });
-        const boxIndicesLeftUp = this.getBoxIndices({ coordinate: leftUp });
-        const boxIndicesRightDown = this.getBoxIndices({ coordinate: rightDown });
-        const boxIndices = new Plane_ENGINE({ horizontal: 0, vertical: 0 });
+        const boxIndicesLeftUp = this.getBoxIndices({
+            coordinate: leftUp
+        });
+        const boxIndicesRightDown = this.getBoxIndices({
+            coordinate: rightDown
+        });
+        const boxIndices = new Plane_ENGINE({
+            horizontal: 0,
+            vertical: 0
+        });
         for (
-            boxIndices.vertical = boxIndicesLeftUp.y;
-            boxIndices.vertical <= boxIndicesRightDown.y;
+            boxIndices.vertical = boxIndicesLeftUp.vertical;
+            boxIndices.vertical <= boxIndicesRightDown.vertical;
             boxIndices.vertical++
         ) {
             for (
-                boxIndices.horizontal = boxIndicesLeftUp.x;
-                boxIndices.horizontal <= boxIndicesRightDown.x;
+                boxIndices.horizontal = boxIndicesLeftUp.horizontal;
+                boxIndices.horizontal <= boxIndicesRightDown.horizontal;
                 boxIndices.horizontal++
             ) {
                 const box = this.getBox({ boxIndices });
@@ -104,11 +111,14 @@ export class Boxes_ENGINE extends Coordinate_ENGINE {
     }
 
     getBoxIndices(props: {
-        coordinate: Coordinate_ENGINE
-    }): Coordinate_ENGINE {
-        const boxX = Math.floor(props.coordinate.x / this.size.width);
-        const boxY = Math.floor(props.coordinate.y / this.size.height);
-        return new Coordinate_ENGINE({ x: boxX, y: boxY });
+        coordinate: Coordinate_ENGINE;
+    }): Plane_ENGINE {
+        const horizontal = Math.floor(props.coordinate.x / this.size.width);
+        const vertical = Math.floor(props.coordinate.y / this.size.height);
+        return new Plane_ENGINE({
+            horizontal,
+            vertical
+        });
     }
 
     private boxesIndices(props: {

@@ -1,61 +1,73 @@
-
-import type { Canvas } from "../../engine/canvas.js";
-import { Coordinate } from "../../engine/coordinate.js";
-import { ElementBoxes } from "../../engine/elementBoxes.js";
-import { Elements } from "../../engine/elements.js";
-import { Element } from "../../engine/element.js";
-import { Plane } from "../../engine/plane.js";
-import { Size } from "../../engine/size.js";
-import type { Map } from "../map.js";
+import type { Canvas_ENGINE } from "../../engine/canvas";
+import { Element_ENGINE } from "../../engine/element";
+import { ElementBoxes_ENGINE } from "../../engine/elementBoxes";
+import type { Elements_ENGINE } from "../../engine/elements";
+import { Plane_ENGINE } from "../../engine/plane";
+import { Size_ENGINE } from "../../engine/size";
+import type { Map_GAME } from "../map";
 
 export type FlatElevationState = "grass" | "sand";
 export type FlatElevationElementIndices = {
-    [key in FlatElevationState]: Plane;
+    [key in FlatElevationState]: Plane_ENGINE;
 }
 
-export class FlatElevations extends ElementBoxes {
+export class FlatElevations_FLOOR extends ElementBoxes_ENGINE {
     elementIndices: FlatElevationElementIndices;
     constructor(props: {
-        map: Map,
-        canvas: Canvas,
+        map: Map_GAME,
+        canvas: Canvas_ENGINE,
     }) {
         super({
-            x: props.map.initial.x,
-            y: props.map.initial.y,
+            x: props.map.leftUp.x,
+            y: props.map.leftUp.y,
             canvas: props.canvas,
-            size: new Size({
+            size: new Size_ENGINE({
                 width: props.map.boxes.width,
                 height: props.map.boxes.height
             }),
-            length: new Plane({
+            length: new Plane_ENGINE({
                 horizontal: 1,
                 vertical: 1
             }),
             occupied: true,
             route: "images/terrain/ground/flat.png",
-            element: new Element({
-                size: new Size({ width: 64, height: 64 }),
-                indices: new Plane({ horizontal: 0, vertical: 0 })
+            element: new Element_ENGINE({
+                size: new Size_ENGINE({
+                    width: 64,
+                    height: 64
+                }),
+                indices: new Plane_ENGINE({
+                    horizontal: 0,
+                    vertical: 0
+                })
             })
         });
         this.elementIndices = {
-            grass: new Plane({ horizontal: 4, vertical: 0 }),
-            sand: new Plane({ horizontal: 9, vertical: 0 })
+            grass: new Plane_ENGINE({
+                horizontal: 4,
+                vertical: 0
+            }),
+            sand: new Plane_ENGINE({
+                horizontal: 9,
+                vertical: 0
+            })
         };
     }
 
-    setFlatElevation(
-        indicesBox: Coordinate,
-        state: FlatElevationState
-    ): Elements | undefined {
-        const indices = this.elementIndices[state];
+    pushFlatElevation(props: {
+        boxIndices: Plane_ENGINE;
+        state: FlatElevationState;
+    }): Elements_ENGINE | undefined {
+        const indices = this.elementIndices[props.state];
         this.element.setIndices(
-            new Plane({
+            new Plane_ENGINE({
                 horizontal: indices.horizontal,
                 vertical: indices.vertical
             })
         );
-        return this.referencePush(indicesBox);
+        return this.referencePush({
+            boxIndices: props.boxIndices
+        });
     }
 
     drawFlatElevations(): void {

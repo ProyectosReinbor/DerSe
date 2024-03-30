@@ -1,24 +1,26 @@
+import type { Canvas_ENGINE } from "./canvas";
+import type { Coordinate_ENGINE } from "./coordinate";
 
-export class Scene {
+export class Scene_ENGINE {
 
-    lienzo: Lienzo;
-    dibujar: () => void = () => { }
-    empezarToque: (toque: Coordenada) => void = () => { }
-    moverToque: (toque: Coordenada) => void = () => { }
-    terminarToque: (toque: Coordenada) => void = () => { }
+    canvas: Canvas_ENGINE;
+    draw: () => void = () => { }
+    touchstart: (toque: Coordinate_ENGINE) => void = () => { }
+    touchmove: (toque: Coordinate_ENGINE) => void = () => { }
+    touchend: (toque: Coordinate_ENGINE) => void = () => { }
 
-    constructor(parametros: {
-        lienzo: Lienzo;
+    constructor(props: {
+        canvas: Canvas_ENGINE;
     }) {
-        this.lienzo = parametros.lienzo;
+        this.canvas = props.canvas;
     }
 
-    async empezar() {
-        await this.lienzo.empezar(
-            () => this.dibujar(),
-            (toque: Coordenada) => this.empezarToque(toque),
-            (toque: Coordenada) => this.moverToque(toque),
-            (toque: Coordenada) => this.terminarToque(toque),
-        );
+    async start() {
+        await this.canvas.start({
+            drawScene: () => this.draw(),
+            touchstartScene: (touch: Coordinate_ENGINE) => this.touchstart(touch),
+            touchmoveScene: (touch: Coordinate_ENGINE) => this.touchmove(touch),
+            touchendScene: (touch: Coordinate_ENGINE) => this.touchend(touch),
+        });
     }
 }

@@ -1,84 +1,115 @@
-import { Animation } from "../engine/animation";
-import type { Canvas } from "../engine/canvas";
-import { Character } from "../engine/character";
-import { Address } from "../engine/character/address";
-import { Coordinate } from "../engine/coordinate";
-import { Element } from "../engine/element";
-import { Line } from "../engine/line";
-import { Plane } from "../engine/plane";
-import { Size } from "../engine/size";
-import type { Map } from "./map";
+import { Animation_ENGINE } from "../engine/animation";
+import type { Canvas_ENGINE } from "../engine/canvas";
+import { Character_ENGINE } from "../engine/character";
+import { CharacterDirection } from "../engine/character/direction";
+import { Coordinate_ENGINE } from "../engine/coordinate";
+import { Element_ENGINE } from "../engine/element";
+import { Line_ENGINE } from "../engine/line";
+import { Plane_ENGINE } from "../engine/plane";
+import { Size_ENGINE } from "../engine/size";
+import type { Map_ENGINE } from "./map";
 
 export type SheepState = "move" | "jump";
-export type SheepCharacter = {
+export type SheepStates = {
     [key in SheepState]: {
-        animation: Animation;
+        animation: Animation_ENGINE;
         element: {
-            indices: Plane;
+            indices: Plane_ENGINE;
         };
     }
 }
 
-export class Sheep extends Character {
-    sightline: Line;
+export class Sheep_ENGINE extends Character_ENGINE {
+
+    lineSight: Line_ENGINE;
     state: SheepState = "move";
-    character: SheepCharacter = {
+    states: SheepStates = {
         move: {
-            animation: new Animation({
+            animation: new Animation_ENGINE({
                 frames: 8,
                 framesPerSecond: 8
             }),
             element: {
-                indices: new Plane({ horizontal: 0, vertical: 0 })
+                indices: new Plane_ENGINE({
+                    horizontal: 0,
+                    vertical: 0
+                })
             }
         },
         jump: {
-            animation: new Animation({
+            animation: new Animation_ENGINE({
                 frames: 6,
                 framesPerSecond: 6
             }),
             element: {
-                indices: new Plane({ horizontal: 0, vertical: 1 })
+                indices: new Plane_ENGINE({
+                    horizontal: 0,
+                    vertical: 1
+                })
             }
         }
     };
     jumpTimer: number = 0;
-    map: Map;
+    map: Map_ENGINE;
+
     constructor(props: {
-        initial: Coordinate,
-        map: Map,
-        canvas: Canvas,
+        leftUp: Coordinate_ENGINE,
+        map: Map_ENGINE,
+        canvas: Canvas_ENGINE,
     }) {
         super({
-            initial: props.initial,
-            size: new Size({
+            leftUp: props.leftUp,
+            size: new Size_ENGINE({
                 width: props.map.boxes.width,
                 height: props.map.boxes.height
             }),
             canvas: props.canvas,
-            scale: new Size({
+            fillStyle: "#fff",
+            strokeStyle: false,
+            lineWidth: 0,
+            scale: new Size_ENGINE({
                 width: 3,
                 height: 3
             }),
             animations: {
                 route: "images/resources/sheep.png",
-                element: new Element({
-                    size: new Size({ width: 128, height: 128 }),
-                    indices: new Plane({ horizontal: 0, vertical: 0 })
+                element: new Element_ENGINE({
+                    size: new Size_ENGINE({
+                        width: 128,
+                        height: 128
+                    }),
+                    indices: new Plane_ENGINE({
+                        horizontal: 0,
+                        vertical: 0
+                    })
                 }),
-                animation: new Animation({ frames: 8, framesPerSecond: 8 })
+                animation: new Animation_ENGINE({
+                    frames: 8,
+                    framesPerSecond: 8
+                })
             },
-            speed: new Coordinate({ x: 40, y: 40 }),
-            address: new Address({ x: 0, y: 0 }),
+            speed: new Coordinate_ENGINE({
+                x: 40,
+                y: 40
+            }),
+            address: new CharacterDirection({
+                x: 0,
+                y: 0
+            }),
         });
         this.map = props.map;
         this.state = "move";
-        this.sightline = new Line({
-            initial: new Coordinate({
-                x: this.initial.x + this.size.width / 2,
-                y: this.initial.y + this.size.height / 2
+        this.lineSight = new Line_ENGINE({
+            leftUp: new Coordinate_ENGINE({
+                x: this.leftUp.x + this.size.width / 2,
+                y: this.leftUp.y + this.size.height / 2
             }),
-            end: this.endPercentage(new Size({ width: 200, height: 50 })),
+            rightDown: this.leftUpPlusSizePercentages({
+                percentages: new Size_ENGINE({
+                    width: 200,
+                    height: 50
+                })
+            }),
             canvas: this.canvas,
             fillStyle: false,
             strokeStyle: "#333",
@@ -87,21 +118,20 @@ export class Sheep extends Character {
     }
 
     moveSheep() {
-        const movedCharacter = this.movedCharacter();
-        if (movedCharacter === false)
+        const moved = this.movedCharacter();
+        if (moved === false)
             return false;
 
-        const collision = this.map.collisionMap(this, movedCharacter);
+        const collision = this.map.collisionMap({
+            character: this,
+            moved
+        });
         if (collision === true) {
             return false;
         }
 
-
-        this.map.collison
-        this.sightline.end
-
-        this.initial.x = movedCharacter.initial.x;
-        this.initial.y = movedCharacter.initial.y;
+        this.leftUp.x = moved.leftUp.x;
+        this.leftUp.y = moved.leftUp.y;
         return true;
     }
 
@@ -118,12 +148,12 @@ export class Sheep extends Character {
     }
 
     refreshState() {
-        let character = this.character[this.state];
+        let character = this.states[this.state];
         if (this.animations.element.getIndices().vertical === character.element.indices.vertical)
             return;
 
         this.animations.element.setIndices(
-            new Plane({
+            new Plane_ENGINE({
                 horizontal: character.element.indices.horizontal,
                 vertical: character.element.indices.vertical
             })
@@ -137,6 +167,6 @@ export class Sheep extends Character {
         this.moveSheep();
         this.jumpSheep();
         this.drawCharacter();
-        this.sightline.drawLine();
+        this.lineSight.drawLine();
     }
 }
