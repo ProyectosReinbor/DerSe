@@ -6,35 +6,37 @@ import type { Coordinate_ENGINE } from "./coordinate.js";
 import { Curve_ENGINE } from "./curve.js";
 
 export class Curves_ENGINE {
+
   curves: Curve_ENGINE[] = [];
   canvas: Canvas_ENGINE;
   fillStyle: FillStyle;
   strokeStyle: StrokeStyle;
   lineWidth: number;
-  constructor(props: {
-    canvas: Canvas_ENGINE;
-    fillStyle: FillStyle;
-    strokeStyle: StrokeStyle;
-    lineWidth: number;
-  }) {
-    this.canvas = props.canvas;
-    this.fillStyle = props.fillStyle;
-    this.strokeStyle = props.strokeStyle;
-    this.lineWidth = props.lineWidth;
+
+  constructor(
+    canvas: Canvas_ENGINE,
+    fillStyle: FillStyle,
+    strokeStyle: StrokeStyle,
+    lineWidth: number,
+  ) {
+    this.canvas = canvas;
+    this.fillStyle = fillStyle;
+    this.strokeStyle = strokeStyle;
+    this.lineWidth = lineWidth;
   }
 
-  addCurve(props: {
+  addCurve(
     leftUp: Coordinate_ENGINE,
     rightDown: Coordinate_ENGINE,
     checkPoint: Coordinate_ENGINE,
-  }) {
+  ) {
     this.curves.push(
-      new Curve_ENGINE({
-        leftUp: props.leftUp,
-        rightDown: props.rightDown,
-        canvas: this.canvas,
-        checkPoint: props.checkPoint,
-      })
+      new Curve_ENGINE(
+        leftUp,
+        rightDown,
+        this.canvas,
+        checkPoint,
+      )
     );
   }
 

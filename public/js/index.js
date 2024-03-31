@@ -205,6 +205,7 @@ class Canvas_ENGINE extends Camera_ENGINE {
   timeBetweenFrames = 0;
   element;
   context;
+  useInnerScreenSize = true;
   drawScene() {
   }
   touchstartScene = () => {
@@ -269,20 +270,23 @@ class Canvas_ENGINE extends Camera_ENGINE {
     this.context.clearRect(0, 0, this.element.width, this.element.height);
     this.drawScene();
   }
-  aspectRatio() {
-    const screen = new window.Screen;
-    const ratio = 0.5625;
-    this.element.width = screen.width;
-    this.element.height = screen.height * ratio;
-    if (this.element.height > screen.height) {
-      const ratio2 = 1.7777777777777777;
-      this.element.height = screen.height;
-      this.element.width = screen.height * ratio2;
+  getScreenSize() {
+    if (this.useInnerScreenSize === true) {
+      return new Size_ENGINE({
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
     }
-    this.margin.width = screen.width - this.element.width;
-    this.margin.height = screen.height - this.element.height;
-    this.element.style.left = `${this.margin.width / 2}px`;
-    this.element.style.top = `${this.margin.height / 2}px`;
+    return new Size_ENGINE({
+      width: window.screen.width,
+      height: window.screen.height
+    });
+  }
+  aspectRatio() {
+    const screenSize = this.getScreenSize();
+    const ratio = 0.5625;
+    this.element.width = screenSize.height;
+    this.element.height = screenSize.height;
     this.aPercent.width = this.element.width / 100;
     this.aPercent.height = this.element.height / 100;
   }

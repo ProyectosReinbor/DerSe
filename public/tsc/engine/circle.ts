@@ -14,7 +14,7 @@ export class Circle extends Position_ENGINE {
   strokeStyle: StrokeStyle;
   lineWidth: number;
 
-  constructor(props: {
+  constructor(
     leftUp: Coordinate_ENGINE,
     size: Size_ENGINE,
     canvas: Canvas_ENGINE,
@@ -24,18 +24,18 @@ export class Circle extends Position_ENGINE {
     fillStyle: FillStyle,
     strokeStyle: StrokeStyle,
     lineWidth: number,
-  }) {
-    super({
-      leftUp: props.leftUp,
-      size: props.size,
-    });
-    this.canvas = props.canvas;
-    this.startingDegrees = props.startingDegrees;
-    this.finalDegrees = props.finalDegrees;
-    this.counterclockwise = props.counterclockwise;
-    this.fillStyle = props.fillStyle;
-    this.strokeStyle = props.strokeStyle;
-    this.lineWidth = props.lineWidth;
+  ) {
+    super(
+      leftUp,
+      size,
+    );
+    this.canvas = canvas;
+    this.startingDegrees = startingDegrees;
+    this.finalDegrees = finalDegrees;
+    this.counterclockwise = counterclockwise;
+    this.fillStyle = fillStyle;
+    this.strokeStyle = strokeStyle;
+    this.lineWidth = lineWidth;
   }
 
   get startingRadians() {
@@ -47,9 +47,7 @@ export class Circle extends Position_ENGINE {
   }
 
   drawCircle() {
-    const positionOnCanvas = this.canvas.positionOnCanvas({
-      position: this
-    });
+    const positionOnCanvas = this.canvas.positionOnCanvas(this);
     if (positionOnCanvas === false)
       return;
 

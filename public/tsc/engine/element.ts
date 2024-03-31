@@ -4,15 +4,15 @@ import { Position_ENGINE } from "./position";
 import type { Size_ENGINE } from "./size";
 
 export class Element_ENGINE extends Position_ENGINE {
-    constructor(props: {
+    constructor(
         size: Size_ENGINE,
         indices: Plane_ENGINE,
-    }) {
-        super({
-            leftUp: new Coordinate_ENGINE({ x: 0, y: 0 }),
-            size: props.size,
-        });
-        this.setIndices(props.indices);
+    ) {
+        super(
+            new Coordinate_ENGINE(0, 0),
+            size,
+        );
+        this.setIndices(indices);
     }
 
     setIndices(newIndices: Plane_ENGINE) {
@@ -21,25 +21,25 @@ export class Element_ENGINE extends Position_ENGINE {
     }
 
     getIndices(): Plane_ENGINE {
-        return new Plane_ENGINE({
-            horizontal: this.leftUp.x / this.size.width,
-            vertical: this.leftUp.y / this.size.height,
-        });
+        return new Plane_ENGINE(
+            this.leftUp.x / this.size.width,
+            this.leftUp.y / this.size.height,
+        );
     }
 
     nextFrame(frames: number) {
         this.setIndices(
-            new Plane_ENGINE({
-                horizontal: this.getIndices().horizontal + 1,
-                vertical: this.getIndices().vertical
-            })
+            new Plane_ENGINE(
+                this.getIndices().horizontal + 1,
+                this.getIndices().vertical
+            )
         );
         if (this.getIndices().horizontal >= frames)
             this.setIndices(
-                new Plane_ENGINE({
-                    horizontal: 0,
-                    vertical: this.getIndices().vertical
-                })
+                new Plane_ENGINE(
+                    0,
+                    this.getIndices().vertical
+                )
             );
     }
 }

@@ -8,38 +8,37 @@ export class Curve_ENGINE extends Position_ENGINE {
   canvas: Canvas_ENGINE;
   checkPoint: Coordinate_ENGINE;
 
-  constructor(props: {
+  constructor(
     leftUp: Coordinate_ENGINE,
     rightDown: Coordinate_ENGINE,
     canvas: Canvas_ENGINE,
     checkPoint: Coordinate_ENGINE,
-  }) {
-    const size = new Size_ENGINE({
-      width: props.rightDown.x - props.leftUp.x,
-      height: props.rightDown.y - props.leftUp.y
-    });
-    super({
-      leftUp: props.leftUp,
+  ) {
+    const size = new Size_ENGINE(
+      rightDown.x - leftUp.x,
+      rightDown.y - leftUp.y
+    );
+    super(
+      leftUp,
       size,
-    });
-    this.canvas = props.canvas;
-    this.checkPoint = props.checkPoint;
+    );
+    this.canvas = canvas;
+    this.checkPoint = checkPoint;
   }
 
   drawCurve() {
-    const positionOnCanvas = this.canvas.positionOnCanvas({
-      position: this
-    });
+    const positionOnCanvas = this.canvas.positionOnCanvas(this);
     if (positionOnCanvas === false)
       return;
 
-    const checkPointOnCanvas = this.canvas.positionOnCanvas({
-      position: new Position_ENGINE({
-        leftUp: this.checkPoint,
-        size: new Size_ENGINE({ width: 0, height: 0 })
-      })
-    });
-    if (checkPointOnCanvas === false) return;
+    const checkPointOnCanvas = this.canvas.positionOnCanvas(
+      new Position_ENGINE(
+        this.checkPoint,
+        new Size_ENGINE(0, 0)
+      )
+    );
+    if (checkPointOnCanvas === false)
+      return;
 
     this.canvas.context.moveTo(
       positionOnCanvas.leftUp.x,

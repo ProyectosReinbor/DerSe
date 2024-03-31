@@ -5,30 +5,29 @@ import { Position_ENGINE } from "./position";
 import { Size_ENGINE } from "./size";
 
 export class Canvas_ENGINE extends Camera_ENGINE {
-  aPercent: Size_ENGINE = new Size_ENGINE({ width: 0, height: 0 });
-  margin: Size_ENGINE = new Size_ENGINE({ width: 0, height: 0 });
+  aPercent: Size_ENGINE = new Size_ENGINE(0, 0);
+  margin: Size_ENGINE = new Size_ENGINE(0, 0);
   images: Images_ENGINE = new Images_ENGINE;
   intervalBetweenFrames: number = 0;
   time: number = 0;
   timeBetweenFrames: number = 0;
   element: HTMLCanvasElement;
   context: CanvasRenderingContext2D;
+  useInnerScreenSize: boolean;
 
   drawScene() { }
   touchstartScene: (toque: Coordinate_ENGINE) => void = () => { }
   touchmoveScene: (toque: Coordinate_ENGINE) => void = () => { };
   touchendScene: (toque: Coordinate_ENGINE) => void = () => { };
 
-  constructor(props: {
+  constructor(
     leftUp: Coordinate_ENGINE,
     framesPerSecond: number,
-  }) {
-    super({
-      leftUp: props.leftUp,
-    });
-    this.setFramesPerSecond({
-      value: props.framesPerSecond
-    });
+    useInnerScreenSize: boolean,
+  ) {
+    super(leftUp);
+    this.useInnerScreenSize = useInnerScreenSize;
+    this.setFramesPerSecond(framesPerSecond);
     this.element = window.document.getElementById("canvas") as HTMLCanvasElement;
     this.context = this.element.getContext("2d") as CanvasRenderingContext2D;
 
@@ -40,71 +39,55 @@ export class Canvas_ENGINE extends Camera_ENGINE {
 
     this.element.addEventListener(
       "touchstart",
-      (event) => this.touchstartCanvas({
-        event
-      }),
+      (event) => this.touchstartCanvas(event),
     );
     this.element.addEventListener(
       "touchmove",
-      (event) => this.touchmoveCanvas({
-        event
-      }),
+      (event) => this.touchmoveCanvas(event),
     );
     this.element.addEventListener(
       "touchend",
-      (event) => this.touchendCanvas({
-        event
-      })
+      (event) => this.touchendCanvas(event)
     );
 
-    this.nextFrame({
-      time: 0
-    });
+    this.nextFrame(0);
   }
 
   getFramesPerSecond(): number {
     return 1000 / this.intervalBetweenFrames;
   }
 
-  setFramesPerSecond(props: {
-    value: number;
-  }) {
-    this.intervalBetweenFrames = 1000 / props.value;
+  setFramesPerSecond(value: number) {
+    this.intervalBetweenFrames = 1000 / value;
   }
 
-  nextFrame(props: {
-    time: number;
-  }) {
-    const difference = props.time - this.time;
+  nextFrame(time: number) {
+    const difference = time - this.time;
     if (difference < this.intervalBetweenFrames) {
       requestAnimationFrame(
-        time => this.nextFrame({
-          time
-        })
+        time => this.nextFrame(time)
       );
       return;
     }
     this.timeBetweenFrames = difference;
-    this.time = props.time;
+    this.time = time;
     this.drawCanvas();
     requestAnimationFrame(
-      time => this.nextFrame({
-        time
-      })
+      time => this.nextFrame(time)
     );
   }
 
-  async start(props: {
+  async start(
     drawScene: () => void,
     touchstartScene: (touch: Coordinate_ENGINE) => void,
     touchmoveScene: (touch: Coordinate_ENGINE) => void,
     touchendScene: (touch: Coordinate_ENGINE) => void,
-  }) {
+  ) {
     await this.images.loadAll();
-    this.drawScene = props.drawScene;
-    this.touchstartScene = props.touchstartScene;
-    this.touchmoveScene = props.touchmoveScene;
-    this.touchendScene = props.touchendScene;
+    this.drawScene = drawScene;
+    this.touchstartScene = touchstartScene;
+    this.touchmoveScene = touchmoveScene;
+    this.touchendScene = touchendScene;
   }
 
   drawCanvas() {
@@ -112,63 +95,65 @@ export class Canvas_ENGINE extends Camera_ENGINE {
     this.drawScene();
   }
 
-  aspectRatio() {
-    /*const screen = new Size_ENGINE({
-      width: window.innerWidth,
-      height: window.innerHeight
-    });*/
+  getScreenSize() {
+    if (this.useInnerScreenSize === true) {
+      return new Size_ENGINE(
+        window.innerWidth,
+        window.innerHeight
+      );
+    }
+    return new Size_ENGINE(
+      window.screen.width,
+      window.screen.height
+    );
+  }
 
-    const screen = new window.Screen();
+  aspectRatio() {
+    const screenSize = this.getScreenSize();
 
     const ratio = 720 / 1280;
-    this.element.width = screen.width;
-    this.element.height = screen.height * ratio;
+    // this.element.width = screenSize.width * ratio;
+    // this.element.height = screenSize.height;
 
-    if (this.element.height > screen.height) {
-      const ratio = 1280 / 720;
-      this.element.height = screen.height;
-      this.element.width = screen.height * ratio;
-    }
+    // if (screenSize.width < screenSize.height) {
+    this.element.width = screenSize.height;
+    this.element.height = screenSize.height;
+    // }
 
+    // this.margin.width = screenSize.width - this.element.width;
+    // this.margin.height = screenSize.height - this.element.height;
 
-    this.margin.width = screen.width - this.element.width;
-    this.margin.height = screen.height - this.element.height;
-
-    this.element.style.left = `${this.margin.width / 2}px`;
-    this.element.style.top = `${this.margin.height / 2}px`;
+    // this.element.style.left = `${this.margin.width / 2}px`;
+    // this.element.style.top = `${this.margin.height / 2}px`;
 
     this.aPercent.width = this.element.width / 100;
     this.aPercent.height = this.element.height / 100;
   }
 
-  getTouchCoordinate(props: {
-    touch: Touch | null;
-  }) {
-    if (props.touch === null)
+  getTouchCoordinate(touch: Touch | null) {
+    if (touch === null)
       return false;
 
     const left = this.margin.width / 2;
     const top = this.margin.height / 2;
-    return new Coordinate_ENGINE({
-      x: props.touch.pageX - left,
-      y: props.touch.pageY - top
-    });
+    return new Coordinate_ENGINE(
+      touch.pageX - left,
+      touch.pageY - top
+    );
   }
 
-  touchstartCanvas(props: {
-    event: TouchEvent;
-  }) {
-    props.event.preventDefault();
+  touchstartCanvas(
+    event: TouchEvent
+  ) {
+    event.preventDefault();
 
     for (
       let index = 0;
-      index < props.event.changedTouches.length;
+      index < event.changedTouches.length;
       index++
     ) {
-      const touch = props.event.changedTouches.item(index);
-      const coordinate = this.getTouchCoordinate({
-        touch
-      });
+      const touch = event.changedTouches.item(index);
+      const coordinate = this.getTouchCoordinate(touch);
       if (coordinate === false)
         continue;
 
@@ -176,17 +161,15 @@ export class Canvas_ENGINE extends Camera_ENGINE {
     }
   }
 
-  touchmoveCanvas(props: {
-    event: TouchEvent;
-  }) {
-    props.event.preventDefault();
+  touchmoveCanvas(event: TouchEvent) {
+    event.preventDefault();
     for (
       let index = 0;
-      index < props.event.changedTouches.length;
+      index < event.changedTouches.length;
       index++
     ) {
-      const touch = props.event.changedTouches.item(index);
-      const coordinate = this.getTouchCoordinate({ touch });
+      const touch = event.changedTouches.item(index);
+      const coordinate = this.getTouchCoordinate(touch);
       if (coordinate === false)
         continue;
 
@@ -194,19 +177,15 @@ export class Canvas_ENGINE extends Camera_ENGINE {
     }
   }
 
-  touchendCanvas(props: {
-    event: TouchEvent;
-  }) {
-    props.event.preventDefault();
+  touchendCanvas(event: TouchEvent) {
+    event.preventDefault();
     for (
       let index = 0;
-      index < props.event.changedTouches.length;
+      index < event.changedTouches.length;
       index++
     ) {
-      const touch = props.event.changedTouches.item(index);
-      const coordinate = this.getTouchCoordinate({
-        touch
-      });
+      const touch = event.changedTouches.item(index);
+      const coordinate = this.getTouchCoordinate(touch);
       if (coordinate === false)
         continue;
 
@@ -214,56 +193,46 @@ export class Canvas_ENGINE extends Camera_ENGINE {
     }
   }
 
-  positionOnCanvas(props: {
-    position: Position_ENGINE;
-  }) {
-    const positionOnCamera = this.positionOnCamera({
-      position: props.position
-    });
+  positionOnCanvas(
+    position: Position_ENGINE
+  ) {
+    const positionOnCamera = this.positionOnCamera(position);
     if (positionOnCamera === false)
       return false;
 
-    return new Position_ENGINE({
-      leftUp: new Coordinate_ENGINE({
-        x: this.getWidthInPixels({
-          percentage: positionOnCamera.leftUp.x
-        }),
-        y: this.getHeightInPixels({
-          percentage: positionOnCamera.leftUp.y
-        }),
-      }),
-      size: new Size_ENGINE({
-        width: this.getWidthInPixels({
-          percentage: positionOnCamera.size.width
-        }),
-        height: this.getHeightInPixels({
-          percentage: positionOnCamera.size.height
-        })
-      })
-    });
+    return new Position_ENGINE(
+      new Coordinate_ENGINE(
+        this.getWidthInPixels(
+          positionOnCamera.leftUp.x
+        ),
+        this.getHeightInPixels(
+          positionOnCamera.leftUp.y
+        ),
+      ),
+      new Size_ENGINE(
+        this.getWidthInPixels(
+          positionOnCamera.size.width
+        ),
+        this.getHeightInPixels(
+          positionOnCamera.size.height
+        )
+      )
+    );
   }
 
-  getWidthInPercentages(props: {
-    pixels: number;
-  }) {
-    return props.pixels / this.aPercent.width;
+  getWidthInPercentages(pixels: number) {
+    return pixels / this.aPercent.width;
   }
 
-  getWidthInPixels(props: {
-    percentage: number;
-  }) {
-    return props.percentage * this.aPercent.width;
+  getWidthInPixels(percentage: number) {
+    return percentage * this.aPercent.width;
   }
 
-  getHeightInPercentages(props: {
-    pixels: number;
-  }) {
-    return props.pixels / this.aPercent.height;
+  getHeightInPercentages(pixels: number) {
+    return pixels / this.aPercent.height;
   }
 
-  getHeightInPixels(props: {
-    percentage: number;
-  }) {
-    return props.percentage * this.aPercent.height;
+  getHeightInPixels(percentage: number) {
+    return percentage * this.aPercent.height;
   }
 }

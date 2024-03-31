@@ -11,16 +11,18 @@ export class Image_ENGINE extends Position_ENGINE {
   route: ImagePath;
   reflected: boolean;
 
-  constructor(props: {
+  constructor(
     leftUp: Coordinate_ENGINE,
     size: Size_ENGINE,
     canvas: Canvas_ENGINE,
     route: ImagePath,
-  }) {
-    super(props);
-    this.canvas = props.canvas;
-    this.route = props.route;
-    this.canvas.images
+  ) {
+    super(
+      leftUp,
+      size
+    );
+    this.canvas = canvas;
+    this.route = route;
     this.canvas.images.addRoute(this.route);
     this.reflected = true;
   }
@@ -35,12 +37,12 @@ export class Image_ENGINE extends Position_ENGINE {
 
   drawImage() {
     const image = this.image;
-    if (image === false) return;
+    if (image === false)
+      return;
 
-    const positionOnTheCanvas = this.canvas.positionOnCanvas({
-      position: this
-    });
-    if (positionOnTheCanvas === false) return;
+    const positionOnTheCanvas = this.canvas.positionOnCanvas(this);
+    if (positionOnTheCanvas === false)
+      return;
 
     if (this.reflected === true) {
       this.canvas.context.scale(-1, 1);

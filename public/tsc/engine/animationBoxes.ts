@@ -13,60 +13,56 @@ export class AnimationBoxes_ENGINE extends ElementBoxes_ENGINE {
     override references: Animations_ENGINE[] = [];
     animation: Animation_ENGINE;
 
-    constructor(props: {
-        x: number;
-        y: number;
-        canvas: Canvas_ENGINE;
-        size: Size_ENGINE;
-        length: Plane_ENGINE;
-        occupied: OccupiedBoxes;
-        route: ImagePath;
-        element: Element_ENGINE;
-        animation: Animation_ENGINE;
-    }) {
-        super({
-            x: props.x,
-            y: props.y,
-            canvas: props.canvas,
-            size: props.size,
-            length: props.length,
-            occupied: props.occupied,
-            route: props.route,
-            element: props.element,
-        });
-        this.animation = props.animation;
+    constructor(
+        x: number,
+        y: number,
+        canvas: Canvas_ENGINE,
+        size: Size_ENGINE,
+        length: Plane_ENGINE,
+        occupied: OccupiedBoxes,
+        route: ImagePath,
+        element: Element_ENGINE,
+        animation: Animation_ENGINE,
+    ) {
+        super(
+            x,
+            y,
+            canvas,
+            size,
+            length,
+            occupied,
+            route,
+            element
+        );
+        this.animation = animation;
     }
 
-    override referencePush(props: {
-        boxIndices: Plane_ENGINE;
-    }): Animations_ENGINE | undefined {
-        const position = this.getPosition({
-            boxIndices: props.boxIndices
-        });
-        const reference = new Animations_ENGINE({
-            leftUp: position.leftUp,
-            size: position.size,
-            canvas: this.canvas,
-            route: this.route,
-            element: new Element_ENGINE({
-                size: new Size_ENGINE({
-                    width: this.element.size.width,
-                    height: this.element.size.height
-                }),
-                indices: new Plane_ENGINE({
-                    horizontal: 0,
-                    vertical: this.element.getIndices().vertical
-                })
-            }),
-            animation: new Animation_ENGINE({
-                frames: this.animation.frames,
-                framesPerSecond: this.animation.framesPerSecond
-            })
-        });
-        const indexReference = this.referencesPush({
-            boxIndices: props.boxIndices,
+    override referencePush(boxIndices: Plane_ENGINE): Animations_ENGINE | undefined {
+        const position = this.getPosition(boxIndices);
+        const reference = new Animations_ENGINE(
+            position.leftUp,
+            position.size,
+            this.canvas,
+            this.route,
+            new Element_ENGINE(
+                new Size_ENGINE(
+                    this.element.size.width,
+                    this.element.size.height
+                ),
+                new Plane_ENGINE(
+                    0,
+                    this.element.getIndices().vertical
+                )
+            ),
+            new Animation_ENGINE(
+                this.animation.frames,
+                this.animation.framesPerSecond
+            )
+        );
+        const indexReference = this.referencesPush(
+            boxIndices,
             reference
-        });
+        );
         if (indexReference === undefined)
             return undefined;
 

@@ -8,43 +8,39 @@ export class ImageBoxes_ENGINE extends Boxes_ENGINE {
     override references: Image_ENGINE[] = [];
     route: ImagePath;
 
-    constructor(props: {
-        x: number;
-        y: number;
-        canvas: Canvas_ENGINE;
-        size: Size_ENGINE;
-        length: Plane_ENGINE;
-        occupied: OccupiedBoxes;
-        route: ImagePath;
-    }) {
-        super({
-            x: props.x,
-            y: props.y,
-            canvas: props.canvas,
-            size: props.size,
-            length: props.length,
-            occupied: props.occupied,
-        });
-        this.route = props.route;
+    constructor(
+        x: number,
+        y: number,
+        canvas: Canvas_ENGINE,
+        size: Size_ENGINE,
+        length: Plane_ENGINE,
+        occupied: OccupiedBoxes,
+        route: ImagePath,
+    ) {
+        super(
+            x,
+            y,
+            canvas,
+            size,
+            length,
+            occupied,
+        );
+        this.route = route;
     }
 
-    override referencePush(props: {
-        boxIndices: Plane_ENGINE;
-    }): Image_ENGINE | undefined {
-        const position = this.getPosition({
-            boxIndices: props.boxIndices
-        });
-        const reference = new Image_ENGINE({
-            leftUp: position.leftUp,
-            size: position.size,
-            canvas: this.canvas,
-            route: this.route,
-        });
+    override referencePush(boxIndices: Plane_ENGINE): Image_ENGINE | undefined {
+        const position = this.getPosition(boxIndices);
+        const reference = new Image_ENGINE(
+            position.leftUp,
+            position.size,
+            this.canvas,
+            this.route,
+        );
 
-        const indexReference = this.referencesPush({
-            boxIndices: props.boxIndices,
+        const indexReference = this.referencesPush(
+            boxIndices,
             reference
-        });
+        );
         if (indexReference === undefined)
             return undefined;
 

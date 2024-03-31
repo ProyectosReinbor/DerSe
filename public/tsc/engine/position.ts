@@ -6,84 +6,76 @@ export class Position_ENGINE {
   leftUp: Coordinate_ENGINE;
   size: Size_ENGINE;
 
-  constructor(props: {
-    leftUp: Coordinate_ENGINE;
-    size: Size_ENGINE;
-  }) {
-    this.leftUp = props.leftUp;
-    this.size = props.size;
+  constructor(
+    leftUp: Coordinate_ENGINE,
+    size: Size_ENGINE,
+  ) {
+    this.leftUp = leftUp;
+    this.size = size;
   }
 
   get leftDown() {
-    return new Coordinate_ENGINE({
-      x: this.leftUp.x,
-      y: this.leftUp.y + this.size.height
-    });
+    return new Coordinate_ENGINE(
+      this.leftUp.x,
+      this.leftUp.y + this.size.height
+    );
   }
 
   get rightDown() {
-    return new Coordinate_ENGINE({
-      x: this.leftUp.x + this.size.width,
-      y: this.leftUp.y + this.size.height,
-    });
+    return new Coordinate_ENGINE(
+      this.leftUp.x + this.size.width,
+      this.leftUp.y + this.size.height,
+    );
   }
 
   get rightUp() {
-    return new Coordinate_ENGINE({
-      x: this.leftUp.x + this.size.width,
-      y: this.leftUp.y,
-    });
+    return new Coordinate_ENGINE(
+      this.leftUp.x + this.size.width,
+      this.leftUp.y,
+    );
   }
 
-  leftUpPlusSizePercentages(props: {
-    percentages: Size_ENGINE;
-  }) {
-    const size = this.size.getPercentages(props);
-    return new Coordinate_ENGINE({
-      x: this.leftUp.x + size.width,
-      y: this.leftUp.y + size.height,
-    });
+  leftUpPlusSizePercentages(
+    percentages: Size_ENGINE
+  ) {
+    const size = this.size.getPercentages(percentages);
+    return new Coordinate_ENGINE(
+      this.leftUp.x + size.width,
+      this.leftUp.y + size.height,
+    );
   }
 
-  insidePositionCoordinate(props: {
-    coordinate: Coordinate_ENGINE;
-  }) {
-    return this.leftUp.x <= props.coordinate.x &&
-      this.leftUp.y <= props.coordinate.y &&
-      this.rightDown.x >= props.coordinate.x &&
-      this.rightDown.y >= props.coordinate.y;
+  insidePositionCoordinate(
+    coordinate: Coordinate_ENGINE
+  ) {
+    return this.leftUp.x <= coordinate.x &&
+      this.leftUp.y <= coordinate.y &&
+      this.rightDown.x >= coordinate.x &&
+      this.rightDown.y >= coordinate.y;
   }
 
-  insidePosition(props: {
-    position: Position_ENGINE;
-  }) {
-    return this.leftUp.x <= props.position.leftUp.x &&
-      this.leftUp.y <= props.position.leftUp.y &&
-      this.rightDown.x >= props.position.rightDown.x &&
-      this.rightDown.y >= props.position.rightDown.y;
-  }
-
-  someVertexInside(props: {
+  insidePosition(
     position: Position_ENGINE
-  }): boolean {
-    if (this.insidePositionCoordinate({
-      coordinate: props.position.leftUp
-    }) === true)
+  ) {
+    return this.leftUp.x <= position.leftUp.x &&
+      this.leftUp.y <= position.leftUp.y &&
+      this.rightDown.x >= position.rightDown.x &&
+      this.rightDown.y >= position.rightDown.y;
+  }
+
+  someVertexInside(
+    position: Position_ENGINE
+  ): boolean {
+    if (this.insidePositionCoordinate(position.leftUp))
       return true;
 
-    if (this.insidePositionCoordinate({
-      coordinate: props.position.leftDown
-    }) === true)
+    if (this.insidePositionCoordinate(position.leftDown))
       return true;
 
-    if (this.insidePositionCoordinate({
-      coordinate: props.position.rightUp
-    }) === true)
+    if (this.insidePositionCoordinate(position.rightUp))
       return true;
 
-    if (this.insidePositionCoordinate({
-      coordinate: props.position.rightDown
-    }) === true)
+    if (this.insidePositionCoordinate(position.rightDown))
       return true;
 
     return false;

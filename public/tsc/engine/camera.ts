@@ -3,58 +3,60 @@ import { Position_ENGINE } from "./position";
 import { Size_ENGINE } from "./size";
 
 export class Camera_ENGINE extends Position_ENGINE {
-    constructor(props: { leftUp: Coordinate_ENGINE }) {
-        super({
-            leftUp: props.leftUp,
-            size: new Size_ENGINE({ width: 100, height: 100 })
-        });
+    constructor(
+        leftUp: Coordinate_ENGINE,
+    ) {
+        super(
+            leftUp,
+            new Size_ENGINE(100, 100)
+        );
     }
 
-    insideCamera(props: {
-        position: Position_ENGINE;
-    }) {
-        const doubleSize = new Size_ENGINE({
-            width: props.position.size.width * 2,
-            height: props.position.size.height * 2
-        });
+    insideCamera(
+        position: Position_ENGINE
+    ) {
+        const doubleSize = new Size_ENGINE(
+            position.size.width * 2,
+            position.size.height * 2
+        );
 
-        const vision = new Position_ENGINE({
-            leftUp: new Coordinate_ENGINE({
-                x: this.leftUp.x - props.position.size.width,
-                y: this.leftUp.y - props.position.size.height,
-            }),
-            size: new Size_ENGINE({
-                width: this.size.width + doubleSize.width,
-                height: this.size.height + doubleSize.height,
-            })
-        });
-        return vision.insidePosition({
-            position: props.position
-        });
+        const vision = new Position_ENGINE(
+            new Coordinate_ENGINE(
+                this.leftUp.x - position.size.width,
+                this.leftUp.y - position.size.height,
+            ),
+            new Size_ENGINE(
+                this.size.width + doubleSize.width,
+                this.size.height + doubleSize.height,
+            )
+        );
+        return vision.insidePosition(
+            position
+        );
     }
 
-    positionOnCamera(props: {
-        position: Position_ENGINE;
-    }) {
-        const insideCamera = this.insideCamera({
-            position: props.position
-        });
+    positionOnCamera(
+        position: Position_ENGINE
+    ) {
+        const insideCamera = this.insideCamera(position);
         if (insideCamera === false)
             return false;
 
-        return new Position_ENGINE({
-            leftUp: new Coordinate_ENGINE({
-                x: props.position.leftUp.x - this.leftUp.x,
-                y: props.position.leftUp.y - this.leftUp.y,
-            }),
-            size: new Size_ENGINE({
-                width: props.position.size.width,
-                height: props.position.size.height
-            })
-        });
+        return new Position_ENGINE(
+            new Coordinate_ENGINE(
+                position.leftUp.x - this.leftUp.x,
+                position.leftUp.y - this.leftUp.y,
+            ),
+            new Size_ENGINE(
+                position.size.width,
+                position.size.height
+            )
+        );
     }
 
-    focusPosition(position: Position_ENGINE) {
+    focusPosition(
+        position: Position_ENGINE
+    ) {
         let x = position.leftUp.x - (this.size.width / 2);
         x += position.size.width / 2;
 

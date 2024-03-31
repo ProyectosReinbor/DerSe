@@ -11,28 +11,26 @@ export class Square_ENGINE extends Position_ENGINE {
     strokeStyle: StrokeStyle;
     lineWidth: number;
 
-    constructor(props: {
+    constructor(
         leftUp: Coordinate_ENGINE,
         size: Size_ENGINE,
         canvas: Canvas_ENGINE,
-        fillStyle: FillStyle;
-        strokeStyle: StrokeStyle;
-        lineWidth: number;
-    }) {
-        super({
-            leftUp: props.leftUp,
-            size: props.size,
-        });
-        this.canvas = props.canvas;
-        this.fillStyle = props.fillStyle;
-        this.strokeStyle = props.strokeStyle;
-        this.lineWidth = props.lineWidth;
+        fillStyle: FillStyle,
+        strokeStyle: StrokeStyle,
+        lineWidth: number,
+    ) {
+        super(
+            leftUp,
+            size,
+        );
+        this.canvas = canvas;
+        this.fillStyle = fillStyle;
+        this.strokeStyle = strokeStyle;
+        this.lineWidth = lineWidth;
     }
 
     drawSquare() {
-        const positionOnCanvas = this.canvas.positionOnCanvas({
-            position: this
-        });
+        const positionOnCanvas = this.canvas.positionOnCanvas(this);
         if (positionOnCanvas === false)
             return;
 

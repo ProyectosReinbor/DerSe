@@ -11,16 +11,22 @@ export class Animations_ENGINE extends Elements_ENGINE {
   timerNextFrame: number = 0;
   animation: Animation_ENGINE;
 
-  constructor(props: {
+  constructor(
     leftUp: Coordinate_ENGINE,
     size: Size_ENGINE,
     canvas: Canvas_ENGINE,
     route: ImagePath,
     element: Element_ENGINE,
     animation: Animation_ENGINE
-  }) {
-    super(props);
-    this.animation = props.animation;
+  ) {
+    super(
+      leftUp,
+      size,
+      canvas,
+      route,
+      element,
+    );
+    this.animation = animation;
   }
 
   nextFrame() {

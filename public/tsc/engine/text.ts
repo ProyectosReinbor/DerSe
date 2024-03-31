@@ -12,21 +12,24 @@ export class Text_ENGINE extends Position_ENGINE {
     strokeStyle: StrokeStyle;
     dungeonFont: boolean;
 
-    constructor(props: {
-        canvas: Canvas_ENGINE;
-        leftUp: Coordinate_ENGINE;
-        size: Size_ENGINE;
-        value: string;
-        fillStyle: FillStyle;
-        strokeStyle: StrokeStyle;
-        dungeonFont: boolean;
-    }) {
-        super(props);
-        this.canvas = props.canvas;
-        this.value = props.value;
-        this.fillStyle = props.fillStyle;
-        this.strokeStyle = props.strokeStyle;
-        this.dungeonFont = props.dungeonFont;
+    constructor(
+        leftUp: Coordinate_ENGINE,
+        size: Size_ENGINE,
+        canvas: Canvas_ENGINE,
+        value: string,
+        fillStyle: FillStyle,
+        strokeStyle: StrokeStyle,
+        dungeonFont: boolean,
+    ) {
+        super(
+            leftUp,
+            size,
+        );
+        this.canvas = canvas;
+        this.value = value;
+        this.fillStyle = fillStyle;
+        this.strokeStyle = strokeStyle;
+        this.dungeonFont = dungeonFont;
     }
 
     get font() {
@@ -41,9 +44,7 @@ export class Text_ENGINE extends Position_ENGINE {
         if (this.value.length === 0)
             return;
 
-        const positionOnCamera = this.canvas.positionOnCamera({
-            position: this
-        });
+        const positionOnCamera = this.canvas.positionOnCamera(this);
         if (positionOnCamera === false)
             return;
 

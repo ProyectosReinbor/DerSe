@@ -10,15 +10,20 @@ export class Elements_ENGINE extends Image_ENGINE {
 
   element: Element_ENGINE;
 
-  constructor(props: {
+  constructor(
     leftUp: Coordinate_ENGINE,
     size: Size_ENGINE,
     canvas: Canvas_ENGINE,
     route: ImagePath,
     element: Element_ENGINE
-  }) {
-    super(props);
-    this.element = props.element;
+  ) {
+    super(
+      leftUp,
+      size,
+      canvas,
+      route,
+    );
+    this.element = element;
   }
 
   drawElement() {
@@ -26,9 +31,7 @@ export class Elements_ENGINE extends Image_ENGINE {
     if (image === false)
       return;
 
-    const positionOnCanvas = this.canvas.positionOnCanvas({
-      position: this
-    });
+    const positionOnCanvas = this.canvas.positionOnCanvas(this);
     if (positionOnCanvas === false)
       return;
 

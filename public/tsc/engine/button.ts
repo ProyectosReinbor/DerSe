@@ -9,7 +9,7 @@ export class Button_ENGINE extends Square_ENGINE {
 
   text: Text_ENGINE;
 
-  constructor(props: {
+  constructor(
     leftUp: Coordinate_ENGINE,
     size: Size_ENGINE,
     canvas: Canvas_ENGINE,
@@ -17,16 +17,16 @@ export class Button_ENGINE extends Square_ENGINE {
     strokeStyle: StrokeStyle,
     lineWidth: number,
     text: Text_ENGINE,
-  }) {
-    super({
-      leftUp: props.leftUp,
-      size: props.size,
-      canvas: props.canvas,
-      fillStyle: props.fillStyle,
-      strokeStyle: props.strokeStyle,
-      lineWidth: props.lineWidth,
-    });
-    this.text = props.text;
+  ) {
+    super(
+      leftUp,
+      size,
+      canvas,
+      fillStyle,
+      strokeStyle,
+      lineWidth,
+    );
+    this.text = text;
   }
 
   drawButton() {
