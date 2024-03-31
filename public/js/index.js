@@ -270,10 +270,7 @@ class Canvas_ENGINE extends Camera_ENGINE {
     this.drawScene();
   }
   aspectRatio() {
-    const screen = new Size_ENGINE({
-      width: window.innerWidth,
-      height: window.innerHeight
-    });
+    const screen = new window.Screen;
     const ratio = 0.5625;
     this.element.width = screen.width;
     this.element.height = screen.height * ratio;
@@ -594,12 +591,14 @@ class Element_ENGINE extends Position_ENGINE {
 class Image_ENGINE extends Position_ENGINE {
   canvas;
   route;
+  reflected;
   constructor(props) {
     super(props);
     this.canvas = props.canvas;
     this.route = props.route;
     this.canvas.images;
     this.canvas.images.addRoute(this.route);
+    this.reflected = true;
   }
   set image(route) {
     this.route = route;
@@ -616,6 +615,9 @@ class Image_ENGINE extends Position_ENGINE {
     });
     if (positionOnTheCanvas === false)
       return;
+    if (this.reflected === true) {
+      this.canvas.context.scale(-1, 1);
+    }
     this.canvas.context.imageSmoothingEnabled = false;
     this.canvas.context.drawImage(image, positionOnTheCanvas.leftUp.x, positionOnTheCanvas.leftUp.y, positionOnTheCanvas.size.width, positionOnTheCanvas.size.height);
   }
@@ -2723,7 +2725,6 @@ class Sheep_ENGINE extends Character_ENGINE {
       strokeStyle: "#333",
       lineWidth: 2
     });
-    this.address.x = -1;
   }
   moveSheep() {
     const moved = this.movedCharacter();

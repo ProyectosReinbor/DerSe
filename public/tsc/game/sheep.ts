@@ -115,7 +115,6 @@ export class Sheep_ENGINE extends Character_ENGINE {
             strokeStyle: "#333",
             lineWidth: 2,
         });
-        this.address.x = -1;
     }
 
     moveSheep() {

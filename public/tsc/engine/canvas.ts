@@ -113,10 +113,12 @@ export class Canvas_ENGINE extends Camera_ENGINE {
   }
 
   aspectRatio() {
-    const screen = new Size_ENGINE({
+    /*const screen = new Size_ENGINE({
       width: window.innerWidth,
       height: window.innerHeight
-    });
+    });*/
+
+    const screen = new window.Screen();
 
     const ratio = 720 / 1280;
     this.element.width = screen.width;

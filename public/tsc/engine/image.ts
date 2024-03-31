@@ -1,5 +1,5 @@
 import type { Canvas_ENGINE } from "./canvas";
-import type { Coordinate_ENGINE } from "./coordinate";
+import { Coordinate_ENGINE } from "./coordinate";
 import { Position_ENGINE } from "./position";
 import type { Size_ENGINE } from "./size";
 
@@ -9,6 +9,7 @@ export class Image_ENGINE extends Position_ENGINE {
 
   canvas: Canvas_ENGINE;
   route: ImagePath;
+  reflected: boolean;
 
   constructor(props: {
     leftUp: Coordinate_ENGINE,
@@ -21,6 +22,7 @@ export class Image_ENGINE extends Position_ENGINE {
     this.route = props.route;
     this.canvas.images
     this.canvas.images.addRoute(this.route);
+    this.reflected = true;
   }
 
   set image(route: ImagePath) {
@@ -39,6 +41,10 @@ export class Image_ENGINE extends Position_ENGINE {
       position: this
     });
     if (positionOnTheCanvas === false) return;
+
+    if (this.reflected === true) {
+      this.canvas.context.scale(-1, 1);
+    }
 
     this.canvas.context.imageSmoothingEnabled = false;
     this.canvas.context.drawImage(
