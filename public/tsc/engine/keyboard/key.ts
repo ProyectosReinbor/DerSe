@@ -5,32 +5,36 @@ import type { Coordinate_ENGINE } from "../coordinate";
 import type { Size_ENGINE } from "../size";
 import type { Text_ENGINE } from "../text";
 
-export type KeyPress_KEY = (character: string) => void;
+export type KeyPress = (character: string) => void;
 
 export class Key_ENGINE extends Button_ENGINE {
 
-    keyPress: KeyPress_KEY
+    keyPress: KeyPress
 
-    constructor(props: {
-        leftUp: Coordinate_ENGINE;
-        size: Size_ENGINE;
-        canvas: Canvas_ENGINE;
-        fillStyle: FillStyle;
-        strokeStyle: StrokeStyle;
-        lineWidth: number;
-        text: Text_ENGINE;
-        keyPress: KeyPress_KEY;
-    }) {
-        super(props);
-        this.keyPress = props.keyPress;
+    constructor(
+        leftUp: Coordinate_ENGINE,
+        size: Size_ENGINE,
+        canvas: Canvas_ENGINE,
+        fillStyle: FillStyle,
+        strokeStyle: StrokeStyle,
+        lineWidth: number,
+        text: Text_ENGINE,
+        keyPress: KeyPress
+    ) {
+        super(
+            leftUp,
+            size,
+            canvas,
+            fillStyle,
+            strokeStyle,
+            lineWidth,
+            text,
+        );
+        this.keyPress = keyPress;
     }
 
-    touchendKey(props: {
-        touch: Coordinate_ENGINE;
-    }) {
-        if (this.insidePositionCoordinate({
-            coordinate: props.touch
-        }) === false)
+    touchendKey(touch: Coordinate_ENGINE) {
+        if (this.insidePositionCoordinate(touch) === false)
             return false;
 
         this.keyPress(this.text.value);

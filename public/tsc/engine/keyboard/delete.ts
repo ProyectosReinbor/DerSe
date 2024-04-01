@@ -13,90 +13,56 @@ export class Delete_ENGINE extends Position_ENGINE {
   character: Text_ENGINE;
   keyboard: Keyboard_ENGINE;
 
-  constructor(props: {
-    canvas: Canvas_ENGINE;
-    keyboard: Keyboard_ENGINE;
-  }) {
-    super({
-      leftUp: props.keyboard.leftUpPlusSizePercentages({
-        percentages: new Size_ENGINE({
-          width: 63,
-          height: 0
-        })
-      }),
-      size: props.keyboard.size.getPercentages({
-        percentages: new Size_ENGINE({
-          width: 15,
-          height: 20
-        })
-      }),
-    });
-    this.lines = new Lines_ENGINE({
-      leftUp: this.leftUp,
-      size: this.size,
-      canvas: props.canvas,
-      fillStyle: "#21618C",
-      strokeStyle: "#fff",
-      lineWidth: 0.5
-    });
-    this.lines.addLine({
-      leftUp: new Size_ENGINE({
-        width: 10,
-        height: 50
-      }),
-      rightDown: new Size_ENGINE({
-        width: 30,
-        height: 20
-      })
-    });
-    this.lines.addLine({
-      leftUp: new Size_ENGINE({
-        width: 90,
-        height: 20
-      }),
-      rightDown: new Size_ENGINE({
-        width: 90,
-        height: 80
-      })
-    });
-    this.lines.addLine({
-      leftUp: new Size_ENGINE({
-        width: 30,
-        height: 80
-      }),
-      rightDown: new Size_ENGINE({
-        width: 10,
-        height: 50
-      })
-    });
-    this.character = new Text_ENGINE({
-      leftUp: this.leftUpPlusSizePercentages({
-        percentages: new Size_ENGINE({
-          width: 50,
-          height: 15
-        })
-      }),
-      size: this.size.getPercentages({
-        percentages: new Size_ENGINE({
-          width: 15,
-          height: 100
-        })
-      }),
-      canvas: props.canvas,
-      value: "X",
-      fillStyle: "#fff",
-      strokeStyle: false,
-      dungeonFont: true
-    });
-    this.keyboard = props.keyboard;
+  constructor(
+    canvas: Canvas_ENGINE,
+    keyboard: Keyboard_ENGINE,
+  ) {
+    super(
+      keyboard.leftUpPlusSizePercentages(
+        new Size_ENGINE(63, 0)
+      ),
+      keyboard.size.getPercentages(
+        new Size_ENGINE(15, 20)
+      ),
+    );
+    this.lines = new Lines_ENGINE(
+      this.leftUp,
+      this.size,
+      canvas,
+      "#21618C",
+      "#fff",
+      0.5
+    );
+    this.lines.addLine(
+      new Size_ENGINE(10, 50),
+      new Size_ENGINE(30, 20)
+    );
+    this.lines.addLine(
+      new Size_ENGINE(90, 20),
+      new Size_ENGINE(90, 80)
+    );
+    this.lines.addLine(
+      new Size_ENGINE(30, 80),
+      new Size_ENGINE(10, 50)
+    );
+    this.character = new Text_ENGINE(
+      this.leftUpPlusSizePercentages(
+        new Size_ENGINE(50, 15)
+      ),
+      this.size.getPercentages(
+        new Size_ENGINE(15, 100)
+      ),
+      canvas,
+      "X",
+      "#fff",
+      false,
+      true
+    );
+    this.keyboard = keyboard;
   }
 
-  touchstartDelete(props: {
-    touch: Coordinate_ENGINE
-  }) {
-    const inside = this.insidePositionCoordinate({
-      coordinate: props.touch
-    });
+  touchstartDelete(touch: Coordinate_ENGINE) {
+    const inside = this.insidePositionCoordinate(touch);
     if (inside === false)
       return;
 
@@ -111,12 +77,8 @@ export class Delete_ENGINE extends Position_ENGINE {
     this.keyboard.input.deleteLastCharacter();
   }
 
-  touchmoveDelete(props: {
-    touch: Coordinate_ENGINE;
-  }) {
-    const inside = this.insidePositionCoordinate({
-      coordinate: props.touch
-    });
+  touchmoveDelete(touch: Coordinate_ENGINE) {
+    const inside = this.insidePositionCoordinate(touch);
     if (inside === true)
       return;
 

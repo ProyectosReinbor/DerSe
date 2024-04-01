@@ -14,106 +14,78 @@ export class Hide_ENGINE extends Square_ENGINE {
   eyelid: Curves_ENGINE;
   iris: Circle;
 
-  constructor(props: {
+  constructor(
     canvas: Canvas_ENGINE,
     input: Input_ENGINE,
     switchedOn: boolean,
-  }) {
-    super({
-      leftUp: props.input.leftUpPlusSizePercentages({
-        percentages: new Size_ENGINE({ width: 88, height: 20 })
-      }),
-      size: props.input.size.getPercentages({
-        percentages: new Size_ENGINE({ width: 10, height: 60 })
-      }),
-      canvas: props.canvas,
-      fillStyle: "#AED6F1",
-      strokeStyle: "#EAF2F8",
-      lineWidth: 0
-    });
-    this.input = props.input;
-    this.switchedOn = props.switchedOn;
-    this.eyelid = new Curves_ENGINE({
-      canvas: props.canvas,
-      fillStyle: false,
-      strokeStyle: "#fff",
-      lineWidth: 0.5
-    });
-    this.eyelid = new Curves_ENGINE({
-      canvas: props.canvas,
-      fillStyle: false,
-      strokeStyle: "#fff",
-      lineWidth: 0.5
-    });
-    this.eyelid.addCurve({
-      leftUp: props.input.leftUpPlusSizePercentages({
-        percentages: new Size_ENGINE({
-          width: 89,
-          height: 50
-        })
-      }),
-      rightDown: props.input.leftUpPlusSizePercentages({
-        percentages: new Size_ENGINE({
-          width: 97,
-          height: 50
-        })
-      }),
-      checkPoint: props.input.leftUpPlusSizePercentages({
-        percentages: new Size_ENGINE({
-          width: 93,
-          height: 70
-        })
-      })
-    });
-    this.eyelid.addCurve({
-      leftUp: props.input.leftUpPlusSizePercentages({
-        percentages: new Size_ENGINE({
-          width: 89,
-          height: 50
-        })
-      }),
-      rightDown: props.input.leftUpPlusSizePercentages({
-        percentages: new Size_ENGINE({
-          width: 97,
-          height: 50
-        })
-      }),
-      checkPoint: props.input.leftUpPlusSizePercentages({
-        percentages: new Size_ENGINE({
-          width: 93,
-          height: 20
-        })
-      })
-    });
-    this.iris = new Circle({
-      leftUp: props.input.leftUpPlusSizePercentages({
-        percentages: new Size_ENGINE({
-          width: 87,
-          height: 36
-        })
-      }),
-      size: props.input.size.getPercentages({
-        percentages: new Size_ENGINE({
-          width: 12,
-          height: 26
-        })
-      }),
-      canvas: props.canvas,
-      startingDegrees: 0,
-      finalDegrees: 360,
-      counterclockwise: false,
-      fillStyle: "#fff",
-      strokeStyle: false,
-      lineWidth: 0,
-    });
+  ) {
+    super(
+      input.leftUpPlusSizePercentages(
+        new Size_ENGINE(88, 20)
+      ),
+      input.size.getPercentages(
+        new Size_ENGINE(10, 60)
+      ),
+      canvas,
+      "#AED6F1",
+      "#EAF2F8",
+      0
+    );
+    this.input = input;
+    this.switchedOn = switchedOn;
+    this.eyelid = new Curves_ENGINE(
+      canvas,
+      false,
+      "#fff",
+      0.5
+    );
+    this.eyelid = new Curves_ENGINE(
+      canvas,
+      false,
+      "#fff",
+      0.5
+    );
+    this.eyelid.addCurve(
+      input.leftUpPlusSizePercentages(
+        new Size_ENGINE(89, 50)
+      ),
+      input.leftUpPlusSizePercentages(
+        new Size_ENGINE(97, 50)
+      ),
+      input.leftUpPlusSizePercentages(
+        new Size_ENGINE(93, 70)
+      )
+    );
+    this.eyelid.addCurve(
+      input.leftUpPlusSizePercentages(
+        new Size_ENGINE(89, 50)
+      ),
+      input.leftUpPlusSizePercentages(
+        new Size_ENGINE(97, 50)
+      ),
+      input.leftUpPlusSizePercentages(
+        new Size_ENGINE(93, 20)
+      )
+    );
+    this.iris = new Circle(
+      input.leftUpPlusSizePercentages(
+        new Size_ENGINE(87, 36)
+      ),
+      input.size.getPercentages(
+        new Size_ENGINE(12, 26)
+      ),
+      canvas,
+      0,
+      360,
+      false,
+      "#fff",
+      false,
+      0,
+    );
   }
 
-  touchendHide(props: {
-    touch: Coordinate_ENGINE;
-  }) {
-    if (this.insidePositionCoordinate({
-      coordinate: props.touch
-    }) === false)
+  touchendHide(touch: Coordinate_ENGINE) {
+    if (this.insidePositionCoordinate(touch) === false)
       return false;
 
     this.switchedOn = !this.switchedOn;
@@ -127,11 +99,15 @@ export class Hide_ENGINE extends Square_ENGINE {
   }
 
   get encryption() {
-    if (this.value.length === this.input.value.length) return this.value;
+    if (this.value.length === this.input.value.length)
+      return this.value;
+
     const words = this.input.value.split(" ");
     for (const index in words) {
       const word = words[index];
-      if (word === undefined) continue;
+      if (word === undefined)
+        continue;
+
       words[index] = new Array(word.length).fill("*").join("");
     }
     this.value = words.join(" ");

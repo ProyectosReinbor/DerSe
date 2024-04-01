@@ -10,65 +10,43 @@ export class Finish_ENGINE extends Square_ENGINE {
   seen: Lines_ENGINE;
   keyboard: Keyboard_ENGINE;
 
-  constructor(props: {
-    canvas: Canvas_ENGINE;
-    keyboard: Keyboard_ENGINE;
-  }) {
-    super({
-      canvas: props.canvas,
-      leftUp: props.keyboard.leftUpPlusSizePercentages({
-        percentages: new Size_ENGINE({
-          width: 88,
-          height: 3
-        })
-      }),
-      size: props.keyboard.size.getPercentages({
-        percentages: new Size_ENGINE({
-          width: 1,
-          height: 14
-        })
-      }),
-      fillStyle: "#21618C",
-      strokeStyle: "#fff",
-      lineWidth: 0.5,
-    });
-    this.seen = new Lines_ENGINE({
-      leftUp: this.leftUp,
-      size: this.size,
-      canvas: props.canvas,
-      fillStyle: false,
-      strokeStyle: "#fff",
-      lineWidth: 0.5
-    });
-    this.seen.addLine({
-      leftUp: new Size_ENGINE({
-        width: 30,
-        height: 50
-      }),
-      rightDown: new Size_ENGINE({
-        width: 50,
-        height: 80
-      })
-    });
-    this.seen.addLine({
-      leftUp: new Size_ENGINE({
-        width: 70,
-        height: 20
-      }),
-      rightDown: new Size_ENGINE({
-        width: 0,
-        height: 0
-      })
-    });
-    this.keyboard = props.keyboard;
+  constructor(
+    canvas: Canvas_ENGINE,
+    keyboard: Keyboard_ENGINE,
+  ) {
+    super(
+      keyboard.leftUpPlusSizePercentages(
+        new Size_ENGINE(88, 3)
+      ),
+      keyboard.size.getPercentages(
+        new Size_ENGINE(1, 14)
+      ),
+      canvas,
+      "#21618C",
+      "#fff",
+      0.5,
+    );
+    this.seen = new Lines_ENGINE(
+      this.leftUp,
+      this.size,
+      canvas,
+      false,
+      "#fff",
+      0.5,
+    );
+    this.seen.addLine(
+      new Size_ENGINE(30, 50),
+      new Size_ENGINE(50, 80)
+    );
+    this.seen.addLine(
+      new Size_ENGINE(70, 20),
+      new Size_ENGINE(0, 0)
+    );
+    this.keyboard = keyboard;
   }
 
-  touchendFinish(props: {
-    touch: Coordinate_ENGINE;
-  }) {
-    if (this.insidePositionCoordinate({
-      coordinate: props.touch
-    }) === false)
+  touchendFinish(touch: Coordinate_ENGINE) {
+    if (this.insidePositionCoordinate(touch) === false)
       return false;
 
     this.keyboard.input = false;

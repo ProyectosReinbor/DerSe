@@ -13,38 +13,37 @@ export class Lines_ENGINE extends Position_ENGINE {
   strokeStyle: StrokeStyle;
   lineWidth: number;
 
-  constructor(props: {
-    leftUp: Coordinate_ENGINE;
-    size: Size_ENGINE;
-    canvas: Canvas_ENGINE;
-    fillStyle: FillStyle;
-    strokeStyle: StrokeStyle;
-    lineWidth: number;
-  }) {
-    super(props);
-    this.canvas = props.canvas;
-    this.fillStyle = props.fillStyle;
-    this.strokeStyle = props.strokeStyle;
-    this.lineWidth = props.lineWidth;
+  constructor(
+    leftUp: Coordinate_ENGINE,
+    size: Size_ENGINE,
+    canvas: Canvas_ENGINE,
+    fillStyle: FillStyle,
+    strokeStyle: StrokeStyle,
+    lineWidth: number,
+  ) {
+    super(
+      leftUp,
+      size
+    );
+    this.canvas = canvas;
+    this.fillStyle = fillStyle;
+    this.strokeStyle = strokeStyle;
+    this.lineWidth = lineWidth;
   }
 
-  addLine(props: {
-    leftUp: Size_ENGINE;
-    rightDown: Size_ENGINE;
-  }) {
+  addLine(
+    leftUp: Size_ENGINE,
+    rightDown: Size_ENGINE,
+  ) {
     this.lines.push(
-      new Line_ENGINE({
-        leftUp: this.leftUpPlusSizePercentages({
-          percentages: props.leftUp
-        }),
-        rightDown: this.leftUpPlusSizePercentages({
-          percentages: props.rightDown
-        }),
-        canvas: this.canvas,
-        fillStyle: this.fillStyle,
-        strokeStyle: this.strokeStyle,
-        lineWidth: this.lineWidth,
-      })
+      new Line_ENGINE(
+        this.leftUpPlusSizePercentages(leftUp),
+        this.leftUpPlusSizePercentages(rightDown),
+        this.canvas,
+        this.fillStyle,
+        this.strokeStyle,
+        this.lineWidth,
+      )
     );
   }
 

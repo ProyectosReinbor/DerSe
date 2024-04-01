@@ -7,52 +7,36 @@ import { Text_ENGINE } from "../text";
 
 export class CloseQuestion_ENGINE extends Button_ENGINE {
   keyboard: Keyboard_ENGINE;
-  constructor(props: {
-    canvas: Canvas_ENGINE;
-    keyboard: Keyboard_ENGINE;
-  }) {
-    super({
-      canvas: props.canvas,
-      leftUp: props.keyboard.leftUpPlusSizePercentages({
-        percentages: new Size_ENGINE({
-          width: 78,
-          height: 3
-        })
-      }),
-      size: props.keyboard.size.getPercentages({
-        percentages: new Size_ENGINE({
-          width: 7,
-          height: 14
-        })
-      }),
-      fillStyle: "#21618C",
-      strokeStyle: "#fff",
-      lineWidth: 0.5,
-      text: new Text_ENGINE({
-        canvas: props.canvas,
-        leftUp: new Coordinate_ENGINE({
-          x: 0,
-          y: 0
-        }),
-        size: new Size_ENGINE({
-          width: 0,
-          height: 10
-        }),
-        value: "?",
-        fillStyle: "#fff",
-        strokeStyle: false,
-        dungeonFont: false,
-      })
-    });
-    this.keyboard = props.keyboard;
+  constructor(
+    canvas: Canvas_ENGINE,
+    keyboard: Keyboard_ENGINE,
+  ) {
+    super(
+      keyboard.leftUpPlusSizePercentages(
+        new Size_ENGINE(78, 3)
+      ),
+      keyboard.size.getPercentages(
+        new Size_ENGINE(7, 14)
+      ),
+      canvas,
+      "#21618C",
+      "#fff",
+      0.5,
+      new Text_ENGINE(
+        new Coordinate_ENGINE(0, 0),
+        new Size_ENGINE(0, 10),
+        canvas,
+        "?",
+        "#fff",
+        false,
+        false
+      )
+    );
+    this.keyboard = keyboard;
   }
 
-  touchendCloseQuestion(props: {
-    touch: Coordinate_ENGINE;
-  }) {
-    if (this.insidePositionCoordinate({
-      coordinate: props.touch
-    }) === false)
+  touchendCloseQuestion(touch: Coordinate_ENGINE) {
+    if (this.insidePositionCoordinate(touch) === false)
       return false;
 
     if (this.keyboard.input === false)

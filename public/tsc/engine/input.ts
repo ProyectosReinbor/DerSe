@@ -15,36 +15,37 @@ export class Input_ENGINE extends Square_ENGINE {
     informationDefault: Text_ENGINE;
     text: Text_ENGINE;
 
-    constructor(props: {
-        canvas: Canvas_ENGINE;
-        leftUp: Coordinate_ENGINE;
-        size: Size_ENGINE;
-        fillStyle: FillStyle;
-        strokeStyle: StrokeStyle;
-        lineWidth: number;
-        hide: Hide_ENGINE;
-        textDefault: Text_ENGINE;
-        informationDefault: Text_ENGINE;
-        text: Text_ENGINE;
-    }) {
-        super(props);
-        this.hide = props.hide;
-        this.textDefault = props.textDefault;
-        this.informationDefault = props.informationDefault;
-        this.text = props.text;
+    constructor(
+        leftUp: Coordinate_ENGINE,
+        size: Size_ENGINE,
+        canvas: Canvas_ENGINE,
+        fillStyle: FillStyle,
+        strokeStyle: StrokeStyle,
+        lineWidth: number,
+        hide: Hide_ENGINE,
+        textDefault: Text_ENGINE,
+        informationDefault: Text_ENGINE,
+        text: Text_ENGINE,
+    ) {
+        super(
+            leftUp,
+            size,
+            canvas,
+            fillStyle,
+            strokeStyle,
+            lineWidth,
+        );
+        this.hide = hide;
+        this.textDefault = textDefault;
+        this.informationDefault = informationDefault;
+        this.text = text;
     }
 
-    touchendInput(props: {
-        touch: Coordinate_ENGINE;
-    }) {
-        if (this.hide.touchendHide({
-            touch: props.touch
-        }) === true)
+    touchendInput(touch: Coordinate_ENGINE) {
+        if (this.hide.touchendHide(touch) === true)
             return;
 
-        if (this.insidePositionCoordinate({
-            coordinate: props.touch
-        }) === false)
+        if (this.insidePositionCoordinate(touch) === false)
             return;
     }
 

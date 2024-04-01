@@ -5,14 +5,12 @@ export class Scene_ENGINE {
 
     canvas: Canvas_ENGINE;
     draw: () => void = () => { }
-    touchstart: (toque: Coordinate_ENGINE) => void = () => { }
-    touchmove: (toque: Coordinate_ENGINE) => void = () => { }
-    touchend: (toque: Coordinate_ENGINE) => void = () => { }
+    touchstart: (touch: Coordinate_ENGINE) => void = () => { }
+    touchmove: (touch: Coordinate_ENGINE) => void = () => { }
+    touchend: (touch: Coordinate_ENGINE) => void = () => { }
 
-    constructor(props: {
-        canvas: Canvas_ENGINE;
-    }) {
-        this.canvas = props.canvas;
+    constructor(canvas: Canvas_ENGINE) {
+        this.canvas = canvas;
     }
 
     async start() {

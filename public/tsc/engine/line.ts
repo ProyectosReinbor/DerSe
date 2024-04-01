@@ -5,37 +5,36 @@ import { Position_ENGINE } from "./position";
 import { Size_ENGINE } from "./size";
 
 export class Line_ENGINE extends Position_ENGINE {
+
   canvas: Canvas_ENGINE;
   fillStyle: FillStyle;
   strokeStyle: StrokeStyle;
   lineWidth: number;
 
-  constructor(props: {
-    canvas: Canvas_ENGINE;
-    leftUp: Coordinate_ENGINE;
-    rightDown: Coordinate_ENGINE;
-    fillStyle: FillStyle;
-    strokeStyle: StrokeStyle;
-    lineWidth: number;
-  }) {
-    const size = new Size_ENGINE({
-      width: props.rightDown.x - props.leftUp.x,
-      height: props.rightDown.y - props.leftUp.y
-    });
-    super({
-      leftUp: props.leftUp,
+  constructor(
+    leftUp: Coordinate_ENGINE,
+    rightDown: Coordinate_ENGINE,
+    canvas: Canvas_ENGINE,
+    fillStyle: FillStyle,
+    strokeStyle: StrokeStyle,
+    lineWidth: number,
+  ) {
+    const size = new Size_ENGINE(
+      rightDown.x - leftUp.x,
+      rightDown.y - leftUp.y
+    );
+    super(
+      leftUp,
       size
-    });
-    this.canvas = props.canvas;
-    this.fillStyle = props.fillStyle;
-    this.strokeStyle = props.strokeStyle;
-    this.lineWidth = props.lineWidth;
+    );
+    this.canvas = canvas;
+    this.fillStyle = fillStyle;
+    this.strokeStyle = strokeStyle;
+    this.lineWidth = lineWidth;
   }
 
   drawLine() {
-    const positionOnCanvas = this.canvas.positionOnCanvas({
-      position: this
-    });
+    const positionOnCanvas = this.canvas.positionOnCanvas(this);
     if (positionOnCanvas === false)
       return;
 
