@@ -7,30 +7,23 @@ import { Pawn_ENGINE } from "./pawn.js";
 import { Sheep_ENGINE } from "./sheep.js";
 
 export class Game_ENGINE extends Scene_ENGINE {
+
     map: Map_ENGINE;
     pawns: Pawn_ENGINE[] = [];
     sheepGroup: Sheep_ENGINE[] = [];
-    constructor(props: {
-        canvas: Canvas_ENGINE
-    }) {
-        super({
-            canvas: props.canvas
-        });
-        this.map = new Map_ENGINE({
-            canvas: props.canvas
-        });
+
+    constructor(canvas: Canvas_ENGINE) {
+        super(canvas);
+        this.map = new Map_ENGINE(canvas);
         this.sheepGroup = [
-            new Sheep_ENGINE({
-                leftUp: new Coordinate_ENGINE({
-                    x: 35,
-                    y: 50
-                }),
+            new Sheep_ENGINE(
+                new Coordinate_ENGINE(35, 50),
                 // Math.floor(Math.random() * this.map.size.width),
                 // Math.floor(Math.random() * this.map.size.height)
                 // }),
-                map: this.map,
-                canvas: props.canvas
-            })
+                this.map,
+                canvas
+            )
         ];
     }
 
@@ -45,10 +38,10 @@ export class Game_ENGINE extends Scene_ENGINE {
         if (exist === true) return;
         this.pawns.push(
             new Pawn_ENGINE({
-                leftUp: new Coordinate_ENGINE({
-                    x: Math.floor(Math.random() * this.map.size.width),
-                    y: Math.floor(Math.random() * this.map.size.height),
-                }),
+                leftUp: new Coordinate_ENGINE(
+                    Math.floor(Math.random() * this.map.size.width),
+                    Math.floor(Math.random() * this.map.size.height),
+                ),
                 map: this.map,
                 canvas: this.canvas,
                 color: "blue",

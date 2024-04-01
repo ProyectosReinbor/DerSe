@@ -15,47 +15,42 @@ export class Castles_ENGINE extends ImageBoxes_ENGINE {
 
     override references: Castle_ENGINE[] = [];
 
-    constructor(props: {
+    constructor(
         map: Map_ENGINE,
         canvas: Canvas_ENGINE,
-    }) {
-        super({
-            x: props.map.leftUp.x,
-            y: props.map.leftUp.y,
-            canvas: props.canvas,
-            size: new Size_ENGINE({
-                width: props.map.boxes.width,
-                height: props.map.boxes.height
-            }),
-            length: new Plane_ENGINE({
-                horizontal: 4,
-                vertical: 3
-            }),
-            occupied: true,
-            route: false
-        });
+    ) {
+        super(
+            map.leftUp.x,
+            map.leftUp.y,
+            canvas,
+            new Size_ENGINE(
+                map.boxes.width,
+                map.boxes.height
+            ),
+            new Plane_ENGINE(4, 3),
+            true,
+            false
+        );
     }
 
-    castlePush(props: {
-        boxIndices: Plane_ENGINE;
-        state: CastleState;
-        color: CastleColor;
-    }): number | undefined {
-        const position = this.getPosition({
-            boxIndices: props.boxIndices
-        });
-        const reference = new Castle_ENGINE({
-            leftUp: position.leftUp,
-            size: position.size,
-            canvas: this.canvas,
-            state: props.state,
-            color: props.color
-        });
+    castlePush(
+        boxIndices: Plane_ENGINE,
+        state: CastleState,
+        color: CastleColor,
+    ): number | undefined {
+        const position = this.getPosition(boxIndices);
+        const reference = new Castle_ENGINE(
+            position.leftUp,
+            position.size,
+            this.canvas,
+            state,
+            color
+        );
 
-        const indexReference = this.referencesPush({
-            boxIndices: props.boxIndices,
+        const indexReference = this.referencesPush(
+            boxIndices,
             reference
-        });
+        );
         if (indexReference === undefined)
             return undefined;
 

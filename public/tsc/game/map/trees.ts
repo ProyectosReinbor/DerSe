@@ -21,93 +21,70 @@ export class Trees_ENGINE extends AnimationBoxes_ENGINE {
 
     states: TreeStates;
 
-    constructor(props: {
+    constructor(
         map: Map_ENGINE,
         canvas: Canvas_ENGINE
-    }) {
-        super({
-            x: props.map.leftUp.x,
-            y: props.map.leftUp.y,
-            canvas: props.canvas,
-            size: new Size_ENGINE({
-                width: props.map.boxes.width,
-                height: props.map.boxes.height
-            }),
-            length: new Plane_ENGINE({
-                horizontal: 3,
-                vertical: 3
-            }),
-            occupied: [
+    ) {
+        super(
+            map.leftUp.x,
+            map.leftUp.y,
+            canvas,
+            new Size_ENGINE(
+                map.boxes.width,
+                map.boxes.height
+            ),
+            new Plane_ENGINE(3, 3),
+            [
                 [true, false, false],
                 [true, false, false],
                 [false, false, false]
             ],
-            route: "images/resources/tree.png",
-            element: new Element_ENGINE({
-                size: new Size_ENGINE({
-                    width: 192,
-                    height: 192
-                }),
-                indices: new Plane_ENGINE({
-                    horizontal: 0,
-                    vertical: 0
-                })
-            }),
-            animation: new Animation_ENGINE({
-                frames: 4,
-                framesPerSecond: 4
-            })
-        });
+            "images/resources/tree.png",
+            new Element_ENGINE(
+                new Size_ENGINE(192, 192),
+                new Plane_ENGINE(0, 0)
+            ),
+            new Animation_ENGINE(4, 4)
+        );
         this.states = {
             motion: {
-                animation: new Animation_ENGINE({
-                    frames: 4,
-                    framesPerSecond: 4
-                }),
+                animation: new Animation_ENGINE(4, 4),
                 element: {
-                    indices: new Plane_ENGINE({ horizontal: 0, vertical: 0 })
+                    indices: new Plane_ENGINE(0, 0)
                 }
             },
             attacked: {
-                animation: new Animation_ENGINE({
-                    frames: 2,
-                    framesPerSecond: 2
-                }),
+                animation: new Animation_ENGINE(2, 2),
                 element: {
-                    indices: new Plane_ENGINE({ horizontal: 0, vertical: 1 })
+                    indices: new Plane_ENGINE(0, 1)
                 }
             },
             felled: {
-                animation: new Animation_ENGINE({
-                    frames: 1,
-                    framesPerSecond: 1
-                }),
+                animation: new Animation_ENGINE(1, 1),
                 element: {
-                    indices: new Plane_ENGINE({ horizontal: 0, vertical: 2 })
+                    indices: new Plane_ENGINE(0, 2)
                 }
             }
         }
     }
 
-    pushTree(props: {
+    pushTree(
         boxIndices: Plane_ENGINE,
         state: TreeState
-    }): Animations_ENGINE | undefined {
-        const tree = this.states[props.state];
-        const animations = this.referencePush({
-            boxIndices: props.boxIndices
-        });
+    ): Animations_ENGINE | undefined {
+        const tree = this.states[state];
+        const animations = this.referencePush(boxIndices);
         if (animations === undefined) return undefined;
         animations.element.setIndices(
-            new Plane_ENGINE({
-                horizontal: tree.element.indices.horizontal,
-                vertical: tree.element.indices.vertical
-            })
+            new Plane_ENGINE(
+                tree.element.indices.horizontal,
+                tree.element.indices.vertical
+            )
         );
-        animations.animation = new Animation_ENGINE({
-            frames: tree.animation.frames,
-            framesPerSecond: tree.animation.framesPerSecond
-        });
+        animations.animation = new Animation_ENGINE(
+            tree.animation.frames,
+            tree.animation.framesPerSecond
+        );
         return animations;
     }
 

@@ -39,17 +39,12 @@ type Box = {
     trees: false | Trees;
 };
 
-type GetBoxFloor = (props: {
-    boxIndices: Plane_ENGINE;
-}) => Box;
+type GetBoxFloor = (boxIndices: Plane_ENGINE) => Box;
 
 export type FloorMatrix_MapMatrix = Box[][];
 
 export class MapMatrix_ENGINE {
-    static length = new Plane_ENGINE({
-        horizontal: 21,
-        vertical: 21
-    });
+    static length = new Plane_ENGINE(21, 21);
 
     static getEmptyBox(): Box {
         return {
@@ -63,57 +58,45 @@ export class MapMatrix_ENGINE {
         };
     }
 
-    static getFloor0Box(props: {
-        boxIndices: Plane_ENGINE;
-    }): Box {
+    static getFloor0Box(boxIndices: Plane_ENGINE): Box {
         const box = MapMatrix_ENGINE.getEmptyBox();
         box.water = true;
-        if (props.boxIndices.vertical >= 3 && props.boxIndices.vertical <= 19 &&
-            props.boxIndices.horizontal >= 1 && props.boxIndices.horizontal <= 19)
+        if (
+            boxIndices.vertical >= 3 && boxIndices.vertical <= 19 &&
+            boxIndices.horizontal >= 1 && boxIndices.horizontal <= 19
+        )
             box.foam = {
                 flatSand: true
             };
 
         if (
-            props.boxIndices.vertical === 14 &&
-            props.boxIndices.horizontal >= 11 && props.boxIndices.horizontal <= 13
+            boxIndices.vertical === 14 &&
+            boxIndices.horizontal >= 11 && boxIndices.horizontal <= 13
         )
             box.stairElevation = {
                 shadow: true,
-                flatElevation: (props.boxIndices.horizontal === 11) ? "sand" : false
+                flatElevation: (boxIndices.horizontal === 11) ? "sand" : false
             };
 
         return box;
     }
 
-    static getFloor1Box(props: {
-        boxIndices: Plane_ENGINE;
-    }): Box {
+    static getFloor1Box(boxIndices: Plane_ENGINE): Box {
         const box = MapMatrix_ENGINE.getEmptyBox();
 
         if (
-            props.boxIndices.horizontal >= 2 && props.boxIndices.horizontal <= 17 &&
-            props.boxIndices.vertical >= 2 && props.boxIndices.vertical <= 13
+            boxIndices.horizontal >= 2 && boxIndices.horizontal <= 17 &&
+            boxIndices.vertical >= 2 && boxIndices.vertical <= 13
         )
             box.elevation = {
                 floor: 1,
-                shadow: props.boxIndices.vertical >= 3,
+                shadow: boxIndices.vertical >= 3,
                 flatGrass: true
             };
 
         if (
-            props.boxIndices.horizontal >= 2 && props.boxIndices.horizontal <= 10 &&
-            props.boxIndices.vertical === 14
-        )
-            box.elevation = {
-                floor: 1,
-                shadow: true,
-                flatGrass: true
-            };
-
-        if (
-            props.boxIndices.horizontal >= 14 && props.boxIndices.horizontal <= 17 &&
-            props.boxIndices.vertical === 14
+            boxIndices.horizontal >= 2 && boxIndices.horizontal <= 10 &&
+            boxIndices.vertical === 14
         )
             box.elevation = {
                 floor: 1,
@@ -122,8 +105,18 @@ export class MapMatrix_ENGINE {
             };
 
         if (
-            props.boxIndices.vertical === 15 &&
-            props.boxIndices.horizontal >= 2 && props.boxIndices.horizontal <= 10
+            boxIndices.horizontal >= 14 && boxIndices.horizontal <= 17 &&
+            boxIndices.vertical === 14
+        )
+            box.elevation = {
+                floor: 1,
+                shadow: true,
+                flatGrass: true
+            };
+
+        if (
+            boxIndices.vertical === 15 &&
+            boxIndices.horizontal >= 2 && boxIndices.horizontal <= 10
         ) {
             const flatElevationRandom = Math.round(Math.random());
             box.wallElevation = {
@@ -133,8 +126,8 @@ export class MapMatrix_ENGINE {
         }
 
         if (
-            props.boxIndices.vertical === 15 &&
-            props.boxIndices.horizontal >= 14 && props.boxIndices.horizontal <= 17
+            boxIndices.vertical === 15 &&
+            boxIndices.horizontal >= 14 && boxIndices.horizontal <= 17
         ) {
             const flatElevationRandom = Math.round(Math.random());
             box.wallElevation = {
@@ -144,16 +137,16 @@ export class MapMatrix_ENGINE {
         }
 
         if (
-            props.boxIndices.vertical === 7 &&
-            props.boxIndices.horizontal >= 11 && props.boxIndices.horizontal <= 13
+            boxIndices.vertical === 7 &&
+            boxIndices.horizontal >= 11 && boxIndices.horizontal <= 13
         ) {
             box.stairElevation = {
                 shadow: true,
-                flatElevation: (props.boxIndices.horizontal === 9) ? "grass" : false
+                flatElevation: (boxIndices.horizontal === 9) ? "grass" : false
             };
         }
 
-        if (props.boxIndices.vertical === 3 && props.boxIndices.horizontal === 14) {
+        if (boxIndices.vertical === 3 && boxIndices.horizontal === 14) {
             box.trees = {
                 animation: "felled"
             }
@@ -162,35 +155,22 @@ export class MapMatrix_ENGINE {
         return box;
     }
 
-    static getFloor2Box(props: {
-        boxIndices: Plane_ENGINE;
-    }): Box {
+    static getFloor2Box(boxIndices: Plane_ENGINE): Box {
         const box = MapMatrix_ENGINE.getEmptyBox();
 
         if (
-            props.boxIndices.horizontal >= 6 && props.boxIndices.horizontal <= 14 &&
-            props.boxIndices.vertical >= 1 && props.boxIndices.vertical <= 6
+            boxIndices.horizontal >= 6 && boxIndices.horizontal <= 14 &&
+            boxIndices.vertical >= 1 && boxIndices.vertical <= 6
         ) {
             box.elevation = {
                 floor: 2,
-                shadow: props.boxIndices.vertical >= 3,
+                shadow: boxIndices.vertical >= 3,
                 flatGrass: true
             };
         }
         if (
-            props.boxIndices.horizontal >= 6 && props.boxIndices.horizontal <= 10 &&
-            props.boxIndices.vertical === 7
-        ) {
-            box.elevation = {
-                floor: 2,
-                shadow: true,
-                flatGrass: true
-            };
-        }
-
-        if (
-            props.boxIndices.horizontal >= 14 && props.boxIndices.horizontal <= 14 &&
-            props.boxIndices.vertical === 7
+            boxIndices.horizontal >= 6 && boxIndices.horizontal <= 10 &&
+            boxIndices.vertical === 7
         ) {
             box.elevation = {
                 floor: 2,
@@ -200,8 +180,19 @@ export class MapMatrix_ENGINE {
         }
 
         if (
-            props.boxIndices.vertical === 8 &&
-            props.boxIndices.horizontal >= 6 && props.boxIndices.horizontal <= 10
+            boxIndices.horizontal >= 14 && boxIndices.horizontal <= 14 &&
+            boxIndices.vertical === 7
+        ) {
+            box.elevation = {
+                floor: 2,
+                shadow: true,
+                flatGrass: true
+            };
+        }
+
+        if (
+            boxIndices.vertical === 8 &&
+            boxIndices.horizontal >= 6 && boxIndices.horizontal <= 10
         ) {
             const flatElevationRandom = Math.round(Math.random());
             box.wallElevation = {
@@ -210,7 +201,7 @@ export class MapMatrix_ENGINE {
             };
         }
 
-        if (props.boxIndices.vertical === 8 && props.boxIndices.horizontal === 14) {
+        if (boxIndices.vertical === 8 && boxIndices.horizontal === 14) {
             const flatElevationRandom = Math.round(Math.random());
             box.wallElevation = {
                 shadow: true,
@@ -239,10 +230,7 @@ export class MapMatrix_ENGINE {
             if (floorMatrix === undefined)
                 continue;
 
-            const boxIndices = new Plane_ENGINE({
-                horizontal: 0,
-                vertical: 0
-            });
+            const boxIndices = new Plane_ENGINE(0, 0);
 
             for (
                 boxIndices.vertical = 0;
@@ -263,9 +251,7 @@ export class MapMatrix_ENGINE {
                     if (getBoxFloor === undefined)
                         continue;
 
-                    row[boxIndices.horizontal] = getBoxFloor({
-                        boxIndices
-                    });
+                    row[boxIndices.horizontal] = getBoxFloor(boxIndices);
                 }
             }
         }

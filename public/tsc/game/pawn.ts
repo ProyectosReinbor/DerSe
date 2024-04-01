@@ -17,65 +17,44 @@ export class Pawn_ENGINE extends Character_ENGINE {
     nickname: string;
     userBar: UserBar_ENGINE;
 
-    constructor(props: {
+    constructor(
         leftUp: Coordinate_ENGINE,
         map: Map_ENGINE,
         canvas: Canvas_ENGINE,
         color: PawnColor,
         nickname: string,
-    }) {
-        super({
-            leftUp: props.leftUp,
-            size: new Size_ENGINE({
-                width: props.map.boxes.width,
-                height: props.map.boxes.height
-            }),
-            canvas: props.canvas,
-            fillStyle: "#fff",
-            strokeStyle: false,
-            lineWidth: 0,
-            scale: new Size_ENGINE({
-                width: 3,
-                height: 3
-            }),
-            animations: {
-                route: `images/factions/knights/troops/pawn/${props.color}.png`,
-                element: new Element_ENGINE({
-                    size: new Size_ENGINE({
-                        width: 192,
-                        height: 192
-                    }),
-                    indices: new Plane_ENGINE({
-                        horizontal: 6,
-                        vertical: 6
-                    })
-                }),
-                animation: new Animation_ENGINE({
-                    frames: 6,
-                    framesPerSecond: 6
-                }),
+    ) {
+        super(
+            leftUp,
+            new Size_ENGINE(
+                map.boxes.width,
+                map.boxes.height
+            ),
+            canvas,
+            "#fff",
+            false,
+            0,
+            new Size_ENGINE(3, 3),
+            {
+                route: `images/factions/knights/troops/pawn/${color}.png`,
+                element: new Element_ENGINE(
+                    new Size_ENGINE(192, 192),
+                    new Plane_ENGINE(6, 6)
+                ),
+                animation: new Animation_ENGINE(6, 6),
             },
-            speed: new Coordinate_ENGINE({
-                x: 2,
-                y: 2
-            }),
-            address: new Direction_ENGINE({
-                x: 0,
-                y: 0
-            }),
-        });
-        this.map = props.map;
-        this.nickname = props.nickname;
-        this.userBar = new UserBar_ENGINE({
-            pawn: this,
-            size: new Size_ENGINE({
-                width: 0,
-                height: 0
-            }),
-            canvas: this.canvas,
-            photoRoute: false,
-            nickname: this.nickname
-        })
+            new Coordinate_ENGINE(2, 2),
+            new Direction_ENGINE(0, 0),
+        );
+        this.map = map;
+        this.nickname = nickname;
+        this.userBar = new UserBar_ENGINE(
+            this,
+            new Size_ENGINE(0, 0),
+            this.canvas,
+            false,
+            this.nickname
+        )
     }
 
     drawPawn() {

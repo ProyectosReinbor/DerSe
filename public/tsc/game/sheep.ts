@@ -25,96 +25,63 @@ export class Sheep_ENGINE extends Character_ENGINE {
     state: SheepState = "move";
     states: SheepStates = {
         move: {
-            animation: new Animation_ENGINE({
-                frames: 8,
-                framesPerSecond: 8
-            }),
+            animation: new Animation_ENGINE(8, 8),
             element: {
-                indices: new Plane_ENGINE({
-                    horizontal: 0,
-                    vertical: 0
-                })
+                indices: new Plane_ENGINE(0, 0)
             }
         },
         jump: {
-            animation: new Animation_ENGINE({
-                frames: 6,
-                framesPerSecond: 6
-            }),
+            animation: new Animation_ENGINE(6, 6),
             element: {
-                indices: new Plane_ENGINE({
-                    horizontal: 0,
-                    vertical: 1
-                })
+                indices: new Plane_ENGINE(0, 1)
             }
         }
     };
     jumpTimer: number = 0;
     map: Map_ENGINE;
 
-    constructor(props: {
+    constructor(
         leftUp: Coordinate_ENGINE,
         map: Map_ENGINE,
         canvas: Canvas_ENGINE,
-    }) {
-        super({
-            leftUp: props.leftUp,
-            size: new Size_ENGINE({
-                width: props.map.boxes.width,
-                height: props.map.boxes.height
-            }),
-            canvas: props.canvas,
-            fillStyle: "#fff",
-            strokeStyle: false,
-            lineWidth: 0,
-            scale: new Size_ENGINE({
-                width: 3,
-                height: 3
-            }),
-            animations: {
+    ) {
+        super(
+            leftUp,
+            new Size_ENGINE(
+                map.boxes.width,
+                map.boxes.height
+            ),
+            canvas,
+            "#fff",
+            false,
+            0,
+            new Size_ENGINE(3, 3),
+            {
                 route: "images/resources/sheep.png",
-                element: new Element_ENGINE({
-                    size: new Size_ENGINE({
-                        width: 128,
-                        height: 128
-                    }),
-                    indices: new Plane_ENGINE({
-                        horizontal: 0,
-                        vertical: 0
-                    })
-                }),
-                animation: new Animation_ENGINE({
-                    frames: 8,
-                    framesPerSecond: 8
-                })
+                element: new Element_ENGINE(
+                    new Size_ENGINE(128, 128),
+                    new Plane_ENGINE(0, 0)
+                ),
+                animation: new Animation_ENGINE(8, 8)
             },
-            speed: new Coordinate_ENGINE({
-                x: 40,
-                y: 40
-            }),
-            address: new Direction_ENGINE({
-                x: 0,
-                y: 0
-            }),
-        });
-        this.map = props.map;
+            new Coordinate_ENGINE(40, 40),
+            new Direction_ENGINE(0, 0),
+        );
+        this.map = map;
         this.state = "move";
-        this.lineSight = new Line_ENGINE({
-            leftUp: new Coordinate_ENGINE({
-                x: this.leftUp.x + this.size.width / 2,
-                y: this.leftUp.y + this.size.height / 2
-            }),
-            rightDown: this.leftUpPlusSizePercentages({
-                percentages: new Size_ENGINE({
-                    width: 200,
-                    height: 50
-                })
-            }),
-            canvas: this.canvas,
-            fillStyle: false,
-            strokeStyle: "#333",
-            lineWidth: 2,
-        });
+        this.lineSight = new Line_ENGINE(
+            new Coordinate_ENGINE(
+                this.leftUp.x + this.size.width / 2,
+                this.leftUp.y + this.size.height / 2
+            ),
+            this.leftUpPlusSizePercentages(
+                new Size_ENGINE(200, 50)
+            ),
+            this.canvas,
+            false,
+            "#333",
+            2,
+        );
     }
 
     moveSheep() {
@@ -122,13 +89,10 @@ export class Sheep_ENGINE extends Character_ENGINE {
         if (moved === false)
             return false;
 
-        const collision = this.map.collisionMap({
-            character: this,
-            moved
-        });
-        if (collision === true) {
+        const collision = this.map.collisionMap(this, moved);
+        if (collision === true)
             return false;
-        }
+
 
         this.leftUp.x = moved.leftUp.x;
         this.leftUp.y = moved.leftUp.y;
@@ -153,10 +117,10 @@ export class Sheep_ENGINE extends Character_ENGINE {
             return;
 
         this.animations.element.setIndices(
-            new Plane_ENGINE({
-                horizontal: character.element.indices.horizontal,
-                vertical: character.element.indices.vertical
-            })
+            new Plane_ENGINE(
+                character.element.indices.horizontal,
+                character.element.indices.vertical
+            )
         );
         this.animations.animation.frames = character.animation.frames;
         this.animations.animation.framesPerSecond = character.animation.framesPerSecond;

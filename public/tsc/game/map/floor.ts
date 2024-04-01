@@ -31,12 +31,12 @@ export class Floor_ENGINE {
     castles: Castles_ENGINE;
     trees: Trees_ENGINE;
 
-    constructor(props: {
+    constructor(
         map: Map_ENGINE,
         canvas: Canvas_ENGINE,
-    }) {
-        this.map = props.map;
-        this.canvas = props.canvas;
+    ) {
+        this.map = map;
+        this.canvas = canvas;
 
         this.water = new Water_ENGINE({
             map: this.map,
@@ -97,10 +97,10 @@ export class Floor_ENGINE {
     pushFloor(matrix: FloorMatrix_MapMatrix) {
         matrix.forEach((row, vertical) => {
             row.forEach((box, horizontal) => {
-                const boxIndices = new Plane_ENGINE({
+                const boxIndices = new Plane_ENGINE(
                     horizontal,
                     vertical
-                });
+                );
 
                 if (box.water === true)
                     this.water.pushWater({
@@ -184,18 +184,10 @@ export class Floor_ENGINE {
         });
     }
 
-    aboveFloor(props: {
-        character: Character_ENGINE;
-    }): boolean {
-        const flatSand = this.flatsSand.collision({
-            character: props.character
-        }) !== false;
-        const elevations = this.elevations.collision({
-            character: props.character
-        }) !== false;
-        const stairsElevations = this.stairsElevation.collision({
-            character: props.character
-        }) !== false;
+    aboveFloor(character: Character_ENGINE): boolean {
+        const flatSand = this.flatsSand.collision(character) !== false;
+        const elevations = this.elevations.collision(character) !== false;
+        const stairsElevations = this.stairsElevation.collision(character) !== false;
 
         if (flatSand === true)
             return true;
@@ -209,35 +201,19 @@ export class Floor_ENGINE {
         return false;
     }
 
-    collisionFloor(props: {
-        character: Character_ENGINE;
-        moved: Character_ENGINE;
-    }): boolean {
-        const flatSand = this.flatsSand.collision({
-            character: props.character
-        }) !== false;
-        const elevations = this.elevations.collision({
-            character: props.character
-        }) !== false;
-        const wallElevations = this.wallElevations.collision({
-            character: props.character
-        }) !== false;
-        const stairsElevations = this.stairsElevation.collision({
-            character: props.character
-        }) !== false;
+    collisionFloor(
+        character: Character_ENGINE,
+        moved: Character_ENGINE,
+    ): boolean {
+        const flatSand = this.flatsSand.collision(character) !== false;
+        const elevations = this.elevations.collision(character) !== false;
+        const wallElevations = this.wallElevations.collision(character) !== false;
+        const stairsElevations = this.stairsElevation.collision(character) !== false;
 
-        const nextFlatSand = this.flatsSand.collision({
-            character: props.moved
-        }) !== false;
-        const nextElevations = this.elevations.collision({
-            character: props.moved
-        }) !== false;
-        const nextWallElevations = this.wallElevations.collision({
-            character: props.moved
-        }) !== false;
-        const nextStairsElevations = this.stairsElevation.collision({
-            character: props.moved
-        }) !== false;
+        const nextFlatSand = this.flatsSand.collision(moved) !== false;
+        const nextElevations = this.elevations.collision(moved) !== false;
+        const nextWallElevations = this.wallElevations.collision(moved) !== false;
+        const nextStairsElevations = this.stairsElevation.collision(moved) !== false;
 
         if (flatSand === true) {
             if (nextFlatSand === true)

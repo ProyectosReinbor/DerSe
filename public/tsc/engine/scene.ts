@@ -14,11 +14,11 @@ export class Scene_ENGINE {
     }
 
     async start() {
-        await this.canvas.start({
-            drawScene: () => this.draw(),
-            touchstartScene: (touch: Coordinate_ENGINE) => this.touchstart(touch),
-            touchmoveScene: (touch: Coordinate_ENGINE) => this.touchmove(touch),
-            touchendScene: (touch: Coordinate_ENGINE) => this.touchend(touch),
-        });
+        await this.canvas.start(
+            () => this.draw(),
+            (touch: Coordinate_ENGINE) => this.touchstart(touch),
+            (touch: Coordinate_ENGINE) => this.touchmove(touch),
+            (touch: Coordinate_ENGINE) => this.touchend(touch),
+        );
     }
 }

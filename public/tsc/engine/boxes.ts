@@ -121,14 +121,14 @@ export class Boxes_ENGINE extends Coordinate_ENGINE {
         );
         const distanceX = boxIndices.horizontal * size.width;
         const distanceY = boxIndices.vertical * size.height;
-        const box = new Box_ENGINE({
-            leftUp: new Coordinate_ENGINE(
+        const box = new Box_ENGINE(
+            new Coordinate_ENGINE(
                 this.x + distanceX,
                 this.y + distanceY,
             ),
             size,
             referenceIndex
-        });
+        );
         this.boxesIndices(
             boxIndices,
             box

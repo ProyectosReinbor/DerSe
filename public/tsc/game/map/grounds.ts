@@ -23,96 +23,72 @@ export class Grounds_ENGINE extends ElementBoxes_ENGINE {
     override references: Elements_ENGINE[] = [];
     elementIndices: GroundElementIndices;
 
-    constructor(props: {
-        canvas: Canvas_ENGINE;
-        map: Map_ENGINE;
-        route: ImagePath;
-        elementIndices: GroundElementIndices;
-    }) {
-        super({
-            x: props.map.leftUp.x,
-            y: props.map.leftUp.y,
-            canvas: props.canvas,
-            size: new Size_ENGINE({
-                width: props.map.boxes.width,
-                height: props.map.boxes.height
-            }),
-            length: new Plane_ENGINE({
-                horizontal: 1,
-                vertical: 1
-            }),
-            occupied: true,
-            route: props.route,
-            element: new Element_ENGINE({
-                size: new Size_ENGINE({
-                    width: 64,
-                    height: 64
-                }),
-                indices: props.elementIndices.only
-            })
-        });
-        this.elementIndices = props.elementIndices;
+    constructor(
+        map: Map_ENGINE,
+        canvas: Canvas_ENGINE,
+        route: ImagePath,
+        elementIndices: GroundElementIndices,
+    ) {
+        super(
+            map.leftUp.x,
+            map.leftUp.y,
+            canvas,
+            new Size_ENGINE(
+                map.boxes.width,
+                map.boxes.height
+            ),
+            new Plane_ENGINE(1, 1),
+            true,
+            route,
+            new Element_ENGINE(
+                new Size_ENGINE(64, 64),
+                elementIndices.only
+            )
+        );
+        this.elementIndices = elementIndices;
     }
 
     refreshElements() {
         this.references.forEach(elements => {
-            const boxIndices = this.getBoxIndices({
-                coordinate: elements.leftUp
-            });
-            const groundPosition = this.groundPosition({
-                boxIndices
-            });
+            const boxIndices = this.getBoxIndices(elements.leftUp);
+            const groundPosition = this.groundPosition(boxIndices);
             const indices = this.elementIndices[groundPosition];
             elements.element.setIndices(
-                new Plane_ENGINE({
-                    horizontal: indices.horizontal,
-                    vertical: indices.vertical
-                })
+                new Plane_ENGINE(
+                    indices.horizontal,
+                    indices.vertical
+                )
             );
         });
     }
 
-    pushGround(props: {
-        boxIndices: Plane_ENGINE;
-    }): Elements_ENGINE | undefined {
-        const ground = this.referencePush({
-            boxIndices: props.boxIndices
-        });
+    pushGround(boxIndices: Plane_ENGINE): Elements_ENGINE | undefined {
+        const ground = this.referencePush(boxIndices);
         this.refreshElements();
         return ground;
     }
 
-    groundPosition(props: {
-        boxIndices: Plane_ENGINE;
-    }): GroundState {
-        const leftBoxes = new Plane_ENGINE({
-            horizontal: props.boxIndices.horizontal - 1,
-            vertical: props.boxIndices.vertical
-        });
-        const rightBoxes = new Plane_ENGINE({
-            horizontal: props.boxIndices.horizontal + 1,
-            vertical: props.boxIndices.vertical
-        });
-        const upBoxes = new Plane_ENGINE({
-            horizontal: props.boxIndices.horizontal,
-            vertical: props.boxIndices.vertical - 1
-        });
-        const downBoxes = new Plane_ENGINE({
-            horizontal: props.boxIndices.horizontal,
-            vertical: props.boxIndices.vertical + 1
-        });
-        const left = this.getBox({
-            boxIndices: leftBoxes
-        }) !== undefined;
-        const right = this.getBox({
-            boxIndices: rightBoxes
-        }) !== undefined;
-        const up = this.getBox({
-            boxIndices: upBoxes
-        }) !== undefined;
-        const down = this.getBox({
-            boxIndices: downBoxes
-        }) !== undefined;
+    groundPosition(boxIndices: Plane_ENGINE): GroundState {
+        const leftBoxes = new Plane_ENGINE(
+            boxIndices.horizontal - 1,
+            boxIndices.vertical
+        );
+        const rightBoxes = new Plane_ENGINE(
+            boxIndices.horizontal + 1,
+            boxIndices.vertical
+        );
+        const upBoxes = new Plane_ENGINE(
+            boxIndices.horizontal,
+            boxIndices.vertical - 1
+        );
+        const downBoxes = new Plane_ENGINE(
+            boxIndices.horizontal,
+            boxIndices.vertical + 1
+        );
+        const left = this.getBox(leftBoxes) !== undefined;
+        const right = this.getBox(rightBoxes) !== undefined;
+        const up = this.getBox(upBoxes) !== undefined;
+        const down = this.getBox(downBoxes) !== undefined;
 
         const isLeftUp = !up && down && !left && right;
         if (isLeftUp) return "leftUp";

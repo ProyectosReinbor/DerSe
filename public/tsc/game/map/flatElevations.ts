@@ -13,61 +13,44 @@ export type FlatElevationElementIndices = {
 
 export class FlatElevations_ENGINE extends ElementBoxes_ENGINE {
     elementIndices: FlatElevationElementIndices;
-    constructor(props: {
+    constructor(
         map: Map_ENGINE,
         canvas: Canvas_ENGINE,
-    }) {
-        super({
-            x: props.map.leftUp.x,
-            y: props.map.leftUp.y,
-            canvas: props.canvas,
-            size: new Size_ENGINE({
-                width: props.map.boxes.width,
-                height: props.map.boxes.height
-            }),
-            length: new Plane_ENGINE({
-                horizontal: 1,
-                vertical: 1
-            }),
-            occupied: true,
-            route: "images/terrain/ground/flat.png",
-            element: new Element_ENGINE({
-                size: new Size_ENGINE({
-                    width: 64,
-                    height: 64
-                }),
-                indices: new Plane_ENGINE({
-                    horizontal: 0,
-                    vertical: 0
-                })
-            })
-        });
+    ) {
+        super(
+            map.leftUp.x,
+            map.leftUp.y,
+            canvas,
+            new Size_ENGINE(
+                map.boxes.width,
+                map.boxes.height
+            ),
+            new Plane_ENGINE(1, 1),
+            true,
+            "images/terrain/ground/flat.png",
+            new Element_ENGINE(
+                new Size_ENGINE(64, 64),
+                new Plane_ENGINE(0, 0)
+            )
+        );
         this.elementIndices = {
-            grass: new Plane_ENGINE({
-                horizontal: 4,
-                vertical: 0
-            }),
-            sand: new Plane_ENGINE({
-                horizontal: 9,
-                vertical: 0
-            })
+            grass: new Plane_ENGINE(4, 0),
+            sand: new Plane_ENGINE(9, 0)
         };
     }
 
-    pushFlatElevation(props: {
-        boxIndices: Plane_ENGINE;
-        state: FlatElevationState;
-    }): Elements_ENGINE | undefined {
-        const indices = this.elementIndices[props.state];
+    pushFlatElevation(
+        boxIndices: Plane_ENGINE,
+        state: FlatElevationState,
+    ): Elements_ENGINE | undefined {
+        const indices = this.elementIndices[state];
         this.element.setIndices(
-            new Plane_ENGINE({
-                horizontal: indices.horizontal,
-                vertical: indices.vertical
-            })
+            new Plane_ENGINE(
+                indices.horizontal,
+                indices.vertical
+            )
         );
-        return this.referencePush({
-            boxIndices: props.boxIndices
-        });
+        return this.referencePush(boxIndices);
     }
 
     drawFlatElevations(): void {

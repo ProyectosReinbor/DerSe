@@ -5,33 +5,26 @@ import { Size_ENGINE } from "../../engine/size";
 import type { Map_ENGINE } from "../map";
 
 export class Water_ENGINE extends ImageBoxes_ENGINE {
-    constructor(props: {
+    constructor(
         map: Map_ENGINE,
         canvas: Canvas_ENGINE,
-    }) {
-        super({
-            x: props.map.leftUp.x,
-            y: props.map.leftUp.y,
-            canvas: props.canvas,
-            size: new Size_ENGINE({
-                width: props.map.boxes.width,
-                height: props.map.boxes.height
-            }),
-            length: new Plane_ENGINE({
-                horizontal: 1,
-                vertical: 1
-            }),
-            occupied: true,
-            route: "images/terrain/water/water.png",
-        });
+    ) {
+        super(
+            map.leftUp.x,
+            map.leftUp.y,
+            canvas,
+            new Size_ENGINE(
+                map.boxes.width,
+                map.boxes.height
+            ),
+            new Plane_ENGINE(1, 1),
+            true,
+            "images/terrain/water/water.png",
+        );
     }
 
-    pushWater(props: {
-        boxIndices: Plane_ENGINE;
-    }) {
-        return this.referencePush({
-            boxIndices: props.boxIndices
-        });
+    pushWater(boxIndices: Plane_ENGINE) {
+        return this.referencePush(boxIndices);
     }
 
     drawWater() {

@@ -9,51 +9,35 @@ import type { Map_ENGINE } from "../map";
 
 
 export class Foams_ENGINE extends AnimationBoxes_ENGINE {
-    constructor(props: {
+    constructor(
         map: Map_ENGINE,
         canvas: Canvas_ENGINE,
-    }) {
-        super({
-            x: props.map.leftUp.x,
-            y: props.map.leftUp.y,
-            canvas: props.canvas,
-            size: new Size_ENGINE({
-                width: props.map.boxes.width,
-                height: props.map.boxes.height
-            }),
-            length: new Plane_ENGINE({
-                horizontal: 3,
-                vertical: 3
-            }),
-            occupied: [
+    ) {
+        super(
+            map.leftUp.x,
+            map.leftUp.y,
+            canvas,
+            new Size_ENGINE(
+                map.boxes.width,
+                map.boxes.height
+            ),
+            new Plane_ENGINE(3, 3),
+            [
                 [true, false, false],
                 [false, false, false],
                 [false, false, false]
             ],
-            route: "images/terrain/water/foam.png",
-            element: new Element_ENGINE({
-                size: new Size_ENGINE({
-                    width: 192,
-                    height: 192
-                }),
-                indices: new Plane_ENGINE({
-                    horizontal: 0,
-                    vertical: 0
-                })
-            }),
-            animation: new Animation_ENGINE({
-                frames: 8,
-                framesPerSecond: 8
-            })
-        });
+            "images/terrain/water/foam.png",
+            new Element_ENGINE(
+                new Size_ENGINE(192, 192),
+                new Plane_ENGINE(0, 0)
+            ),
+            new Animation_ENGINE(8, 8)
+        );
     }
 
-    pushFoam(props: {
-        boxIndices: Plane_ENGINE;
-    }): Animations_ENGINE | undefined {
-        const foam = this.referencePush({
-            boxIndices: props.boxIndices
-        });
+    pushFoam(boxIndices: Plane_ENGINE): Animations_ENGINE | undefined {
+        const foam = this.referencePush(boxIndices);
         if (foam === undefined)
             return undefined;
 

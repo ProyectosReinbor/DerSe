@@ -55,7 +55,7 @@ export class Character_ENGINE extends Square_ENGINE {
 
     movedCharacter(): Character_ENGINE | false {
         if (this.address.isEqualTo(
-            new Direction_ENGINE({ x: 0, y: 0 })
+            new Direction_ENGINE(0, 0)
         ))
             return false;
 

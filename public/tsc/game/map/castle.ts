@@ -11,22 +11,22 @@ export class Castle_ENGINE extends Image_ENGINE {
     state: CastleState = "construction";
     color: CastleColor = "blue";
 
-    constructor(props: {
-        leftUp: Coordinate_ENGINE;
-        size: Size_ENGINE;
-        canvas: Canvas_ENGINE;
-        state: CastleState;
-        color: CastleColor;
-    }) {
-        super({
-            leftUp: props.leftUp,
-            size: props.size,
-            canvas: props.canvas,
-            route: false,
-        });
+    constructor(
+        leftUp: Coordinate_ENGINE,
+        size: Size_ENGINE,
+        canvas: Canvas_ENGINE,
+        state: CastleState,
+        color: CastleColor,
+    ) {
+        super(
+            leftUp,
+            size,
+            canvas,
+            false,
+        );
         this.imageCastle(
-            props.state,
-            props.color
+            state,
+            color
         );
     }
 

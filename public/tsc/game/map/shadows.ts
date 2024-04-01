@@ -7,37 +7,30 @@ import type { Map_ENGINE } from "../map";
 
 
 export class Shadows_ENGINE extends ImageBoxes_ENGINE {
-    constructor(props: {
+    constructor(
         map: Map_ENGINE,
         canvas: Canvas_ENGINE,
-    }) {
-        super({
-            x: props.map.leftUp.x,
-            y: props.map.leftUp.y,
-            canvas: props.canvas,
-            size: new Size_ENGINE({
-                width: props.map.boxes.width,
-                height: props.map.boxes.height
-            }),
-            length: new Plane_ENGINE({
-                horizontal: 3,
-                vertical: 3
-            }),
-            occupied: [
+    ) {
+        super(
+            map.leftUp.x,
+            map.leftUp.y,
+            canvas,
+            new Size_ENGINE(
+                map.boxes.width,
+                map.boxes.height
+            ),
+            new Plane_ENGINE(3, 3),
+            [
                 [true, false, false],
                 [false, false, false],
                 [false, false, false]
             ],
-            route: "images/terrain/ground/shadows.png",
-        });
+            "images/terrain/ground/shadows.png",
+        );
     }
 
-    pushShadow(props: {
-        boxIndices: Plane_ENGINE;
-    }): Image_ENGINE | undefined {
-        const shadow = this.referencePush({
-            boxIndices: props.boxIndices
-        });
+    pushShadow(boxIndices: Plane_ENGINE): Image_ENGINE | undefined {
+        const shadow = this.referencePush(boxIndices);
         if (shadow === undefined) return undefined;
         shadow.leftUp.x -= this.size.width;
         shadow.leftUp.y -= this.size.height;

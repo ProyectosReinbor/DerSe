@@ -15,73 +15,46 @@ export class StairsElevations_ENGINE extends ElementBoxes_ENGINE {
 
     elementIndices: StairElevationElementIndices;
 
-    constructor(props: {
+    constructor(
         map: Map_ENGINE,
         canvas: Canvas_ENGINE,
-    }) {
-        super({
-            x: props.map.leftUp.x,
-            y: props.map.leftUp.y,
-            canvas: props.canvas,
-            size: new Size_ENGINE({
-                width: props.map.boxes.width,
-                height: props.map.boxes.height
-            }),
-            length: new Plane_ENGINE({
-                horizontal: 1,
-                vertical: 1
-            }),
-            occupied: true,
-            route: "images/terrain/ground/elevation.png",
-            element: new Element_ENGINE({
-                size: new Size_ENGINE({
-                    width: 64,
-                    height: 64
-                }),
-                indices: new Plane_ENGINE({
-                    horizontal: 0,
-                    vertical: 0
-                })
-            })
-        });
+    ) {
+        super(
+            map.leftUp.x,
+            map.leftUp.y,
+            canvas,
+            new Size_ENGINE(
+                map.boxes.width,
+                map.boxes.height
+            ),
+            new Plane_ENGINE(1, 1),
+            true,
+            "images/terrain/ground/elevation.png",
+            new Element_ENGINE(
+                new Size_ENGINE(64, 64),
+                new Plane_ENGINE(0, 0)
+            )
+        );
         this.elementIndices = {
-            left: new Plane_ENGINE({
-                horizontal: 0,
-                vertical: 7
-            }),
-            center: new Plane_ENGINE({
-                horizontal: 1,
-                vertical: 7
-            }),
-            right: new Plane_ENGINE({
-                horizontal: 2,
-                vertical: 7
-            }),
-            only: new Plane_ENGINE({
-                horizontal: 3,
-                vertical: 7
-            })
+            left: new Plane_ENGINE(0, 7),
+            center: new Plane_ENGINE(1, 7),
+            right: new Plane_ENGINE(2, 7),
+            only: new Plane_ENGINE(3, 7)
         };
     }
 
-    positionStairElevation(props: {
-        boxIndices: Plane_ENGINE;
-    }): StairElevationState {
-        const leftBoxIndices = new Plane_ENGINE({
-            horizontal: props.boxIndices.horizontal - 1,
-            vertical: props.boxIndices.vertical,
-        });
-        const rightBoxIndices = new Plane_ENGINE({
-            horizontal: props.boxIndices.horizontal + 1,
-            vertical: props.boxIndices.vertical,
-        });
+    positionStairElevation(boxIndices: Plane_ENGINE): StairElevationState {
+        const leftBoxIndices = new Plane_ENGINE(
+            boxIndices.horizontal - 1,
+            boxIndices.vertical,
+        );
+        const rightBoxIndices = new Plane_ENGINE(
+            boxIndices.horizontal + 1,
+            boxIndices.vertical,
+        );
 
-        const left = this.getBox({
-            boxIndices: leftBoxIndices
-        }) !== undefined;
-        const right = this.getBox({
-            boxIndices: rightBoxIndices
-        }) !== undefined;
+        const left = this.getBox(leftBoxIndices) !== undefined;
+        const right = this.getBox(rightBoxIndices) !== undefined;
 
         const isLeft = !left && right;
         if (isLeft) return "left";
@@ -100,28 +73,20 @@ export class StairsElevations_ENGINE extends ElementBoxes_ENGINE {
 
     refreshElements(): void {
         this.references.forEach(elements => {
-            const boxIndices = this.getBoxIndices({
-                coordinate: elements.leftUp
-            });
-            const position = this.positionStairElevation({
-                boxIndices
-            });
+            const boxIndices = this.getBoxIndices(elements.leftUp);
+            const position = this.positionStairElevation(boxIndices);
             const indices = this.elementIndices[position];
             elements.element.setIndices(
-                new Plane_ENGINE({
-                    horizontal: indices.horizontal,
-                    vertical: indices.vertical
-                })
+                new Plane_ENGINE(
+                    indices.horizontal,
+                    indices.vertical
+                )
             );
         });
     }
 
-    setStairsElevations(props: {
-        boxIndices: Plane_ENGINE;
-    }): Elements_ENGINE | undefined {
-        const stairElevation = this.referencePush({
-            boxIndices: props.boxIndices
-        });
+    setStairsElevations(boxIndices: Plane_ENGINE): Elements_ENGINE | undefined {
+        const stairElevation = this.referencePush(boxIndices);
         if (stairElevation === undefined)
             return undefined;
 
