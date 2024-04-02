@@ -64,24 +64,48 @@ export class Sheep_ENGINE extends Character_ENGINE {
                 ),
                 animation: new Animation_ENGINE(8, 8)
             },
-            new Coordinate_ENGINE(200, 200),
-            new Direction_ENGINE(1, 0),
+            new Coordinate_ENGINE(50, 50),
+            new Direction_ENGINE(0, -1),
         );
         this.map = map;
         this.state = "move";
         this.lineSight = new Line_ENGINE(
-            new Coordinate_ENGINE(
-                this.leftUp.x + this.size.width / 2,
-                this.leftUp.y + this.size.height / 2
-            ),
-            this.leftUpPlusSizePercentages(
-                new Size_ENGINE(200, 50)
-            ),
+            new Coordinate_ENGINE(0, 0),
+            new Coordinate_ENGINE(0, 0),
             this.canvas,
             false,
             "#333",
             2,
         );
+    }
+
+    lineSightPosition() {
+        const leftUp = () => {
+            const halfSizeWidth = this.size.width / 2;
+            const halfSizeHeight = this.size.height / 2;
+            const leftUpX = this.leftUp.x + halfSizeWidth;
+            const leftUpY = this.leftUp.y + halfSizeHeight;
+            return new Coordinate_ENGINE(
+                leftUpX,
+                leftUpY
+            );
+        };
+        const rightDownPercentages = () => {
+            const lineReach = 200;
+            const percentageCenter = 50;
+            const lineScopeX = lineReach * this.address.x;
+            const lineScopeY = lineReach * this.address.y;
+            return new Size_ENGINE(
+                lineScopeX + percentageCenter,
+                lineScopeY + percentageCenter
+            );
+        }
+        this.lineSight.setPosition(
+            leftUp(),
+            this.leftUpPlusSizePercentages(
+                rightDownPercentages()
+            ),
+        )
     }
 
     moveSheep() {
@@ -92,7 +116,6 @@ export class Sheep_ENGINE extends Character_ENGINE {
         const collision = this.map.collisionMap(this, moved);
         if (collision === true)
             return false;
-
 
         this.leftUp.x = moved.leftUp.x;
         this.leftUp.y = moved.leftUp.y;
@@ -144,6 +167,7 @@ export class Sheep_ENGINE extends Character_ENGINE {
         this.jumpSheep();
         this.imageAccordingDirectionMovement();
         this.drawCharacter();
+        this.lineSightPosition();
         this.lineSight.drawLine();
     }
 }

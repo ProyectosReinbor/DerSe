@@ -2,7 +2,6 @@ import type { FloorMatrix_MapMatrix } from "../mapMatrix";
 import type { Map_ENGINE } from "../map";
 import type { Canvas_ENGINE } from "../../engine/canvas";
 import { Plane_ENGINE } from "../../engine/plane";
-import type { Character_ENGINE } from "../../engine/character";
 import { FlatsSand_ENGINE } from "./flatsSand";
 import { Elevations_ENGINE } from "./elevations";
 import { WallElevations_ENGINE } from "./wallElevations";
@@ -14,6 +13,7 @@ import { Shadows_ENGINE } from "./shadows";
 import { StairsElevations_ENGINE } from "./stairsElevations";
 import { FlatElevations_ENGINE } from "./flatElevations";
 import { Trees_ENGINE } from "./trees";
+import type { Position_ENGINE } from "../../engine/position";
 
 export class Floor_ENGINE {
 
@@ -121,7 +121,7 @@ export class Floor_ENGINE {
         });
     }
 
-    aboveFloor(character: Character_ENGINE): boolean {
+    aboveFloor(character: Position_ENGINE): boolean {
         const flatSand = this.flatsSand.collision(character) !== false;
         const elevations = this.elevations.collision(character) !== false;
         const stairsElevations = this.stairsElevation.collision(character) !== false;
@@ -139,13 +139,13 @@ export class Floor_ENGINE {
     }
 
     collisionFloor(
-        character: Character_ENGINE,
-        moved: Character_ENGINE,
+        position: Position_ENGINE,
+        moved: Position_ENGINE,
     ): boolean {
-        const flatSand = this.flatsSand.collision(character) !== false;
-        const elevations = this.elevations.collision(character) !== false;
-        const wallElevations = this.wallElevations.collision(character) !== false;
-        const stairsElevations = this.stairsElevation.collision(character) !== false;
+        const flatSand = this.flatsSand.collision(position) !== false;
+        const elevations = this.elevations.collision(position) !== false;
+        const wallElevations = this.wallElevations.collision(position) !== false;
+        const stairsElevations = this.stairsElevation.collision(position) !== false;
 
         const nextFlatSand = this.flatsSand.collision(moved) !== false;
         const nextElevations = this.elevations.collision(moved) !== false;

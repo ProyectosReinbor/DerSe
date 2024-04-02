@@ -1,6 +1,5 @@
 import { Box_ENGINE } from "./box";
 import type { Canvas_ENGINE } from "./canvas";
-import type { Character_ENGINE } from "./character";
 import { Coordinate_ENGINE } from "./coordinate";
 import { Plane_ENGINE } from "./plane";
 import { Position_ENGINE } from "./position";
@@ -32,21 +31,22 @@ export class Boxes_ENGINE extends Coordinate_ENGINE {
         this.occupied = occupied;
     }
 
-    collision(character: Character_ENGINE): Box_ENGINE | false {
-        const size = new Size_ENGINE(
-            this.size.width * character.address.x,
-            this.size.height * character.address.y
-        );
+    collision(position: Position_ENGINE): Box_ENGINE | false {
         const leftUp = new Coordinate_ENGINE(
-            character.leftUp.x + size.width,
-            character.leftUp.y + size.height
+            position.leftUp.x + this.size.width,
+            position.leftUp.y + this.size.height
         );
-        const rightDown = new Coordinate_ENGINE(
-            character.rightDown.x + size.width,
-            character.rightDown.y + size.height
-        );
+        const rightDown = () => {
+            const positionRightDown = position.rightDown();
+            return new Coordinate_ENGINE(
+                positionRightDown.x + this.size.width,
+                positionRightDown.y + this.size.height
+            );
+        };
         const boxIndicesLeftUp = this.getBoxIndices(leftUp);
-        const boxIndicesRightDown = this.getBoxIndices(rightDown);
+        const boxIndicesRightDown = this.getBoxIndices(
+            rightDown()
+        );
         const boxIndices = new Plane_ENGINE(0, 0);
         for (
             boxIndices.vertical = boxIndicesLeftUp.vertical;
@@ -62,7 +62,7 @@ export class Boxes_ENGINE extends Coordinate_ENGINE {
                 if (box === undefined)
                     continue;
 
-                if (box.someVertexInside(character) === false)
+                if (box.someVertexInside(position) === false)
                     continue;
 
                 return box;

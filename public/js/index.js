@@ -19,13 +19,13 @@ class Position_ENGINE {
     this.leftUp = leftUp;
     this.size = size;
   }
-  get leftDown() {
+  leftDown() {
     return new Coordinate_ENGINE(this.leftUp.x, this.leftUp.y + this.size.height);
   }
-  get rightDown() {
+  rightDown() {
     return new Coordinate_ENGINE(this.leftUp.x + this.size.width, this.leftUp.y + this.size.height);
   }
-  get rightUp() {
+  rightUp() {
     return new Coordinate_ENGINE(this.leftUp.x + this.size.width, this.leftUp.y);
   }
   leftUpPlusSizePercentages(percentages) {
@@ -33,19 +33,19 @@ class Position_ENGINE {
     return new Coordinate_ENGINE(this.leftUp.x + size.width, this.leftUp.y + size.height);
   }
   insidePositionCoordinate(coordinate2) {
-    return this.leftUp.x <= coordinate2.x && this.leftUp.y <= coordinate2.y && this.rightDown.x >= coordinate2.x && this.rightDown.y >= coordinate2.y;
+    return this.leftUp.x <= coordinate2.x && this.leftUp.y <= coordinate2.y && this.rightDown().x >= coordinate2.x && this.rightDown().y >= coordinate2.y;
   }
   insidePosition(position) {
-    return this.leftUp.x <= position.leftUp.x && this.leftUp.y <= position.leftUp.y && this.rightDown.x >= position.rightDown.x && this.rightDown.y >= position.rightDown.y;
+    return this.leftUp.x <= position.leftUp.x && this.leftUp.y <= position.leftUp.y && this.rightDown().x >= position.rightDown().x && this.rightDown().y >= position.rightDown().y;
   }
   someVertexInside(position) {
     if (this.insidePositionCoordinate(position.leftUp))
       return true;
-    if (this.insidePositionCoordinate(position.leftDown))
+    if (this.insidePositionCoordinate(position.leftDown()))
       return true;
-    if (this.insidePositionCoordinate(position.rightUp))
+    if (this.insidePositionCoordinate(position.rightUp()))
       return true;
-    if (this.insidePositionCoordinate(position.rightDown))
+    if (this.insidePositionCoordinate(position.rightDown()))
       return true;
     return false;
   }
@@ -517,10 +517,9 @@ class Boxes_ENGINE extends Coordinate_ENGINE {
     this.length = length;
     this.occupied = occupied;
   }
-  collision(character) {
-    const size4 = new Size_ENGINE(this.size.width * character.address.x, this.size.height * character.address.y);
-    const leftUp = new Coordinate_ENGINE(character.leftUp.x + size4.width, character.leftUp.y + size4.height);
-    const rightDown = new Coordinate_ENGINE(character.rightDown.x + size4.width, character.rightDown.y + size4.height);
+  collision(position7) {
+    const leftUp = new Coordinate_ENGINE(position7.leftUp.x + this.size.width, position7.leftUp.y + this.size.height);
+    const rightDown = new Coordinate_ENGINE(position7.rightDown().x + this.size.width, position7.rightDown().y + this.size.height);
     const boxIndicesLeftUp = this.getBoxIndices(leftUp);
     const boxIndicesRightDown = this.getBoxIndices(rightDown);
     const boxIndices = new Plane_ENGINE(0, 0);
@@ -529,7 +528,7 @@ class Boxes_ENGINE extends Coordinate_ENGINE {
         const box2 = this.getBox(boxIndices);
         if (box2 === undefined)
           continue;
-        if (box2.someVertexInside(character) === false)
+        if (box2.someVertexInside(position7) === false)
           continue;
         return box2;
       }
@@ -1222,11 +1221,11 @@ class Floor_ENGINE {
       return true;
     return false;
   }
-  collisionFloor(character, moved) {
-    const flatSand = this.flatsSand.collision(character) !== false;
-    const elevations2 = this.elevations.collision(character) !== false;
-    const wallElevations2 = this.wallElevations.collision(character) !== false;
-    const stairsElevations2 = this.stairsElevation.collision(character) !== false;
+  collisionFloor(position7, moved) {
+    const flatSand = this.flatsSand.collision(position7) !== false;
+    const elevations2 = this.elevations.collision(position7) !== false;
+    const wallElevations2 = this.wallElevations.collision(position7) !== false;
+    const stairsElevations2 = this.stairsElevation.collision(position7) !== false;
     const nextFlatSand = this.flatsSand.collision(moved) !== false;
     const nextElevations = this.elevations.collision(moved) !== false;
     const nextWallElevations = this.wallElevations.collision(moved) !== false;
@@ -1562,13 +1561,18 @@ class Line_ENGINE extends Position_ENGINE {
     this.strokeStyle = strokeStyle;
     this.lineWidth = lineWidth;
   }
+  setPosition(leftUp, rightDown) {
+    const size20 = new Size_ENGINE(rightDown.x - leftUp.x, rightDown.y - leftUp.y);
+    this.leftUp = leftUp;
+    this.size = size20;
+  }
   drawLine() {
     const positionOnCanvas = this.canvas.positionOnCanvas(this);
     if (positionOnCanvas === false)
       return;
     this.canvas.context.beginPath();
     this.canvas.context.lineTo(positionOnCanvas.leftUp.x, positionOnCanvas.leftUp.y);
-    this.canvas.context.lineTo(positionOnCanvas.rightDown.x, positionOnCanvas.rightDown.y);
+    this.canvas.context.lineTo(positionOnCanvas.rightDown().x, positionOnCanvas.rightDown().y);
     if (this.strokeStyle !== false) {
       this.canvas.context.lineWidth = this.lineWidth;
       this.canvas.context.strokeStyle = this.strokeStyle;
@@ -1607,10 +1611,27 @@ class Sheep_ENGINE extends Character_ENGINE {
       route: "images/resources/sheep/left.png",
       element: new Element_ENGINE(new Size_ENGINE(128, 128), new Plane_ENGINE(0, 0)),
       animation: new Animation_ENGINE(8, 8)
-    }, new Coordinate_ENGINE(200, 200), new Direction_ENGINE(1, 0));
+    }, new Coordinate_ENGINE(50, 50), new Direction_ENGINE(0, -1));
     this.map = map;
     this.state = "move";
-    this.lineSight = new Line_ENGINE(new Coordinate_ENGINE(this.leftUp.x + this.size.width / 2, this.leftUp.y + this.size.height / 2), this.leftUpPlusSizePercentages(new Size_ENGINE(200, 50)), this.canvas, false, "#333", 2);
+    this.lineSight = new Line_ENGINE(new Coordinate_ENGINE(0, 0), new Coordinate_ENGINE(0, 0), this.canvas, false, "#333", 2);
+  }
+  lineSightPosition() {
+    const leftUp = () => {
+      const halfSizeWidth = this.size.width / 2;
+      const halfSizeHeight = this.size.height / 2;
+      const leftUpX = this.leftUp.x + halfSizeWidth;
+      const leftUpY = this.leftUp.y + halfSizeHeight;
+      return new Coordinate_ENGINE(leftUpX, leftUpY);
+    };
+    const rightDownPercentages = () => {
+      const lineReach = 200;
+      const percentageCenter = 50;
+      const lineScopeX = lineReach * this.address.x;
+      const lineScopeY = lineReach * this.address.y;
+      return new Size_ENGINE(lineScopeX + percentageCenter, lineScopeY + percentageCenter);
+    };
+    this.lineSight.setPosition(leftUp(), this.leftUpPlusSizePercentages(rightDownPercentages()));
   }
   moveSheep() {
     const moved = this.movedCharacter();
@@ -1659,6 +1680,7 @@ class Sheep_ENGINE extends Character_ENGINE {
     this.jumpSheep();
     this.imageAccordingDirectionMovement();
     this.drawCharacter();
+    this.lineSightPosition();
     this.lineSight.drawLine();
   }
 }

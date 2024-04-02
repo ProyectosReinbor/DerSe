@@ -53,15 +53,9 @@ export class Map_ENGINE extends Position_ENGINE {
         }
     }
 
-    // boxesInsideCoordinate(
-    //     coordinate: Coordinate_ENGINE
-    // ) {
-    //     this.floor
-    // }
-
     collisionMap(
-        character: Character_ENGINE,
-        moved: Character_ENGINE,
+        character: Position_ENGINE,
+        moved: Position_ENGINE,
     ): boolean {
         for (
             let floorIndex = this.floors.length - 1;

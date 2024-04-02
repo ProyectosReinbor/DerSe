@@ -33,6 +33,18 @@ export class Line_ENGINE extends Position_ENGINE {
     this.lineWidth = lineWidth;
   }
 
+  setPosition(
+    leftUp: Coordinate_ENGINE,
+    rightDown: Coordinate_ENGINE,
+  ) {
+    const size = new Size_ENGINE(
+      rightDown.x - leftUp.x,
+      rightDown.y - leftUp.y
+    );
+    this.leftUp = leftUp;
+    this.size = size;
+  }
+
   drawLine() {
     const positionOnCanvas = this.canvas.positionOnCanvas(this);
     if (positionOnCanvas === false)
@@ -45,9 +57,11 @@ export class Line_ENGINE extends Position_ENGINE {
       positionOnCanvas.leftUp.y
     );
 
+    const positionOnCanvasRightDown = positionOnCanvas.rightDown();
+
     this.canvas.context.lineTo(
-      positionOnCanvas.rightDown.x,
-      positionOnCanvas.rightDown.y
+      positionOnCanvasRightDown.x,
+      positionOnCanvasRightDown.y
     );
 
     if (this.strokeStyle !== false) {

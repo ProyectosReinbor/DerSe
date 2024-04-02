@@ -45,11 +45,13 @@ export class Curve_ENGINE extends Position_ENGINE {
       positionOnCanvas.leftUp.y
     );
 
+    const positionOnCanvasRightDown = positionOnCanvas.rightDown();
+
     this.canvas.context.quadraticCurveTo(
       checkPointOnCanvas.leftUp.x,
       checkPointOnCanvas.leftUp.y,
-      positionOnCanvas.rightDown.x,
-      positionOnCanvas.rightDown.y
+      positionOnCanvasRightDown.x,
+      positionOnCanvasRightDown.y
     );
   }
 }

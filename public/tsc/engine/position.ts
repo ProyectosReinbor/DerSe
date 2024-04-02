@@ -14,21 +14,21 @@ export class Position_ENGINE {
     this.size = size;
   }
 
-  get leftDown() {
+  leftDown() {
     return new Coordinate_ENGINE(
       this.leftUp.x,
       this.leftUp.y + this.size.height
     );
   }
 
-  get rightDown() {
+  rightDown() {
     return new Coordinate_ENGINE(
       this.leftUp.x + this.size.width,
       this.leftUp.y + this.size.height,
     );
   }
 
-  get rightUp() {
+  rightUp() {
     return new Coordinate_ENGINE(
       this.leftUp.x + this.size.width,
       this.leftUp.y,
@@ -48,19 +48,22 @@ export class Position_ENGINE {
   insidePositionCoordinate(
     coordinate: Coordinate_ENGINE
   ) {
+    const thisRightDown = this.rightDown();
     return this.leftUp.x <= coordinate.x &&
       this.leftUp.y <= coordinate.y &&
-      this.rightDown.x >= coordinate.x &&
-      this.rightDown.y >= coordinate.y;
+      thisRightDown.x >= coordinate.x &&
+      thisRightDown.y >= coordinate.y;
   }
 
   insidePosition(
     position: Position_ENGINE
   ) {
+    const thisRightDown = this.rightDown();
+    const positionRightDown = position.rightDown();
     return this.leftUp.x <= position.leftUp.x &&
       this.leftUp.y <= position.leftUp.y &&
-      this.rightDown.x >= position.rightDown.x &&
-      this.rightDown.y >= position.rightDown.y;
+      thisRightDown.x >= positionRightDown.x &&
+      thisRightDown.y >= positionRightDown.y;
   }
 
   someVertexInside(
@@ -69,13 +72,19 @@ export class Position_ENGINE {
     if (this.insidePositionCoordinate(position.leftUp))
       return true;
 
-    if (this.insidePositionCoordinate(position.leftDown))
+    if (this.insidePositionCoordinate(
+      position.leftDown()
+    ))
       return true;
 
-    if (this.insidePositionCoordinate(position.rightUp))
+    if (this.insidePositionCoordinate(
+      position.rightUp()
+    ))
       return true;
 
-    if (this.insidePositionCoordinate(position.rightDown))
+    if (this.insidePositionCoordinate(
+      position.rightDown()
+    ))
       return true;
 
     return false;
