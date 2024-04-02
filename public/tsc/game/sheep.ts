@@ -123,7 +123,6 @@ export class Sheep_ENGINE extends Character_ENGINE {
         );
 
         if (lineSightCollision === true) {
-            console.log("lineSight");
             return false;
         }
 

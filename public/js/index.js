@@ -1678,7 +1678,6 @@ class Sheep_ENGINE extends Character_ENGINE {
       return false;
     const lineSightCollision = this.map.collisionMap(this.leftUp, this.lineSight.rightDown());
     if (lineSightCollision === true) {
-      console.log("lineSight");
       return false;
     }
     this.leftUp.x = moved.leftUp.x;
