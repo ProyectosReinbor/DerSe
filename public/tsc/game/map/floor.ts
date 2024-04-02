@@ -38,60 +38,17 @@ export class Floor_ENGINE {
         this.map = map;
         this.canvas = canvas;
 
-        this.water = new Water_ENGINE({
-            map: this.map,
-            canvas: this.canvas
-        });
-
-        this.foams = new Foams_ENGINE({
-            map: this.map,
-            canvas: this.canvas
-        });
-
-        this.flatsSand = new FlatsSand_ENGINE({
-            map: this.map,
-            canvas: this.canvas
-        })
-
-        this.elevations = new Elevations_ENGINE({
-            map: this.map,
-            canvas: this.canvas,
-        });
-
-        this.flatsGrass = new FlatsGrass_ENGINE({
-            map: this.map,
-            canvas: this.canvas,
-        });
-
-        this.shadows = new Shadows_ENGINE({
-            map: this.map,
-            canvas: this.canvas,
-        });
-
-        this.wallElevations = new WallElevations_ENGINE({
-            map: this.map,
-            canvas: this.canvas,
-        });
-
-        this.stairsElevation = new StairsElevations_ENGINE({
-            map: this.map,
-            canvas: this.canvas,
-        });
-
-        this.flatElevations = new FlatElevations_ENGINE({
-            map: this.map,
-            canvas: this.canvas,
-        });
-
-        this.castles = new Castles_ENGINE({
-            map: this.map,
-            canvas: this.canvas,
-        });
-
-        this.trees = new Trees_ENGINE({
-            map: this.map,
-            canvas: this.canvas,
-        });
+        this.water = new Water_ENGINE(this.map, this.canvas);
+        this.foams = new Foams_ENGINE(this.map, this.canvas);
+        this.flatsSand = new FlatsSand_ENGINE(this.map, this.canvas);
+        this.elevations = new Elevations_ENGINE(this.map, this.canvas);
+        this.flatsGrass = new FlatsGrass_ENGINE(this.map, this.canvas);
+        this.shadows = new Shadows_ENGINE(this.map, this.canvas);
+        this.wallElevations = new WallElevations_ENGINE(this.map, this.canvas);
+        this.stairsElevation = new StairsElevations_ENGINE(this.map, this.canvas);
+        this.flatElevations = new FlatElevations_ENGINE(this.map, this.canvas);
+        this.castles = new Castles_ENGINE(this.map, this.canvas);
+        this.trees = new Trees_ENGINE(this.map, this.canvas);
     }
 
     pushFloor(matrix: FloorMatrix_MapMatrix) {
@@ -103,82 +60,62 @@ export class Floor_ENGINE {
                 );
 
                 if (box.water === true)
-                    this.water.pushWater({
-                        boxIndices
-                    });
+                    this.water.pushWater(boxIndices);
 
                 if (box.foam !== false) {
-                    this.foams.pushFoam({
-                        boxIndices
-                    });
+                    this.foams.pushFoam(boxIndices);
                     if (box.foam.flatSand === true)
-                        this.flatsSand.pushFlatSand({
-                            boxIndices: boxIndices
-                        });
+                        this.flatsSand.pushFlatSand(boxIndices);
                 }
 
                 if (box.elevation !== false) {
                     if (box.elevation.shadow === true)
-                        this.shadows.pushShadow({
-                            boxIndices
-                        });
+                        this.shadows.pushShadow(boxIndices);
 
                     if (box.elevation.flatGrass === true)
-                        this.flatsGrass.pushFlatGrass({
-                            boxIndices
-                        });
+                        this.flatsGrass.pushFlatGrass(boxIndices);
 
-                    this.elevations.pushElevation({
-                        boxIndices
-                    });
+                    this.elevations.pushElevation(boxIndices);
                 }
 
                 if (box.wallElevation !== false) {
                     if (box.wallElevation.shadow === true)
-                        this.shadows.pushShadow({
-                            boxIndices
-                        });
+                        this.shadows.pushShadow(boxIndices);
 
-                    this.wallElevations.pushWallElevation({
-                        boxIndices
-                    });
+                    this.wallElevations.pushWallElevation(boxIndices);
                     if (box.wallElevation.flatElevation !== false)
-                        this.flatElevations.pushFlatElevation({
+                        this.flatElevations.pushFlatElevation(
                             boxIndices,
-                            state: box.wallElevation.flatElevation
-                        });
+                            box.wallElevation.flatElevation
+                        );
                 }
 
                 if (box.stairElevation !== false) {
                     if (box.stairElevation.shadow === true)
-                        this.shadows.pushShadow({
-                            boxIndices
-                        });
+                        this.shadows.pushShadow(boxIndices);
 
-                    this.stairsElevation.setStairsElevations({
-                        boxIndices
-                    });
+                    this.stairsElevation.setStairsElevations(boxIndices);
 
                     if (box.stairElevation.flatElevation !== false)
-                        this.flatElevations.pushFlatElevation({
+                        this.flatElevations.pushFlatElevation(
                             boxIndices,
-                            state: box.stairElevation.flatElevation
-                        });
+                            box.stairElevation.flatElevation
+                        );
                 }
 
                 if (box.castle !== false) {
-                    this.castles.castlePush({
+                    this.castles.castlePush(
                         boxIndices,
-                        state: box.castle.state,
-                        color: box.castle.color,
-                    });
+                        box.castle.state,
+                        box.castle.color,
+                    );
                 }
 
                 if (box.trees !== false) {
-                    this.trees.pushTree({
+                    this.trees.pushTree(
                         boxIndices,
-                        state: box.trees.animation
-                    });
+                        box.trees.animation
+                    );
                 }
             });
         });

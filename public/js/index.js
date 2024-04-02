@@ -2,12 +2,12 @@
 class Coordinate_ENGINE {
   x;
   y;
-  constructor(props) {
-    this.x = props.x;
-    this.y = props.y;
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
   }
-  isEqualTo(props) {
-    return this.x === props.coordinate.x && this.y === props.coordinate.y;
+  isEqualTo(coordinate) {
+    return this.x === coordinate.x && this.y === coordinate.y;
   }
 }
 
@@ -15,57 +15,37 @@ class Coordinate_ENGINE {
 class Position_ENGINE {
   leftUp;
   size;
-  constructor(props) {
-    this.leftUp = props.leftUp;
-    this.size = props.size;
+  constructor(leftUp, size) {
+    this.leftUp = leftUp;
+    this.size = size;
   }
   get leftDown() {
-    return new Coordinate_ENGINE({
-      x: this.leftUp.x,
-      y: this.leftUp.y + this.size.height
-    });
+    return new Coordinate_ENGINE(this.leftUp.x, this.leftUp.y + this.size.height);
   }
   get rightDown() {
-    return new Coordinate_ENGINE({
-      x: this.leftUp.x + this.size.width,
-      y: this.leftUp.y + this.size.height
-    });
+    return new Coordinate_ENGINE(this.leftUp.x + this.size.width, this.leftUp.y + this.size.height);
   }
   get rightUp() {
-    return new Coordinate_ENGINE({
-      x: this.leftUp.x + this.size.width,
-      y: this.leftUp.y
-    });
+    return new Coordinate_ENGINE(this.leftUp.x + this.size.width, this.leftUp.y);
   }
-  leftUpPlusSizePercentages(props) {
-    const size = this.size.getPercentages(props);
-    return new Coordinate_ENGINE({
-      x: this.leftUp.x + size.width,
-      y: this.leftUp.y + size.height
-    });
+  leftUpPlusSizePercentages(percentages) {
+    const size = this.size.getPercentages(percentages);
+    return new Coordinate_ENGINE(this.leftUp.x + size.width, this.leftUp.y + size.height);
   }
-  insidePositionCoordinate(props) {
-    return this.leftUp.x <= props.coordinate.x && this.leftUp.y <= props.coordinate.y && this.rightDown.x >= props.coordinate.x && this.rightDown.y >= props.coordinate.y;
+  insidePositionCoordinate(coordinate2) {
+    return this.leftUp.x <= coordinate2.x && this.leftUp.y <= coordinate2.y && this.rightDown.x >= coordinate2.x && this.rightDown.y >= coordinate2.y;
   }
-  insidePosition(props) {
-    return this.leftUp.x <= props.position.leftUp.x && this.leftUp.y <= props.position.leftUp.y && this.rightDown.x >= props.position.rightDown.x && this.rightDown.y >= props.position.rightDown.y;
+  insidePosition(position) {
+    return this.leftUp.x <= position.leftUp.x && this.leftUp.y <= position.leftUp.y && this.rightDown.x >= position.rightDown.x && this.rightDown.y >= position.rightDown.y;
   }
-  someVertexInside(props) {
-    if (this.insidePositionCoordinate({
-      coordinate: props.position.leftUp
-    }) === true)
+  someVertexInside(position) {
+    if (this.insidePositionCoordinate(position.leftUp))
       return true;
-    if (this.insidePositionCoordinate({
-      coordinate: props.position.leftDown
-    }) === true)
+    if (this.insidePositionCoordinate(position.leftDown))
       return true;
-    if (this.insidePositionCoordinate({
-      coordinate: props.position.rightUp
-    }) === true)
+    if (this.insidePositionCoordinate(position.rightUp))
       return true;
-    if (this.insidePositionCoordinate({
-      coordinate: props.position.rightDown
-    }) === true)
+    if (this.insidePositionCoordinate(position.rightDown))
       return true;
     return false;
   }
@@ -75,67 +55,33 @@ class Position_ENGINE {
 class Size_ENGINE {
   width;
   height;
-  constructor(props) {
-    this.width = props.width;
-    this.height = props.height;
+  constructor(width, height) {
+    this.width = width;
+    this.height = height;
   }
   get aPercent() {
-    return new Size_ENGINE({
-      width: this.width / 100,
-      height: this.height / 100
-    });
+    return new Size_ENGINE(this.width / 100, this.height / 100);
   }
-  getPercentages(props) {
-    return new Size_ENGINE({
-      width: this.aPercent.width * props.percentages.width,
-      height: this.aPercent.height * props.percentages.height
-    });
+  getPercentages(percentages) {
+    return new Size_ENGINE(this.aPercent.width * percentages.width, this.aPercent.height * percentages.height);
   }
 }
 
 // public/tsc/engine/camera.ts
 class Camera_ENGINE extends Position_ENGINE {
-  constructor(props) {
-    super({
-      leftUp: props.leftUp,
-      size: new Size_ENGINE({ width: 100, height: 100 })
-    });
+  constructor(leftUp) {
+    super(leftUp, new Size_ENGINE(100, 100));
   }
-  insideCamera(props) {
-    const doubleSize = new Size_ENGINE({
-      width: props.position.size.width * 2,
-      height: props.position.size.height * 2
-    });
-    const vision = new Position_ENGINE({
-      leftUp: new Coordinate_ENGINE({
-        x: this.leftUp.x - props.position.size.width,
-        y: this.leftUp.y - props.position.size.height
-      }),
-      size: new Size_ENGINE({
-        width: this.size.width + doubleSize.width,
-        height: this.size.height + doubleSize.height
-      })
-    });
-    return vision.insidePosition({
-      position: props.position
-    });
+  insideCamera(position2) {
+    const doubleSize = new Size_ENGINE(position2.size.width * 2, position2.size.height * 2);
+    const vision = new Position_ENGINE(new Coordinate_ENGINE(this.leftUp.x - position2.size.width, this.leftUp.y - position2.size.height), new Size_ENGINE(this.size.width + doubleSize.width, this.size.height + doubleSize.height));
+    return vision.insidePosition(position2);
   }
-  positionOnCamera(props) {
-    const insideCamera = this.insideCamera({
-      position: props.position
-    });
+  positionOnCamera(position2) {
+    const insideCamera = this.insideCamera(position2);
     if (insideCamera === false)
       return false;
-    return new Position_ENGINE({
-      leftUp: new Coordinate_ENGINE({
-        x: props.position.leftUp.x - this.leftUp.x,
-        y: props.position.leftUp.y - this.leftUp.y
-      }),
-      size: new Size_ENGINE({
-        width: props.position.size.width,
-        height: props.position.size.height
-      })
-    });
+    return new Position_ENGINE(new Coordinate_ENGINE(position2.leftUp.x - this.leftUp.x, position2.leftUp.y - this.leftUp.y), new Size_ENGINE(position2.size.width, position2.size.height));
   }
   focusPosition(position2) {
     let x = position2.leftUp.x - this.size.width / 2;
@@ -165,12 +111,13 @@ class Images_ENGINE {
       throw new Error(`image ${route} is not found`);
     return image;
   }
-  addRoute(route) {
+  async addRoute(route) {
     if (route === false)
       return;
     if (this.routes.includes(route) === true)
       return;
     this.routes.push(route);
+    await this.uploadImage(route);
   }
   async loadAll() {
     for (const route of this.routes) {
@@ -197,15 +144,14 @@ class Images_ENGINE {
 
 // public/tsc/engine/canvas.ts
 class Canvas_ENGINE extends Camera_ENGINE {
-  aPercent = new Size_ENGINE({ width: 0, height: 0 });
-  margin = new Size_ENGINE({ width: 0, height: 0 });
+  aPercent = new Size_ENGINE(0, 0);
+  margin = new Size_ENGINE(0, 0);
   images = new Images_ENGINE;
   intervalBetweenFrames = 0;
   time = 0;
   timeBetweenFrames = 0;
   element;
   context;
-  useInnerScreenSize = true;
   drawScene() {
   }
   touchstartScene = () => {
@@ -214,162 +160,111 @@ class Canvas_ENGINE extends Camera_ENGINE {
   };
   touchendScene = () => {
   };
-  constructor(props) {
-    super({
-      leftUp: props.leftUp
-    });
-    this.setFramesPerSecond({
-      value: props.framesPerSecond
-    });
+  constructor(leftUp, framesPerSecond) {
+    super(leftUp);
+    this.setFramesPerSecond(framesPerSecond);
     this.element = window.document.getElementById("canvas");
     this.context = this.element.getContext("2d");
     this.aspectRatio();
     window.addEventListener("resize", () => this.aspectRatio());
-    this.element.addEventListener("touchstart", (event) => this.touchstartCanvas({
-      event
-    }));
-    this.element.addEventListener("touchmove", (event) => this.touchmoveCanvas({
-      event
-    }));
-    this.element.addEventListener("touchend", (event) => this.touchendCanvas({
-      event
-    }));
-    this.nextFrame({
-      time: 0
-    });
+    this.element.addEventListener("touchstart", (event) => this.touchstartCanvas(event));
+    this.element.addEventListener("touchmove", (event) => this.touchmoveCanvas(event));
+    this.element.addEventListener("touchend", (event) => this.touchendCanvas(event));
+    this.nextFrame(0);
   }
   getFramesPerSecond() {
     return 1000 / this.intervalBetweenFrames;
   }
-  setFramesPerSecond(props) {
-    this.intervalBetweenFrames = 1000 / props.value;
+  setFramesPerSecond(value) {
+    this.intervalBetweenFrames = 1000 / value;
   }
-  nextFrame(props) {
-    const difference = props.time - this.time;
+  nextFrame(time) {
+    const difference = time - this.time;
     if (difference < this.intervalBetweenFrames) {
-      requestAnimationFrame((time) => this.nextFrame({
-        time
-      }));
+      requestAnimationFrame((time2) => this.nextFrame(time2));
       return;
     }
     this.timeBetweenFrames = difference;
-    this.time = props.time;
+    this.time = time;
     this.drawCanvas();
-    requestAnimationFrame((time) => this.nextFrame({
-      time
-    }));
+    requestAnimationFrame((time2) => this.nextFrame(time2));
   }
-  async start(props) {
+  async start(drawScene, touchstartScene, touchmoveScene, touchendScene) {
     await this.images.loadAll();
-    this.drawScene = props.drawScene;
-    this.touchstartScene = props.touchstartScene;
-    this.touchmoveScene = props.touchmoveScene;
-    this.touchendScene = props.touchendScene;
+    this.drawScene = drawScene;
+    this.touchstartScene = touchstartScene;
+    this.touchmoveScene = touchmoveScene;
+    this.touchendScene = touchendScene;
   }
   drawCanvas() {
     this.context.clearRect(0, 0, this.element.width, this.element.height);
     this.drawScene();
   }
-  getScreenSize() {
-    if (this.useInnerScreenSize === true) {
-      return new Size_ENGINE({
-        width: window.innerWidth,
-        height: window.innerHeight
-      });
-    }
-    return new Size_ENGINE({
-      width: window.screen.width,
-      height: window.screen.height
-    });
-  }
   aspectRatio() {
-    const screenSize = this.getScreenSize();
-    const ratio = 0.5625;
-    this.element.width = screenSize.height;
+    const screenSize = new Size_ENGINE(1280, 720);
+    this.element.width = screenSize.width;
     this.element.height = screenSize.height;
     this.aPercent.width = this.element.width / 100;
     this.aPercent.height = this.element.height / 100;
   }
-  getTouchCoordinate(props) {
-    if (props.touch === null)
+  getTouchCoordinate(touch) {
+    if (touch === null)
       return false;
     const left = this.margin.width / 2;
     const top = this.margin.height / 2;
-    return new Coordinate_ENGINE({
-      x: props.touch.pageX - left,
-      y: props.touch.pageY - top
-    });
+    return new Coordinate_ENGINE(touch.pageX - left, touch.pageY - top);
   }
-  touchstartCanvas(props) {
-    props.event.preventDefault();
-    for (let index = 0;index < props.event.changedTouches.length; index++) {
-      const touch = props.event.changedTouches.item(index);
-      const coordinate4 = this.getTouchCoordinate({
-        touch
-      });
+  touchstartCanvas(event) {
+    event.preventDefault();
+    for (let index = 0;index < event.changedTouches.length; index++) {
+      const touch = event.changedTouches.item(index);
+      const coordinate4 = this.getTouchCoordinate(touch);
       if (coordinate4 === false)
         continue;
       this.touchstartScene(coordinate4);
     }
   }
-  touchmoveCanvas(props) {
-    props.event.preventDefault();
-    for (let index = 0;index < props.event.changedTouches.length; index++) {
-      const touch = props.event.changedTouches.item(index);
-      const coordinate4 = this.getTouchCoordinate({ touch });
+  touchmoveCanvas(event) {
+    event.preventDefault();
+    for (let index = 0;index < event.changedTouches.length; index++) {
+      const touch = event.changedTouches.item(index);
+      const coordinate4 = this.getTouchCoordinate(touch);
       if (coordinate4 === false)
         continue;
       this.touchmoveScene(coordinate4);
     }
   }
-  touchendCanvas(props) {
-    props.event.preventDefault();
-    for (let index = 0;index < props.event.changedTouches.length; index++) {
-      const touch = props.event.changedTouches.item(index);
-      const coordinate4 = this.getTouchCoordinate({
-        touch
-      });
+  touchendCanvas(event) {
+    event.preventDefault();
+    for (let index = 0;index < event.changedTouches.length; index++) {
+      const touch = event.changedTouches.item(index);
+      const coordinate4 = this.getTouchCoordinate(touch);
       if (coordinate4 === false)
         continue;
       this.touchendScene(coordinate4);
     }
   }
-  positionOnCanvas(props) {
-    const positionOnCamera = this.positionOnCamera({
-      position: props.position
-    });
+  positionOnCanvas(position3) {
+    const positionOnCamera = this.positionOnCamera(position3);
     if (positionOnCamera === false)
       return false;
-    return new Position_ENGINE({
-      leftUp: new Coordinate_ENGINE({
-        x: this.getWidthInPixels({
-          percentage: positionOnCamera.leftUp.x
-        }),
-        y: this.getHeightInPixels({
-          percentage: positionOnCamera.leftUp.y
-        })
-      }),
-      size: new Size_ENGINE({
-        width: this.getWidthInPixels({
-          percentage: positionOnCamera.size.width
-        }),
-        height: this.getHeightInPixels({
-          percentage: positionOnCamera.size.height
-        })
-      })
-    });
+    return new Position_ENGINE(new Coordinate_ENGINE(this.widthInPixels(positionOnCamera.leftUp.x), this.heightInPixels(positionOnCamera.leftUp.y)), new Size_ENGINE(this.widthInPixels(positionOnCamera.size.width), this.heightInPixels(positionOnCamera.size.height)));
   }
-  getWidthInPercentages(props) {
-    return props.pixels / this.aPercent.width;
+  widthInPercentageHeight(percentageHeight) {
+    const pixels = this.heightInPixels(percentageHeight);
+    return this.widthInPercentages(pixels);
   }
-  getWidthInPixels(props) {
-    return props.percentage * this.aPercent.width;
+  widthInPercentages(pixels) {
+    return pixels / this.aPercent.width;
   }
-  getHeightInPercentages(props) {
-    return props.pixels / this.aPercent.height;
+  widthInPixels(percentage) {
+    return percentage * this.aPercent.width;
   }
-  getHeightInPixels(props) {
-    return props.percentage * this.aPercent.height;
+  heightInPercentages(pixels) {
+    return pixels / this.aPercent.height;
+  }
+  heightInPixels(percentage) {
+    return percentage * this.aPercent.height;
   }
 }
 
@@ -384,16 +279,11 @@ class Scene_ENGINE {
   };
   touchend = () => {
   };
-  constructor(props) {
-    this.canvas = props.canvas;
+  constructor(canvas) {
+    this.canvas = canvas;
   }
   async start() {
-    await this.canvas.start({
-      drawScene: () => this.draw(),
-      touchstartScene: (touch) => this.touchstart(touch),
-      touchmoveScene: (touch) => this.touchmove(touch),
-      touchendScene: (touch) => this.touchend(touch)
-    });
+    await this.canvas.start(() => this.draw(), (touch) => this.touchstart(touch), (touch) => this.touchmove(touch), (touch) => this.touchend(touch));
   }
 }
 
@@ -401,18 +291,15 @@ class Scene_ENGINE {
 class Plane_ENGINE {
   horizontal;
   vertical;
-  constructor(props) {
-    this.horizontal = props.horizontal;
-    this.vertical = props.vertical;
+  constructor(horizontal, vertical) {
+    this.horizontal = horizontal;
+    this.vertical = vertical;
   }
 }
 
 // public/tsc/game/mapMatrix.ts
 class MapMatrix_ENGINE {
-  static length = new Plane_ENGINE({
-    horizontal: 21,
-    vertical: 21
-  });
+  static length = new Plane_ENGINE(37, 21);
   static getEmptyBox() {
     return {
       water: false,
@@ -424,98 +311,98 @@ class MapMatrix_ENGINE {
       trees: false
     };
   }
-  static getFloor0Box(props) {
+  static getFloor0Box(boxIndices) {
     const box = MapMatrix_ENGINE.getEmptyBox();
     box.water = true;
-    if (props.boxIndices.vertical >= 3 && props.boxIndices.vertical <= 19 && props.boxIndices.horizontal >= 1 && props.boxIndices.horizontal <= 19)
+    if (boxIndices.vertical >= 3 && boxIndices.vertical <= 19 && boxIndices.horizontal >= 1 && boxIndices.horizontal <= 35)
       box.foam = {
         flatSand: true
       };
-    if (props.boxIndices.vertical === 14 && props.boxIndices.horizontal >= 11 && props.boxIndices.horizontal <= 13)
+    if (boxIndices.vertical === 14 && boxIndices.horizontal >= 11 && boxIndices.horizontal <= 13)
       box.stairElevation = {
         shadow: true,
-        flatElevation: props.boxIndices.horizontal === 11 ? "sand" : false
+        flatElevation: boxIndices.horizontal === 11 ? "sand" : false
       };
     return box;
   }
-  static getFloor1Box(props) {
+  static getFloor1Box(boxIndices) {
     const box = MapMatrix_ENGINE.getEmptyBox();
-    if (props.boxIndices.horizontal >= 2 && props.boxIndices.horizontal <= 17 && props.boxIndices.vertical >= 2 && props.boxIndices.vertical <= 13)
+    if (boxIndices.horizontal >= 2 && boxIndices.horizontal <= 34 && boxIndices.vertical >= 2 && boxIndices.vertical <= 13)
       box.elevation = {
         floor: 1,
-        shadow: props.boxIndices.vertical >= 3,
+        shadow: boxIndices.vertical >= 3,
         flatGrass: true
       };
-    if (props.boxIndices.horizontal >= 2 && props.boxIndices.horizontal <= 10 && props.boxIndices.vertical === 14)
-      box.elevation = {
-        floor: 1,
-        shadow: true,
-        flatGrass: true
-      };
-    if (props.boxIndices.horizontal >= 14 && props.boxIndices.horizontal <= 17 && props.boxIndices.vertical === 14)
+    if (boxIndices.horizontal >= 2 && boxIndices.horizontal <= 10 && boxIndices.vertical === 14)
       box.elevation = {
         floor: 1,
         shadow: true,
         flatGrass: true
       };
-    if (props.boxIndices.vertical === 15 && props.boxIndices.horizontal >= 2 && props.boxIndices.horizontal <= 10) {
+    if (boxIndices.horizontal >= 14 && boxIndices.horizontal <= 34 && boxIndices.vertical === 14)
+      box.elevation = {
+        floor: 1,
+        shadow: true,
+        flatGrass: true
+      };
+    if (boxIndices.vertical === 15 && boxIndices.horizontal >= 2 && boxIndices.horizontal <= 10) {
       const flatElevationRandom = Math.round(Math.random());
       box.wallElevation = {
         shadow: true,
         flatElevation: flatElevationRandom === 0 ? "sand" : false
       };
     }
-    if (props.boxIndices.vertical === 15 && props.boxIndices.horizontal >= 14 && props.boxIndices.horizontal <= 17) {
+    if (boxIndices.vertical === 15 && boxIndices.horizontal >= 14 && boxIndices.horizontal <= 34) {
       const flatElevationRandom = Math.round(Math.random());
       box.wallElevation = {
         shadow: true,
         flatElevation: flatElevationRandom === 0 ? "sand" : false
       };
     }
-    if (props.boxIndices.vertical === 7 && props.boxIndices.horizontal >= 11 && props.boxIndices.horizontal <= 13) {
+    if (boxIndices.vertical === 7 && boxIndices.horizontal >= 11 && boxIndices.horizontal <= 13) {
       box.stairElevation = {
         shadow: true,
-        flatElevation: props.boxIndices.horizontal === 9 ? "grass" : false
+        flatElevation: boxIndices.horizontal === 9 ? "grass" : false
       };
     }
-    if (props.boxIndices.vertical === 3 && props.boxIndices.horizontal === 14) {
+    if (boxIndices.vertical === 3 && boxIndices.horizontal === 14) {
       box.trees = {
         animation: "felled"
       };
     }
     return box;
   }
-  static getFloor2Box(props) {
+  static getFloor2Box(boxIndices) {
     const box = MapMatrix_ENGINE.getEmptyBox();
-    if (props.boxIndices.horizontal >= 6 && props.boxIndices.horizontal <= 14 && props.boxIndices.vertical >= 1 && props.boxIndices.vertical <= 6) {
+    if (boxIndices.horizontal >= 6 && boxIndices.horizontal <= 30 && boxIndices.vertical >= 1 && boxIndices.vertical <= 6) {
       box.elevation = {
         floor: 2,
-        shadow: props.boxIndices.vertical >= 3,
+        shadow: boxIndices.vertical >= 3,
         flatGrass: true
       };
     }
-    if (props.boxIndices.horizontal >= 6 && props.boxIndices.horizontal <= 10 && props.boxIndices.vertical === 7) {
-      box.elevation = {
-        floor: 2,
-        shadow: true,
-        flatGrass: true
-      };
-    }
-    if (props.boxIndices.horizontal >= 14 && props.boxIndices.horizontal <= 14 && props.boxIndices.vertical === 7) {
+    if (boxIndices.horizontal >= 6 && boxIndices.horizontal <= 10 && boxIndices.vertical === 7) {
       box.elevation = {
         floor: 2,
         shadow: true,
         flatGrass: true
       };
     }
-    if (props.boxIndices.vertical === 8 && props.boxIndices.horizontal >= 6 && props.boxIndices.horizontal <= 10) {
+    if (boxIndices.horizontal >= 14 && boxIndices.horizontal <= 30 && boxIndices.vertical === 7) {
+      box.elevation = {
+        floor: 2,
+        shadow: true,
+        flatGrass: true
+      };
+    }
+    if (boxIndices.vertical === 8 && boxIndices.horizontal >= 6 && boxIndices.horizontal <= 10) {
       const flatElevationRandom = Math.round(Math.random());
       box.wallElevation = {
         shadow: true,
         flatElevation: flatElevationRandom === 0 ? "grass" : false
       };
     }
-    if (props.boxIndices.vertical === 8 && props.boxIndices.horizontal === 14) {
+    if (boxIndices.vertical === 8 && boxIndices.horizontal >= 14 && boxIndices.horizontal <= 30) {
       const flatElevationRandom = Math.round(Math.random());
       box.wallElevation = {
         shadow: true,
@@ -536,10 +423,7 @@ class MapMatrix_ENGINE {
       const floorMatrix = map[floor];
       if (floorMatrix === undefined)
         continue;
-      const boxIndices = new Plane_ENGINE({
-        horizontal: 0,
-        vertical: 0
-      });
+      const boxIndices = new Plane_ENGINE(0, 0);
       for (boxIndices.vertical = 0;boxIndices.vertical < MapMatrix_ENGINE.length.vertical; boxIndices.vertical++) {
         floorMatrix[boxIndices.vertical] = [];
         const row = floorMatrix[boxIndices.vertical];
@@ -549,9 +433,7 @@ class MapMatrix_ENGINE {
           const getBoxFloor = MapMatrix_ENGINE.getBoxFloors[floor];
           if (getBoxFloor === undefined)
             continue;
-          row[boxIndices.horizontal] = getBoxFloor({
-            boxIndices
-          });
+          row[boxIndices.horizontal] = getBoxFloor(boxIndices);
         }
       }
     }
@@ -561,67 +443,47 @@ class MapMatrix_ENGINE {
 
 // public/tsc/engine/element.ts
 class Element_ENGINE extends Position_ENGINE {
-  constructor(props) {
-    super({
-      leftUp: new Coordinate_ENGINE({ x: 0, y: 0 }),
-      size: props.size
-    });
-    this.setIndices(props.indices);
+  constructor(size3, indices) {
+    super(new Coordinate_ENGINE(0, 0), size3);
+    this.setIndices(indices);
   }
   setIndices(newIndices) {
     this.leftUp.x = this.size.width * newIndices.horizontal;
     this.leftUp.y = this.size.height * newIndices.vertical;
   }
   getIndices() {
-    return new Plane_ENGINE({
-      horizontal: this.leftUp.x / this.size.width,
-      vertical: this.leftUp.y / this.size.height
-    });
+    return new Plane_ENGINE(this.leftUp.x / this.size.width, this.leftUp.y / this.size.height);
   }
   nextFrame(frames) {
-    this.setIndices(new Plane_ENGINE({
-      horizontal: this.getIndices().horizontal + 1,
-      vertical: this.getIndices().vertical
-    }));
+    this.setIndices(new Plane_ENGINE(this.getIndices().horizontal + 1, this.getIndices().vertical));
     if (this.getIndices().horizontal >= frames)
-      this.setIndices(new Plane_ENGINE({
-        horizontal: 0,
-        vertical: this.getIndices().vertical
-      }));
+      this.setIndices(new Plane_ENGINE(0, this.getIndices().vertical));
   }
 }
 
 // public/tsc/engine/image.ts
 class Image_ENGINE extends Position_ENGINE {
   canvas;
-  route;
-  reflected;
-  constructor(props) {
-    super(props);
-    this.canvas = props.canvas;
-    this.route = props.route;
-    this.canvas.images;
-    this.canvas.images.addRoute(this.route);
-    this.reflected = true;
+  route = false;
+  constructor(leftUp, size3, canvas, route) {
+    super(leftUp, size3);
+    this.canvas = canvas;
+    this.setImage(route);
   }
-  set image(route) {
+  setImage(route) {
     this.route = route;
+    this.canvas.images.addRoute(this.route);
   }
-  get image() {
+  getImage() {
     return this.canvas.images.getImage(this.route);
   }
   drawImage() {
-    const image = this.image;
+    const image = this.getImage();
     if (image === false)
       return;
-    const positionOnTheCanvas = this.canvas.positionOnCanvas({
-      position: this
-    });
+    const positionOnTheCanvas = this.canvas.positionOnCanvas(this);
     if (positionOnTheCanvas === false)
       return;
-    if (this.reflected === true) {
-      this.canvas.context.scale(-1, 1);
-    }
     this.canvas.context.imageSmoothingEnabled = false;
     this.canvas.context.drawImage(image, positionOnTheCanvas.leftUp.x, positionOnTheCanvas.leftUp.y, positionOnTheCanvas.size.width, positionOnTheCanvas.size.height);
   }
@@ -630,17 +492,15 @@ class Image_ENGINE extends Position_ENGINE {
 // public/tsc/engine/elements.ts
 class Elements_ENGINE extends Image_ENGINE {
   element;
-  constructor(props) {
-    super(props);
-    this.element = props.element;
+  constructor(leftUp, size3, canvas, route, element) {
+    super(leftUp, size3, canvas, route);
+    this.element = element;
   }
   drawElement() {
     const image2 = this.image;
     if (image2 === false)
       return;
-    const positionOnCanvas = this.canvas.positionOnCanvas({
-      position: this
-    });
+    const positionOnCanvas = this.canvas.positionOnCanvas(this);
     if (positionOnCanvas === false)
       return;
     this.canvas.context.imageSmoothingEnabled = false;
@@ -651,9 +511,9 @@ class Elements_ENGINE extends Image_ENGINE {
 // public/tsc/engine/box.ts
 class Box_ENGINE extends Position_ENGINE {
   referenceIndex;
-  constructor(props) {
-    super(props);
-    this.referenceIndex = props.referenceIndex;
+  constructor(leftUp, size3, referenceIndex) {
+    super(leftUp, size3);
+    this.referenceIndex = referenceIndex;
   }
 }
 
@@ -665,152 +525,88 @@ class Boxes_ENGINE extends Coordinate_ENGINE {
   size;
   length;
   occupied;
-  constructor(props) {
-    super({
-      x: props.x,
-      y: props.y
-    });
-    this.canvas = props.canvas;
-    this.size = props.size;
-    this.length = props.length;
-    this.occupied = props.occupied;
+  constructor(x, y, canvas, size4, length, occupied) {
+    super(x, y);
+    this.canvas = canvas;
+    this.size = size4;
+    this.length = length;
+    this.occupied = occupied;
   }
-  collision(props) {
-    const size4 = new Size_ENGINE({
-      width: this.size.width * props.character.address.x,
-      height: this.size.height * props.character.address.y
-    });
-    const leftUp = new Coordinate_ENGINE({
-      x: props.character.leftUp.x + size4.width,
-      y: props.character.leftUp.y + size4.height
-    });
-    const rightDown = new Coordinate_ENGINE({
-      x: props.character.rightDown.x + size4.width,
-      y: props.character.rightDown.y + size4.height
-    });
-    const boxIndicesLeftUp = this.getBoxIndices({
-      coordinate: leftUp
-    });
-    const boxIndicesRightDown = this.getBoxIndices({
-      coordinate: rightDown
-    });
-    const boxIndices = new Plane_ENGINE({
-      horizontal: 0,
-      vertical: 0
-    });
+  collision(character) {
+    const size4 = new Size_ENGINE(this.size.width * character.address.x, this.size.height * character.address.y);
+    const leftUp = new Coordinate_ENGINE(character.leftUp.x + size4.width, character.leftUp.y + size4.height);
+    const rightDown = new Coordinate_ENGINE(character.rightDown.x + size4.width, character.rightDown.y + size4.height);
+    const boxIndicesLeftUp = this.getBoxIndices(leftUp);
+    const boxIndicesRightDown = this.getBoxIndices(rightDown);
+    const boxIndices = new Plane_ENGINE(0, 0);
     for (boxIndices.vertical = boxIndicesLeftUp.vertical;boxIndices.vertical <= boxIndicesRightDown.vertical; boxIndices.vertical++) {
       for (boxIndices.horizontal = boxIndicesLeftUp.horizontal;boxIndices.horizontal <= boxIndicesRightDown.horizontal; boxIndices.horizontal++) {
-        const box2 = this.getBox({ boxIndices });
+        const box2 = this.getBox(boxIndices);
         if (box2 === undefined)
           continue;
-        if (box2.someVertexInside({ position: props.character }) === false)
+        if (box2.someVertexInside(character) === false)
           continue;
         return box2;
       }
     }
     return false;
   }
-  getPosition(props) {
-    return new Position_ENGINE({
-      leftUp: new Coordinate_ENGINE({
-        x: props.boxIndices.horizontal * this.size.width,
-        y: props.boxIndices.vertical * this.size.height
-      }),
-      size: new Size_ENGINE({
-        width: this.size.width * this.length.horizontal,
-        height: this.size.height * this.length.vertical
-      })
-    });
+  getPosition(boxIndices) {
+    return new Position_ENGINE(new Coordinate_ENGINE(boxIndices.horizontal * this.size.width, boxIndices.vertical * this.size.height), new Size_ENGINE(this.size.width * this.length.horizontal, this.size.height * this.length.vertical));
   }
-  getBox(props) {
-    const boxesRow = this.boxes[props.boxIndices.vertical];
+  getBox(boxIndices) {
+    const boxesRow = this.boxes[boxIndices.vertical];
     if (boxesRow === undefined)
       return;
-    const box2 = boxesRow[props.boxIndices.horizontal];
+    const box2 = boxesRow[boxIndices.horizontal];
     return box2;
   }
-  getBoxIndices(props) {
-    const horizontal = Math.floor(props.coordinate.x / this.size.width);
-    const vertical = Math.floor(props.coordinate.y / this.size.height);
-    return new Plane_ENGINE({
-      horizontal,
-      vertical
-    });
+  getBoxIndices(coordinate6) {
+    const horizontal = Math.floor(coordinate6.x / this.size.width);
+    const vertical = Math.floor(coordinate6.y / this.size.height);
+    return new Plane_ENGINE(horizontal, vertical);
   }
-  boxesIndices(props) {
-    let row = this.boxes[props.boxIndices.vertical];
+  boxesIndices(boxIndices, box2) {
+    let row = this.boxes[boxIndices.vertical];
     if (row === undefined)
       row = [];
-    row[props.boxIndices.horizontal] = props.box;
-    this.boxes[props.boxIndices.vertical] = row;
+    row[boxIndices.horizontal] = box2;
+    this.boxes[boxIndices.vertical] = row;
   }
-  setBox(props) {
-    const size4 = new Size_ENGINE({
-      width: this.size.width,
-      height: this.size.height
-    });
-    const distanceX = props.boxIndices.horizontal * size4.width;
-    const distanceY = props.boxIndices.vertical * size4.height;
-    const box2 = new Box_ENGINE({
-      leftUp: new Coordinate_ENGINE({
-        x: this.x + distanceX,
-        y: this.y + distanceY
-      }),
-      size: size4,
-      referenceIndex: props.referenceIndex
-    });
-    this.boxesIndices({
-      boxIndices: props.boxIndices,
-      box: box2
-    });
+  setBox(boxIndices, referenceIndex) {
+    const size4 = new Size_ENGINE(this.size.width, this.size.height);
+    const distanceX = boxIndices.horizontal * size4.width;
+    const distanceY = boxIndices.vertical * size4.height;
+    const box2 = new Box_ENGINE(new Coordinate_ENGINE(this.x + distanceX, this.y + distanceY), size4, referenceIndex);
+    this.boxesIndices(boxIndices, box2);
   }
-  occupiedBoxes(props) {
-    const boxIndices = new Plane_ENGINE({
-      horizontal: props.boxIndices.horizontal + props.occupiedIndices.vertical,
-      vertical: props.boxIndices.vertical + props.occupiedIndices.horizontal
-    });
+  occupiedBoxes(initialReferenceIndices, indexesBoxOccupy, referenceIndex) {
+    const boxIndices = new Plane_ENGINE(initialReferenceIndices.horizontal + indexesBoxOccupy.vertical, initialReferenceIndices.vertical + indexesBoxOccupy.horizontal);
     let boxesRow = this.boxes[boxIndices.vertical];
     if (boxesRow === undefined)
       boxesRow = [];
-    let box2 = this.getBox({ boxIndices });
+    let box2 = this.getBox(boxIndices);
     if (box2 !== undefined)
       return;
-    this.setBox({
-      boxIndices,
-      referenceIndex: props.referenceIndex
-    });
+    this.setBox(boxIndices, referenceIndex);
   }
-  referencePush(props) {
-    const reference = this.getPosition({
-      boxIndices: props.boxIndices
-    });
-    const referenceIndex = this.referencesPush({
-      boxIndices: props.boxIndices,
-      reference
-    });
+  referencePush(boxIndices) {
+    const reference = this.getPosition(boxIndices);
+    const referenceIndex = this.referencesPush(boxIndices, reference);
     if (referenceIndex === undefined)
       return;
     return this.references[referenceIndex];
   }
-  referencesPush(props) {
-    const box2 = this.getBox({
-      boxIndices: props.boxIndices
-    });
+  referencesPush(boxIndices, reference) {
+    const box2 = this.getBox(boxIndices);
     if (box2 !== undefined)
       return;
-    this.references.push(props.reference);
+    this.references.push(reference);
     const referenceIndex = this.references.length - 1;
     if (this.occupied === true) {
       for (let vertical = 0;vertical < this.length.vertical; vertical++) {
         for (let horizontal = 0;horizontal < this.length.horizontal; horizontal++) {
-          this.occupiedBoxes({
-            boxIndices: props.boxIndices,
-            occupiedIndices: new Plane_ENGINE({
-              horizontal,
-              vertical
-            }),
-            referenceIndex
-          });
+          this.occupiedBoxes(boxIndices, new Plane_ENGINE(horizontal, vertical), referenceIndex);
         }
       }
     } else {
@@ -818,14 +614,7 @@ class Boxes_ENGINE extends Coordinate_ENGINE {
         row.forEach((value, horizontal) => {
           if (value === false)
             return;
-          this.occupiedBoxes({
-            boxIndices: props.boxIndices,
-            occupiedIndices: new Plane_ENGINE({
-              horizontal,
-              vertical
-            }),
-            referenceIndex
-          });
+          this.occupiedBoxes(boxIndices, new Plane_ENGINE(horizontal, vertical), referenceIndex);
         });
       });
     }
@@ -837,31 +626,14 @@ class Boxes_ENGINE extends Coordinate_ENGINE {
 class ImageBoxes_ENGINE extends Boxes_ENGINE {
   references = [];
   route;
-  constructor(props) {
-    super({
-      x: props.x,
-      y: props.y,
-      canvas: props.canvas,
-      size: props.size,
-      length: props.length,
-      occupied: props.occupied
-    });
-    this.route = props.route;
+  constructor(x, y, canvas, size4, length, occupied, route) {
+    super(x, y, canvas, size4, length, occupied);
+    this.route = route;
   }
-  referencePush(props) {
-    const position7 = this.getPosition({
-      boxIndices: props.boxIndices
-    });
-    const reference = new Image_ENGINE({
-      leftUp: position7.leftUp,
-      size: position7.size,
-      canvas: this.canvas,
-      route: this.route
-    });
-    const indexReference = this.referencesPush({
-      boxIndices: props.boxIndices,
-      reference
-    });
+  referencePush(boxIndices) {
+    const position7 = this.getPosition(boxIndices);
+    const reference = new Image_ENGINE(position7.leftUp, position7.size, this.canvas, this.route);
+    const indexReference = this.referencesPush(boxIndices, reference);
     if (indexReference === undefined)
       return;
     return this.references[indexReference];
@@ -875,42 +647,14 @@ class ImageBoxes_ENGINE extends Boxes_ENGINE {
 class ElementBoxes_ENGINE extends ImageBoxes_ENGINE {
   references = [];
   element;
-  constructor(props) {
-    super({
-      x: props.x,
-      y: props.y,
-      canvas: props.canvas,
-      size: props.size,
-      length: props.length,
-      occupied: props.occupied,
-      route: props.route
-    });
-    this.element = props.element;
+  constructor(x, y, canvas, size5, length, occupied, route, element2) {
+    super(x, y, canvas, size5, length, occupied, route);
+    this.element = element2;
   }
-  referencePush(props) {
-    const position7 = this.getPosition({
-      boxIndices: props.boxIndices
-    });
-    const reference = new Elements_ENGINE({
-      leftUp: position7.leftUp,
-      size: position7.size,
-      canvas: this.canvas,
-      route: this.route,
-      element: new Element_ENGINE({
-        size: new Size_ENGINE({
-          width: this.element.size.width,
-          height: this.element.size.height
-        }),
-        indices: new Plane_ENGINE({
-          horizontal: this.element.getIndices().horizontal,
-          vertical: this.element.getIndices().vertical
-        })
-      })
-    });
-    const indexReference = this.referencesPush({
-      boxIndices: props.boxIndices,
-      reference
-    });
+  referencePush(boxIndices) {
+    const position7 = this.getPosition(boxIndices);
+    const reference = new Elements_ENGINE(position7.leftUp, position7.size, this.canvas, this.route, new Element_ENGINE(new Size_ENGINE(this.element.size.width, this.element.size.height), new Plane_ENGINE(this.element.getIndices().horizontal, this.element.getIndices().vertical)));
+    const indexReference = this.referencesPush(boxIndices, reference);
     if (indexReference === undefined)
       return;
     return this.references[indexReference];
@@ -924,82 +668,32 @@ class ElementBoxes_ENGINE extends ImageBoxes_ENGINE {
 class Grounds_ENGINE extends ElementBoxes_ENGINE {
   references = [];
   elementIndices;
-  constructor(props) {
-    super({
-      x: props.map.leftUp.x,
-      y: props.map.leftUp.y,
-      canvas: props.canvas,
-      size: new Size_ENGINE({
-        width: props.map.boxes.width,
-        height: props.map.boxes.height
-      }),
-      length: new Plane_ENGINE({
-        horizontal: 1,
-        vertical: 1
-      }),
-      occupied: true,
-      route: props.route,
-      element: new Element_ENGINE({
-        size: new Size_ENGINE({
-          width: 64,
-          height: 64
-        }),
-        indices: props.elementIndices.only
-      })
-    });
-    this.elementIndices = props.elementIndices;
+  constructor(map, canvas, route, elementIndices) {
+    super(map.leftUp.x, map.leftUp.y, canvas, new Size_ENGINE(map.boxes.width, map.boxes.height), new Plane_ENGINE(1, 1), true, route, new Element_ENGINE(new Size_ENGINE(64, 64), elementIndices.only));
+    this.elementIndices = elementIndices;
   }
   refreshElements() {
     this.references.forEach((elements2) => {
-      const boxIndices = this.getBoxIndices({
-        coordinate: elements2.leftUp
-      });
-      const groundPosition = this.groundPosition({
-        boxIndices
-      });
+      const boxIndices = this.getBoxIndices(elements2.leftUp);
+      const groundPosition = this.groundPosition(boxIndices);
       const indices = this.elementIndices[groundPosition];
-      elements2.element.setIndices(new Plane_ENGINE({
-        horizontal: indices.horizontal,
-        vertical: indices.vertical
-      }));
+      elements2.element.setIndices(new Plane_ENGINE(indices.horizontal, indices.vertical));
     });
   }
-  pushGround(props) {
-    const ground = this.referencePush({
-      boxIndices: props.boxIndices
-    });
+  pushGround(boxIndices) {
+    const ground = this.referencePush(boxIndices);
     this.refreshElements();
     return ground;
   }
-  groundPosition(props) {
-    const leftBoxes = new Plane_ENGINE({
-      horizontal: props.boxIndices.horizontal - 1,
-      vertical: props.boxIndices.vertical
-    });
-    const rightBoxes = new Plane_ENGINE({
-      horizontal: props.boxIndices.horizontal + 1,
-      vertical: props.boxIndices.vertical
-    });
-    const upBoxes = new Plane_ENGINE({
-      horizontal: props.boxIndices.horizontal,
-      vertical: props.boxIndices.vertical - 1
-    });
-    const downBoxes = new Plane_ENGINE({
-      horizontal: props.boxIndices.horizontal,
-      vertical: props.boxIndices.vertical + 1
-    });
-    const left = this.getBox({
-      boxIndices: leftBoxes
-    }) !== undefined;
-    const right = this.getBox({
-      boxIndices: rightBoxes
-    }) !== undefined;
-    const up = this.getBox({
-      boxIndices: upBoxes
-    }) !== undefined;
-    const down = this.getBox({
-      boxIndices: downBoxes
-    }) !== undefined;
+  groundPosition(boxIndices) {
+    const leftBoxes = new Plane_ENGINE(boxIndices.horizontal - 1, boxIndices.vertical);
+    const rightBoxes = new Plane_ENGINE(boxIndices.horizontal + 1, boxIndices.vertical);
+    const upBoxes = new Plane_ENGINE(boxIndices.horizontal, boxIndices.vertical - 1);
+    const downBoxes = new Plane_ENGINE(boxIndices.horizontal, boxIndices.vertical + 1);
+    const left = this.getBox(leftBoxes) !== undefined;
+    const right = this.getBox(rightBoxes) !== undefined;
+    const up = this.getBox(upBoxes) !== undefined;
+    const down = this.getBox(downBoxes) !== undefined;
     const isLeftUp = !up && down && !left && right;
     if (isLeftUp)
       return "leftUp";
@@ -1054,83 +748,28 @@ class Grounds_ENGINE extends ElementBoxes_ENGINE {
 
 // public/tsc/game/map/flatsSand.ts
 class FlatsSand_ENGINE extends Grounds_ENGINE {
-  constructor(props) {
-    super({
-      canvas: props.canvas,
-      map: props.map,
-      route: "images/terrain/ground/flat.png",
-      elementIndices: {
-        leftUp: new Plane_ENGINE({
-          horizontal: 5,
-          vertical: 0
-        }),
-        up: new Plane_ENGINE({
-          horizontal: 6,
-          vertical: 0
-        }),
-        rightUp: new Plane_ENGINE({
-          horizontal: 7,
-          vertical: 0
-        }),
-        left: new Plane_ENGINE({
-          horizontal: 5,
-          vertical: 1
-        }),
-        center: new Plane_ENGINE({
-          horizontal: 6,
-          vertical: 1
-        }),
-        right: new Plane_ENGINE({
-          horizontal: 7,
-          vertical: 1
-        }),
-        leftDown: new Plane_ENGINE({
-          horizontal: 5,
-          vertical: 2
-        }),
-        down: new Plane_ENGINE({
-          horizontal: 6,
-          vertical: 2
-        }),
-        rightDown: new Plane_ENGINE({
-          horizontal: 7,
-          vertical: 2
-        }),
-        horizontalLeft: new Plane_ENGINE({
-          horizontal: 5,
-          vertical: 3
-        }),
-        horizontalCenter: new Plane_ENGINE({
-          horizontal: 6,
-          vertical: 3
-        }),
-        horizontalRight: new Plane_ENGINE({
-          horizontal: 7,
-          vertical: 3
-        }),
-        verticalUp: new Plane_ENGINE({
-          horizontal: 8,
-          vertical: 0
-        }),
-        verticalCenter: new Plane_ENGINE({
-          horizontal: 8,
-          vertical: 1
-        }),
-        verticalDown: new Plane_ENGINE({
-          horizontal: 8,
-          vertical: 2
-        }),
-        only: new Plane_ENGINE({
-          horizontal: 8,
-          vertical: 3
-        })
-      }
+  constructor(map, canvas) {
+    super(map, canvas, "images/terrain/ground/flat.png", {
+      leftUp: new Plane_ENGINE(5, 0),
+      up: new Plane_ENGINE(6, 0),
+      rightUp: new Plane_ENGINE(7, 0),
+      left: new Plane_ENGINE(5, 1),
+      center: new Plane_ENGINE(6, 1),
+      right: new Plane_ENGINE(7, 1),
+      leftDown: new Plane_ENGINE(5, 2),
+      down: new Plane_ENGINE(6, 2),
+      rightDown: new Plane_ENGINE(7, 2),
+      horizontalLeft: new Plane_ENGINE(5, 3),
+      horizontalCenter: new Plane_ENGINE(6, 3),
+      horizontalRight: new Plane_ENGINE(7, 3),
+      verticalUp: new Plane_ENGINE(8, 0),
+      verticalCenter: new Plane_ENGINE(8, 1),
+      verticalDown: new Plane_ENGINE(8, 2),
+      only: new Plane_ENGINE(8, 3)
     });
   }
-  pushFlatSand(props) {
-    return this.pushGround({
-      boxIndices: props.boxIndices
-    });
+  pushFlatSand(boxIndices) {
+    return this.pushGround(boxIndices);
   }
   drawFlatsSand() {
     this.drawGrounds();
@@ -1139,83 +778,28 @@ class FlatsSand_ENGINE extends Grounds_ENGINE {
 
 // public/tsc/game/map/elevations.ts
 class Elevations_ENGINE extends Grounds_ENGINE {
-  constructor(props) {
-    super({
-      canvas: props.canvas,
-      map: props.map,
-      route: "images/terrain/ground/elevation.png",
-      elementIndices: {
-        leftUp: new Plane_ENGINE({
-          horizontal: 0,
-          vertical: 0
-        }),
-        up: new Plane_ENGINE({
-          horizontal: 1,
-          vertical: 0
-        }),
-        rightUp: new Plane_ENGINE({
-          horizontal: 2,
-          vertical: 0
-        }),
-        left: new Plane_ENGINE({
-          horizontal: 0,
-          vertical: 1
-        }),
-        center: new Plane_ENGINE({
-          horizontal: 1,
-          vertical: 1
-        }),
-        right: new Plane_ENGINE({
-          horizontal: 2,
-          vertical: 1
-        }),
-        leftDown: new Plane_ENGINE({
-          horizontal: 0,
-          vertical: 2
-        }),
-        down: new Plane_ENGINE({
-          horizontal: 1,
-          vertical: 2
-        }),
-        rightDown: new Plane_ENGINE({
-          horizontal: 2,
-          vertical: 2
-        }),
-        horizontalLeft: new Plane_ENGINE({
-          horizontal: 0,
-          vertical: 4
-        }),
-        horizontalCenter: new Plane_ENGINE({
-          horizontal: 1,
-          vertical: 4
-        }),
-        horizontalRight: new Plane_ENGINE({
-          horizontal: 2,
-          vertical: 4
-        }),
-        verticalUp: new Plane_ENGINE({
-          horizontal: 3,
-          vertical: 0
-        }),
-        verticalCenter: new Plane_ENGINE({
-          horizontal: 3,
-          vertical: 1
-        }),
-        verticalDown: new Plane_ENGINE({
-          horizontal: 3,
-          vertical: 2
-        }),
-        only: new Plane_ENGINE({
-          horizontal: 3,
-          vertical: 4
-        })
-      }
+  constructor(map, canvas) {
+    super(map, canvas, "images/terrain/ground/elevation.png", {
+      leftUp: new Plane_ENGINE(0, 0),
+      up: new Plane_ENGINE(1, 0),
+      rightUp: new Plane_ENGINE(2, 0),
+      left: new Plane_ENGINE(0, 1),
+      center: new Plane_ENGINE(1, 1),
+      right: new Plane_ENGINE(2, 1),
+      leftDown: new Plane_ENGINE(0, 2),
+      down: new Plane_ENGINE(1, 2),
+      rightDown: new Plane_ENGINE(2, 2),
+      horizontalLeft: new Plane_ENGINE(0, 4),
+      horizontalCenter: new Plane_ENGINE(1, 4),
+      horizontalRight: new Plane_ENGINE(2, 4),
+      verticalUp: new Plane_ENGINE(3, 0),
+      verticalCenter: new Plane_ENGINE(3, 1),
+      verticalDown: new Plane_ENGINE(3, 2),
+      only: new Plane_ENGINE(3, 4)
     });
   }
-  pushElevation(props) {
-    this.pushGround({
-      boxIndices: props.boxIndices
-    });
+  pushElevation(boxIndices) {
+    this.pushGround(boxIndices);
   }
   drawElevations() {
     this.drawGrounds();
@@ -1225,66 +809,20 @@ class Elevations_ENGINE extends Grounds_ENGINE {
 // public/tsc/game/map/wallElevations.ts
 class WallElevations_ENGINE extends ElementBoxes_ENGINE {
   elementIndices;
-  constructor(props) {
-    super({
-      x: props.map.leftUp.x,
-      y: props.map.leftUp.y,
-      canvas: props.canvas,
-      size: new Size_ENGINE({
-        width: props.map.boxes.width,
-        height: props.map.boxes.height
-      }),
-      length: new Plane_ENGINE({
-        horizontal: 1,
-        vertical: 1
-      }),
-      occupied: true,
-      route: "images/terrain/ground/elevation.png",
-      element: new Element_ENGINE({
-        size: new Size_ENGINE({
-          width: 64,
-          height: 64
-        }),
-        indices: new Plane_ENGINE({
-          horizontal: 0,
-          vertical: 0
-        })
-      })
-    });
+  constructor(map, canvas) {
+    super(map.leftUp.x, map.leftUp.y, canvas, new Size_ENGINE(map.boxes.width, map.boxes.height), new Plane_ENGINE(1, 1), true, "images/terrain/ground/elevation.png", new Element_ENGINE(new Size_ENGINE(64, 64), new Plane_ENGINE(0, 0)));
     this.elementIndices = {
-      left: new Plane_ENGINE({
-        horizontal: 0,
-        vertical: 3
-      }),
-      center: new Plane_ENGINE({
-        horizontal: 1,
-        vertical: 3
-      }),
-      right: new Plane_ENGINE({
-        horizontal: 2,
-        vertical: 3
-      }),
-      only: new Plane_ENGINE({
-        horizontal: 3,
-        vertical: 5
-      })
+      left: new Plane_ENGINE(0, 3),
+      center: new Plane_ENGINE(1, 3),
+      right: new Plane_ENGINE(2, 3),
+      only: new Plane_ENGINE(3, 5)
     };
   }
-  wallElevationPosition(props) {
-    const leftBoxes = new Plane_ENGINE({
-      horizontal: props.boxIndices.horizontal - 1,
-      vertical: props.boxIndices.vertical
-    });
-    const rightBoxes = new Plane_ENGINE({
-      horizontal: props.boxIndices.horizontal + 1,
-      vertical: props.boxIndices.vertical
-    });
-    const left = this.getBox({
-      boxIndices: leftBoxes
-    }) !== undefined;
-    const right = this.getBox({
-      boxIndices: rightBoxes
-    }) !== undefined;
+  wallElevationPosition(boxIndices) {
+    const leftBoxes = new Plane_ENGINE(boxIndices.horizontal - 1, boxIndices.vertical);
+    const rightBoxes = new Plane_ENGINE(boxIndices.horizontal + 1, boxIndices.vertical);
+    const left = this.getBox(leftBoxes) !== undefined;
+    const right = this.getBox(rightBoxes) !== undefined;
     const isLeft = !left && right;
     if (isLeft)
       return "left";
@@ -1301,23 +839,14 @@ class WallElevations_ENGINE extends ElementBoxes_ENGINE {
   }
   refreshElements() {
     this.references.forEach((elements2) => {
-      const boxIndices = this.getBoxIndices({
-        coordinate: elements2.leftUp
-      });
-      const position7 = this.wallElevationPosition({
-        boxIndices
-      });
+      const boxIndices = this.getBoxIndices(elements2.leftUp);
+      const position7 = this.wallElevationPosition(boxIndices);
       const indices = this.elementIndices[position7];
-      elements2.element.setIndices(new Plane_ENGINE({
-        horizontal: indices.horizontal,
-        vertical: indices.vertical
-      }));
+      elements2.element.setIndices(new Plane_ENGINE(indices.horizontal, indices.vertical));
     });
   }
-  pushWallElevation(props) {
-    const wallElevation = this.referencePush({
-      boxIndices: props.boxIndices
-    });
+  pushWallElevation(boxIndices) {
+    const wallElevation = this.referencePush(boxIndices);
     if (wallElevation === undefined)
       return;
     this.refreshElements();
@@ -1332,14 +861,9 @@ class WallElevations_ENGINE extends ElementBoxes_ENGINE {
 class Castle_ENGINE extends Image_ENGINE {
   state = "construction";
   color = "blue";
-  constructor(props) {
-    super({
-      leftUp: props.leftUp,
-      size: props.size,
-      canvas: props.canvas,
-      route: false
-    });
-    this.imageCastle(props.state, props.color);
+  constructor(leftUp, size7, canvas, state, color) {
+    super(leftUp, size7, canvas, false);
+    this.imageCastle(state, color);
   }
   imageCastle(newState, newColor) {
     this.state = newState;
@@ -1354,38 +878,13 @@ class Castle_ENGINE extends Image_ENGINE {
 // public/tsc/game/map/castles.ts
 class Castles_ENGINE extends ImageBoxes_ENGINE {
   references = [];
-  constructor(props) {
-    super({
-      x: props.map.leftUp.x,
-      y: props.map.leftUp.y,
-      canvas: props.canvas,
-      size: new Size_ENGINE({
-        width: props.map.boxes.width,
-        height: props.map.boxes.height
-      }),
-      length: new Plane_ENGINE({
-        horizontal: 4,
-        vertical: 3
-      }),
-      occupied: true,
-      route: false
-    });
+  constructor(map, canvas) {
+    super(map.leftUp.x, map.leftUp.y, canvas, new Size_ENGINE(map.boxes.width, map.boxes.height), new Plane_ENGINE(4, 3), true, false);
   }
-  castlePush(props) {
-    const position7 = this.getPosition({
-      boxIndices: props.boxIndices
-    });
-    const reference = new Castle_ENGINE({
-      leftUp: position7.leftUp,
-      size: position7.size,
-      canvas: this.canvas,
-      state: props.state,
-      color: props.color
-    });
-    const indexReference = this.referencesPush({
-      boxIndices: props.boxIndices,
-      reference
-    });
+  castlePush(boxIndices, state, color) {
+    const position7 = this.getPosition(boxIndices);
+    const reference = new Castle_ENGINE(position7.leftUp, position7.size, this.canvas, state, color);
+    const indexReference = this.referencesPush(boxIndices, reference);
     if (indexReference === undefined)
       return;
     return 0;
@@ -1397,27 +896,11 @@ class Castles_ENGINE extends ImageBoxes_ENGINE {
 
 // public/tsc/game/map/water.ts
 class Water_ENGINE extends ImageBoxes_ENGINE {
-  constructor(props) {
-    super({
-      x: props.map.leftUp.x,
-      y: props.map.leftUp.y,
-      canvas: props.canvas,
-      size: new Size_ENGINE({
-        width: props.map.boxes.width,
-        height: props.map.boxes.height
-      }),
-      length: new Plane_ENGINE({
-        horizontal: 1,
-        vertical: 1
-      }),
-      occupied: true,
-      route: "images/terrain/water/water.png"
-    });
+  constructor(map, canvas) {
+    super(map.leftUp.x, map.leftUp.y, canvas, new Size_ENGINE(map.boxes.width, map.boxes.height), new Plane_ENGINE(1, 1), true, "images/terrain/water/water.png");
   }
-  pushWater(props) {
-    return this.referencePush({
-      boxIndices: props.boxIndices
-    });
+  pushWater(boxIndices) {
+    return this.referencePush(boxIndices);
   }
   drawWater() {
     this.drawImages();
@@ -1428,9 +911,9 @@ class Water_ENGINE extends ImageBoxes_ENGINE {
 class Animation_ENGINE {
   frames;
   intervalBetweenFrame = 0;
-  constructor(props) {
-    this.frames = props.frames;
-    this.framesPerSecond = props.framesPerSecond;
+  constructor(frames, framesPerSecond) {
+    this.frames = frames;
+    this.framesPerSecond = framesPerSecond;
   }
   get framesPerSecond() {
     return 1000 / this.intervalBetweenFrame;
@@ -1444,9 +927,9 @@ class Animation_ENGINE {
 class Animations_ENGINE extends Elements_ENGINE {
   timerNextFrame = 0;
   animation;
-  constructor(props) {
-    super(props);
-    this.animation = props.animation;
+  constructor(leftUp, size9, canvas, route, element4, animation) {
+    super(leftUp, size9, canvas, route, element4);
+    this.animation = animation;
   }
   nextFrame() {
     this.timerNextFrame += this.canvas.timeBetweenFrames;
@@ -1465,47 +948,14 @@ class Animations_ENGINE extends Elements_ENGINE {
 class AnimationBoxes_ENGINE extends ElementBoxes_ENGINE {
   references = [];
   animation;
-  constructor(props) {
-    super({
-      x: props.x,
-      y: props.y,
-      canvas: props.canvas,
-      size: props.size,
-      length: props.length,
-      occupied: props.occupied,
-      route: props.route,
-      element: props.element
-    });
-    this.animation = props.animation;
+  constructor(x, y, canvas, size10, length, occupied, route, element5, animation2) {
+    super(x, y, canvas, size10, length, occupied, route, element5);
+    this.animation = animation2;
   }
-  referencePush(props) {
-    const position7 = this.getPosition({
-      boxIndices: props.boxIndices
-    });
-    const reference = new Animations_ENGINE({
-      leftUp: position7.leftUp,
-      size: position7.size,
-      canvas: this.canvas,
-      route: this.route,
-      element: new Element_ENGINE({
-        size: new Size_ENGINE({
-          width: this.element.size.width,
-          height: this.element.size.height
-        }),
-        indices: new Plane_ENGINE({
-          horizontal: 0,
-          vertical: this.element.getIndices().vertical
-        })
-      }),
-      animation: new Animation_ENGINE({
-        frames: this.animation.frames,
-        framesPerSecond: this.animation.framesPerSecond
-      })
-    });
-    const indexReference = this.referencesPush({
-      boxIndices: props.boxIndices,
-      reference
-    });
+  referencePush(boxIndices) {
+    const position7 = this.getPosition(boxIndices);
+    const reference = new Animations_ENGINE(position7.leftUp, position7.size, this.canvas, this.route, new Element_ENGINE(new Size_ENGINE(this.element.size.width, this.element.size.height), new Plane_ENGINE(0, this.element.getIndices().vertical)), new Animation_ENGINE(this.animation.frames, this.animation.framesPerSecond));
+    const indexReference = this.referencesPush(boxIndices, reference);
     if (indexReference === undefined)
       return;
     return this.references[indexReference];
@@ -1517,45 +967,15 @@ class AnimationBoxes_ENGINE extends ElementBoxes_ENGINE {
 
 // public/tsc/game/map/foams.ts
 class Foams_ENGINE extends AnimationBoxes_ENGINE {
-  constructor(props) {
-    super({
-      x: props.map.leftUp.x,
-      y: props.map.leftUp.y,
-      canvas: props.canvas,
-      size: new Size_ENGINE({
-        width: props.map.boxes.width,
-        height: props.map.boxes.height
-      }),
-      length: new Plane_ENGINE({
-        horizontal: 3,
-        vertical: 3
-      }),
-      occupied: [
-        [true, false, false],
-        [false, false, false],
-        [false, false, false]
-      ],
-      route: "images/terrain/water/foam.png",
-      element: new Element_ENGINE({
-        size: new Size_ENGINE({
-          width: 192,
-          height: 192
-        }),
-        indices: new Plane_ENGINE({
-          horizontal: 0,
-          vertical: 0
-        })
-      }),
-      animation: new Animation_ENGINE({
-        frames: 8,
-        framesPerSecond: 8
-      })
-    });
+  constructor(map, canvas) {
+    super(map.leftUp.x, map.leftUp.y, canvas, new Size_ENGINE(map.boxes.width, map.boxes.height), new Plane_ENGINE(3, 3), [
+      [true, false, false],
+      [false, false, false],
+      [false, false, false]
+    ], "images/terrain/water/foam.png", new Element_ENGINE(new Size_ENGINE(192, 192), new Plane_ENGINE(0, 0)), new Animation_ENGINE(8, 8));
   }
-  pushFoam(props) {
-    const foam = this.referencePush({
-      boxIndices: props.boxIndices
-    });
+  pushFoam(boxIndices) {
+    const foam = this.referencePush(boxIndices);
     if (foam === undefined)
       return;
     foam.leftUp.x -= this.size.width;
@@ -1569,83 +989,28 @@ class Foams_ENGINE extends AnimationBoxes_ENGINE {
 
 // public/tsc/game/map/flatsGrass.ts
 class FlatsGrass_ENGINE extends Grounds_ENGINE {
-  constructor(props) {
-    super({
-      canvas: props.canvas,
-      map: props.map,
-      route: "images/terrain/ground/flat.png",
-      elementIndices: {
-        leftUp: new Plane_ENGINE({
-          horizontal: 0,
-          vertical: 0
-        }),
-        up: new Plane_ENGINE({
-          horizontal: 1,
-          vertical: 0
-        }),
-        rightUp: new Plane_ENGINE({
-          horizontal: 2,
-          vertical: 0
-        }),
-        left: new Plane_ENGINE({
-          horizontal: 0,
-          vertical: 1
-        }),
-        center: new Plane_ENGINE({
-          horizontal: 1,
-          vertical: 1
-        }),
-        right: new Plane_ENGINE({
-          horizontal: 2,
-          vertical: 1
-        }),
-        leftDown: new Plane_ENGINE({
-          horizontal: 0,
-          vertical: 2
-        }),
-        down: new Plane_ENGINE({
-          horizontal: 1,
-          vertical: 2
-        }),
-        rightDown: new Plane_ENGINE({
-          horizontal: 2,
-          vertical: 2
-        }),
-        horizontalLeft: new Plane_ENGINE({
-          horizontal: 0,
-          vertical: 3
-        }),
-        horizontalCenter: new Plane_ENGINE({
-          horizontal: 1,
-          vertical: 3
-        }),
-        horizontalRight: new Plane_ENGINE({
-          horizontal: 2,
-          vertical: 3
-        }),
-        verticalUp: new Plane_ENGINE({
-          horizontal: 3,
-          vertical: 0
-        }),
-        verticalCenter: new Plane_ENGINE({
-          horizontal: 3,
-          vertical: 1
-        }),
-        verticalDown: new Plane_ENGINE({
-          horizontal: 3,
-          vertical: 2
-        }),
-        only: new Plane_ENGINE({
-          horizontal: 3,
-          vertical: 3
-        })
-      }
+  constructor(map, canvas) {
+    super(map, canvas, "images/terrain/ground/flat.png", {
+      leftUp: new Plane_ENGINE(0, 0),
+      up: new Plane_ENGINE(1, 0),
+      rightUp: new Plane_ENGINE(2, 0),
+      left: new Plane_ENGINE(0, 1),
+      center: new Plane_ENGINE(1, 1),
+      right: new Plane_ENGINE(2, 1),
+      leftDown: new Plane_ENGINE(0, 2),
+      down: new Plane_ENGINE(1, 2),
+      rightDown: new Plane_ENGINE(2, 2),
+      horizontalLeft: new Plane_ENGINE(0, 3),
+      horizontalCenter: new Plane_ENGINE(1, 3),
+      horizontalRight: new Plane_ENGINE(2, 3),
+      verticalUp: new Plane_ENGINE(3, 0),
+      verticalCenter: new Plane_ENGINE(3, 1),
+      verticalDown: new Plane_ENGINE(3, 2),
+      only: new Plane_ENGINE(3, 3)
     });
   }
-  pushFlatGrass(props) {
-    return this.pushGround({
-      boxIndices: props.boxIndices
-    });
+  pushFlatGrass(boxIndices) {
+    return this.pushGround(boxIndices);
   }
   drawFlatsGrass() {
     this.drawGrounds();
@@ -1654,31 +1019,15 @@ class FlatsGrass_ENGINE extends Grounds_ENGINE {
 
 // public/tsc/game/map/shadows.ts
 class Shadows_ENGINE extends ImageBoxes_ENGINE {
-  constructor(props) {
-    super({
-      x: props.map.leftUp.x,
-      y: props.map.leftUp.y,
-      canvas: props.canvas,
-      size: new Size_ENGINE({
-        width: props.map.boxes.width,
-        height: props.map.boxes.height
-      }),
-      length: new Plane_ENGINE({
-        horizontal: 3,
-        vertical: 3
-      }),
-      occupied: [
-        [true, false, false],
-        [false, false, false],
-        [false, false, false]
-      ],
-      route: "images/terrain/ground/shadows.png"
-    });
+  constructor(map, canvas) {
+    super(map.leftUp.x, map.leftUp.y, canvas, new Size_ENGINE(map.boxes.width, map.boxes.height), new Plane_ENGINE(3, 3), [
+      [true, false, false],
+      [false, false, false],
+      [false, false, false]
+    ], "images/terrain/ground/shadows.png");
   }
-  pushShadow(props) {
-    const shadow = this.referencePush({
-      boxIndices: props.boxIndices
-    });
+  pushShadow(boxIndices) {
+    const shadow = this.referencePush(boxIndices);
     if (shadow === undefined)
       return;
     shadow.leftUp.x -= this.size.width;
@@ -1693,66 +1042,20 @@ class Shadows_ENGINE extends ImageBoxes_ENGINE {
 // public/tsc/game/map/stairsElevations.ts
 class StairsElevations_ENGINE extends ElementBoxes_ENGINE {
   elementIndices;
-  constructor(props) {
-    super({
-      x: props.map.leftUp.x,
-      y: props.map.leftUp.y,
-      canvas: props.canvas,
-      size: new Size_ENGINE({
-        width: props.map.boxes.width,
-        height: props.map.boxes.height
-      }),
-      length: new Plane_ENGINE({
-        horizontal: 1,
-        vertical: 1
-      }),
-      occupied: true,
-      route: "images/terrain/ground/elevation.png",
-      element: new Element_ENGINE({
-        size: new Size_ENGINE({
-          width: 64,
-          height: 64
-        }),
-        indices: new Plane_ENGINE({
-          horizontal: 0,
-          vertical: 0
-        })
-      })
-    });
+  constructor(map, canvas) {
+    super(map.leftUp.x, map.leftUp.y, canvas, new Size_ENGINE(map.boxes.width, map.boxes.height), new Plane_ENGINE(1, 1), true, "images/terrain/ground/elevation.png", new Element_ENGINE(new Size_ENGINE(64, 64), new Plane_ENGINE(0, 0)));
     this.elementIndices = {
-      left: new Plane_ENGINE({
-        horizontal: 0,
-        vertical: 7
-      }),
-      center: new Plane_ENGINE({
-        horizontal: 1,
-        vertical: 7
-      }),
-      right: new Plane_ENGINE({
-        horizontal: 2,
-        vertical: 7
-      }),
-      only: new Plane_ENGINE({
-        horizontal: 3,
-        vertical: 7
-      })
+      left: new Plane_ENGINE(0, 7),
+      center: new Plane_ENGINE(1, 7),
+      right: new Plane_ENGINE(2, 7),
+      only: new Plane_ENGINE(3, 7)
     };
   }
-  positionStairElevation(props) {
-    const leftBoxIndices = new Plane_ENGINE({
-      horizontal: props.boxIndices.horizontal - 1,
-      vertical: props.boxIndices.vertical
-    });
-    const rightBoxIndices = new Plane_ENGINE({
-      horizontal: props.boxIndices.horizontal + 1,
-      vertical: props.boxIndices.vertical
-    });
-    const left = this.getBox({
-      boxIndices: leftBoxIndices
-    }) !== undefined;
-    const right = this.getBox({
-      boxIndices: rightBoxIndices
-    }) !== undefined;
+  positionStairElevation(boxIndices) {
+    const leftBoxIndices = new Plane_ENGINE(boxIndices.horizontal - 1, boxIndices.vertical);
+    const rightBoxIndices = new Plane_ENGINE(boxIndices.horizontal + 1, boxIndices.vertical);
+    const left = this.getBox(leftBoxIndices) !== undefined;
+    const right = this.getBox(rightBoxIndices) !== undefined;
     const isLeft = !left && right;
     if (isLeft)
       return "left";
@@ -1769,23 +1072,14 @@ class StairsElevations_ENGINE extends ElementBoxes_ENGINE {
   }
   refreshElements() {
     this.references.forEach((elements3) => {
-      const boxIndices = this.getBoxIndices({
-        coordinate: elements3.leftUp
-      });
-      const position7 = this.positionStairElevation({
-        boxIndices
-      });
+      const boxIndices = this.getBoxIndices(elements3.leftUp);
+      const position7 = this.positionStairElevation(boxIndices);
       const indices = this.elementIndices[position7];
-      elements3.element.setIndices(new Plane_ENGINE({
-        horizontal: indices.horizontal,
-        vertical: indices.vertical
-      }));
+      elements3.element.setIndices(new Plane_ENGINE(indices.horizontal, indices.vertical));
     });
   }
-  setStairsElevations(props) {
-    const stairElevation = this.referencePush({
-      boxIndices: props.boxIndices
-    });
+  setStairsElevations(boxIndices) {
+    const stairElevation = this.referencePush(boxIndices);
     if (stairElevation === undefined)
       return;
     this.refreshElements();
@@ -1799,52 +1093,17 @@ class StairsElevations_ENGINE extends ElementBoxes_ENGINE {
 // public/tsc/game/map/flatElevations.ts
 class FlatElevations_ENGINE extends ElementBoxes_ENGINE {
   elementIndices;
-  constructor(props) {
-    super({
-      x: props.map.leftUp.x,
-      y: props.map.leftUp.y,
-      canvas: props.canvas,
-      size: new Size_ENGINE({
-        width: props.map.boxes.width,
-        height: props.map.boxes.height
-      }),
-      length: new Plane_ENGINE({
-        horizontal: 1,
-        vertical: 1
-      }),
-      occupied: true,
-      route: "images/terrain/ground/flat.png",
-      element: new Element_ENGINE({
-        size: new Size_ENGINE({
-          width: 64,
-          height: 64
-        }),
-        indices: new Plane_ENGINE({
-          horizontal: 0,
-          vertical: 0
-        })
-      })
-    });
+  constructor(map, canvas) {
+    super(map.leftUp.x, map.leftUp.y, canvas, new Size_ENGINE(map.boxes.width, map.boxes.height), new Plane_ENGINE(1, 1), true, "images/terrain/ground/flat.png", new Element_ENGINE(new Size_ENGINE(64, 64), new Plane_ENGINE(0, 0)));
     this.elementIndices = {
-      grass: new Plane_ENGINE({
-        horizontal: 4,
-        vertical: 0
-      }),
-      sand: new Plane_ENGINE({
-        horizontal: 9,
-        vertical: 0
-      })
+      grass: new Plane_ENGINE(4, 0),
+      sand: new Plane_ENGINE(9, 0)
     };
   }
-  pushFlatElevation(props) {
-    const indices = this.elementIndices[props.state];
-    this.element.setIndices(new Plane_ENGINE({
-      horizontal: indices.horizontal,
-      vertical: indices.vertical
-    }));
-    return this.referencePush({
-      boxIndices: props.boxIndices
-    });
+  pushFlatElevation(boxIndices, state) {
+    const indices = this.elementIndices[state];
+    this.element.setIndices(new Plane_ENGINE(indices.horizontal, indices.vertical));
+    return this.referencePush(boxIndices);
   }
   drawFlatElevations() {
     this.drawElements();
@@ -1854,85 +1113,40 @@ class FlatElevations_ENGINE extends ElementBoxes_ENGINE {
 // public/tsc/game/map/trees.ts
 class Trees_ENGINE extends AnimationBoxes_ENGINE {
   states;
-  constructor(props) {
-    super({
-      x: props.map.leftUp.x,
-      y: props.map.leftUp.y,
-      canvas: props.canvas,
-      size: new Size_ENGINE({
-        width: props.map.boxes.width,
-        height: props.map.boxes.height
-      }),
-      length: new Plane_ENGINE({
-        horizontal: 3,
-        vertical: 3
-      }),
-      occupied: [
-        [true, false, false],
-        [true, false, false],
-        [false, false, false]
-      ],
-      route: "images/resources/tree.png",
-      element: new Element_ENGINE({
-        size: new Size_ENGINE({
-          width: 192,
-          height: 192
-        }),
-        indices: new Plane_ENGINE({
-          horizontal: 0,
-          vertical: 0
-        })
-      }),
-      animation: new Animation_ENGINE({
-        frames: 4,
-        framesPerSecond: 4
-      })
-    });
+  constructor(map, canvas) {
+    super(map.leftUp.x, map.leftUp.y, canvas, new Size_ENGINE(map.boxes.width, map.boxes.height), new Plane_ENGINE(3, 3), [
+      [true, false, false],
+      [true, false, false],
+      [false, false, false]
+    ], "images/resources/tree.png", new Element_ENGINE(new Size_ENGINE(192, 192), new Plane_ENGINE(0, 0)), new Animation_ENGINE(4, 4));
     this.states = {
       motion: {
-        animation: new Animation_ENGINE({
-          frames: 4,
-          framesPerSecond: 4
-        }),
+        animation: new Animation_ENGINE(4, 4),
         element: {
-          indices: new Plane_ENGINE({ horizontal: 0, vertical: 0 })
+          indices: new Plane_ENGINE(0, 0)
         }
       },
       attacked: {
-        animation: new Animation_ENGINE({
-          frames: 2,
-          framesPerSecond: 2
-        }),
+        animation: new Animation_ENGINE(2, 2),
         element: {
-          indices: new Plane_ENGINE({ horizontal: 0, vertical: 1 })
+          indices: new Plane_ENGINE(0, 1)
         }
       },
       felled: {
-        animation: new Animation_ENGINE({
-          frames: 1,
-          framesPerSecond: 1
-        }),
+        animation: new Animation_ENGINE(1, 1),
         element: {
-          indices: new Plane_ENGINE({ horizontal: 0, vertical: 2 })
+          indices: new Plane_ENGINE(0, 2)
         }
       }
     };
   }
-  pushTree(props) {
-    const tree = this.states[props.state];
-    const animations2 = this.referencePush({
-      boxIndices: props.boxIndices
-    });
+  pushTree(boxIndices, state) {
+    const tree = this.states[state];
+    const animations2 = this.referencePush(boxIndices);
     if (animations2 === undefined)
       return;
-    animations2.element.setIndices(new Plane_ENGINE({
-      horizontal: tree.element.indices.horizontal,
-      vertical: tree.element.indices.vertical
-    }));
-    animations2.animation = new Animation_ENGINE({
-      frames: tree.animation.frames,
-      framesPerSecond: tree.animation.framesPerSecond
-    });
+    animations2.element.setIndices(new Plane_ENGINE(tree.element.indices.horizontal, tree.element.indices.vertical));
+    animations2.animation = new Animation_ENGINE(tree.animation.frames, tree.animation.framesPerSecond);
     return animations2;
   }
   drawTrees() {
@@ -1955,141 +1169,66 @@ class Floor_ENGINE {
   flatElevations;
   castles;
   trees;
-  constructor(props) {
-    this.map = props.map;
-    this.canvas = props.canvas;
-    this.water = new Water_ENGINE({
-      map: this.map,
-      canvas: this.canvas
-    });
-    this.foams = new Foams_ENGINE({
-      map: this.map,
-      canvas: this.canvas
-    });
-    this.flatsSand = new FlatsSand_ENGINE({
-      map: this.map,
-      canvas: this.canvas
-    });
-    this.elevations = new Elevations_ENGINE({
-      map: this.map,
-      canvas: this.canvas
-    });
-    this.flatsGrass = new FlatsGrass_ENGINE({
-      map: this.map,
-      canvas: this.canvas
-    });
-    this.shadows = new Shadows_ENGINE({
-      map: this.map,
-      canvas: this.canvas
-    });
-    this.wallElevations = new WallElevations_ENGINE({
-      map: this.map,
-      canvas: this.canvas
-    });
-    this.stairsElevation = new StairsElevations_ENGINE({
-      map: this.map,
-      canvas: this.canvas
-    });
-    this.flatElevations = new FlatElevations_ENGINE({
-      map: this.map,
-      canvas: this.canvas
-    });
-    this.castles = new Castles_ENGINE({
-      map: this.map,
-      canvas: this.canvas
-    });
-    this.trees = new Trees_ENGINE({
-      map: this.map,
-      canvas: this.canvas
-    });
+  constructor(map, canvas) {
+    this.map = map;
+    this.canvas = canvas;
+    this.water = new Water_ENGINE(this.map, this.canvas);
+    this.foams = new Foams_ENGINE(this.map, this.canvas);
+    this.flatsSand = new FlatsSand_ENGINE(this.map, this.canvas);
+    this.elevations = new Elevations_ENGINE(this.map, this.canvas);
+    this.flatsGrass = new FlatsGrass_ENGINE(this.map, this.canvas);
+    this.shadows = new Shadows_ENGINE(this.map, this.canvas);
+    this.wallElevations = new WallElevations_ENGINE(this.map, this.canvas);
+    this.stairsElevation = new StairsElevations_ENGINE(this.map, this.canvas);
+    this.flatElevations = new FlatElevations_ENGINE(this.map, this.canvas);
+    this.castles = new Castles_ENGINE(this.map, this.canvas);
+    this.trees = new Trees_ENGINE(this.map, this.canvas);
   }
   pushFloor(matrix) {
     matrix.forEach((row, vertical) => {
       row.forEach((box2, horizontal) => {
-        const boxIndices = new Plane_ENGINE({
-          horizontal,
-          vertical
-        });
+        const boxIndices = new Plane_ENGINE(horizontal, vertical);
         if (box2.water === true)
-          this.water.pushWater({
-            boxIndices
-          });
+          this.water.pushWater(boxIndices);
         if (box2.foam !== false) {
-          this.foams.pushFoam({
-            boxIndices
-          });
+          this.foams.pushFoam(boxIndices);
           if (box2.foam.flatSand === true)
-            this.flatsSand.pushFlatSand({
-              boxIndices
-            });
+            this.flatsSand.pushFlatSand(boxIndices);
         }
         if (box2.elevation !== false) {
           if (box2.elevation.shadow === true)
-            this.shadows.pushShadow({
-              boxIndices
-            });
+            this.shadows.pushShadow(boxIndices);
           if (box2.elevation.flatGrass === true)
-            this.flatsGrass.pushFlatGrass({
-              boxIndices
-            });
-          this.elevations.pushElevation({
-            boxIndices
-          });
+            this.flatsGrass.pushFlatGrass(boxIndices);
+          this.elevations.pushElevation(boxIndices);
         }
         if (box2.wallElevation !== false) {
           if (box2.wallElevation.shadow === true)
-            this.shadows.pushShadow({
-              boxIndices
-            });
-          this.wallElevations.pushWallElevation({
-            boxIndices
-          });
+            this.shadows.pushShadow(boxIndices);
+          this.wallElevations.pushWallElevation(boxIndices);
           if (box2.wallElevation.flatElevation !== false)
-            this.flatElevations.pushFlatElevation({
-              boxIndices,
-              state: box2.wallElevation.flatElevation
-            });
+            this.flatElevations.pushFlatElevation(boxIndices, box2.wallElevation.flatElevation);
         }
         if (box2.stairElevation !== false) {
           if (box2.stairElevation.shadow === true)
-            this.shadows.pushShadow({
-              boxIndices
-            });
-          this.stairsElevation.setStairsElevations({
-            boxIndices
-          });
+            this.shadows.pushShadow(boxIndices);
+          this.stairsElevation.setStairsElevations(boxIndices);
           if (box2.stairElevation.flatElevation !== false)
-            this.flatElevations.pushFlatElevation({
-              boxIndices,
-              state: box2.stairElevation.flatElevation
-            });
+            this.flatElevations.pushFlatElevation(boxIndices, box2.stairElevation.flatElevation);
         }
         if (box2.castle !== false) {
-          this.castles.castlePush({
-            boxIndices,
-            state: box2.castle.state,
-            color: box2.castle.color
-          });
+          this.castles.castlePush(boxIndices, box2.castle.state, box2.castle.color);
         }
         if (box2.trees !== false) {
-          this.trees.pushTree({
-            boxIndices,
-            state: box2.trees.animation
-          });
+          this.trees.pushTree(boxIndices, box2.trees.animation);
         }
       });
     });
   }
-  aboveFloor(props) {
-    const flatSand = this.flatsSand.collision({
-      character: props.character
-    }) !== false;
-    const elevations2 = this.elevations.collision({
-      character: props.character
-    }) !== false;
-    const stairsElevations2 = this.stairsElevation.collision({
-      character: props.character
-    }) !== false;
+  aboveFloor(character) {
+    const flatSand = this.flatsSand.collision(character) !== false;
+    const elevations2 = this.elevations.collision(character) !== false;
+    const stairsElevations2 = this.stairsElevation.collision(character) !== false;
     if (flatSand === true)
       return true;
     if (elevations2 === true)
@@ -2098,31 +1237,15 @@ class Floor_ENGINE {
       return true;
     return false;
   }
-  collisionFloor(props) {
-    const flatSand = this.flatsSand.collision({
-      character: props.character
-    }) !== false;
-    const elevations2 = this.elevations.collision({
-      character: props.character
-    }) !== false;
-    const wallElevations2 = this.wallElevations.collision({
-      character: props.character
-    }) !== false;
-    const stairsElevations2 = this.stairsElevation.collision({
-      character: props.character
-    }) !== false;
-    const nextFlatSand = this.flatsSand.collision({
-      character: props.moved
-    }) !== false;
-    const nextElevations = this.elevations.collision({
-      character: props.moved
-    }) !== false;
-    const nextWallElevations = this.wallElevations.collision({
-      character: props.moved
-    }) !== false;
-    const nextStairsElevations = this.stairsElevation.collision({
-      character: props.moved
-    }) !== false;
+  collisionFloor(character, moved) {
+    const flatSand = this.flatsSand.collision(character) !== false;
+    const elevations2 = this.elevations.collision(character) !== false;
+    const wallElevations2 = this.wallElevations.collision(character) !== false;
+    const stairsElevations2 = this.stairsElevation.collision(character) !== false;
+    const nextFlatSand = this.flatsSand.collision(moved) !== false;
+    const nextElevations = this.elevations.collision(moved) !== false;
+    const nextWallElevations = this.wallElevations.collision(moved) !== false;
+    const nextStairsElevations = this.stairsElevation.collision(moved) !== false;
     if (flatSand === true) {
       if (nextFlatSand === true)
         return false;
@@ -2178,81 +1301,47 @@ class Map_ENGINE extends Position_ENGINE {
   floors;
   boxes;
   canvas;
-  constructor(props) {
-    super({
-      leftUp: new Coordinate_ENGINE({ x: 0, y: 0 }),
-      size: new Size_ENGINE({
-        width: 100,
-        height: 100
-      })
-    });
-    this.canvas = props.canvas;
-    this.boxes = new Size_ENGINE({
-      width: this.size.width / MapMatrix_ENGINE.length.horizontal,
-      height: this.size.height / MapMatrix_ENGINE.length.vertical
-    });
+  constructor(canvas) {
+    super(new Coordinate_ENGINE(0, 0), new Size_ENGINE(100, 100));
+    this.canvas = canvas;
+    this.boxes = new Size_ENGINE(0, this.size.height / MapMatrix_ENGINE.length.vertical);
+    this.boxes.width = this.canvas.widthInPercentageHeight(this.boxes.height);
     this.floors = this.matrix.map((matrix) => {
-      const floor2 = new Floor_ENGINE({
-        map: this,
-        canvas: this.canvas
-      });
+      const floor2 = new Floor_ENGINE(this, this.canvas);
       floor2.pushFloor(matrix);
       return floor2;
     });
   }
-  indexFloorOn(props) {
+  indexFloorOn(character) {
     for (let floorIndex = this.floors.length - 1;floorIndex >= 0; floorIndex--) {
       const floor2 = this.floors[floorIndex];
       if (floor2 === undefined)
         continue;
-      if (floor2.aboveFloor({
-        character: props.character
-      }) === false)
+      if (floor2.aboveFloor(character) === false)
         continue;
     }
   }
-  collisionMap(props) {
+  collisionMap(character, moved) {
     for (let floorIndex = this.floors.length - 1;floorIndex >= 0; floorIndex--) {
       const floor2 = this.floors[floorIndex];
       if (floor2 === undefined)
         continue;
-      if (floor2.aboveFloor({
-        character: props.character
-      }) === false)
+      if (floor2.aboveFloor(character) === false)
         continue;
-      if (floor2.collisionFloor({
-        character: props.character,
-        moved: props.moved
-      }) === true)
+      if (floor2.collisionFloor(character, moved) === true)
         return true;
       const nextFloorIndex = floorIndex + 1;
       const nextFloor = this.floors[nextFloorIndex];
       if (nextFloor === undefined)
         return false;
-      const flatSand = floor2.flatsSand.collision({
-        character: props.character
-      }) !== false;
-      const elevations2 = floor2.elevations.collision({
-        character: props.character
-      }) !== false;
-      const wallElevations2 = floor2.wallElevations.collision({
-        character: props.character
-      }) !== false;
-      const stairsElevations2 = floor2.stairsElevation.collision({
-        character: props.character
-      }) !== false;
-      const nextFlatSand = nextFloor.flatsSand.collision({
-        character: props.moved
-      }) !== false;
-      const nextElevations = nextFloor.elevations.collision({
-        character: props.moved
-      }) !== false;
-      const nextWallElevations = nextFloor.wallElevations.collision({
-        character: props.moved
-      }) !== false;
-      const nextStairsElevations = nextFloor.stairsElevation.collision({
-        character: props.moved
-      }) !== false;
+      const flatSand = floor2.flatsSand.collision(character) !== false;
+      const elevations2 = floor2.elevations.collision(character) !== false;
+      const wallElevations2 = floor2.wallElevations.collision(character) !== false;
+      const stairsElevations2 = floor2.stairsElevation.collision(character) !== false;
+      const nextFlatSand = nextFloor.flatsSand.collision(moved) !== false;
+      const nextElevations = nextFloor.elevations.collision(moved) !== false;
+      const nextWallElevations = nextFloor.wallElevations.collision(moved) !== false;
+      const nextStairsElevations = nextFloor.stairsElevation.collision(moved) !== false;
       if (flatSand === true) {
         if (nextFlatSand === true)
           return true;
@@ -2306,9 +1395,9 @@ class Map_ENGINE extends Position_ENGINE {
 class Direction_ENGINE {
   x;
   y;
-  constructor(props) {
-    this.x = props.x;
-    this.y = props.y;
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
   }
   isEqualTo(direction) {
     return this.x === direction.x && this.y === direction.y;
@@ -2321,20 +1410,15 @@ class Square_ENGINE extends Position_ENGINE {
   fillStyle;
   strokeStyle;
   lineWidth;
-  constructor(props) {
-    super({
-      leftUp: props.leftUp,
-      size: props.size
-    });
-    this.canvas = props.canvas;
-    this.fillStyle = props.fillStyle;
-    this.strokeStyle = props.strokeStyle;
-    this.lineWidth = props.lineWidth;
+  constructor(leftUp, size16, canvas, fillStyle, strokeStyle, lineWidth) {
+    super(leftUp, size16);
+    this.canvas = canvas;
+    this.fillStyle = fillStyle;
+    this.strokeStyle = strokeStyle;
+    this.lineWidth = lineWidth;
   }
   drawSquare() {
-    const positionOnCanvas = this.canvas.positionOnCanvas({
-      position: this
-    });
+    const positionOnCanvas = this.canvas.positionOnCanvas(this);
     if (positionOnCanvas === false)
       return;
     this.canvas.context.beginPath();
@@ -2358,30 +1442,16 @@ class Character_ENGINE extends Square_ENGINE {
   animations;
   speed;
   address;
-  constructor(props) {
-    super({
-      leftUp: props.leftUp,
-      size: props.size,
-      canvas: props.canvas,
-      fillStyle: props.fillStyle,
-      strokeStyle: props.strokeStyle,
-      lineWidth: props.lineWidth
-    });
-    this.scale = props.scale;
-    this.canvas = props.canvas;
-    this.animations = new Animations_ENGINE({
-      leftUp: new Coordinate_ENGINE({ x: 0, y: 0 }),
-      size: new Size_ENGINE({ width: 0, height: 0 }),
-      canvas: props.canvas,
-      route: props.animations.route,
-      element: props.animations.element,
-      animation: props.animations.animation
-    });
-    this.speed = props.speed;
-    this.address = props.address;
+  constructor(leftUp, size17, canvas, fillStyle, strokeStyle, lineWidth, scale, animations3, speed, address) {
+    super(leftUp, size17, canvas, fillStyle, strokeStyle, lineWidth);
+    this.scale = scale;
+    this.canvas = canvas;
+    this.animations = new Animations_ENGINE(new Coordinate_ENGINE(0, 0), new Size_ENGINE(0, 0), canvas, animations3.route, animations3.element, animations3.animation);
+    this.speed = speed;
+    this.address = address;
   }
   movedCharacter() {
-    if (this.address.isEqualTo(new Direction_ENGINE({ x: 0, y: 0 })))
+    if (this.address.isEqualTo(new Direction_ENGINE(0, 0)))
       return false;
     const secondsBetweenFrames = this.canvas.timeBetweenFrames / 1000;
     const speedX = this.speed.x * secondsBetweenFrames;
@@ -2390,36 +1460,16 @@ class Character_ENGINE extends Square_ENGINE {
     const distanceY = speedY * this.address.y;
     const newX = this.leftUp.x + distanceX;
     const newY = this.leftUp.y + distanceY;
-    return new Character_ENGINE({
-      leftUp: new Coordinate_ENGINE({ x: newX, y: newY }),
-      size: new Size_ENGINE({
-        width: this.size.width,
-        height: this.size.height
-      }),
-      canvas: this.canvas,
-      fillStyle: this.fillStyle,
-      strokeStyle: this.strokeStyle,
-      lineWidth: this.lineWidth,
-      scale: this.scale,
-      animations: {
-        route: this.animations.route,
-        element: this.animations.element,
-        animation: this.animations.animation
-      },
-      speed: this.speed,
-      address: this.address
-    });
+    return new Character_ENGINE(new Coordinate_ENGINE(newX, newY), new Size_ENGINE(this.size.width, this.size.height), this.canvas, this.fillStyle, this.strokeStyle, this.lineWidth, this.scale, {
+      route: this.animations.route,
+      element: this.animations.element,
+      animation: this.animations.animation
+    }, this.speed, this.address);
   }
   drawCharacter() {
     this.drawSquare();
-    this.animations.size = new Size_ENGINE({
-      width: this.scale.width * this.size.width,
-      height: this.scale.height * this.size.height
-    });
-    this.animations.leftUp = new Coordinate_ENGINE({
-      x: this.leftUp.x + this.size.width / 2 - this.animations.size.width / 2,
-      y: this.leftUp.y + this.size.height / 2 - this.animations.size.height / 2
-    });
+    this.animations.size = new Size_ENGINE(this.scale.width * this.size.width, this.scale.height * this.size.height);
+    this.animations.leftUp = new Coordinate_ENGINE(this.leftUp.x + this.size.width / 2 - this.animations.size.width / 2, this.leftUp.y + this.size.height / 2 - this.animations.size.height / 2);
     this.animations.drawAnimation();
   }
 }
@@ -2431,13 +1481,13 @@ class Text_ENGINE extends Position_ENGINE {
   fillStyle;
   strokeStyle;
   dungeonFont;
-  constructor(props) {
-    super(props);
-    this.canvas = props.canvas;
-    this.value = props.value;
-    this.fillStyle = props.fillStyle;
-    this.strokeStyle = props.strokeStyle;
-    this.dungeonFont = props.dungeonFont;
+  constructor(leftUp, size17, canvas, value, fillStyle, strokeStyle, dungeonFont) {
+    super(leftUp, size17);
+    this.canvas = canvas;
+    this.value = value;
+    this.fillStyle = fillStyle;
+    this.strokeStyle = strokeStyle;
+    this.dungeonFont = dungeonFont;
   }
   get font() {
     let font = `${this.size.height}px`;
@@ -2448,9 +1498,7 @@ class Text_ENGINE extends Position_ENGINE {
   drawText() {
     if (this.value.length === 0)
       return;
-    const positionOnCamera = this.canvas.positionOnCamera({
-      position: this
-    });
+    const positionOnCamera = this.canvas.positionOnCamera(this);
     if (positionOnCamera === false)
       return;
     this.canvas.context.font = this.font;
@@ -2475,48 +1523,11 @@ class UserBar_ENGINE extends Square_ENGINE {
   pawn;
   photo;
   name;
-  constructor(props) {
-    super({
-      leftUp: new Coordinate_ENGINE({
-        x: 0,
-        y: 0
-      }),
-      size: props.size,
-      canvas: props.canvas,
-      fillStyle: "#416177",
-      strokeStyle: "#fff",
-      lineWidth: 0.5
-    });
-    this.pawn = props.pawn;
-    this.photo = new Image_ENGINE({
-      leftUp: new Coordinate_ENGINE({
-        x: 0,
-        y: 0
-      }),
-      size: new Size_ENGINE({
-        width: this.size.width * 0.3,
-        height: this.size.height
-      }),
-      canvas: this.canvas,
-      route: props.photoRoute
-    });
-    this.name = new Text_ENGINE({
-      leftUp: new Coordinate_ENGINE({
-        x: 0,
-        y: 0
-      }),
-      size: this.size.getPercentages({
-        percentages: new Size_ENGINE({
-          width: 70,
-          height: 100
-        })
-      }),
-      canvas: this.canvas,
-      value: props.nickname,
-      fillStyle: "#fff",
-      strokeStyle: false,
-      dungeonFont: false
-    });
+  constructor(pawn, size18, canvas, photoRoute, nickname) {
+    super(new Coordinate_ENGINE(0, 0), size18, canvas, "#416177", "#fff", 0.5);
+    this.pawn = pawn;
+    this.photo = new Image_ENGINE(new Coordinate_ENGINE(0, 0), new Size_ENGINE(this.size.width * 0.3, this.size.height), this.canvas, photoRoute);
+    this.name = new Text_ENGINE(new Coordinate_ENGINE(0, 0), this.size.getPercentages(new Size_ENGINE(70, 100)), this.canvas, nickname, "#fff", false, false);
   }
   drawUserBar() {
     this.leftUp.x = this.pawn.leftUp.x;
@@ -2536,59 +1547,15 @@ class Pawn_ENGINE extends Character_ENGINE {
   map;
   nickname;
   userBar;
-  constructor(props) {
-    super({
-      leftUp: props.leftUp,
-      size: new Size_ENGINE({
-        width: props.map.boxes.width,
-        height: props.map.boxes.height
-      }),
-      canvas: props.canvas,
-      fillStyle: "#fff",
-      strokeStyle: false,
-      lineWidth: 0,
-      scale: new Size_ENGINE({
-        width: 3,
-        height: 3
-      }),
-      animations: {
-        route: `images/factions/knights/troops/pawn/${props.color}.png`,
-        element: new Element_ENGINE({
-          size: new Size_ENGINE({
-            width: 192,
-            height: 192
-          }),
-          indices: new Plane_ENGINE({
-            horizontal: 6,
-            vertical: 6
-          })
-        }),
-        animation: new Animation_ENGINE({
-          frames: 6,
-          framesPerSecond: 6
-        })
-      },
-      speed: new Coordinate_ENGINE({
-        x: 2,
-        y: 2
-      }),
-      address: new Direction_ENGINE({
-        x: 0,
-        y: 0
-      })
-    });
-    this.map = props.map;
-    this.nickname = props.nickname;
-    this.userBar = new UserBar_ENGINE({
-      pawn: this,
-      size: new Size_ENGINE({
-        width: 0,
-        height: 0
-      }),
-      canvas: this.canvas,
-      photoRoute: false,
-      nickname: this.nickname
-    });
+  constructor(leftUp, map, canvas, color, nickname) {
+    super(leftUp, new Size_ENGINE(map.boxes.width, map.boxes.height), canvas, "#fff", false, 0, new Size_ENGINE(3, 3), {
+      route: `images/factions/knights/troops/pawn/${color}.png`,
+      element: new Element_ENGINE(new Size_ENGINE(192, 192), new Plane_ENGINE(6, 6)),
+      animation: new Animation_ENGINE(6, 6)
+    }, new Coordinate_ENGINE(2, 2), new Direction_ENGINE(0, 0));
+    this.map = map;
+    this.nickname = nickname;
+    this.userBar = new UserBar_ENGINE(this, new Size_ENGINE(0, 0), this.canvas, false, this.nickname);
   }
   drawPawn() {
     this.drawCharacter();
@@ -2602,24 +1569,16 @@ class Line_ENGINE extends Position_ENGINE {
   fillStyle;
   strokeStyle;
   lineWidth;
-  constructor(props) {
-    const size20 = new Size_ENGINE({
-      width: props.rightDown.x - props.leftUp.x,
-      height: props.rightDown.y - props.leftUp.y
-    });
-    super({
-      leftUp: props.leftUp,
-      size: size20
-    });
-    this.canvas = props.canvas;
-    this.fillStyle = props.fillStyle;
-    this.strokeStyle = props.strokeStyle;
-    this.lineWidth = props.lineWidth;
+  constructor(leftUp, rightDown, canvas, fillStyle, strokeStyle, lineWidth) {
+    const size20 = new Size_ENGINE(rightDown.x - leftUp.x, rightDown.y - leftUp.y);
+    super(leftUp, size20);
+    this.canvas = canvas;
+    this.fillStyle = fillStyle;
+    this.strokeStyle = strokeStyle;
+    this.lineWidth = lineWidth;
   }
   drawLine() {
-    const positionOnCanvas = this.canvas.positionOnCanvas({
-      position: this
-    });
+    const positionOnCanvas = this.canvas.positionOnCanvas(this);
     if (positionOnCanvas === false)
       return;
     this.canvas.context.beginPath();
@@ -2644,103 +1603,37 @@ class Sheep_ENGINE extends Character_ENGINE {
   state = "move";
   states = {
     move: {
-      animation: new Animation_ENGINE({
-        frames: 8,
-        framesPerSecond: 8
-      }),
+      animation: new Animation_ENGINE(8, 8),
       element: {
-        indices: new Plane_ENGINE({
-          horizontal: 0,
-          vertical: 0
-        })
+        indices: new Plane_ENGINE(0, 0)
       }
     },
     jump: {
-      animation: new Animation_ENGINE({
-        frames: 6,
-        framesPerSecond: 6
-      }),
+      animation: new Animation_ENGINE(6, 6),
       element: {
-        indices: new Plane_ENGINE({
-          horizontal: 0,
-          vertical: 1
-        })
+        indices: new Plane_ENGINE(0, 1)
       }
     }
   };
   jumpTimer = 0;
   map;
-  constructor(props) {
-    super({
-      leftUp: props.leftUp,
-      size: new Size_ENGINE({
-        width: props.map.boxes.width,
-        height: props.map.boxes.height
-      }),
-      canvas: props.canvas,
-      fillStyle: "#fff",
-      strokeStyle: false,
-      lineWidth: 0,
-      scale: new Size_ENGINE({
-        width: 3,
-        height: 3
-      }),
-      animations: {
-        route: "images/resources/sheep.png",
-        element: new Element_ENGINE({
-          size: new Size_ENGINE({
-            width: 128,
-            height: 128
-          }),
-          indices: new Plane_ENGINE({
-            horizontal: 0,
-            vertical: 0
-          })
-        }),
-        animation: new Animation_ENGINE({
-          frames: 8,
-          framesPerSecond: 8
-        })
-      },
-      speed: new Coordinate_ENGINE({
-        x: 40,
-        y: 40
-      }),
-      address: new Direction_ENGINE({
-        x: 0,
-        y: 0
-      })
-    });
-    this.map = props.map;
+  constructor(leftUp, map, canvas) {
+    super(leftUp, new Size_ENGINE(map.boxes.width, map.boxes.height), canvas, "#fff", false, 0, new Size_ENGINE(3, 3), {
+      route: "images/resources/sheep/left.png",
+      element: new Element_ENGINE(new Size_ENGINE(128, 128), new Plane_ENGINE(0, 0)),
+      animation: new Animation_ENGINE(8, 8)
+    }, new Coordinate_ENGINE(200, 200), new Direction_ENGINE(1, 0));
+    this.map = map;
     this.state = "move";
-    this.lineSight = new Line_ENGINE({
-      leftUp: new Coordinate_ENGINE({
-        x: this.leftUp.x + this.size.width / 2,
-        y: this.leftUp.y + this.size.height / 2
-      }),
-      rightDown: this.leftUpPlusSizePercentages({
-        percentages: new Size_ENGINE({
-          width: 200,
-          height: 50
-        })
-      }),
-      canvas: this.canvas,
-      fillStyle: false,
-      strokeStyle: "#333",
-      lineWidth: 2
-    });
+    this.lineSight = new Line_ENGINE(new Coordinate_ENGINE(this.leftUp.x + this.size.width / 2, this.leftUp.y + this.size.height / 2), this.leftUpPlusSizePercentages(new Size_ENGINE(200, 50)), this.canvas, false, "#333", 2);
   }
   moveSheep() {
     const moved = this.movedCharacter();
     if (moved === false)
       return false;
-    const collision = this.map.collisionMap({
-      character: this,
-      moved
-    });
-    if (collision === true) {
+    const collision = this.map.collisionMap(this, moved);
+    if (collision === true)
       return false;
-    }
     this.leftUp.x = moved.leftUp.x;
     this.leftUp.y = moved.leftUp.y;
     return true;
@@ -2761,17 +1654,25 @@ class Sheep_ENGINE extends Character_ENGINE {
     let character3 = this.states[this.state];
     if (this.animations.element.getIndices().vertical === character3.element.indices.vertical)
       return;
-    this.animations.element.setIndices(new Plane_ENGINE({
-      horizontal: character3.element.indices.horizontal,
-      vertical: character3.element.indices.vertical
-    }));
+    this.animations.element.setIndices(new Plane_ENGINE(character3.element.indices.horizontal, character3.element.indices.vertical));
     this.animations.animation.frames = character3.animation.frames;
     this.animations.animation.framesPerSecond = character3.animation.framesPerSecond;
+  }
+  imageAccordingDirectionMovement() {
+    if (this.address.x === 0)
+      return;
+    let addressName = false;
+    if (this.address.x === -1)
+      addressName = "left";
+    else
+      addressName = "right";
+    this.animations.image = `images/resources/sheep/${addressName}.png`;
   }
   drawSheep() {
     this.refreshState();
     this.moveSheep();
     this.jumpSheep();
+    this.imageAccordingDirectionMovement();
     this.drawCharacter();
     this.lineSight.drawLine();
   }
@@ -2782,38 +1683,18 @@ class Game_ENGINE extends Scene_ENGINE {
   map;
   pawns = [];
   sheepGroup = [];
-  constructor(props) {
-    super({
-      canvas: props.canvas
-    });
-    this.map = new Map_ENGINE({
-      canvas: props.canvas
-    });
+  constructor(canvas) {
+    super(canvas);
+    this.map = new Map_ENGINE(canvas);
     this.sheepGroup = [
-      new Sheep_ENGINE({
-        leftUp: new Coordinate_ENGINE({
-          x: 35,
-          y: 50
-        }),
-        map: this.map,
-        canvas: props.canvas
-      })
+      new Sheep_ENGINE(new Coordinate_ENGINE(35, 50), this.map, canvas)
     ];
   }
   tiktokGift(gift) {
     const exist = this.pawns.some((pawn2) => pawn2.nickname === gift.nickname);
     if (exist === true)
       return;
-    this.pawns.push(new Pawn_ENGINE({
-      leftUp: new Coordinate_ENGINE({
-        x: Math.floor(Math.random() * this.map.size.width),
-        y: Math.floor(Math.random() * this.map.size.height)
-      }),
-      map: this.map,
-      canvas: this.canvas,
-      color: "blue",
-      nickname: gift.nickname
-    }));
+    this.pawns.push(new Pawn_ENGINE(new Coordinate_ENGINE(Math.floor(Math.random() * this.map.size.width), Math.floor(Math.random() * this.map.size.height)), this.map, this.canvas, "blue", gift.nickname));
   }
   tiktokChat(chat) {
     console.log(chat);
@@ -2827,10 +1708,7 @@ class Game_ENGINE extends Scene_ENGINE {
 
 // public/tsc/index.ts
 window.addEventListener("load", () => {
-  const canvas2 = new Canvas_ENGINE({
-    leftUp: new Coordinate_ENGINE({ x: 0, y: 0 }),
-    framesPerSecond: 24
-  });
-  const game2 = new Game_ENGINE({ canvas: canvas2 });
+  const canvas2 = new Canvas_ENGINE(new Coordinate_ENGINE(0, 0), 24);
+  const game2 = new Game_ENGINE(canvas2);
   game2.start();
 });

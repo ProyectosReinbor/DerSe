@@ -44,7 +44,7 @@ type GetBoxFloor = (boxIndices: Plane_ENGINE) => Box;
 export type FloorMatrix_MapMatrix = Box[][];
 
 export class MapMatrix_ENGINE {
-    static length = new Plane_ENGINE(21, 21);
+    static length = new Plane_ENGINE(37, 21);
 
     static getEmptyBox(): Box {
         return {
@@ -63,7 +63,7 @@ export class MapMatrix_ENGINE {
         box.water = true;
         if (
             boxIndices.vertical >= 3 && boxIndices.vertical <= 19 &&
-            boxIndices.horizontal >= 1 && boxIndices.horizontal <= 19
+            boxIndices.horizontal >= 1 && boxIndices.horizontal <= 35
         )
             box.foam = {
                 flatSand: true
@@ -85,7 +85,7 @@ export class MapMatrix_ENGINE {
         const box = MapMatrix_ENGINE.getEmptyBox();
 
         if (
-            boxIndices.horizontal >= 2 && boxIndices.horizontal <= 17 &&
+            boxIndices.horizontal >= 2 && boxIndices.horizontal <= 34 &&
             boxIndices.vertical >= 2 && boxIndices.vertical <= 13
         )
             box.elevation = {
@@ -105,7 +105,7 @@ export class MapMatrix_ENGINE {
             };
 
         if (
-            boxIndices.horizontal >= 14 && boxIndices.horizontal <= 17 &&
+            boxIndices.horizontal >= 14 && boxIndices.horizontal <= 34 &&
             boxIndices.vertical === 14
         )
             box.elevation = {
@@ -127,7 +127,7 @@ export class MapMatrix_ENGINE {
 
         if (
             boxIndices.vertical === 15 &&
-            boxIndices.horizontal >= 14 && boxIndices.horizontal <= 17
+            boxIndices.horizontal >= 14 && boxIndices.horizontal <= 34
         ) {
             const flatElevationRandom = Math.round(Math.random());
             box.wallElevation = {
@@ -159,7 +159,7 @@ export class MapMatrix_ENGINE {
         const box = MapMatrix_ENGINE.getEmptyBox();
 
         if (
-            boxIndices.horizontal >= 6 && boxIndices.horizontal <= 14 &&
+            boxIndices.horizontal >= 6 && boxIndices.horizontal <= 30 &&
             boxIndices.vertical >= 1 && boxIndices.vertical <= 6
         ) {
             box.elevation = {
@@ -180,7 +180,7 @@ export class MapMatrix_ENGINE {
         }
 
         if (
-            boxIndices.horizontal >= 14 && boxIndices.horizontal <= 14 &&
+            boxIndices.horizontal >= 14 && boxIndices.horizontal <= 30 &&
             boxIndices.vertical === 7
         ) {
             box.elevation = {
@@ -201,7 +201,10 @@ export class MapMatrix_ENGINE {
             };
         }
 
-        if (boxIndices.vertical === 8 && boxIndices.horizontal === 14) {
+        if (
+            boxIndices.vertical === 8 &&
+            boxIndices.horizontal >= 14 && boxIndices.horizontal <= 30
+        ) {
             const flatElevationRandom = Math.round(Math.random());
             box.wallElevation = {
                 shadow: true,

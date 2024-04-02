@@ -57,15 +57,15 @@ export class Sheep_ENGINE extends Character_ENGINE {
             0,
             new Size_ENGINE(3, 3),
             {
-                route: "images/resources/sheep.png",
+                route: "images/resources/sheep/left.png",
                 element: new Element_ENGINE(
                     new Size_ENGINE(128, 128),
                     new Plane_ENGINE(0, 0)
                 ),
                 animation: new Animation_ENGINE(8, 8)
             },
-            new Coordinate_ENGINE(40, 40),
-            new Direction_ENGINE(0, 0),
+            new Coordinate_ENGINE(200, 200),
+            new Direction_ENGINE(1, 0),
         );
         this.map = map;
         this.state = "move";
@@ -126,10 +126,23 @@ export class Sheep_ENGINE extends Character_ENGINE {
         this.animations.animation.framesPerSecond = character.animation.framesPerSecond;
     }
 
+    imageAccordingDirectionMovement() {
+        if (this.address.x === 0) return;
+
+        let addressName: "left" | "right" | false = false;
+        if (this.address.x === -1)
+            addressName = "left";
+        else
+            addressName = "right";
+
+        this.animations.image = `images/resources/sheep/${addressName}.png`;
+    }
+
     drawSheep() {
         this.refreshState();
         this.moveSheep();
         this.jumpSheep();
+        this.imageAccordingDirectionMovement();
         this.drawCharacter();
         this.lineSight.drawLine();
     }

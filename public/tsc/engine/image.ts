@@ -8,8 +8,7 @@ export type ImagePath = `images/${string}.png` | false;
 export class Image_ENGINE extends Position_ENGINE {
 
   canvas: Canvas_ENGINE;
-  route: ImagePath;
-  reflected: boolean;
+  route: ImagePath = false;
 
   constructor(
     leftUp: Coordinate_ENGINE,
@@ -22,31 +21,26 @@ export class Image_ENGINE extends Position_ENGINE {
       size
     );
     this.canvas = canvas;
+    this.setImage(route);
+  }
+
+  setImage(route: ImagePath) {
     this.route = route;
     this.canvas.images.addRoute(this.route);
-    this.reflected = true;
   }
 
-  set image(route: ImagePath) {
-    this.route = route;
-  }
-
-  get image(): HTMLImageElement | false {
+  getImage(): HTMLImageElement | false {
     return this.canvas.images.getImage(this.route);
   }
 
   drawImage() {
-    const image = this.image;
+    const image = this.getImage();
     if (image === false)
       return;
 
     const positionOnTheCanvas = this.canvas.positionOnCanvas(this);
     if (positionOnTheCanvas === false)
       return;
-
-    if (this.reflected === true) {
-      this.canvas.context.scale(-1, 1);
-    }
 
     this.canvas.context.imageSmoothingEnabled = false;
     this.canvas.context.drawImage(

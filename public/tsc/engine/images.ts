@@ -25,7 +25,7 @@ export class Images_ENGINE {
     return image;
   }
 
-  addRoute(route: ImagePath) {
+  async addRoute(route: ImagePath) {
     if (route === false)
       return;
 
@@ -33,6 +33,7 @@ export class Images_ENGINE {
       return;
 
     this.routes.push(route);
+    await this.uploadImage(route);
   }
 
   async loadAll() {

@@ -37,16 +37,16 @@ export class Game_ENGINE extends Scene_ENGINE {
         const exist = this.pawns.some((pawn) => pawn.nickname === gift.nickname);
         if (exist === true) return;
         this.pawns.push(
-            new Pawn_ENGINE({
-                leftUp: new Coordinate_ENGINE(
+            new Pawn_ENGINE(
+                new Coordinate_ENGINE(
                     Math.floor(Math.random() * this.map.size.width),
                     Math.floor(Math.random() * this.map.size.height),
                 ),
-                map: this.map,
-                canvas: this.canvas,
-                color: "blue",
-                nickname: gift.nickname,
-            })
+                this.map,
+                this.canvas,
+                "blue",
+                gift.nickname,
+            )
         );
     }
 

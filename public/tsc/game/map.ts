@@ -23,9 +23,10 @@ export class Map_ENGINE extends Position_ENGINE {
         );
         this.canvas = canvas;
         this.boxes = new Size_ENGINE(
-            this.size.width / MapMatrix_ENGINE.length.horizontal,
+            0,
             this.size.height / MapMatrix_ENGINE.length.vertical,
         );
+        this.boxes.width = this.canvas.widthInPercentageHeight(this.boxes.height)
         this.floors = this.matrix.map((matrix) => {
             const floor = new Floor_ENGINE(
                 this,

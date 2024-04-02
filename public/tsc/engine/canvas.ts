@@ -13,7 +13,6 @@ export class Canvas_ENGINE extends Camera_ENGINE {
   timeBetweenFrames: number = 0;
   element: HTMLCanvasElement;
   context: CanvasRenderingContext2D;
-  useInnerScreenSize: boolean;
 
   drawScene() { }
   touchstartScene: (toque: Coordinate_ENGINE) => void = () => { }
@@ -23,10 +22,8 @@ export class Canvas_ENGINE extends Camera_ENGINE {
   constructor(
     leftUp: Coordinate_ENGINE,
     framesPerSecond: number,
-    useInnerScreenSize: boolean,
   ) {
     super(leftUp);
-    this.useInnerScreenSize = useInnerScreenSize;
     this.setFramesPerSecond(framesPerSecond);
     this.element = window.document.getElementById("canvas") as HTMLCanvasElement;
     this.context = this.element.getContext("2d") as CanvasRenderingContext2D;
@@ -95,36 +92,11 @@ export class Canvas_ENGINE extends Camera_ENGINE {
     this.drawScene();
   }
 
-  getScreenSize() {
-    if (this.useInnerScreenSize === true) {
-      return new Size_ENGINE(
-        window.innerWidth,
-        window.innerHeight
-      );
-    }
-    return new Size_ENGINE(
-      window.screen.width,
-      window.screen.height
-    );
-  }
-
   aspectRatio() {
-    const screenSize = this.getScreenSize();
+    const screenSize = new Size_ENGINE(1280, 720);
 
-    const ratio = 720 / 1280;
-    // this.element.width = screenSize.width * ratio;
-    // this.element.height = screenSize.height;
-
-    // if (screenSize.width < screenSize.height) {
-    this.element.width = screenSize.height;
+    this.element.width = screenSize.width;
     this.element.height = screenSize.height;
-    // }
-
-    // this.margin.width = screenSize.width - this.element.width;
-    // this.margin.height = screenSize.height - this.element.height;
-
-    // this.element.style.left = `${this.margin.width / 2}px`;
-    // this.element.style.top = `${this.margin.height / 2}px`;
 
     this.aPercent.width = this.element.width / 100;
     this.aPercent.height = this.element.height / 100;
@@ -194,7 +166,7 @@ export class Canvas_ENGINE extends Camera_ENGINE {
   }
 
   positionOnCanvas(
-    position: Position_ENGINE
+    position: Position_ENGINE,
   ) {
     const positionOnCamera = this.positionOnCamera(position);
     if (positionOnCamera === false)
@@ -202,37 +174,42 @@ export class Canvas_ENGINE extends Camera_ENGINE {
 
     return new Position_ENGINE(
       new Coordinate_ENGINE(
-        this.getWidthInPixels(
+        this.widthInPixels(
           positionOnCamera.leftUp.x
         ),
-        this.getHeightInPixels(
+        this.heightInPixels(
           positionOnCamera.leftUp.y
         ),
       ),
       new Size_ENGINE(
-        this.getWidthInPixels(
-          positionOnCamera.size.width
+        this.widthInPixels(
+          positionOnCamera.size.width,
         ),
-        this.getHeightInPixels(
+        this.heightInPixels(
           positionOnCamera.size.height
         )
       )
     );
   }
 
-  getWidthInPercentages(pixels: number) {
+  widthInPercentageHeight(percentageHeight: number) {
+    const pixels = this.heightInPixels(percentageHeight);
+    return this.widthInPercentages(pixels);
+  }
+
+  widthInPercentages(pixels: number) {
     return pixels / this.aPercent.width;
   }
 
-  getWidthInPixels(percentage: number) {
+  widthInPixels(percentage: number) {
     return percentage * this.aPercent.width;
   }
 
-  getHeightInPercentages(pixels: number) {
+  heightInPercentages(pixels: number) {
     return pixels / this.aPercent.height;
   }
 
-  getHeightInPixels(percentage: number) {
+  heightInPixels(percentage: number) {
     return percentage * this.aPercent.height;
   }
 }

@@ -5,8 +5,8 @@ import { Grounds_ENGINE } from "./grounds";
 
 export class Elevations_ENGINE extends Grounds_ENGINE {
     constructor(
-        canvas: Canvas_ENGINE,
         map: Map_ENGINE,
+        canvas: Canvas_ENGINE,
     ) {
         super(
             map,

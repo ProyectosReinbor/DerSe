@@ -39,7 +39,7 @@ export class WallElevations_ENGINE extends ElementBoxes_ENGINE {
         this.elementIndices = {
             left: new Plane_ENGINE(0, 3),
             center: new Plane_ENGINE(1, 3),
-            right: new Plane_ENGINE(2, 4),
+            right: new Plane_ENGINE(2, 3),
             only: new Plane_ENGINE(3, 5)
         };
     }
