@@ -40,6 +40,8 @@ export class Castle_ENGINE extends Image_ENGINE {
         if (this.state === "ready")
             file = this.color;
 
-        this.image = `images/factions/knights/buildings/castle/${file}.png`;
+        this.setImage(
+            `images/factions/knights/buildings/castle/${file}.png`
+        );
     }
 }

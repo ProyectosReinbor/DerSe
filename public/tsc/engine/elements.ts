@@ -27,7 +27,7 @@ export class Elements_ENGINE extends Image_ENGINE {
   }
 
   drawElement() {
-    const image = this.image;
+    const image = this.getImage();
     if (image === false)
       return;
 
