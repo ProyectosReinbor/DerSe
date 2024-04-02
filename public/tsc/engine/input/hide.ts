@@ -23,7 +23,7 @@ export class Hide_ENGINE extends Square_ENGINE {
       input.leftUpPlusSizePercentages(
         new Size_ENGINE(88, 20)
       ),
-      input.size.getPercentages(
+      input.size.percentage(
         new Size_ENGINE(10, 60)
       ),
       canvas,
@@ -71,7 +71,7 @@ export class Hide_ENGINE extends Square_ENGINE {
       input.leftUpPlusSizePercentages(
         new Size_ENGINE(87, 36)
       ),
-      input.size.getPercentages(
+      input.size.percentage(
         new Size_ENGINE(12, 26)
       ),
       canvas,

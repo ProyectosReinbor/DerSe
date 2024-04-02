@@ -17,7 +17,7 @@ export class Space_ENGINE extends Button_ENGINE {
       keyboard.leftUpPlusSizePercentages(
         new Size_ENGINE(27, 3)
       ),
-      keyboard.size.getPercentages(
+      keyboard.size.percentage(
         new Size_ENGINE(36, 14)
       ),
       canvas,

@@ -31,22 +31,29 @@ export class Boxes_ENGINE extends Coordinate_ENGINE {
         this.occupied = occupied;
     }
 
-    collision(position: Position_ENGINE): Box_ENGINE | false {
-        const leftUp = new Coordinate_ENGINE(
-            position.leftUp.x + this.size.width,
-            position.leftUp.y + this.size.height
+    collision(coordinate: Coordinate_ENGINE): Box_ENGINE | false {
+        const position = new Position_ENGINE(
+            coordinate,
+            new Size_ENGINE(this.size.width, this.size.height)
         );
-        const rightDown = () => {
+
+        const boxIndicesLeftUp = (() => {
+            const coordinate = new Coordinate_ENGINE(
+                position.leftUp.x - this.size.width,
+                position.leftUp.y - this.size.height
+            );
+            return this.getBoxIndices(coordinate);
+        })();
+
+        const boxIndicesRightDown = (() => {
             const positionRightDown = position.rightDown();
-            return new Coordinate_ENGINE(
+            const coordinate = new Coordinate_ENGINE(
                 positionRightDown.x + this.size.width,
                 positionRightDown.y + this.size.height
             );
-        };
-        const boxIndicesLeftUp = this.getBoxIndices(leftUp);
-        const boxIndicesRightDown = this.getBoxIndices(
-            rightDown()
-        );
+            return this.getBoxIndices(coordinate);
+        })();
+
         const boxIndices = new Plane_ENGINE(0, 0);
         for (
             boxIndices.vertical = boxIndicesLeftUp.vertical;
@@ -72,15 +79,13 @@ export class Boxes_ENGINE extends Coordinate_ENGINE {
     }
 
     getPosition(boxIndices: Plane_ENGINE): Position_ENGINE {
+        const x = boxIndices.horizontal * this.size.width;
+        const y = boxIndices.vertical * this.size.height;
+        const width = this.size.width * this.length.horizontal;
+        const height = this.size.height * this.length.vertical;
         return new Position_ENGINE(
-            new Coordinate_ENGINE(
-                boxIndices.horizontal * this.size.width,
-                boxIndices.vertical * this.size.height
-            ),
-            new Size_ENGINE(
-                this.size.width * this.length.horizontal,
-                this.size.height * this.length.vertical
-            )
+            new Coordinate_ENGINE(x, y),
+            new Size_ENGINE(width, height)
         );
     }
 
@@ -115,20 +120,25 @@ export class Boxes_ENGINE extends Coordinate_ENGINE {
         boxIndices: Plane_ENGINE,
         referenceIndex: number,
     ) {
-        const size = new Size_ENGINE(
-            this.size.width,
-            this.size.height
-        );
-        const distanceX = boxIndices.horizontal * size.width;
-        const distanceY = boxIndices.vertical * size.height;
-        const box = new Box_ENGINE(
-            new Coordinate_ENGINE(
-                this.x + distanceX,
-                this.y + distanceY,
-            ),
-            size,
-            referenceIndex
-        );
+        const box = (() => {
+            const size = new Size_ENGINE(
+                this.size.width,
+                this.size.height
+            );
+            const leftUp = (() => {
+                const distanceX = boxIndices.horizontal * size.width;
+                const distanceY = boxIndices.vertical * size.height;
+                return new Coordinate_ENGINE(
+                    this.x + distanceX,
+                    this.y + distanceY,
+                )
+            })();
+            return new Box_ENGINE(
+                leftUp,
+                size,
+                referenceIndex
+            );
+        })();
         this.boxesIndices(
             boxIndices,
             box
@@ -140,10 +150,11 @@ export class Boxes_ENGINE extends Coordinate_ENGINE {
         indexesBoxOccupy: Plane_ENGINE,
         referenceIndex: number,
     ) {
-        const boxIndices = new Plane_ENGINE(
-            initialReferenceIndices.horizontal + indexesBoxOccupy.vertical,
-            initialReferenceIndices.vertical + indexesBoxOccupy.horizontal
-        );
+        const boxIndices = (() => {
+            const horizontal = initialReferenceIndices.horizontal + indexesBoxOccupy.vertical;
+            const vertical = initialReferenceIndices.vertical + indexesBoxOccupy.horizontal;
+            return new Plane_ENGINE(horizontal, vertical);
+        })();
         let boxesRow = this.boxes[boxIndices.vertical];
         if (boxesRow === undefined)
             boxesRow = [];
@@ -192,12 +203,13 @@ export class Boxes_ENGINE extends Coordinate_ENGINE {
                     horizontal < this.length.horizontal;
                     horizontal++
                 ) {
+                    const indexesBoxOccupy = new Plane_ENGINE(
+                        horizontal,
+                        vertical
+                    );
                     this.occupiedBoxes(
                         boxIndices,
-                        new Plane_ENGINE(
-                            horizontal,
-                            vertical
-                        ),
+                        indexesBoxOccupy,
                         referenceIndex,
                     );
                 }
@@ -208,12 +220,13 @@ export class Boxes_ENGINE extends Coordinate_ENGINE {
                     if (value === false)
                         return;
 
+                    const indexesBoxOccupy = new Plane_ENGINE(
+                        horizontal,
+                        vertical
+                    );
                     this.occupiedBoxes(
                         boxIndices,
-                        new Plane_ENGINE(
-                            horizontal,
-                            vertical
-                        ),
+                        indexesBoxOccupy,
                         referenceIndex,
                     );
                 });

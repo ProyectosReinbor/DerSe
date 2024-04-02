@@ -7,7 +7,6 @@ import { Position_ENGINE } from "../engine/position.js";
 import { Size_ENGINE } from "../engine/size.js";
 import type { Canvas_ENGINE } from "../engine/canvas.js";
 import { Coordinate_ENGINE } from "../engine/coordinate.js";
-import type { Character_ENGINE } from "../engine/character.js";
 
 export class Map_ENGINE extends Position_ENGINE {
 
@@ -37,7 +36,7 @@ export class Map_ENGINE extends Position_ENGINE {
         });
     }
 
-    indexFloorOn(character: Character_ENGINE) {
+    indexFloorOn(coordinate: Coordinate_ENGINE) {
         for (
             let floorIndex = this.floors.length - 1;
             floorIndex >= 0;
@@ -48,14 +47,14 @@ export class Map_ENGINE extends Position_ENGINE {
             if (floor === undefined)
                 continue;
 
-            if (floor.aboveFloor(character) === false)
+            if (floor.aboveFloor(coordinate) === false)
                 continue;
         }
     }
 
     collisionMap(
-        character: Position_ENGINE,
-        moved: Position_ENGINE,
+        character: Coordinate_ENGINE,
+        moved: Coordinate_ENGINE,
     ): boolean {
         for (
             let floorIndex = this.floors.length - 1;

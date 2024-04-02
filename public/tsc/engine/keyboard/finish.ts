@@ -18,7 +18,7 @@ export class Finish_ENGINE extends Square_ENGINE {
       keyboard.leftUpPlusSizePercentages(
         new Size_ENGINE(88, 3)
       ),
-      keyboard.size.getPercentages(
+      keyboard.size.percentage(
         new Size_ENGINE(1, 14)
       ),
       canvas,

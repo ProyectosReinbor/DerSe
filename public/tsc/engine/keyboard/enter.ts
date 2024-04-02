@@ -19,7 +19,7 @@ export class Enter_ENGINE extends Square_ENGINE {
       keyboard.leftUpPlusSizePercentages(
         new Size_ENGINE(13, 3)
       ),
-      keyboard.size.getPercentages(
+      keyboard.size.percentage(
         new Size_ENGINE(12, 14)
       ),
       canvas,

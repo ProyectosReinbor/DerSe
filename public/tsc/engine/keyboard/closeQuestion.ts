@@ -15,7 +15,7 @@ export class CloseQuestion_ENGINE extends Button_ENGINE {
       keyboard.leftUpPlusSizePercentages(
         new Size_ENGINE(78, 3)
       ),
-      keyboard.size.getPercentages(
+      keyboard.size.percentage(
         new Size_ENGINE(7, 14)
       ),
       canvas,

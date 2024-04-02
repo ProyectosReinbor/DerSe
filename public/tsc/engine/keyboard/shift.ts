@@ -19,7 +19,7 @@ export class Shift_ENGINE extends Square_ENGINE {
       keyboard.leftUpPlusSizePercentages(
         new Size_ENGINE(2, 3)
       ),
-      keyboard.size.getPercentages(
+      keyboard.size.percentage(
         new Size_ENGINE(9, 14)
       ),
       canvas,

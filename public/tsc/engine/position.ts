@@ -35,40 +35,31 @@ export class Position_ENGINE {
     );
   }
 
-  leftUpPlusSizePercentages(
-    percentages: Size_ENGINE
-  ) {
-    const size = this.size.getPercentages(percentages);
-    return new Coordinate_ENGINE(
-      this.leftUp.x + size.width,
-      this.leftUp.y + size.height,
-    );
+  leftUpPlusSizePercentages(percentages: Size_ENGINE) {
+    const sizePercentage = this.size.percentage(percentages);
+    const x = this.leftUp.x + sizePercentage.width;
+    const y = this.leftUp.y + sizePercentage.height;
+    return new Coordinate_ENGINE(x, y);
   }
 
-  insidePositionCoordinate(
-    coordinate: Coordinate_ENGINE
-  ) {
-    const thisRightDown = this.rightDown();
+  insidePositionCoordinate(coordinate: Coordinate_ENGINE) {
+    const rightDown = this.rightDown();
     return this.leftUp.x <= coordinate.x &&
       this.leftUp.y <= coordinate.y &&
-      thisRightDown.x >= coordinate.x &&
-      thisRightDown.y >= coordinate.y;
+      rightDown.x >= coordinate.x &&
+      rightDown.y >= coordinate.y;
   }
 
-  insidePosition(
-    position: Position_ENGINE
-  ) {
-    const thisRightDown = this.rightDown();
+  insidePosition(position: Position_ENGINE) {
+    const rightDown = this.rightDown();
     const positionRightDown = position.rightDown();
     return this.leftUp.x <= position.leftUp.x &&
       this.leftUp.y <= position.leftUp.y &&
-      thisRightDown.x >= positionRightDown.x &&
-      thisRightDown.y >= positionRightDown.y;
+      rightDown.x >= positionRightDown.x &&
+      rightDown.y >= positionRightDown.y;
   }
 
-  someVertexInside(
-    position: Position_ENGINE
-  ): boolean {
+  someVertexInside(position: Position_ENGINE): boolean {
     if (this.insidePositionCoordinate(position.leftUp))
       return true;
 

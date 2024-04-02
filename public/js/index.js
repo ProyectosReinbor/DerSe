@@ -29,14 +29,19 @@ class Position_ENGINE {
     return new Coordinate_ENGINE(this.leftUp.x + this.size.width, this.leftUp.y);
   }
   leftUpPlusSizePercentages(percentages) {
-    const size = this.size.getPercentages(percentages);
-    return new Coordinate_ENGINE(this.leftUp.x + size.width, this.leftUp.y + size.height);
+    const sizePercentage = this.size.percentage(percentages);
+    const x = this.leftUp.x + sizePercentage.width;
+    const y = this.leftUp.y + sizePercentage.height;
+    return new Coordinate_ENGINE(x, y);
   }
   insidePositionCoordinate(coordinate2) {
-    return this.leftUp.x <= coordinate2.x && this.leftUp.y <= coordinate2.y && this.rightDown().x >= coordinate2.x && this.rightDown().y >= coordinate2.y;
+    const rightDown = this.rightDown();
+    return this.leftUp.x <= coordinate2.x && this.leftUp.y <= coordinate2.y && rightDown.x >= coordinate2.x && rightDown.y >= coordinate2.y;
   }
   insidePosition(position) {
-    return this.leftUp.x <= position.leftUp.x && this.leftUp.y <= position.leftUp.y && this.rightDown().x >= position.rightDown().x && this.rightDown().y >= position.rightDown().y;
+    const rightDown = this.rightDown();
+    const positionRightDown = position.rightDown();
+    return this.leftUp.x <= position.leftUp.x && this.leftUp.y <= position.leftUp.y && rightDown.x >= positionRightDown.x && rightDown.y >= positionRightDown.y;
   }
   someVertexInside(position) {
     if (this.insidePositionCoordinate(position.leftUp))
@@ -59,11 +64,19 @@ class Size_ENGINE {
     this.width = width;
     this.height = height;
   }
-  get aPercent() {
+  aPercent() {
     return new Size_ENGINE(this.width / 100, this.height / 100);
   }
-  getPercentages(percentages) {
-    return new Size_ENGINE(this.aPercent.width * percentages.width, this.aPercent.height * percentages.height);
+  percentage(percentages) {
+    const aPercent = this.aPercent();
+    const width = aPercent.width * percentages.width;
+    const height = aPercent.height * percentages.height;
+    return new Size_ENGINE(width, height);
+  }
+  half() {
+    const width = this.width / 2;
+    const height = this.height / 2;
+    return new Size_ENGINE(width, height);
   }
 }
 
@@ -517,11 +530,17 @@ class Boxes_ENGINE extends Coordinate_ENGINE {
     this.length = length;
     this.occupied = occupied;
   }
-  collision(position7) {
-    const leftUp = new Coordinate_ENGINE(position7.leftUp.x + this.size.width, position7.leftUp.y + this.size.height);
-    const rightDown = new Coordinate_ENGINE(position7.rightDown().x + this.size.width, position7.rightDown().y + this.size.height);
-    const boxIndicesLeftUp = this.getBoxIndices(leftUp);
-    const boxIndicesRightDown = this.getBoxIndices(rightDown);
+  collision(coordinate6) {
+    const position7 = new Position_ENGINE(coordinate6, new Size_ENGINE(this.size.width, this.size.height));
+    const boxIndicesLeftUp = (() => {
+      const coordinate7 = new Coordinate_ENGINE(position7.leftUp.x - this.size.width, position7.leftUp.y - this.size.height);
+      return this.getBoxIndices(coordinate7);
+    })();
+    const boxIndicesRightDown = (() => {
+      const positionRightDown = position7.rightDown();
+      const coordinate7 = new Coordinate_ENGINE(positionRightDown.x + this.size.width, positionRightDown.y + this.size.height);
+      return this.getBoxIndices(coordinate7);
+    })();
     const boxIndices = new Plane_ENGINE(0, 0);
     for (boxIndices.vertical = boxIndicesLeftUp.vertical;boxIndices.vertical <= boxIndicesRightDown.vertical; boxIndices.vertical++) {
       for (boxIndices.horizontal = boxIndicesLeftUp.horizontal;boxIndices.horizontal <= boxIndicesRightDown.horizontal; boxIndices.horizontal++) {
@@ -536,7 +555,11 @@ class Boxes_ENGINE extends Coordinate_ENGINE {
     return false;
   }
   getPosition(boxIndices) {
-    return new Position_ENGINE(new Coordinate_ENGINE(boxIndices.horizontal * this.size.width, boxIndices.vertical * this.size.height), new Size_ENGINE(this.size.width * this.length.horizontal, this.size.height * this.length.vertical));
+    const x = boxIndices.horizontal * this.size.width;
+    const y = boxIndices.vertical * this.size.height;
+    const width = this.size.width * this.length.horizontal;
+    const height = this.size.height * this.length.vertical;
+    return new Position_ENGINE(new Coordinate_ENGINE(x, y), new Size_ENGINE(width, height));
   }
   getBox(boxIndices) {
     const boxesRow = this.boxes[boxIndices.vertical];
@@ -558,14 +581,23 @@ class Boxes_ENGINE extends Coordinate_ENGINE {
     this.boxes[boxIndices.vertical] = row;
   }
   setBox(boxIndices, referenceIndex) {
-    const size4 = new Size_ENGINE(this.size.width, this.size.height);
-    const distanceX = boxIndices.horizontal * size4.width;
-    const distanceY = boxIndices.vertical * size4.height;
-    const box2 = new Box_ENGINE(new Coordinate_ENGINE(this.x + distanceX, this.y + distanceY), size4, referenceIndex);
+    const box2 = (() => {
+      const size4 = new Size_ENGINE(this.size.width, this.size.height);
+      const leftUp = (() => {
+        const distanceX = boxIndices.horizontal * size4.width;
+        const distanceY = boxIndices.vertical * size4.height;
+        return new Coordinate_ENGINE(this.x + distanceX, this.y + distanceY);
+      })();
+      return new Box_ENGINE(leftUp, size4, referenceIndex);
+    })();
     this.boxesIndices(boxIndices, box2);
   }
   occupiedBoxes(initialReferenceIndices, indexesBoxOccupy, referenceIndex) {
-    const boxIndices = new Plane_ENGINE(initialReferenceIndices.horizontal + indexesBoxOccupy.vertical, initialReferenceIndices.vertical + indexesBoxOccupy.horizontal);
+    const boxIndices = (() => {
+      const horizontal = initialReferenceIndices.horizontal + indexesBoxOccupy.vertical;
+      const vertical = initialReferenceIndices.vertical + indexesBoxOccupy.horizontal;
+      return new Plane_ENGINE(horizontal, vertical);
+    })();
     let boxesRow = this.boxes[boxIndices.vertical];
     if (boxesRow === undefined)
       boxesRow = [];
@@ -590,7 +622,8 @@ class Boxes_ENGINE extends Coordinate_ENGINE {
     if (this.occupied === true) {
       for (let vertical = 0;vertical < this.length.vertical; vertical++) {
         for (let horizontal = 0;horizontal < this.length.horizontal; horizontal++) {
-          this.occupiedBoxes(boxIndices, new Plane_ENGINE(horizontal, vertical), referenceIndex);
+          const indexesBoxOccupy = new Plane_ENGINE(horizontal, vertical);
+          this.occupiedBoxes(boxIndices, indexesBoxOccupy, referenceIndex);
         }
       }
     } else {
@@ -598,7 +631,8 @@ class Boxes_ENGINE extends Coordinate_ENGINE {
         row.forEach((value, horizontal) => {
           if (value === false)
             return;
-          this.occupiedBoxes(boxIndices, new Plane_ENGINE(horizontal, vertical), referenceIndex);
+          const indexesBoxOccupy = new Plane_ENGINE(horizontal, vertical);
+          this.occupiedBoxes(boxIndices, indexesBoxOccupy, referenceIndex);
         });
       });
     }
@@ -1209,10 +1243,10 @@ class Floor_ENGINE {
       });
     });
   }
-  aboveFloor(character) {
-    const flatSand = this.flatsSand.collision(character) !== false;
-    const elevations2 = this.elevations.collision(character) !== false;
-    const stairsElevations2 = this.stairsElevation.collision(character) !== false;
+  aboveFloor(coordinate6) {
+    const flatSand = this.flatsSand.collision(coordinate6) !== false;
+    const elevations2 = this.elevations.collision(coordinate6) !== false;
+    const stairsElevations2 = this.stairsElevation.collision(coordinate6) !== false;
     if (flatSand === true)
       return true;
     if (elevations2 === true)
@@ -1221,15 +1255,15 @@ class Floor_ENGINE {
       return true;
     return false;
   }
-  collisionFloor(position7, moved) {
-    const flatSand = this.flatsSand.collision(position7) !== false;
-    const elevations2 = this.elevations.collision(position7) !== false;
-    const wallElevations2 = this.wallElevations.collision(position7) !== false;
-    const stairsElevations2 = this.stairsElevation.collision(position7) !== false;
-    const nextFlatSand = this.flatsSand.collision(moved) !== false;
-    const nextElevations = this.elevations.collision(moved) !== false;
-    const nextWallElevations = this.wallElevations.collision(moved) !== false;
-    const nextStairsElevations = this.stairsElevation.collision(moved) !== false;
+  collisionFloor(coordinate6, nextCoordinate) {
+    const flatSand = this.flatsSand.collision(coordinate6) !== false;
+    const elevations2 = this.elevations.collision(coordinate6) !== false;
+    const wallElevations2 = this.wallElevations.collision(coordinate6) !== false;
+    const stairsElevations2 = this.stairsElevation.collision(coordinate6) !== false;
+    const nextFlatSand = this.flatsSand.collision(nextCoordinate) !== false;
+    const nextElevations = this.elevations.collision(nextCoordinate) !== false;
+    const nextWallElevations = this.wallElevations.collision(nextCoordinate) !== false;
+    const nextStairsElevations = this.stairsElevation.collision(nextCoordinate) !== false;
     if (flatSand === true) {
       if (nextFlatSand === true)
         return false;
@@ -1296,12 +1330,12 @@ class Map_ENGINE extends Position_ENGINE {
       return floor2;
     });
   }
-  indexFloorOn(character) {
+  indexFloorOn(coordinate7) {
     for (let floorIndex = this.floors.length - 1;floorIndex >= 0; floorIndex--) {
       const floor2 = this.floors[floorIndex];
       if (floor2 === undefined)
         continue;
-      if (floor2.aboveFloor(character) === false)
+      if (floor2.aboveFloor(coordinate7) === false)
         continue;
     }
   }
@@ -1511,7 +1545,7 @@ class UserBar_ENGINE extends Square_ENGINE {
     super(new Coordinate_ENGINE(0, 0), size18, canvas, "#416177", "#fff", 0.5);
     this.pawn = pawn;
     this.photo = new Image_ENGINE(new Coordinate_ENGINE(0, 0), new Size_ENGINE(this.size.width * 0.3, this.size.height), this.canvas, photoRoute);
-    this.name = new Text_ENGINE(new Coordinate_ENGINE(0, 0), this.size.getPercentages(new Size_ENGINE(70, 100)), this.canvas, nickname, "#fff", false, false);
+    this.name = new Text_ENGINE(new Coordinate_ENGINE(0, 0), this.size.percentage(new Size_ENGINE(70, 100)), this.canvas, nickname, "#fff", false, false);
   }
   drawUserBar() {
     this.leftUp.x = this.pawn.leftUp.x;
@@ -1572,7 +1606,8 @@ class Line_ENGINE extends Position_ENGINE {
       return;
     this.canvas.context.beginPath();
     this.canvas.context.lineTo(positionOnCanvas.leftUp.x, positionOnCanvas.leftUp.y);
-    this.canvas.context.lineTo(positionOnCanvas.rightDown().x, positionOnCanvas.rightDown().y);
+    const positionOnCanvasRightDown = positionOnCanvas.rightDown();
+    this.canvas.context.lineTo(positionOnCanvasRightDown.x, positionOnCanvasRightDown.y);
     if (this.strokeStyle !== false) {
       this.canvas.context.lineWidth = this.lineWidth;
       this.canvas.context.strokeStyle = this.strokeStyle;
@@ -1611,35 +1646,41 @@ class Sheep_ENGINE extends Character_ENGINE {
       route: "images/resources/sheep/left.png",
       element: new Element_ENGINE(new Size_ENGINE(128, 128), new Plane_ENGINE(0, 0)),
       animation: new Animation_ENGINE(8, 8)
-    }, new Coordinate_ENGINE(50, 50), new Direction_ENGINE(0, -1));
+    }, new Coordinate_ENGINE(10, 10), new Direction_ENGINE(0, 1));
     this.map = map;
     this.state = "move";
     this.lineSight = new Line_ENGINE(new Coordinate_ENGINE(0, 0), new Coordinate_ENGINE(0, 0), this.canvas, false, "#333", 2);
   }
   lineSightPosition() {
-    const leftUp = () => {
+    const leftUp = (() => {
       const halfSizeWidth = this.size.width / 2;
       const halfSizeHeight = this.size.height / 2;
-      const leftUpX = this.leftUp.x + halfSizeWidth;
-      const leftUpY = this.leftUp.y + halfSizeHeight;
-      return new Coordinate_ENGINE(leftUpX, leftUpY);
-    };
-    const rightDownPercentages = () => {
-      const lineReach = 200;
-      const percentageCenter = 50;
-      const lineScopeX = lineReach * this.address.x;
-      const lineScopeY = lineReach * this.address.y;
-      return new Size_ENGINE(lineScopeX + percentageCenter, lineScopeY + percentageCenter);
-    };
-    this.lineSight.setPosition(leftUp(), this.leftUpPlusSizePercentages(rightDownPercentages()));
+      const x = this.leftUp.x + halfSizeWidth;
+      const y = this.leftUp.y + halfSizeHeight;
+      return new Coordinate_ENGINE(x, y);
+    })();
+    const rightDown = (() => {
+      const percentages = (() => {
+        const lineReach = 150;
+        const percentageCenter = 50;
+        const lineScopeX = lineReach * this.address.x;
+        const lineScopeY = lineReach * this.address.y;
+        return new Size_ENGINE(lineScopeX + percentageCenter, lineScopeY + percentageCenter);
+      })();
+      return this.leftUpPlusSizePercentages(percentages);
+    })();
+    this.lineSight.setPosition(leftUp, rightDown);
   }
   moveSheep() {
+    this.lineSightPosition();
     const moved = this.movedCharacter();
     if (moved === false)
       return false;
-    const collision = this.map.collisionMap(this, moved);
-    if (collision === true)
+    const lineSightCollision = this.map.collisionMap(this.leftUp, this.lineSight.rightDown());
+    if (lineSightCollision === true) {
+      console.log("lineSight");
       return false;
+    }
     this.leftUp.x = moved.leftUp.x;
     this.leftUp.y = moved.leftUp.y;
     return true;
@@ -1680,7 +1721,6 @@ class Sheep_ENGINE extends Character_ENGINE {
     this.jumpSheep();
     this.imageAccordingDirectionMovement();
     this.drawCharacter();
-    this.lineSightPosition();
     this.lineSight.drawLine();
   }
 }

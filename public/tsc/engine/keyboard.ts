@@ -53,12 +53,12 @@ export class Keyboard_ENGINE extends Square_ENGINE {
   }
 
   getKeys(keys: string[]) {
-    const size = this.size.getPercentages(
+    const size = this.size.percentage(
       new Size_ENGINE(97, 80)
     );
     size.height /= keys.length;
     return keys.map((characters, index) => {
-      const left = size.aPercent.width * index;
+      const left = size.aPercent().width * index;
       const nextIndex = index + 1;
       const top = size.height * nextIndex;
       return new Keys_ENGINE(

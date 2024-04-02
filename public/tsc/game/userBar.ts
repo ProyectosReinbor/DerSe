@@ -39,7 +39,7 @@ export class UserBar_ENGINE extends Square_ENGINE {
         );
         this.name = new Text_ENGINE(
             new Coordinate_ENGINE(0, 0),
-            this.size.getPercentages(
+            this.size.percentage(
                 new Size_ENGINE(70, 100)
             ),
             this.canvas,

@@ -64,8 +64,8 @@ export class Sheep_ENGINE extends Character_ENGINE {
                 ),
                 animation: new Animation_ENGINE(8, 8)
             },
-            new Coordinate_ENGINE(50, 50),
-            new Direction_ENGINE(0, -1),
+            new Coordinate_ENGINE(10, 10),
+            new Direction_ENGINE(0, 1),
         );
         this.map = map;
         this.state = "move";
@@ -80,42 +80,52 @@ export class Sheep_ENGINE extends Character_ENGINE {
     }
 
     lineSightPosition() {
-        const leftUp = () => {
+        const leftUp = (() => {
             const halfSizeWidth = this.size.width / 2;
             const halfSizeHeight = this.size.height / 2;
-            const leftUpX = this.leftUp.x + halfSizeWidth;
-            const leftUpY = this.leftUp.y + halfSizeHeight;
-            return new Coordinate_ENGINE(
-                leftUpX,
-                leftUpY
-            );
-        };
-        const rightDownPercentages = () => {
-            const lineReach = 200;
-            const percentageCenter = 50;
-            const lineScopeX = lineReach * this.address.x;
-            const lineScopeY = lineReach * this.address.y;
-            return new Size_ENGINE(
-                lineScopeX + percentageCenter,
-                lineScopeY + percentageCenter
-            );
-        }
-        this.lineSight.setPosition(
-            leftUp(),
-            this.leftUpPlusSizePercentages(
-                rightDownPercentages()
-            ),
-        )
+            const x = this.leftUp.x + halfSizeWidth;
+            const y = this.leftUp.y + halfSizeHeight;
+            return new Coordinate_ENGINE(x, y);
+        })();
+        const rightDown = (() => {
+            const percentages = (() => {
+                const lineReach = 150;
+                const percentageCenter = 50;
+                const lineScopeX = lineReach * this.address.x;
+                const lineScopeY = lineReach * this.address.y;
+                return new Size_ENGINE(
+                    lineScopeX + percentageCenter,
+                    lineScopeY + percentageCenter
+                );
+            })();
+            return this.leftUpPlusSizePercentages(percentages);
+        })();
+        this.lineSight.setPosition(leftUp, rightDown);
     }
 
     moveSheep() {
+        this.lineSightPosition();
+
         const moved = this.movedCharacter();
         if (moved === false)
             return false;
 
-        const collision = this.map.collisionMap(this, moved);
-        if (collision === true)
+        // const collision = this.map.collisionMap(this, moved);
+        // if (collision === true) {
+        //     this.randomAddress();
+        //     this.timerChangePositionRandomly = 0;
+        //     return false;
+        // }
+
+        const lineSightCollision = this.map.collisionMap(
+            this.leftUp,
+            this.lineSight.rightDown(),
+        );
+
+        if (lineSightCollision === true) {
+            console.log("lineSight");
             return false;
+        }
 
         this.leftUp.x = moved.leftUp.x;
         this.leftUp.y = moved.leftUp.y;
@@ -167,7 +177,6 @@ export class Sheep_ENGINE extends Character_ENGINE {
         this.jumpSheep();
         this.imageAccordingDirectionMovement();
         this.drawCharacter();
-        this.lineSightPosition();
         this.lineSight.drawLine();
     }
 }

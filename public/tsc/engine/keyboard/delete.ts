@@ -21,7 +21,7 @@ export class Delete_ENGINE extends Position_ENGINE {
       keyboard.leftUpPlusSizePercentages(
         new Size_ENGINE(63, 0)
       ),
-      keyboard.size.getPercentages(
+      keyboard.size.percentage(
         new Size_ENGINE(15, 20)
       ),
     );
@@ -49,7 +49,7 @@ export class Delete_ENGINE extends Position_ENGINE {
       this.leftUpPlusSizePercentages(
         new Size_ENGINE(50, 15)
       ),
-      this.size.getPercentages(
+      this.size.percentage(
         new Size_ENGINE(15, 100)
       ),
       canvas,
