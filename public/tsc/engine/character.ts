@@ -5,7 +5,7 @@ import { Direction_ENGINE } from "./character/direction";
 import type { FillStyle, StrokeStyle } from "./context";
 import { Coordinate_ENGINE } from "./coordinate";
 import type { Element_ENGINE } from "./element";
-import type { ImagePath } from "./image";
+import type { PathImage_ENGINE } from "./image";
 import { Size_ENGINE } from "./size";
 import { Square_ENGINE } from "./square";
 
@@ -24,7 +24,7 @@ export class Character_ENGINE extends Square_ENGINE {
         lineWidth: number,
         scale: Size_ENGINE,
         animations: {
-            route: ImagePath;
+            route: PathImage_ENGINE | false;
             element: Element_ENGINE;
             animation: Animation_ENGINE;
         },

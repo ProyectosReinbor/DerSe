@@ -4,7 +4,7 @@ import type { OccupiedBoxes } from "./boxes";
 import type { Canvas_ENGINE } from "./canvas";
 import { Element_ENGINE } from "./element";
 import { ElementBoxes_ENGINE } from "./elementBoxes";
-import type { ImagePath } from "./image";
+import type { PathImage_ENGINE } from "./image";
 import { Plane_ENGINE } from "./plane";
 import { Size_ENGINE } from "./size";
 
@@ -20,7 +20,7 @@ export class AnimationBoxes_ENGINE extends ElementBoxes_ENGINE {
         size: Size_ENGINE,
         length: Plane_ENGINE,
         occupied: OccupiedBoxes,
-        route: ImagePath,
+        route: PathImage_ENGINE,
         element: Element_ENGINE,
         animation: Animation_ENGINE,
     ) {

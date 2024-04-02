@@ -96,49 +96,37 @@ class Camera_ENGINE extends Position_ENGINE {
 // public/tsc/engine/images.ts
 class Images_ENGINE {
   notFound = [];
-  routes = [];
   images = {};
-  theImageExists(route) {
-    if (route === false)
-      return false;
-    if (this.notFound.includes(route))
-      throw new Error(`image ${route} is not found`);
-    return this.images[route];
-  }
+  loadingImage = false;
   getImage(route) {
-    const image = this.theImageExists(route);
-    if (image === undefined)
-      throw new Error(`image ${route} is not found`);
+    if (this.loadingImage === true)
+      return false;
+    if (this.notFound.includes(route) === true)
+      return false;
+    const image = this.images[route];
+    if (image === undefined) {
+      this.uploadImage(route);
+      return false;
+    }
     return image;
   }
-  async addRoute(route) {
-    if (route === false)
-      return;
-    if (this.routes.includes(route) === true)
-      return;
-    this.routes.push(route);
-    await this.uploadImage(route);
-  }
-  async loadAll() {
-    for (const route of this.routes) {
-      await this.uploadImage(route);
-    }
-  }
   uploadImage(route) {
-    return new Promise((resolve) => {
-      if (route === false)
-        return resolve(false);
-      const imageExists = this.theImageExists(route);
-      if (imageExists !== undefined)
-        return resolve(imageExists);
-      const image = new Image;
-      image.addEventListener("load", () => {
-        this.images[route] = image;
-        resolve(image);
-      });
-      image.addEventListener("error", () => this.notFound.push(route));
-      image.src = route;
+    if (this.notFound.includes(route) === true)
+      return;
+    const image = this.images[route];
+    if (image !== undefined)
+      return;
+    this.loadingImage = true;
+    const newImage = new Image;
+    newImage.addEventListener("load", () => {
+      this.loadingImage = false;
+      this.images[route] = newImage;
     });
+    newImage.addEventListener("error", () => {
+      throw new Error(`image ${route} is not found`);
+      this.notFound.push(route);
+    });
+    newImage.src = route;
   }
 }
 
@@ -190,7 +178,6 @@ class Canvas_ENGINE extends Camera_ENGINE {
     requestAnimationFrame((time2) => this.nextFrame(time2));
   }
   async start(drawScene, touchstartScene, touchmoveScene, touchendScene) {
-    await this.images.loadAll();
     this.drawScene = drawScene;
     this.touchstartScene = touchstartScene;
     this.touchmoveScene = touchmoveScene;
@@ -468,13 +455,11 @@ class Image_ENGINE extends Position_ENGINE {
   constructor(leftUp, size3, canvas, route) {
     super(leftUp, size3);
     this.canvas = canvas;
-    this.setImage(route);
-  }
-  setImage(route) {
     this.route = route;
-    this.canvas.images.addRoute(this.route);
   }
   getImage() {
+    if (this.route === false)
+      return false;
     return this.canvas.images.getImage(this.route);
   }
   drawImage() {
@@ -497,7 +482,7 @@ class Elements_ENGINE extends Image_ENGINE {
     this.element = element;
   }
   drawElement() {
-    const image2 = this.image;
+    const image2 = this.getImage();
     if (image2 === false)
       return;
     const positionOnCanvas = this.canvas.positionOnCanvas(this);
@@ -871,7 +856,7 @@ class Castle_ENGINE extends Image_ENGINE {
     let file = this.state;
     if (this.state === "ready")
       file = this.color;
-    this.image = `images/factions/knights/buildings/castle/${file}.png`;
+    this.route = `images/factions/knights/buildings/castle/${file}.png`;
   }
 }
 
@@ -1666,7 +1651,7 @@ class Sheep_ENGINE extends Character_ENGINE {
       addressName = "left";
     else
       addressName = "right";
-    this.animations.image = `images/resources/sheep/${addressName}.png`;
+    this.animations.route = `images/resources/sheep/${addressName}.png`;
   }
   drawSheep() {
     this.refreshState();

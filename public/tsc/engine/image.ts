@@ -3,33 +3,31 @@ import { Coordinate_ENGINE } from "./coordinate";
 import { Position_ENGINE } from "./position";
 import type { Size_ENGINE } from "./size";
 
-export type ImagePath = `images/${string}.png` | false;
+export type PathImage_ENGINE = `images/${string}.png`;
 
 export class Image_ENGINE extends Position_ENGINE {
 
   canvas: Canvas_ENGINE;
-  route: ImagePath = false;
+  route: PathImage_ENGINE | false = false;
 
   constructor(
     leftUp: Coordinate_ENGINE,
     size: Size_ENGINE,
     canvas: Canvas_ENGINE,
-    route: ImagePath,
+    route: PathImage_ENGINE | false,
   ) {
     super(
       leftUp,
       size
     );
     this.canvas = canvas;
-    this.setImage(route);
-  }
-
-  setImage(route: ImagePath) {
     this.route = route;
-    this.canvas.images.addRoute(this.route);
   }
 
   getImage(): HTMLImageElement | false {
+    if (this.route === false)
+      return false;
+
     return this.canvas.images.getImage(this.route);
   }
 

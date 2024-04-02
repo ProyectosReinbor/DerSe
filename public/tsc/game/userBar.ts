@@ -1,6 +1,6 @@
 import type { Canvas_ENGINE } from "../engine/canvas";
 import { Coordinate_ENGINE } from "../engine/coordinate";
-import { Image_ENGINE, type ImagePath } from "../engine/image";
+import { Image_ENGINE, type PathImage_ENGINE } from "../engine/image";
 import { Size_ENGINE } from "../engine/size";
 import { Square_ENGINE } from "../engine/square";
 import { Text_ENGINE } from "../engine/text";
@@ -16,7 +16,7 @@ export class UserBar_ENGINE extends Square_ENGINE {
         pawn: Pawn_ENGINE,
         size: Size_ENGINE,
         canvas: Canvas_ENGINE,
-        photoRoute: ImagePath,
+        photoRoute: PathImage_ENGINE | false,
         nickname: string,
     ) {
         super(

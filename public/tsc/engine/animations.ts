@@ -4,7 +4,7 @@ import type { Element_ENGINE } from "./element.js";
 import type { Coordinate_ENGINE } from "./coordinate.js";
 import type { Size_ENGINE } from "./size.js";
 import type { Canvas_ENGINE } from "./canvas.js";
-import type { ImagePath } from "./image.js";
+import type { PathImage_ENGINE } from "./image.js";
 
 export class Animations_ENGINE extends Elements_ENGINE {
 
@@ -15,7 +15,7 @@ export class Animations_ENGINE extends Elements_ENGINE {
     leftUp: Coordinate_ENGINE,
     size: Size_ENGINE,
     canvas: Canvas_ENGINE,
-    route: ImagePath,
+    route: PathImage_ENGINE | false,
     element: Element_ENGINE,
     animation: Animation_ENGINE
   ) {

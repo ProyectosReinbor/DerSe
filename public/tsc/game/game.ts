@@ -1,6 +1,6 @@
 import type { Canvas_ENGINE } from "../engine/canvas.js";
 import { Coordinate_ENGINE } from "../engine/coordinate.js";
-import type { ImagePath } from "../engine/image.js";
+import type { PathImage_ENGINE } from "../engine/image.js";
 import { Scene_ENGINE } from "../engine/scene.js";
 import { Map_ENGINE } from "./map.js";
 import { Pawn_ENGINE } from "./pawn.js";
@@ -32,7 +32,7 @@ export class Game_ENGINE extends Scene_ENGINE {
         giftPictureUrl: string;
         repeatCount: number;
         nickname: string;
-        profilePictureUrl: ImagePath;
+        profilePictureUrl: PathImage_ENGINE;
     }) {
         const exist = this.pawns.some((pawn) => pawn.nickname === gift.nickname);
         if (exist === true) return;

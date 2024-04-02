@@ -1,70 +1,52 @@
-import type { ImagePath } from "./image";
+import type { PathImage_ENGINE } from "./image";
 
 export class Images_ENGINE {
   notFound: string[] = [];
-  routes: ImagePath[] = [];
   images: {
     [key: string]: HTMLImageElement;
   } = {};
+  loadingImage: boolean = false;
 
-  theImageExists(route: ImagePath): false | HTMLImageElement | undefined {
-    if (route === false)
+  getImage(route: PathImage_ENGINE): HTMLImageElement | false {
+    if (this.loadingImage === true)
       return false;
 
-    if (this.notFound.includes(route))
-      throw new Error(`image ${route} is not found`);
+    if (this.notFound.includes(route) === true)
+      return false;
 
-    return this.images[route];
-  }
-
-  getImage(route: ImagePath): HTMLImageElement | false {
-    const image = this.theImageExists(route);
-    if (image === undefined)
-      throw new Error(`image ${route} is not found`);
+    const image = this.images[route];
+    if (image === undefined) {
+      this.uploadImage(route);
+      return false;
+    }
 
     return image;
   }
 
-  async addRoute(route: ImagePath) {
-    if (route === false)
+  uploadImage(route: PathImage_ENGINE): void {
+    if (this.notFound.includes(route) === true)
       return;
 
-    if (this.routes.includes(route) === true)
+    const image = this.images[route];
+    if (image !== undefined)
       return;
 
-    this.routes.push(route);
-    await this.uploadImage(route);
-  }
-
-  async loadAll() {
-    for (const route of this.routes) {
-      await this.uploadImage(route);
-    }
-  }
-
-  uploadImage(route: ImagePath): Promise<HTMLImageElement | false> {
-    return new Promise((resolve) => {
-      if (route === false)
-        return resolve(false);
-
-      const imageExists = this.theImageExists(route);
-
-      if (imageExists !== undefined)
-        return resolve(imageExists);
-
-      const image = new Image();
-      image.addEventListener(
-        "load",
-        () => {
-          this.images[route] = image;
-          resolve(image);
-        }
-      );
-      image.addEventListener(
-        "error",
-        () => this.notFound.push(route)
-      );
-      image.src = route;
-    });
+    this.loadingImage = true;
+    const newImage = new Image();
+    newImage.addEventListener(
+      "load",
+      () => {
+        this.loadingImage = false;
+        this.images[route] = newImage;
+      }
+    );
+    newImage.addEventListener(
+      "error",
+      () => {
+        throw new Error(`image ${route} is not found`);
+        this.notFound.push(route)
+      }
+    );
+    newImage.src = route;
   }
 }

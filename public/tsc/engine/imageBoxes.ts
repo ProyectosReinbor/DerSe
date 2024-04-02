@@ -1,12 +1,12 @@
 import { Boxes_ENGINE, type OccupiedBoxes } from "./boxes";
 import type { Canvas_ENGINE } from "./canvas";
-import { Image_ENGINE, type ImagePath } from "./image";
+import { Image_ENGINE, type PathImage_ENGINE } from "./image";
 import type { Plane_ENGINE } from "./plane";
 import type { Size_ENGINE } from "./size";
 
 export class ImageBoxes_ENGINE extends Boxes_ENGINE {
     override references: Image_ENGINE[] = [];
-    route: ImagePath;
+    route: PathImage_ENGINE | false;
 
     constructor(
         x: number,
@@ -15,7 +15,7 @@ export class ImageBoxes_ENGINE extends Boxes_ENGINE {
         size: Size_ENGINE,
         length: Plane_ENGINE,
         occupied: OccupiedBoxes,
-        route: ImagePath,
+        route: PathImage_ENGINE | false,
     ) {
         super(
             x,

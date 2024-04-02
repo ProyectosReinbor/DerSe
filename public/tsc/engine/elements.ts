@@ -3,7 +3,7 @@
 import type { Canvas_ENGINE } from "./canvas.js";
 import type { Coordinate_ENGINE } from "./coordinate.js";
 import { Element_ENGINE } from "./element.js";
-import { Image_ENGINE, type ImagePath } from "./image.js";
+import { Image_ENGINE, type PathImage_ENGINE } from "./image.js";
 import type { Size_ENGINE } from "./size.js";
 
 export class Elements_ENGINE extends Image_ENGINE {
@@ -14,7 +14,7 @@ export class Elements_ENGINE extends Image_ENGINE {
     leftUp: Coordinate_ENGINE,
     size: Size_ENGINE,
     canvas: Canvas_ENGINE,
-    route: ImagePath,
+    route: PathImage_ENGINE | false,
     element: Element_ENGINE
   ) {
     super(

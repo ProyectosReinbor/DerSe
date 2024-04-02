@@ -2,7 +2,7 @@ import type { Canvas_ENGINE } from "../../engine/canvas";
 import { Element_ENGINE } from "../../engine/element";
 import { ElementBoxes_ENGINE } from "../../engine/elementBoxes";
 import type { Elements_ENGINE } from "../../engine/elements";
-import type { ImagePath } from "../../engine/image";
+import type { PathImage_ENGINE } from "../../engine/image";
 import { Plane_ENGINE } from "../../engine/plane";
 import { Size_ENGINE } from "../../engine/size";
 import type { Map_ENGINE } from "../map";
@@ -26,7 +26,7 @@ export class Grounds_ENGINE extends ElementBoxes_ENGINE {
     constructor(
         map: Map_ENGINE,
         canvas: Canvas_ENGINE,
-        route: ImagePath,
+        route: PathImage_ENGINE | false,
         elementIndices: GroundElementIndices,
     ) {
         super(

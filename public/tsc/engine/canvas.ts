@@ -80,7 +80,6 @@ export class Canvas_ENGINE extends Camera_ENGINE {
     touchmoveScene: (touch: Coordinate_ENGINE) => void,
     touchendScene: (touch: Coordinate_ENGINE) => void,
   ) {
-    await this.images.loadAll();
     this.drawScene = drawScene;
     this.touchstartScene = touchstartScene;
     this.touchmoveScene = touchmoveScene;

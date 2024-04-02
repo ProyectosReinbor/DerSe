@@ -135,9 +135,7 @@ export class Sheep_ENGINE extends Character_ENGINE {
         else
             addressName = "right";
 
-        this.animations.setImage(
-            `images/resources/sheep/${addressName}.png`
-        );
+        this.animations.route = `images/resources/sheep/${addressName}.png`;
     }
 
     drawSheep() {
