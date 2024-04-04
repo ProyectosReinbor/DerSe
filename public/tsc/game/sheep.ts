@@ -64,8 +64,8 @@ export class Sheep_ENGINE extends Character_ENGINE {
                 ),
                 animation: new Animation_ENGINE(8, 8)
             },
-            new Coordinate_ENGINE(10, 10),
-            new Direction_ENGINE(0, 1),
+            new Coordinate_ENGINE(100, 100),
+            new Direction_ENGINE("center", "down"),
         );
         this.map = map;
         this.state = "move";
@@ -89,10 +89,10 @@ export class Sheep_ENGINE extends Character_ENGINE {
         })();
         const rightDown = (() => {
             const percentages = (() => {
-                const lineReach = 150;
+                const lineReach = 120;
                 const percentageCenter = 50;
-                const lineScopeX = lineReach * this.address.x;
-                const lineScopeY = lineReach * this.address.y;
+                const lineScopeX = lineReach * this.direction.getNumberX();
+                const lineScopeY = lineReach * this.direction.getNumberY();
                 return new Size_ENGINE(
                     lineScopeX + percentageCenter,
                     lineScopeY + percentageCenter
@@ -123,6 +123,19 @@ export class Sheep_ENGINE extends Character_ENGINE {
         );
 
         if (lineSightCollision === true) {
+            const random1 = Math.round(Math.random());
+            const random2 = Math.round(Math.random());
+            this.direction.setX(
+                random1 === 0 ? "left" : "right"
+            );
+            this.direction.setY(
+                random2 === 0 ? "up" : "down"
+            );
+            const random3 = Math.round(Math.random() * 2);
+            if (random3 === 0)
+                this.direction.setY("center");
+            else if (random3 === 1)
+                this.direction.setX("center");
             return false;
         }
 
@@ -159,15 +172,11 @@ export class Sheep_ENGINE extends Character_ENGINE {
     }
 
     imageAccordingDirectionMovement() {
-        if (this.address.x === 0) return;
+        const directionX = this.direction.getX();
+        if (directionX === "center")
+            return;
 
-        let addressName: "left" | "right" | false = false;
-        if (this.address.x === -1)
-            addressName = "left";
-        else
-            addressName = "right";
-
-        this.animations.route = `images/resources/sheep/${addressName}.png`;
+        this.animations.route = `images/resources/sheep/${directionX}.png`;
     }
 
     drawSheep() {

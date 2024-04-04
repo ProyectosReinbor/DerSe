@@ -44,7 +44,7 @@ export class Pawn_ENGINE extends Character_ENGINE {
                 animation: new Animation_ENGINE(6, 6),
             },
             new Coordinate_ENGINE(2, 2),
-            new Direction_ENGINE(0, 0),
+            new Direction_ENGINE("center", "center"),
         );
         this.map = map;
         this.nickname = nickname;

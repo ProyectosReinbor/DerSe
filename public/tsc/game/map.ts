@@ -53,8 +53,8 @@ export class Map_ENGINE extends Position_ENGINE {
     }
 
     collisionMap(
-        character: Coordinate_ENGINE,
-        moved: Coordinate_ENGINE,
+        coordinate: Coordinate_ENGINE,
+        nextCoordinate: Coordinate_ENGINE,
     ): boolean {
         for (
             let floorIndex = this.floors.length - 1;
@@ -65,12 +65,12 @@ export class Map_ENGINE extends Position_ENGINE {
             if (floor === undefined)
                 continue;
 
-            if (floor.aboveFloor(character) === false)
+            if (floor.aboveFloor(coordinate) === false)
                 continue;
 
             if (floor.collisionFloor(
-                character,
-                moved
+                coordinate,
+                nextCoordinate
             ) === true)
                 return true;
 
@@ -79,15 +79,15 @@ export class Map_ENGINE extends Position_ENGINE {
             if (nextFloor === undefined)
                 return false;
 
-            const flatSand = floor.flatsSand.collision(character) !== false;
-            const elevations = floor.elevations.collision(character) !== false;
-            const wallElevations = floor.wallElevations.collision(character) !== false;
-            const stairsElevations = floor.stairsElevation.collision(character) !== false;
+            const flatSand = floor.flatsSand.collision(coordinate) !== false;
+            const elevations = floor.elevations.collision(coordinate) !== false;
+            const wallElevations = floor.wallElevations.collision(coordinate) !== false;
+            const stairsElevations = floor.stairsElevation.collision(coordinate) !== false;
 
-            const nextFlatSand = nextFloor.flatsSand.collision(moved) !== false;
-            const nextElevations = nextFloor.elevations.collision(moved) !== false;
-            const nextWallElevations = nextFloor.wallElevations.collision(moved) !== false;
-            const nextStairsElevations = nextFloor.stairsElevation.collision(moved) !== false;
+            const nextFlatSand = nextFloor.flatsSand.collision(nextCoordinate) !== false;
+            const nextElevations = nextFloor.elevations.collision(nextCoordinate) !== false;
+            const nextWallElevations = nextFloor.wallElevations.collision(nextCoordinate) !== false;
+            const nextStairsElevations = nextFloor.stairsElevation.collision(nextCoordinate) !== false;
 
             if (flatSand === true) {
                 if (nextFlatSand === true)

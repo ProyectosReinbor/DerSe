@@ -13,7 +13,7 @@ export class Character_ENGINE extends Square_ENGINE {
     scale: Size_ENGINE;
     animations: Animations_ENGINE;
     speed: Coordinate_ENGINE;
-    address: Direction_ENGINE;
+    direction: Direction_ENGINE;
 
     constructor(
         leftUp: Coordinate_ENGINE,
@@ -29,7 +29,7 @@ export class Character_ENGINE extends Square_ENGINE {
             animation: Animation_ENGINE;
         },
         speed: Coordinate_ENGINE,
-        address: Direction_ENGINE,
+        direction: Direction_ENGINE,
     ) {
         super(
             leftUp,
@@ -50,20 +50,20 @@ export class Character_ENGINE extends Square_ENGINE {
             animations.animation
         );
         this.speed = speed;
-        this.address = address;
+        this.direction = direction;
     }
 
     movedCharacter(): Character_ENGINE | false {
-        if (this.address.isEqualTo(
-            new Direction_ENGINE(0, 0)
+        if (this.direction.isEqualTo(
+            new Direction_ENGINE("center", "center")
         ))
             return false;
 
         const secondsBetweenFrames = this.canvas.timeBetweenFrames / 1000;
         const speedX = this.speed.x * secondsBetweenFrames;
         const speedY = this.speed.y * secondsBetweenFrames;
-        const distanceX = speedX * this.address.x;
-        const distanceY = speedY * this.address.y;
+        const distanceX = speedX * this.direction.getNumberX();
+        const distanceY = speedY * this.direction.getNumberY();
         const newX = this.leftUp.x + distanceX;
         const newY = this.leftUp.y + distanceY;
         return new Character_ENGINE(
@@ -83,7 +83,7 @@ export class Character_ENGINE extends Square_ENGINE {
                 animation: this.animations.animation
             },
             this.speed,
-            this.address
+            this.direction
         );
     }
 

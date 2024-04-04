@@ -1417,6 +1417,36 @@ class Direction_ENGINE {
     this.x = x;
     this.y = y;
   }
+  getX() {
+    return this.x;
+  }
+  getNumberX() {
+    if (this.x === "left")
+      return -1;
+    if (this.x === "right")
+      return 1;
+    if (this.x === "center")
+      return 0;
+    throw new Error("invalid  direction x");
+  }
+  getY() {
+    return this.y;
+  }
+  getNumberY() {
+    if (this.y === "up")
+      return -1;
+    if (this.y === "down")
+      return 1;
+    if (this.y === "center")
+      return 0;
+    throw new Error("invalid direction y");
+  }
+  setX(x) {
+    this.x = x;
+  }
+  setY(y) {
+    this.y = y;
+  }
   isEqualTo(direction) {
     return this.x === direction.x && this.y === direction.y;
   }
@@ -1459,30 +1489,30 @@ class Character_ENGINE extends Square_ENGINE {
   scale;
   animations;
   speed;
-  address;
-  constructor(leftUp, size17, canvas, fillStyle, strokeStyle, lineWidth, scale, animations3, speed, address) {
+  direction;
+  constructor(leftUp, size17, canvas, fillStyle, strokeStyle, lineWidth, scale, animations3, speed, direction2) {
     super(leftUp, size17, canvas, fillStyle, strokeStyle, lineWidth);
     this.scale = scale;
     this.canvas = canvas;
     this.animations = new Animations_ENGINE(new Coordinate_ENGINE(0, 0), new Size_ENGINE(0, 0), canvas, animations3.route, animations3.element, animations3.animation);
     this.speed = speed;
-    this.address = address;
+    this.direction = direction2;
   }
   movedCharacter() {
-    if (this.address.isEqualTo(new Direction_ENGINE(0, 0)))
+    if (this.direction.isEqualTo(new Direction_ENGINE("center", "center")))
       return false;
     const secondsBetweenFrames = this.canvas.timeBetweenFrames / 1000;
     const speedX = this.speed.x * secondsBetweenFrames;
     const speedY = this.speed.y * secondsBetweenFrames;
-    const distanceX = speedX * this.address.x;
-    const distanceY = speedY * this.address.y;
+    const distanceX = speedX * this.direction.getNumberX();
+    const distanceY = speedY * this.direction.getNumberY();
     const newX = this.leftUp.x + distanceX;
     const newY = this.leftUp.y + distanceY;
     return new Character_ENGINE(new Coordinate_ENGINE(newX, newY), new Size_ENGINE(this.size.width, this.size.height), this.canvas, this.fillStyle, this.strokeStyle, this.lineWidth, this.scale, {
       route: this.animations.route,
       element: this.animations.element,
       animation: this.animations.animation
-    }, this.speed, this.address);
+    }, this.speed, this.direction);
   }
   drawCharacter() {
     this.drawSquare();
@@ -1570,7 +1600,7 @@ class Pawn_ENGINE extends Character_ENGINE {
       route: `images/factions/knights/troops/pawn/${color}.png`,
       element: new Element_ENGINE(new Size_ENGINE(192, 192), new Plane_ENGINE(6, 6)),
       animation: new Animation_ENGINE(6, 6)
-    }, new Coordinate_ENGINE(2, 2), new Direction_ENGINE(0, 0));
+    }, new Coordinate_ENGINE(2, 2), new Direction_ENGINE("center", "center"));
     this.map = map;
     this.nickname = nickname;
     this.userBar = new UserBar_ENGINE(this, new Size_ENGINE(0, 0), this.canvas, false, this.nickname);
@@ -1646,7 +1676,7 @@ class Sheep_ENGINE extends Character_ENGINE {
       route: "images/resources/sheep/left.png",
       element: new Element_ENGINE(new Size_ENGINE(128, 128), new Plane_ENGINE(0, 0)),
       animation: new Animation_ENGINE(8, 8)
-    }, new Coordinate_ENGINE(10, 10), new Direction_ENGINE(0, 1));
+    }, new Coordinate_ENGINE(100, 100), new Direction_ENGINE("center", "down"));
     this.map = map;
     this.state = "move";
     this.lineSight = new Line_ENGINE(new Coordinate_ENGINE(0, 0), new Coordinate_ENGINE(0, 0), this.canvas, false, "#333", 2);
@@ -1661,10 +1691,10 @@ class Sheep_ENGINE extends Character_ENGINE {
     })();
     const rightDown = (() => {
       const percentages = (() => {
-        const lineReach = 150;
+        const lineReach = 120;
         const percentageCenter = 50;
-        const lineScopeX = lineReach * this.address.x;
-        const lineScopeY = lineReach * this.address.y;
+        const lineScopeX = lineReach * this.direction.getNumberX();
+        const lineScopeY = lineReach * this.direction.getNumberY();
         return new Size_ENGINE(lineScopeX + percentageCenter, lineScopeY + percentageCenter);
       })();
       return this.leftUpPlusSizePercentages(percentages);
@@ -1678,6 +1708,15 @@ class Sheep_ENGINE extends Character_ENGINE {
       return false;
     const lineSightCollision = this.map.collisionMap(this.leftUp, this.lineSight.rightDown());
     if (lineSightCollision === true) {
+      const random1 = Math.round(Math.random());
+      const random2 = Math.round(Math.random());
+      this.direction.setX(random1 === 0 ? "left" : "right");
+      this.direction.setY(random2 === 0 ? "up" : "down");
+      const random3 = Math.round(Math.random() * 2);
+      if (random3 === 0)
+        this.direction.setY("center");
+      else if (random3 === 1)
+        this.direction.setX("center");
       return false;
     }
     this.leftUp.x = moved.leftUp.x;
@@ -1705,14 +1744,10 @@ class Sheep_ENGINE extends Character_ENGINE {
     this.animations.animation.framesPerSecond = character3.animation.framesPerSecond;
   }
   imageAccordingDirectionMovement() {
-    if (this.address.x === 0)
+    const directionX = this.direction.getX();
+    if (directionX === "center")
       return;
-    let addressName = false;
-    if (this.address.x === -1)
-      addressName = "left";
-    else
-      addressName = "right";
-    this.animations.route = `images/resources/sheep/${addressName}.png`;
+    this.animations.route = `images/resources/sheep/${directionX}.png`;
   }
   drawSheep() {
     this.refreshState();
