@@ -54,8 +54,11 @@ export class Direction_ENGINE {
         this.y = y;
     }
 
-    isEqualTo(direction: Direction_ENGINE) {
-        return this.x === direction.x &&
-            this.y === direction.y;
+    isEqualTo(
+        directionX: XDirection_ENGINE,
+        directionY: YDirection_ENGINE,
+    ) {
+        return this.x === directionX &&
+            this.y === directionY;
     }
 }

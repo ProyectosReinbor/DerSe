@@ -64,7 +64,7 @@ export class Sheep_ENGINE extends Character_ENGINE {
                 ),
                 animation: new Animation_ENGINE(8, 8)
             },
-            new Coordinate_ENGINE(100, 100),
+            new Coordinate_ENGINE(1000, 1000),
             new Direction_ENGINE("center", "down"),
         );
         this.map = map;
@@ -108,7 +108,7 @@ export class Sheep_ENGINE extends Character_ENGINE {
 
         const moved = this.movedCharacter();
         if (moved === false)
-            return false;
+            return;
 
         // const collision = this.map.collisionMap(this, moved);
         // if (collision === true) {
@@ -117,31 +117,34 @@ export class Sheep_ENGINE extends Character_ENGINE {
         //     return false;
         // }
 
-        const lineSightCollision = this.map.collisionMap(
+        const lineSightCollisionMap = this.map.collisionMap(
             this.leftUp,
             this.lineSight.rightDown(),
         );
 
-        if (lineSightCollision === true) {
-            const random1 = Math.round(Math.random());
-            const random2 = Math.round(Math.random());
-            this.direction.setX(
-                random1 === 0 ? "left" : "right"
-            );
-            this.direction.setY(
-                random2 === 0 ? "up" : "down"
-            );
-            const random3 = Math.round(Math.random() * 2);
-            if (random3 === 0)
-                this.direction.setY("center");
-            else if (random3 === 1)
-                this.direction.setX("center");
-            return false;
-        }
+        if (
+            lineSightCollisionMap.x === this.leftUp.x ||
 
-        this.leftUp.x = moved.leftUp.x;
-        this.leftUp.y = moved.leftUp.y;
-        return true;
+        ) {
+
+        }
+        this.leftUp.x = lineSightCollisionMap.x;
+        this.leftUp.y = lineSightCollisionMap.y;
+
+
+        const random1 = Math.round(Math.random());
+        const random2 = Math.round(Math.random());
+        this.direction.setX(
+            random1 === 0 ? "left" : "right"
+        );
+        this.direction.setY(
+            random2 === 0 ? "up" : "down"
+        );
+        const random3 = Math.round(Math.random() * 2);
+        if (random3 === 0)
+            this.direction.setY("center");
+        else if (random3 === 1)
+            this.direction.setX("center");
     }
 
     jumpSheep() {

@@ -53,10 +53,8 @@ export class Character_ENGINE extends Square_ENGINE {
         this.direction = direction;
     }
 
-    movedCharacter(): Character_ENGINE | false {
-        if (this.direction.isEqualTo(
-            new Direction_ENGINE("center", "center")
-        ))
+    movedCharacter(): Coordinate_ENGINE | false {
+        if (this.direction.isEqualTo("center", "center"))
             return false;
 
         const secondsBetweenFrames = this.canvas.timeBetweenFrames / 1000;
@@ -66,25 +64,7 @@ export class Character_ENGINE extends Square_ENGINE {
         const distanceY = speedY * this.direction.getNumberY();
         const newX = this.leftUp.x + distanceX;
         const newY = this.leftUp.y + distanceY;
-        return new Character_ENGINE(
-            new Coordinate_ENGINE(newX, newY),
-            new Size_ENGINE(
-                this.size.width,
-                this.size.height,
-            ),
-            this.canvas,
-            this.fillStyle,
-            this.strokeStyle,
-            this.lineWidth,
-            this.scale,
-            {
-                route: this.animations.route,
-                element: this.animations.element,
-                animation: this.animations.animation
-            },
-            this.speed,
-            this.direction
-        );
+        return new Coordinate_ENGINE(newX, newY);
     }
 
     drawCharacter() {

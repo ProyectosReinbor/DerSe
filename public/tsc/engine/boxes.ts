@@ -39,8 +39,8 @@ export class Boxes_ENGINE extends Coordinate_ENGINE {
 
         const boxIndicesLeftUp = (() => {
             const coordinate = new Coordinate_ENGINE(
-                position.leftUp.x - this.size.width,
-                position.leftUp.y - this.size.height
+                position.leftUp.x,
+                position.leftUp.y
             );
             return this.getBoxIndices(coordinate);
         })();
@@ -48,20 +48,21 @@ export class Boxes_ENGINE extends Coordinate_ENGINE {
         const boxIndicesRightDown = (() => {
             const positionRightDown = position.rightDown();
             const coordinate = new Coordinate_ENGINE(
-                positionRightDown.x + this.size.width,
-                positionRightDown.y + this.size.height
+                positionRightDown.x,
+                positionRightDown.y
             );
             return this.getBoxIndices(coordinate);
         })();
 
-        const boxIndices = new Plane_ENGINE(0, 0);
-        for (
-            boxIndices.vertical = boxIndicesLeftUp.vertical;
+        const boxIndices = new Plane_ENGINE(
+            boxIndicesLeftUp.vertical,
+            boxIndicesLeftUp.horizontal
+        );
+        for (;
             boxIndices.vertical <= boxIndicesRightDown.vertical;
             boxIndices.vertical++
         ) {
-            for (
-                boxIndices.horizontal = boxIndicesLeftUp.horizontal;
+            for (;
                 boxIndices.horizontal <= boxIndicesRightDown.horizontal;
                 boxIndices.horizontal++
             ) {

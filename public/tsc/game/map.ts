@@ -7,6 +7,7 @@ import { Position_ENGINE } from "../engine/position.js";
 import { Size_ENGINE } from "../engine/size.js";
 import type { Canvas_ENGINE } from "../engine/canvas.js";
 import { Coordinate_ENGINE } from "../engine/coordinate.js";
+import { Direction_ENGINE } from "../engine/character/direction.js";
 
 export class Map_ENGINE extends Position_ENGINE {
 
@@ -54,8 +55,9 @@ export class Map_ENGINE extends Position_ENGINE {
 
     collisionMap(
         coordinate: Coordinate_ENGINE,
-        nextCoordinate: Coordinate_ENGINE,
-    ): boolean {
+        lastCoordinate: Coordinate_ENGINE,
+    ):
+        Coordinate_ENGINE | "" {
         for (
             let floorIndex = this.floors.length - 1;
             floorIndex >= 0;
@@ -68,85 +70,141 @@ export class Map_ENGINE extends Position_ENGINE {
             if (floor.aboveFloor(coordinate) === false)
                 continue;
 
-            if (floor.collisionFloor(
-                coordinate,
-                nextCoordinate
-            ) === true)
-                return true;
+            const collisionFloor = floor.collisionFloor(coordinate, lastCoordinate);
 
             const nextFloorIndex = floorIndex + 1;
             const nextFloor = this.floors[nextFloorIndex];
             if (nextFloor === undefined)
-                return false;
+                return collisionFloor;
 
             const flatSand = floor.flatsSand.collision(coordinate) !== false;
             const elevations = floor.elevations.collision(coordinate) !== false;
             const wallElevations = floor.wallElevations.collision(coordinate) !== false;
             const stairsElevations = floor.stairsElevation.collision(coordinate) !== false;
 
-            const nextFlatSand = nextFloor.flatsSand.collision(nextCoordinate) !== false;
-            const nextElevations = nextFloor.elevations.collision(nextCoordinate) !== false;
-            const nextWallElevations = nextFloor.wallElevations.collision(nextCoordinate) !== false;
-            const nextStairsElevations = nextFloor.stairsElevation.collision(nextCoordinate) !== false;
+            const direction = (() => {
+                const value = new Direction_ENGINE("center", "center");
+                if (coordinate.x > lastCoordinate.x)
+                    value.setX("left");
+                else if (coordinate.x < lastCoordinate.x)
+                    value.setX("right");
 
-            if (flatSand === true) {
-                if (nextFlatSand === true)
-                    return true;
+                if (coordinate.y > lastCoordinate.y)
+                    value.setY("up");
+                else if (coordinate.y < lastCoordinate.y)
+                    value.setY("down");
 
-                if (nextElevations === true)
-                    return true;
+                return value;
+            })();
 
-                if (nextWallElevations === true)
-                    return true;
+            const nextCoordinate = new Coordinate_ENGINE(coordinate.x, coordinate.y);
+            let newCoordinate = new Coordinate_ENGINE(coordinate.x, coordinate.y);
 
-                if (nextStairsElevations === true)
-                    return false;
+            const collisionNextCoordinate = (): boolean => {
+                const nextFlatSand = nextFloor.flatsSand.collision(nextCoordinate) !== false;
+                const nextElevations = nextFloor.elevations.collision(nextCoordinate) !== false;
+                const nextWallElevations = nextFloor.wallElevations.collision(nextCoordinate) !== false;
+                const nextStairsElevations = nextFloor.stairsElevation.collision(nextCoordinate) !== false;
+
+                if (flatSand === true) {
+                    if (nextFlatSand === true)
+                        return true;
+
+                    if (nextElevations === true)
+                        return true;
+
+                    if (nextWallElevations === true)
+                        return true;
+
+                    if (nextStairsElevations === true)
+                        return false;
+                }
+
+                if (elevations === true) {
+                    if (nextFlatSand === true)
+                        return true;
+
+                    if (nextElevations === true)
+                        return true;
+
+                    if (nextWallElevations === true)
+                        return true;
+
+                    if (nextStairsElevations === true)
+                        return false;
+                }
+
+                if (wallElevations === true) {
+                    if (nextFlatSand === true)
+                        return true;
+
+                    if (nextElevations === true)
+                        return true;
+
+                    if (nextWallElevations === true)
+                        return true;
+
+                    if (nextStairsElevations === true)
+                        return false;
+                }
+
+                if (stairsElevations === true) {
+                    if (nextFlatSand === true)
+                        return false;
+
+                    if (nextElevations === true)
+                        return false;
+
+                    if (nextWallElevations === true)
+                        return false;
+
+                    if (nextStairsElevations === true)
+                        return false;
+                }
+                return true;
             }
 
-            if (elevations === true) {
-                if (nextFlatSand === true)
-                    return true;
+            const conditionInX = () => {
+                const directionX = direction.getX();
+                if (directionX === "left")
+                    return lastCoordinate.x < nextCoordinate.x;
 
-                if (nextElevations === true)
-                    return true;
+                else if (directionX === "right")
+                    return nextCoordinate.x < lastCoordinate.x;
 
-                if (nextWallElevations === true)
-                    return true;
+                return false;
+            };
 
-                if (nextStairsElevations === true)
-                    return false;
+            const conditionInY = () => {
+                const directionY = direction.getY();
+                if (directionY === "up")
+                    return lastCoordinate.y < nextCoordinate.y;
+
+                else if (directionY === "down") {
+                    return nextCoordinate.y < lastCoordinate.y;
+                }
+
+                return false;
+            };
+
+            while (
+                conditionInX() ||
+                conditionInY()
+            ) {
+                nextCoordinate.x += this.boxes.width * direction.getNumberX();
+                nextCoordinate.y += this.boxes.height * direction.getNumberY();
+                const collision = collisionNextCoordinate();
+                if (collision === true)
+                    return newCoordinate;
+
+                newCoordinate = new Coordinate_ENGINE(
+                    nextCoordinate.x,
+                    nextCoordinate.y
+                );
             }
 
-            if (wallElevations === true) {
-                if (nextFlatSand === true)
-                    return true;
-
-                if (nextElevations === true)
-                    return true;
-
-                if (nextWallElevations === true)
-                    return true;
-
-                if (nextStairsElevations === true)
-                    return false;
-            }
-
-            if (stairsElevations === true) {
-                if (nextFlatSand === true)
-                    return false;
-
-                if (nextElevations === true)
-                    return false;
-
-                if (nextWallElevations === true)
-                    return false;
-
-                if (nextStairsElevations === true)
-                    return false;
-            }
-            return false;
         }
-        return true;
+        throw new Error("no floors");
     }
 
     drawMap() {
@@ -154,4 +212,4 @@ export class Map_ENGINE extends Position_ENGINE {
             floor => floor.drawMap()
         );
     }
-}   
+}

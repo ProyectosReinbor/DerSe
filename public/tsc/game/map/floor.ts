@@ -14,7 +14,8 @@ import { StairsElevations_ENGINE } from "./stairsElevations";
 import { FlatElevations_ENGINE } from "./flatElevations";
 import { Trees_ENGINE } from "./trees";
 import { Coordinate_ENGINE } from "../../engine/coordinate";
-import { Direction_ENGINE } from "../../engine/character/direction";
+import { Direction_ENGINE, type XDirection_ENGINE, type YDirection_ENGINE } from "../../engine/character/direction";
+import { Box_ENGINE } from "../../engine/box";
 
 export class Floor_ENGINE {
 
@@ -142,75 +143,83 @@ export class Floor_ENGINE {
     collisionFloor(
         coordinate: Coordinate_ENGINE,
         lastCoordinate: Coordinate_ENGINE,
-    ): boolean {
-        if (coordinate.x === lastCoordinate.x && coordinate.y === lastCoordinate.y)
-            return false;
+    ): Coordinate_ENGINE {
+        if (
+            coordinate.x === lastCoordinate.x &&
+            coordinate.y === lastCoordinate.y
+        )
+            throw new Error("the initial and final coordinates are the same");
 
-        const flatSand = this.flatsSand.collision(coordinate) !== false;
-        const elevations = this.elevations.collision(coordinate) !== false;
-        const wallElevations = this.wallElevations.collision(coordinate) !== false;
-        const stairsElevations = this.stairsElevation.collision(coordinate) !== false;
+        const flatSandCollisionCoordinate = this.flatsSand.collision(coordinate) instanceof Box_ENGINE;
+        const elevationsCollisionCoordinate = this.elevations.collision(coordinate) instanceof Box_ENGINE;
+        const wallElevationsCollisionCoordinate = this.wallElevations.collision(coordinate) instanceof Box_ENGINE;
+        const stairsElevationsCollisionCoordinate = this.stairsElevation.collision(coordinate) instanceof Box_ENGINE;
 
-        let direction = new Direction_ENGINE("center", "center");
-        if (coordinate.x > lastCoordinate.x)
-            direction.setX("left");
-        else if (coordinate.x < lastCoordinate.x)
-            direction.setX("right");
+        const direction = (() => {
+            let horizontal: XDirection_ENGINE = "center";
+            if (coordinate.x > lastCoordinate.x)
+                horizontal = "left";
+            else if (coordinate.x < lastCoordinate.x)
+                horizontal = "right";
 
-        if (coordinate.y > lastCoordinate.y)
-            direction.setY("up");
-        else if (coordinate.y < lastCoordinate.y)
-            direction.setY("down");
-        let nextCoordinate = new Coordinate_ENGINE(coordinate.x, coordinate.y);
+            let vertical: YDirection_ENGINE = "center";
+            if (coordinate.y > lastCoordinate.y)
+                vertical = "up";
+            else if (coordinate.y < lastCoordinate.y)
+                vertical = "down";
 
-        const collisionNextCoordinate = (
-            nextCoordinate: Coordinate_ENGINE
-        ): boolean => {
-            const nextFlatSand = this.flatsSand.collision(nextCoordinate) !== false;
-            const nextElevations = this.elevations.collision(nextCoordinate) !== false;
-            const nextWallElevations = this.wallElevations.collision(nextCoordinate) !== false;
-            const nextStairsElevations = this.stairsElevation.collision(nextCoordinate) !== false;
+            return new Direction_ENGINE(horizontal, vertical);
+        })();
 
-            if (flatSand === true) {
-                if (nextFlatSand === true)
+        const nextCoordinate = new Coordinate_ENGINE(coordinate.x, coordinate.y);
+        const collisionCoordinate = new Coordinate_ENGINE(coordinate.x, coordinate.y);
+
+        const collisionNextCoordinate = (): boolean => {
+            const flatSandCollisionNextCoordinate = this.flatsSand.collision(nextCoordinate) instanceof Box_ENGINE;
+            const elevationsCollisionNextCoordinate = this.elevations.collision(nextCoordinate) instanceof Box_ENGINE;
+            const wallElevationsCollisionNextCoordinate = this.wallElevations.collision(nextCoordinate) instanceof Box_ENGINE;
+            const stairsElevationsCollisionNextCoordinate = this.stairsElevation.collision(nextCoordinate) instanceof Box_ENGINE;
+
+            if (flatSandCollisionCoordinate === true) {
+                if (flatSandCollisionNextCoordinate === true)
                     return false;
 
-                if (nextElevations === true)
+                if (elevationsCollisionNextCoordinate === true)
                     return true;
 
-                if (nextWallElevations === true)
+                if (wallElevationsCollisionNextCoordinate === true)
                     return true;
 
-                if (nextStairsElevations === true)
+                if (stairsElevationsCollisionNextCoordinate === true)
                     return false;
                 return true;
             }
 
-            if (elevations === true) {
-                if (nextElevations === true) {
+            if (elevationsCollisionCoordinate === true) {
+                if (elevationsCollisionNextCoordinate === true)
                     return false;
-                }
 
-                if (nextWallElevations === true)
+                if (wallElevationsCollisionNextCoordinate === true)
                     return true;
 
-                if (nextStairsElevations === true)
+                if (stairsElevationsCollisionNextCoordinate === true)
                     return false;
 
                 return true;
             }
-            if (wallElevations === true) {
-                return true;
-            }
-            else if (stairsElevations === true) {
 
-                if (nextElevations === true)
+            if (wallElevationsCollisionCoordinate === true)
+                return true;
+
+            else if (stairsElevationsCollisionCoordinate === true) {
+
+                if (elevationsCollisionNextCoordinate === true)
                     return false;
 
-                if (nextWallElevations === true)
+                if (wallElevationsCollisionNextCoordinate === true)
                     return true;
 
-                if (nextStairsElevations === true)
+                if (stairsElevationsCollisionNextCoordinate === true)
                     return false;
 
                 return true;
@@ -219,9 +228,42 @@ export class Floor_ENGINE {
             throw new Error("invalid coordinate collision");
         }
 
-        for (
+        const conditionInX = () => {
+            const directionX = direction.getX();
+            if (directionX === "left")
+                return lastCoordinate.x < nextCoordinate.x;
 
-        )
+            else if (directionX === "right")
+                return nextCoordinate.x < lastCoordinate.x;
+
+            return false;
+        };
+
+        const conditionInY = () => {
+            const directionY = direction.getY();
+            if (directionY === "up")
+                return lastCoordinate.y < nextCoordinate.y;
+
+            else if (directionY === "down")
+                return nextCoordinate.y < lastCoordinate.y;
+
+            return false;
+        };
+
+        while (
+            conditionInX() ||
+            conditionInY()
+        ) {
+            nextCoordinate.x += this.map.boxes.width * direction.getNumberX();
+            nextCoordinate.y += this.map.boxes.height * direction.getNumberY();
+            const collision = collisionNextCoordinate();
+            if (collision === true)
+                return collisionCoordinate;
+
+            collisionCoordinate.x = nextCoordinate.x;
+            collisionCoordinate.y = nextCoordinate.y;
+        }
+        throw new Error("no floor collision");
     }
 
     drawMap() {

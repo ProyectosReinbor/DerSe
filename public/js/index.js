@@ -1172,243 +1172,6 @@ class Trees_ENGINE extends AnimationBoxes_ENGINE {
   }
 }
 
-// public/tsc/game/map/floor.ts
-class Floor_ENGINE {
-  map;
-  canvas;
-  water;
-  foams;
-  flatsSand;
-  elevations;
-  flatsGrass;
-  shadows;
-  wallElevations;
-  stairsElevation;
-  flatElevations;
-  castles;
-  trees;
-  constructor(map, canvas) {
-    this.map = map;
-    this.canvas = canvas;
-    this.water = new Water_ENGINE(this.map, this.canvas);
-    this.foams = new Foams_ENGINE(this.map, this.canvas);
-    this.flatsSand = new FlatsSand_ENGINE(this.map, this.canvas);
-    this.elevations = new Elevations_ENGINE(this.map, this.canvas);
-    this.flatsGrass = new FlatsGrass_ENGINE(this.map, this.canvas);
-    this.shadows = new Shadows_ENGINE(this.map, this.canvas);
-    this.wallElevations = new WallElevations_ENGINE(this.map, this.canvas);
-    this.stairsElevation = new StairsElevations_ENGINE(this.map, this.canvas);
-    this.flatElevations = new FlatElevations_ENGINE(this.map, this.canvas);
-    this.castles = new Castles_ENGINE(this.map, this.canvas);
-    this.trees = new Trees_ENGINE(this.map, this.canvas);
-  }
-  pushFloor(matrix) {
-    matrix.forEach((row, vertical) => {
-      row.forEach((box2, horizontal) => {
-        const boxIndices = new Plane_ENGINE(horizontal, vertical);
-        if (box2.water === true)
-          this.water.pushWater(boxIndices);
-        if (box2.foam !== false) {
-          this.foams.pushFoam(boxIndices);
-          if (box2.foam.flatSand === true)
-            this.flatsSand.pushFlatSand(boxIndices);
-        }
-        if (box2.elevation !== false) {
-          if (box2.elevation.shadow === true)
-            this.shadows.pushShadow(boxIndices);
-          if (box2.elevation.flatGrass === true)
-            this.flatsGrass.pushFlatGrass(boxIndices);
-          this.elevations.pushElevation(boxIndices);
-        }
-        if (box2.wallElevation !== false) {
-          if (box2.wallElevation.shadow === true)
-            this.shadows.pushShadow(boxIndices);
-          this.wallElevations.pushWallElevation(boxIndices);
-          if (box2.wallElevation.flatElevation !== false)
-            this.flatElevations.pushFlatElevation(boxIndices, box2.wallElevation.flatElevation);
-        }
-        if (box2.stairElevation !== false) {
-          if (box2.stairElevation.shadow === true)
-            this.shadows.pushShadow(boxIndices);
-          this.stairsElevation.setStairsElevations(boxIndices);
-          if (box2.stairElevation.flatElevation !== false)
-            this.flatElevations.pushFlatElevation(boxIndices, box2.stairElevation.flatElevation);
-        }
-        if (box2.castle !== false) {
-          this.castles.castlePush(boxIndices, box2.castle.state, box2.castle.color);
-        }
-        if (box2.trees !== false) {
-          this.trees.pushTree(boxIndices, box2.trees.animation);
-        }
-      });
-    });
-  }
-  aboveFloor(coordinate6) {
-    const flatSand = this.flatsSand.collision(coordinate6) !== false;
-    const elevations2 = this.elevations.collision(coordinate6) !== false;
-    const stairsElevations2 = this.stairsElevation.collision(coordinate6) !== false;
-    if (flatSand === true)
-      return true;
-    if (elevations2 === true)
-      return true;
-    if (stairsElevations2 === true)
-      return true;
-    return false;
-  }
-  collisionFloor(coordinate6, nextCoordinate) {
-    const flatSand = this.flatsSand.collision(coordinate6) !== false;
-    const elevations2 = this.elevations.collision(coordinate6) !== false;
-    const wallElevations2 = this.wallElevations.collision(coordinate6) !== false;
-    const stairsElevations2 = this.stairsElevation.collision(coordinate6) !== false;
-    const nextFlatSand = this.flatsSand.collision(nextCoordinate) !== false;
-    const nextElevations = this.elevations.collision(nextCoordinate) !== false;
-    const nextWallElevations = this.wallElevations.collision(nextCoordinate) !== false;
-    const nextStairsElevations = this.stairsElevation.collision(nextCoordinate) !== false;
-    if (flatSand === true) {
-      if (nextFlatSand === true)
-        return false;
-      if (nextElevations === true)
-        return true;
-      if (nextWallElevations === true)
-        return true;
-      if (nextStairsElevations === true)
-        return false;
-      return true;
-    }
-    if (elevations2 === true) {
-      if (nextElevations === true) {
-        return false;
-      }
-      if (nextWallElevations === true)
-        return true;
-      if (nextStairsElevations === true)
-        return false;
-      return true;
-    }
-    if (wallElevations2 === true) {
-      return true;
-    } else if (stairsElevations2 === true) {
-      if (nextElevations === true)
-        return false;
-      if (nextWallElevations === true)
-        return true;
-      if (nextStairsElevations === true)
-        return false;
-      return true;
-    }
-    return true;
-  }
-  drawMap() {
-    this.water.drawWater();
-    this.foams.drawFoams();
-    this.flatsSand.drawFlatsSand();
-    this.shadows.drawShadows();
-    this.elevations.drawElevations();
-    this.wallElevations.drawWallElevations();
-    this.flatsGrass.drawFlatsGrass();
-    this.stairsElevation.drawStairsElevations();
-    this.flatElevations.drawFlatElevations();
-    this.castles.drawCastles();
-    this.trees.drawTrees();
-  }
-}
-
-// public/tsc/game/map.ts
-class Map_ENGINE extends Position_ENGINE {
-  matrix = MapMatrix_ENGINE.get();
-  floors;
-  boxes;
-  canvas;
-  constructor(canvas) {
-    super(new Coordinate_ENGINE(0, 0), new Size_ENGINE(100, 100));
-    this.canvas = canvas;
-    this.boxes = new Size_ENGINE(0, this.size.height / MapMatrix_ENGINE.length.vertical);
-    this.boxes.width = this.canvas.widthInPercentageHeight(this.boxes.height);
-    this.floors = this.matrix.map((matrix) => {
-      const floor2 = new Floor_ENGINE(this, this.canvas);
-      floor2.pushFloor(matrix);
-      return floor2;
-    });
-  }
-  indexFloorOn(coordinate7) {
-    for (let floorIndex = this.floors.length - 1;floorIndex >= 0; floorIndex--) {
-      const floor2 = this.floors[floorIndex];
-      if (floor2 === undefined)
-        continue;
-      if (floor2.aboveFloor(coordinate7) === false)
-        continue;
-    }
-  }
-  collisionMap(character, moved) {
-    for (let floorIndex = this.floors.length - 1;floorIndex >= 0; floorIndex--) {
-      const floor2 = this.floors[floorIndex];
-      if (floor2 === undefined)
-        continue;
-      if (floor2.aboveFloor(character) === false)
-        continue;
-      if (floor2.collisionFloor(character, moved) === true)
-        return true;
-      const nextFloorIndex = floorIndex + 1;
-      const nextFloor = this.floors[nextFloorIndex];
-      if (nextFloor === undefined)
-        return false;
-      const flatSand = floor2.flatsSand.collision(character) !== false;
-      const elevations2 = floor2.elevations.collision(character) !== false;
-      const wallElevations2 = floor2.wallElevations.collision(character) !== false;
-      const stairsElevations2 = floor2.stairsElevation.collision(character) !== false;
-      const nextFlatSand = nextFloor.flatsSand.collision(moved) !== false;
-      const nextElevations = nextFloor.elevations.collision(moved) !== false;
-      const nextWallElevations = nextFloor.wallElevations.collision(moved) !== false;
-      const nextStairsElevations = nextFloor.stairsElevation.collision(moved) !== false;
-      if (flatSand === true) {
-        if (nextFlatSand === true)
-          return true;
-        if (nextElevations === true)
-          return true;
-        if (nextWallElevations === true)
-          return true;
-        if (nextStairsElevations === true)
-          return false;
-      }
-      if (elevations2 === true) {
-        if (nextFlatSand === true)
-          return true;
-        if (nextElevations === true)
-          return true;
-        if (nextWallElevations === true)
-          return true;
-        if (nextStairsElevations === true)
-          return false;
-      }
-      if (wallElevations2 === true) {
-        if (nextFlatSand === true)
-          return true;
-        if (nextElevations === true)
-          return true;
-        if (nextWallElevations === true)
-          return true;
-        if (nextStairsElevations === true)
-          return false;
-      }
-      if (stairsElevations2 === true) {
-        if (nextFlatSand === true)
-          return false;
-        if (nextElevations === true)
-          return false;
-        if (nextWallElevations === true)
-          return false;
-        if (nextStairsElevations === true)
-          return false;
-      }
-      return false;
-    }
-    return true;
-  }
-  drawMap() {
-    this.floors.forEach((floor2) => floor2.drawMap());
-  }
-}
-
 // public/tsc/engine/character/direction.ts
 class Direction_ENGINE {
   x;
@@ -1447,8 +1210,334 @@ class Direction_ENGINE {
   setY(y) {
     this.y = y;
   }
-  isEqualTo(direction) {
-    return this.x === direction.x && this.y === direction.y;
+  isEqualTo(directionX, directionY) {
+    return this.x === directionX && this.y === directionY;
+  }
+}
+
+// public/tsc/game/map/floor.ts
+class Floor_ENGINE {
+  map;
+  canvas;
+  water;
+  foams;
+  flatsSand;
+  elevations;
+  flatsGrass;
+  shadows;
+  wallElevations;
+  stairsElevation;
+  flatElevations;
+  castles;
+  trees;
+  constructor(map, canvas) {
+    this.map = map;
+    this.canvas = canvas;
+    this.water = new Water_ENGINE(this.map, this.canvas);
+    this.foams = new Foams_ENGINE(this.map, this.canvas);
+    this.flatsSand = new FlatsSand_ENGINE(this.map, this.canvas);
+    this.elevations = new Elevations_ENGINE(this.map, this.canvas);
+    this.flatsGrass = new FlatsGrass_ENGINE(this.map, this.canvas);
+    this.shadows = new Shadows_ENGINE(this.map, this.canvas);
+    this.wallElevations = new WallElevations_ENGINE(this.map, this.canvas);
+    this.stairsElevation = new StairsElevations_ENGINE(this.map, this.canvas);
+    this.flatElevations = new FlatElevations_ENGINE(this.map, this.canvas);
+    this.castles = new Castles_ENGINE(this.map, this.canvas);
+    this.trees = new Trees_ENGINE(this.map, this.canvas);
+  }
+  pushFloor(matrix) {
+    matrix.forEach((row, vertical) => {
+      row.forEach((box3, horizontal) => {
+        const boxIndices = new Plane_ENGINE(horizontal, vertical);
+        if (box3.water === true)
+          this.water.pushWater(boxIndices);
+        if (box3.foam !== false) {
+          this.foams.pushFoam(boxIndices);
+          if (box3.foam.flatSand === true)
+            this.flatsSand.pushFlatSand(boxIndices);
+        }
+        if (box3.elevation !== false) {
+          if (box3.elevation.shadow === true)
+            this.shadows.pushShadow(boxIndices);
+          if (box3.elevation.flatGrass === true)
+            this.flatsGrass.pushFlatGrass(boxIndices);
+          this.elevations.pushElevation(boxIndices);
+        }
+        if (box3.wallElevation !== false) {
+          if (box3.wallElevation.shadow === true)
+            this.shadows.pushShadow(boxIndices);
+          this.wallElevations.pushWallElevation(boxIndices);
+          if (box3.wallElevation.flatElevation !== false)
+            this.flatElevations.pushFlatElevation(boxIndices, box3.wallElevation.flatElevation);
+        }
+        if (box3.stairElevation !== false) {
+          if (box3.stairElevation.shadow === true)
+            this.shadows.pushShadow(boxIndices);
+          this.stairsElevation.setStairsElevations(boxIndices);
+          if (box3.stairElevation.flatElevation !== false)
+            this.flatElevations.pushFlatElevation(boxIndices, box3.stairElevation.flatElevation);
+        }
+        if (box3.castle !== false) {
+          this.castles.castlePush(boxIndices, box3.castle.state, box3.castle.color);
+        }
+        if (box3.trees !== false) {
+          this.trees.pushTree(boxIndices, box3.trees.animation);
+        }
+      });
+    });
+  }
+  aboveFloor(coordinate7) {
+    const flatSand = this.flatsSand.collision(coordinate7) !== false;
+    const elevations2 = this.elevations.collision(coordinate7) !== false;
+    const stairsElevations2 = this.stairsElevation.collision(coordinate7) !== false;
+    if (flatSand === true)
+      return true;
+    if (elevations2 === true)
+      return true;
+    if (stairsElevations2 === true)
+      return true;
+    return false;
+  }
+  collisionFloor(coordinate7, lastCoordinate) {
+    if (coordinate7.x === lastCoordinate.x && coordinate7.y === lastCoordinate.y)
+      return false;
+    const flatSand = this.flatsSand.collision(coordinate7) instanceof Box_ENGINE;
+    const elevations2 = this.elevations.collision(coordinate7) instanceof Box_ENGINE;
+    const wallElevations2 = this.wallElevations.collision(coordinate7) instanceof Box_ENGINE;
+    const stairsElevations2 = this.stairsElevation.collision(coordinate7) instanceof Box_ENGINE;
+    const direction2 = (() => {
+      const value = new Direction_ENGINE("center", "center");
+      if (coordinate7.x > lastCoordinate.x)
+        value.setX("left");
+      else if (coordinate7.x < lastCoordinate.x)
+        value.setX("right");
+      if (coordinate7.y > lastCoordinate.y)
+        value.setY("up");
+      else if (coordinate7.y < lastCoordinate.y)
+        value.setY("down");
+      return value;
+    })();
+    const nextCoordinate = new Coordinate_ENGINE(coordinate7.x, coordinate7.y);
+    let newCoordinate = new Coordinate_ENGINE(coordinate7.x, coordinate7.y);
+    const collisionNextCoordinate = () => {
+      console.log("nextCoordinate while", nextCoordinate);
+      console.log("newCoodinate while", newCoordinate);
+      const nextFlatSand = this.flatsSand.collision(nextCoordinate) !== false;
+      const nextElevations = this.elevations.collision(nextCoordinate) !== false;
+      const nextWallElevations = this.wallElevations.collision(nextCoordinate) !== false;
+      const nextStairsElevations = this.stairsElevation.collision(nextCoordinate) !== false;
+      if (flatSand === true) {
+        if (nextFlatSand === true)
+          return false;
+        if (nextElevations === true)
+          return true;
+        if (nextWallElevations === true)
+          return true;
+        if (nextStairsElevations === true)
+          return false;
+        return true;
+      }
+      if (elevations2 === true) {
+        if (nextElevations === true) {
+          return false;
+        }
+        if (nextWallElevations === true)
+          return true;
+        if (nextStairsElevations === true)
+          return false;
+        return true;
+      }
+      if (wallElevations2 === true) {
+        return true;
+      } else if (stairsElevations2 === true) {
+        if (nextElevations === true)
+          return false;
+        if (nextWallElevations === true)
+          return true;
+        if (nextStairsElevations === true)
+          return false;
+        return true;
+      }
+      throw new Error("invalid coordinate collision");
+    };
+    const conditionInX = () => {
+      const directionX = direction2.getX();
+      if (directionX === "left")
+        return lastCoordinate.x < nextCoordinate.x;
+      else if (directionX === "right")
+        return nextCoordinate.x < lastCoordinate.x;
+      return false;
+    };
+    const conditionInY = () => {
+      const directionY = direction2.getY();
+      if (directionY === "up")
+        return lastCoordinate.y < nextCoordinate.y;
+      else if (directionY === "down")
+        return nextCoordinate.y < lastCoordinate.y;
+      return false;
+    };
+    while (conditionInX() || conditionInY()) {
+      nextCoordinate.x += this.map.boxes.width * direction2.getNumberX();
+      nextCoordinate.y += this.map.boxes.height * direction2.getNumberY();
+      const collision = collisionNextCoordinate();
+      if (collision === true)
+        return newCoordinate;
+      newCoordinate = new Coordinate_ENGINE(nextCoordinate.x, nextCoordinate.y);
+    }
+    return false;
+  }
+  drawMap() {
+    this.water.drawWater();
+    this.foams.drawFoams();
+    this.flatsSand.drawFlatsSand();
+    this.shadows.drawShadows();
+    this.elevations.drawElevations();
+    this.wallElevations.drawWallElevations();
+    this.flatsGrass.drawFlatsGrass();
+    this.stairsElevation.drawStairsElevations();
+    this.flatElevations.drawFlatElevations();
+    this.castles.drawCastles();
+    this.trees.drawTrees();
+  }
+}
+
+// public/tsc/game/map.ts
+class Map_ENGINE extends Position_ENGINE {
+  matrix = MapMatrix_ENGINE.get();
+  floors;
+  boxes;
+  canvas;
+  constructor(canvas) {
+    super(new Coordinate_ENGINE(0, 0), new Size_ENGINE(100, 100));
+    this.canvas = canvas;
+    this.boxes = new Size_ENGINE(0, this.size.height / MapMatrix_ENGINE.length.vertical);
+    this.boxes.width = this.canvas.widthInPercentageHeight(this.boxes.height);
+    this.floors = this.matrix.map((matrix) => {
+      const floor2 = new Floor_ENGINE(this, this.canvas);
+      floor2.pushFloor(matrix);
+      return floor2;
+    });
+  }
+  indexFloorOn(coordinate8) {
+    for (let floorIndex = this.floors.length - 1;floorIndex >= 0; floorIndex--) {
+      const floor2 = this.floors[floorIndex];
+      if (floor2 === undefined)
+        continue;
+      if (floor2.aboveFloor(coordinate8) === false)
+        continue;
+    }
+  }
+  collisionMap(coordinate8, lastCoordinate) {
+    console.log(coordinate8, lastCoordinate);
+    for (let floorIndex = this.floors.length - 1;floorIndex >= 0; floorIndex--) {
+      const floor2 = this.floors[floorIndex];
+      if (floor2 === undefined)
+        continue;
+      if (floor2.aboveFloor(coordinate8) === false)
+        continue;
+      const collisionFloor = floor2.collisionFloor(coordinate8, lastCoordinate);
+      if (collisionFloor !== false)
+        return collisionFloor;
+      const nextFloorIndex = floorIndex + 1;
+      const nextFloor = this.floors[nextFloorIndex];
+      if (nextFloor === undefined)
+        return coordinate8;
+      const flatSand = floor2.flatsSand.collision(coordinate8) !== false;
+      const elevations2 = floor2.elevations.collision(coordinate8) !== false;
+      const wallElevations2 = floor2.wallElevations.collision(coordinate8) !== false;
+      const stairsElevations2 = floor2.stairsElevation.collision(coordinate8) !== false;
+      const direction3 = (() => {
+        const value = new Direction_ENGINE("center", "center");
+        if (coordinate8.x > lastCoordinate.x)
+          value.setX("left");
+        else if (coordinate8.x < lastCoordinate.x)
+          value.setX("right");
+        if (coordinate8.y > lastCoordinate.y)
+          value.setY("up");
+        else if (coordinate8.y < lastCoordinate.y)
+          value.setY("down");
+        return value;
+      })();
+      const nextCoordinate = new Coordinate_ENGINE(coordinate8.x, coordinate8.y);
+      let newCoordinate = new Coordinate_ENGINE(coordinate8.x, coordinate8.y);
+      const collisionNextCoordinate = () => {
+        const nextFlatSand = nextFloor.flatsSand.collision(nextCoordinate) !== false;
+        const nextElevations = nextFloor.elevations.collision(nextCoordinate) !== false;
+        const nextWallElevations = nextFloor.wallElevations.collision(nextCoordinate) !== false;
+        const nextStairsElevations = nextFloor.stairsElevation.collision(nextCoordinate) !== false;
+        if (flatSand === true) {
+          if (nextFlatSand === true)
+            return true;
+          if (nextElevations === true)
+            return true;
+          if (nextWallElevations === true)
+            return true;
+          if (nextStairsElevations === true)
+            return false;
+        }
+        if (elevations2 === true) {
+          if (nextFlatSand === true)
+            return true;
+          if (nextElevations === true)
+            return true;
+          if (nextWallElevations === true)
+            return true;
+          if (nextStairsElevations === true)
+            return false;
+        }
+        if (wallElevations2 === true) {
+          if (nextFlatSand === true)
+            return true;
+          if (nextElevations === true)
+            return true;
+          if (nextWallElevations === true)
+            return true;
+          if (nextStairsElevations === true)
+            return false;
+        }
+        if (stairsElevations2 === true) {
+          if (nextFlatSand === true)
+            return false;
+          if (nextElevations === true)
+            return false;
+          if (nextWallElevations === true)
+            return false;
+          if (nextStairsElevations === true)
+            return false;
+        }
+        return true;
+      };
+      const conditionInX = () => {
+        const directionX = direction3.getX();
+        if (directionX === "left")
+          return lastCoordinate.x < nextCoordinate.x;
+        else if (directionX === "right")
+          return nextCoordinate.x < lastCoordinate.x;
+        return false;
+      };
+      const conditionInY = () => {
+        const directionY = direction3.getY();
+        if (directionY === "up")
+          return lastCoordinate.y < nextCoordinate.y;
+        else if (directionY === "down") {
+          return nextCoordinate.y < lastCoordinate.y;
+        }
+        return false;
+      };
+      while (conditionInX() || conditionInY()) {
+        nextCoordinate.x += this.boxes.width * direction3.getNumberX();
+        nextCoordinate.y += this.boxes.height * direction3.getNumberY();
+        const collision = collisionNextCoordinate();
+        if (collision === true)
+          return newCoordinate;
+        newCoordinate = new Coordinate_ENGINE(nextCoordinate.x, nextCoordinate.y);
+      }
+      return false;
+    }
+    throw new Error("no floors");
+  }
+  drawMap() {
+    this.floors.forEach((floor2) => floor2.drawMap());
   }
 }
 
@@ -1490,16 +1579,16 @@ class Character_ENGINE extends Square_ENGINE {
   animations;
   speed;
   direction;
-  constructor(leftUp, size17, canvas, fillStyle, strokeStyle, lineWidth, scale, animations3, speed, direction2) {
+  constructor(leftUp, size17, canvas, fillStyle, strokeStyle, lineWidth, scale, animations3, speed, direction3) {
     super(leftUp, size17, canvas, fillStyle, strokeStyle, lineWidth);
     this.scale = scale;
     this.canvas = canvas;
     this.animations = new Animations_ENGINE(new Coordinate_ENGINE(0, 0), new Size_ENGINE(0, 0), canvas, animations3.route, animations3.element, animations3.animation);
     this.speed = speed;
-    this.direction = direction2;
+    this.direction = direction3;
   }
   movedCharacter() {
-    if (this.direction.isEqualTo(new Direction_ENGINE("center", "center")))
+    if (this.direction.isEqualTo("center", "center"))
       return false;
     const secondsBetweenFrames = this.canvas.timeBetweenFrames / 1000;
     const speedX = this.speed.x * secondsBetweenFrames;
@@ -1508,11 +1597,7 @@ class Character_ENGINE extends Square_ENGINE {
     const distanceY = speedY * this.direction.getNumberY();
     const newX = this.leftUp.x + distanceX;
     const newY = this.leftUp.y + distanceY;
-    return new Character_ENGINE(new Coordinate_ENGINE(newX, newY), new Size_ENGINE(this.size.width, this.size.height), this.canvas, this.fillStyle, this.strokeStyle, this.lineWidth, this.scale, {
-      route: this.animations.route,
-      element: this.animations.element,
-      animation: this.animations.animation
-    }, this.speed, this.direction);
+    return new Coordinate_ENGINE(newX, newY);
   }
   drawCharacter() {
     this.drawSquare();
@@ -1676,7 +1761,7 @@ class Sheep_ENGINE extends Character_ENGINE {
       route: "images/resources/sheep/left.png",
       element: new Element_ENGINE(new Size_ENGINE(128, 128), new Plane_ENGINE(0, 0)),
       animation: new Animation_ENGINE(8, 8)
-    }, new Coordinate_ENGINE(100, 100), new Direction_ENGINE("center", "down"));
+    }, new Coordinate_ENGINE(1000, 1000), new Direction_ENGINE("center", "down"));
     this.map = map;
     this.state = "move";
     this.lineSight = new Line_ENGINE(new Coordinate_ENGINE(0, 0), new Coordinate_ENGINE(0, 0), this.canvas, false, "#333", 2);
@@ -1705,9 +1790,11 @@ class Sheep_ENGINE extends Character_ENGINE {
     this.lineSightPosition();
     const moved = this.movedCharacter();
     if (moved === false)
-      return false;
-    const lineSightCollision = this.map.collisionMap(this.leftUp, this.lineSight.rightDown());
-    if (lineSightCollision === true) {
+      return;
+    const lineSightCollisionMap = this.map.collisionMap(this.leftUp, this.lineSight.rightDown());
+    if (lineSightCollisionMap !== false) {
+      this.leftUp.x = lineSightCollisionMap.x;
+      this.leftUp.y = lineSightCollisionMap.y;
       const random1 = Math.round(Math.random());
       const random2 = Math.round(Math.random());
       this.direction.setX(random1 === 0 ? "left" : "right");
@@ -1717,11 +1804,11 @@ class Sheep_ENGINE extends Character_ENGINE {
         this.direction.setY("center");
       else if (random3 === 1)
         this.direction.setX("center");
-      return false;
+      return;
     }
-    this.leftUp.x = moved.leftUp.x;
-    this.leftUp.y = moved.leftUp.y;
-    return true;
+    console.log("MOVED", moved);
+    this.leftUp.x = moved.x;
+    this.leftUp.y = moved.y;
   }
   jumpSheep() {
     if (this.state !== "jump")
