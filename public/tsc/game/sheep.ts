@@ -122,12 +122,6 @@ export class Sheep_ENGINE extends Character_ENGINE {
             this.lineSight.rightDown(),
         );
 
-        if (
-            lineSightCollisionMap.x === this.leftUp.x ||
-
-        ) {
-
-        }
         this.leftUp.x = lineSightCollisionMap.x;
         this.leftUp.y = lineSightCollisionMap.y;
 

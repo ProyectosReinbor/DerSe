@@ -57,7 +57,7 @@ export class Map_ENGINE extends Position_ENGINE {
         coordinate: Coordinate_ENGINE,
         lastCoordinate: Coordinate_ENGINE,
     ):
-        Coordinate_ENGINE | "" {
+        Coordinate_ENGINE {
         for (
             let floorIndex = this.floors.length - 1;
             floorIndex >= 0;
