@@ -533,17 +533,17 @@ class Boxes_ENGINE extends Coordinate_ENGINE {
   collision(coordinate6) {
     const position7 = new Position_ENGINE(coordinate6, new Size_ENGINE(this.size.width, this.size.height));
     const boxIndicesLeftUp = (() => {
-      const coordinate7 = new Coordinate_ENGINE(position7.leftUp.x - this.size.width, position7.leftUp.y - this.size.height);
+      const coordinate7 = new Coordinate_ENGINE(position7.leftUp.x, position7.leftUp.y);
       return this.getBoxIndices(coordinate7);
     })();
     const boxIndicesRightDown = (() => {
       const positionRightDown = position7.rightDown();
-      const coordinate7 = new Coordinate_ENGINE(positionRightDown.x + this.size.width, positionRightDown.y + this.size.height);
+      const coordinate7 = new Coordinate_ENGINE(positionRightDown.x, positionRightDown.y);
       return this.getBoxIndices(coordinate7);
     })();
-    const boxIndices = new Plane_ENGINE(0, 0);
-    for (boxIndices.vertical = boxIndicesLeftUp.vertical;boxIndices.vertical <= boxIndicesRightDown.vertical; boxIndices.vertical++) {
-      for (boxIndices.horizontal = boxIndicesLeftUp.horizontal;boxIndices.horizontal <= boxIndicesRightDown.horizontal; boxIndices.horizontal++) {
+    const boxIndices = new Plane_ENGINE(boxIndicesLeftUp.vertical, boxIndicesLeftUp.horizontal);
+    for (;boxIndices.vertical <= boxIndicesRightDown.vertical; boxIndices.vertical++) {
+      for (;boxIndices.horizontal <= boxIndicesRightDown.horizontal; boxIndices.horizontal++) {
         const box2 = this.getBox(boxIndices);
         if (box2 === undefined)
           continue;
@@ -1300,61 +1300,59 @@ class Floor_ENGINE {
   }
   collisionFloor(coordinate7, lastCoordinate) {
     if (coordinate7.x === lastCoordinate.x && coordinate7.y === lastCoordinate.y)
-      return false;
-    const flatSand = this.flatsSand.collision(coordinate7) instanceof Box_ENGINE;
-    const elevations2 = this.elevations.collision(coordinate7) instanceof Box_ENGINE;
-    const wallElevations2 = this.wallElevations.collision(coordinate7) instanceof Box_ENGINE;
-    const stairsElevations2 = this.stairsElevation.collision(coordinate7) instanceof Box_ENGINE;
+      throw new Error("the initial and final coordinates are the same");
+    const flatSandCollisionCoordinate = this.flatsSand.collision(coordinate7) instanceof Box_ENGINE;
+    const elevationsCollisionCoordinate = this.elevations.collision(coordinate7) instanceof Box_ENGINE;
+    const wallElevationsCollisionCoordinate = this.wallElevations.collision(coordinate7) instanceof Box_ENGINE;
+    const stairsElevationsCollisionCoordinate = this.stairsElevation.collision(coordinate7) instanceof Box_ENGINE;
     const direction2 = (() => {
-      const value = new Direction_ENGINE("center", "center");
+      let horizontal = "center";
       if (coordinate7.x > lastCoordinate.x)
-        value.setX("left");
+        horizontal = "left";
       else if (coordinate7.x < lastCoordinate.x)
-        value.setX("right");
+        horizontal = "right";
+      let vertical = "center";
       if (coordinate7.y > lastCoordinate.y)
-        value.setY("up");
+        vertical = "up";
       else if (coordinate7.y < lastCoordinate.y)
-        value.setY("down");
-      return value;
+        vertical = "down";
+      return new Direction_ENGINE(horizontal, vertical);
     })();
     const nextCoordinate = new Coordinate_ENGINE(coordinate7.x, coordinate7.y);
-    let newCoordinate = new Coordinate_ENGINE(coordinate7.x, coordinate7.y);
+    const collisionCoordinate = new Coordinate_ENGINE(coordinate7.x, coordinate7.y);
     const collisionNextCoordinate = () => {
-      console.log("nextCoordinate while", nextCoordinate);
-      console.log("newCoodinate while", newCoordinate);
-      const nextFlatSand = this.flatsSand.collision(nextCoordinate) !== false;
-      const nextElevations = this.elevations.collision(nextCoordinate) !== false;
-      const nextWallElevations = this.wallElevations.collision(nextCoordinate) !== false;
-      const nextStairsElevations = this.stairsElevation.collision(nextCoordinate) !== false;
-      if (flatSand === true) {
-        if (nextFlatSand === true)
+      const flatSandCollisionNextCoordinate = this.flatsSand.collision(nextCoordinate) instanceof Box_ENGINE;
+      const elevationsCollisionNextCoordinate = this.elevations.collision(nextCoordinate) instanceof Box_ENGINE;
+      const wallElevationsCollisionNextCoordinate = this.wallElevations.collision(nextCoordinate) instanceof Box_ENGINE;
+      const stairsElevationsCollisionNextCoordinate = this.stairsElevation.collision(nextCoordinate) instanceof Box_ENGINE;
+      if (flatSandCollisionCoordinate === true) {
+        if (flatSandCollisionNextCoordinate === true)
           return false;
-        if (nextElevations === true)
+        if (elevationsCollisionNextCoordinate === true)
           return true;
-        if (nextWallElevations === true)
+        if (wallElevationsCollisionNextCoordinate === true)
           return true;
-        if (nextStairsElevations === true)
+        if (stairsElevationsCollisionNextCoordinate === true)
           return false;
         return true;
       }
-      if (elevations2 === true) {
-        if (nextElevations === true) {
+      if (elevationsCollisionCoordinate === true) {
+        if (elevationsCollisionNextCoordinate === true)
           return false;
-        }
-        if (nextWallElevations === true)
+        if (wallElevationsCollisionNextCoordinate === true)
           return true;
-        if (nextStairsElevations === true)
+        if (stairsElevationsCollisionNextCoordinate === true)
           return false;
         return true;
       }
-      if (wallElevations2 === true) {
+      if (wallElevationsCollisionCoordinate === true)
         return true;
-      } else if (stairsElevations2 === true) {
-        if (nextElevations === true)
+      else if (stairsElevationsCollisionCoordinate === true) {
+        if (elevationsCollisionNextCoordinate === true)
           return false;
-        if (nextWallElevations === true)
+        if (wallElevationsCollisionNextCoordinate === true)
           return true;
-        if (nextStairsElevations === true)
+        if (stairsElevationsCollisionNextCoordinate === true)
           return false;
         return true;
       }
@@ -1381,10 +1379,11 @@ class Floor_ENGINE {
       nextCoordinate.y += this.map.boxes.height * direction2.getNumberY();
       const collision = collisionNextCoordinate();
       if (collision === true)
-        return newCoordinate;
-      newCoordinate = new Coordinate_ENGINE(nextCoordinate.x, nextCoordinate.y);
+        return collisionCoordinate;
+      collisionCoordinate.x = nextCoordinate.x;
+      collisionCoordinate.y = nextCoordinate.y;
     }
-    return false;
+    throw new Error("no floor collision");
   }
   drawMap() {
     this.water.drawWater();
@@ -1428,7 +1427,6 @@ class Map_ENGINE extends Position_ENGINE {
     }
   }
   collisionMap(coordinate8, lastCoordinate) {
-    console.log(coordinate8, lastCoordinate);
     for (let floorIndex = this.floors.length - 1;floorIndex >= 0; floorIndex--) {
       const floor2 = this.floors[floorIndex];
       if (floor2 === undefined)
@@ -1436,12 +1434,10 @@ class Map_ENGINE extends Position_ENGINE {
       if (floor2.aboveFloor(coordinate8) === false)
         continue;
       const collisionFloor = floor2.collisionFloor(coordinate8, lastCoordinate);
-      if (collisionFloor !== false)
-        return collisionFloor;
       const nextFloorIndex = floorIndex + 1;
       const nextFloor = this.floors[nextFloorIndex];
       if (nextFloor === undefined)
-        return coordinate8;
+        return collisionFloor;
       const flatSand = floor2.flatsSand.collision(coordinate8) !== false;
       const elevations2 = floor2.elevations.collision(coordinate8) !== false;
       const wallElevations2 = floor2.wallElevations.collision(coordinate8) !== false;
@@ -1532,7 +1528,6 @@ class Map_ENGINE extends Position_ENGINE {
           return newCoordinate;
         newCoordinate = new Coordinate_ENGINE(nextCoordinate.x, nextCoordinate.y);
       }
-      return false;
     }
     throw new Error("no floors");
   }
@@ -1792,23 +1787,17 @@ class Sheep_ENGINE extends Character_ENGINE {
     if (moved === false)
       return;
     const lineSightCollisionMap = this.map.collisionMap(this.leftUp, this.lineSight.rightDown());
-    if (lineSightCollisionMap !== false) {
-      this.leftUp.x = lineSightCollisionMap.x;
-      this.leftUp.y = lineSightCollisionMap.y;
-      const random1 = Math.round(Math.random());
-      const random2 = Math.round(Math.random());
-      this.direction.setX(random1 === 0 ? "left" : "right");
-      this.direction.setY(random2 === 0 ? "up" : "down");
-      const random3 = Math.round(Math.random() * 2);
-      if (random3 === 0)
-        this.direction.setY("center");
-      else if (random3 === 1)
-        this.direction.setX("center");
-      return;
-    }
-    console.log("MOVED", moved);
-    this.leftUp.x = moved.x;
-    this.leftUp.y = moved.y;
+    this.leftUp.x = lineSightCollisionMap.x;
+    this.leftUp.y = lineSightCollisionMap.y;
+    const random1 = Math.round(Math.random());
+    const random2 = Math.round(Math.random());
+    this.direction.setX(random1 === 0 ? "left" : "right");
+    this.direction.setY(random2 === 0 ? "up" : "down");
+    const random3 = Math.round(Math.random() * 2);
+    if (random3 === 0)
+      this.direction.setY("center");
+    else if (random3 === 1)
+      this.direction.setX("center");
   }
   jumpSheep() {
     if (this.state !== "jump")
