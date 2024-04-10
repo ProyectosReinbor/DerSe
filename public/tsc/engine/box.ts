@@ -4,7 +4,7 @@ import type { Size_ENGINE } from "./size";
 
 export class Box_ENGINE extends Position_ENGINE {
 
-    referenceIndex: number;
+    private referenceIndex: number;
 
     constructor(
         leftUp: Coordinate_ENGINE,
@@ -16,5 +16,9 @@ export class Box_ENGINE extends Position_ENGINE {
             size,
         );
         this.referenceIndex = referenceIndex;
+    }
+
+    getReferenceIndex(): number {
+        return this.referenceIndex;
     }
 }

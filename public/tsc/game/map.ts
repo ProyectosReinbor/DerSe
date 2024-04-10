@@ -58,6 +58,9 @@ export class Map_ENGINE extends Position_ENGINE {
         lastCoordinate: Coordinate_ENGINE,
     ):
         Coordinate_ENGINE {
+
+        console.log(coordinate, lastCoordinate);
+
         for (
             let floorIndex = this.floors.length - 1;
             floorIndex >= 0;
@@ -202,7 +205,6 @@ export class Map_ENGINE extends Position_ENGINE {
                     nextCoordinate.y
                 );
             }
-
         }
         throw new Error("no floors");
     }

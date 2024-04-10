@@ -137,6 +137,8 @@ export class Floor_ENGINE {
         if (stairsElevations === true)
             return true;
 
+        console.log(flatSand, elevations, stairsElevations);
+
         return false;
     }
 

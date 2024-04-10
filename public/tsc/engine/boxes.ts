@@ -9,62 +9,63 @@ export type OccupiedBoxes = true | boolean[][];
 
 export class Boxes_ENGINE extends Coordinate_ENGINE {
 
-    boxes: Box_ENGINE[][] = [];
-    references: Position_ENGINE[] = [];
-    canvas: Canvas_ENGINE;
-    size: Size_ENGINE;
-    length: Plane_ENGINE;
-    occupied: OccupiedBoxes;
+    private boxes: Box_ENGINE[][] = [];
+    private references: Position_ENGINE[] = [];
+    private boxSize: Size_ENGINE;
+    private length: Plane_ENGINE;
+    private occupied: OccupiedBoxes;
 
     constructor(
         x: number,
         y: number,
-        canvas: Canvas_ENGINE,
-        size: Size_ENGINE,
+        boxSize: Size_ENGINE,
         length: Plane_ENGINE,
         occupied: OccupiedBoxes,
     ) {
         super(x, y);
-        this.canvas = canvas;
-        this.size = size;
+        this.boxSize = boxSize;
         this.length = length;
         this.occupied = occupied;
     }
 
-    collision(coordinate: Coordinate_ENGINE): Box_ENGINE | false {
+    collision(
+        coordinate: Coordinate_ENGINE
+    ): Box_ENGINE | false {
         const position = new Position_ENGINE(
             coordinate,
-            new Size_ENGINE(this.size.width, this.size.height)
+            new Size_ENGINE(
+                this.boxSize.getWidth(),
+                this.boxSize.getHeight()
+            )
         );
 
-        const boxIndicesLeftUp = (() => {
-            const coordinate = new Coordinate_ENGINE(
-                position.leftUp.x,
-                position.leftUp.y
-            );
-            return this.getBoxIndices(coordinate);
-        })();
+        const positionLeftUp = position.getLeftUp();
+        const boxIndicesLeftUp = this.getBoxIndices(
+            new Coordinate_ENGINE(
+                positionLeftUp.getX(),
+                positionLeftUp.getY()
+            )
+        );
 
-        const boxIndicesRightDown = (() => {
-            const positionRightDown = position.rightDown();
-            const coordinate = new Coordinate_ENGINE(
-                positionRightDown.x,
-                positionRightDown.y
-            );
-            return this.getBoxIndices(coordinate);
-        })();
+        const positionRightDown = position.getRightDown();
+        const boxIndicesRightDown = this.getBoxIndices(
+            new Coordinate_ENGINE(
+                positionRightDown.getX(),
+                positionRightDown.getY()
+            )
+        );
 
         const boxIndices = new Plane_ENGINE(
-            boxIndicesLeftUp.vertical,
-            boxIndicesLeftUp.horizontal
+            boxIndicesLeftUp.getVertical(),
+            boxIndicesLeftUp.getHorizontal()
         );
         for (;
-            boxIndices.vertical <= boxIndicesRightDown.vertical;
-            boxIndices.vertical++
+            boxIndices.getVertical() <= boxIndicesRightDown.getVertical();
+            boxIndices.addVertical(1)
         ) {
             for (;
-                boxIndices.horizontal <= boxIndicesRightDown.horizontal;
-                boxIndices.horizontal++
+                boxIndices.getHorizontal() <= boxIndicesRightDown.getHorizontal();
+                boxIndices.addHorizontal(1)
             ) {
                 const box = this.getBox(boxIndices);
                 if (box === undefined)
@@ -80,18 +81,21 @@ export class Boxes_ENGINE extends Coordinate_ENGINE {
     }
 
     getPosition(boxIndices: Plane_ENGINE): Position_ENGINE {
-        const x = boxIndices.horizontal * this.size.width;
-        const y = boxIndices.vertical * this.size.height;
-        const width = this.size.width * this.length.horizontal;
-        const height = this.size.height * this.length.vertical;
+        const x = boxIndices.getHorizontal() * this.boxSize.getWidth();
+        const y = boxIndices.getVertical() * this.boxSize.getHeight();
+        const width = this.boxSize.getWidth() * this.length.getHorizontal();
+        const height = this.boxSize.getHeight() * this.length.getVertical();
         return new Position_ENGINE(
             new Coordinate_ENGINE(x, y),
-            new Size_ENGINE(width, height)
+            new Size_ENGINE(
+                width,
+                height
+            )
         );
     }
 
     getBox(boxIndices: Plane_ENGINE): Box_ENGINE | undefined {
-        const boxesRow = this.boxes[boxIndices.vertical];
+        const boxesRow = this.boxes[boxIndices.getVertical()];
         if (boxesRow === undefined)
             return undefined;
 
@@ -100,8 +104,8 @@ export class Boxes_ENGINE extends Coordinate_ENGINE {
     }
 
     getBoxIndices(coordinate: Coordinate_ENGINE): Plane_ENGINE {
-        const horizontal = Math.floor(coordinate.x / this.size.width);
-        const vertical = Math.floor(coordinate.y / this.size.height);
+        const horizontal = Math.floor(coordinate.x / this.boxSize.width);
+        const vertical = Math.floor(coordinate.y / this.boxSize.height);
         return new Plane_ENGINE(horizontal, vertical);
     }
 
@@ -123,8 +127,8 @@ export class Boxes_ENGINE extends Coordinate_ENGINE {
     ) {
         const box = (() => {
             const size = new Size_ENGINE(
-                this.size.width,
-                this.size.height
+                this.boxSize.width,
+                this.boxSize.height
             );
             const leftUp = (() => {
                 const distanceX = boxIndices.horizontal * size.width;

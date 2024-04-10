@@ -1296,6 +1296,7 @@ class Floor_ENGINE {
       return true;
     if (stairsElevations2 === true)
       return true;
+    console.log(flatSand, elevations2, stairsElevations2);
     return false;
   }
   collisionFloor(coordinate7, lastCoordinate) {
@@ -1427,6 +1428,7 @@ class Map_ENGINE extends Position_ENGINE {
     }
   }
   collisionMap(coordinate8, lastCoordinate) {
+    console.log(coordinate8, lastCoordinate);
     for (let floorIndex = this.floors.length - 1;floorIndex >= 0; floorIndex--) {
       const floor2 = this.floors[floorIndex];
       if (floor2 === undefined)
