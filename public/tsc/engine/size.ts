@@ -1,61 +1,36 @@
 export class Size_ENGINE {
 
-    private width: number;
-    private height: number;
+    public width: number;
+    public height: number;
 
     constructor(
-        width: number,
-        height: number
+        _width: number,
+        _height: number
     ) {
-        this.width = width;
-        this.height = height;
+        this.width = _width;
+        this.height = _height;
     }
 
-    getWidth(): number {
-        return this.width;
-    }
-
-    getHeight(): number {
-        return this.height;
-    }
-
-    setWidth(
-        newWidth: number
-    ): void {
-        this.width = newWidth;
-    }
-
-    setHeight(
-        newHeight: number
-    ): void {
-        this.height = newHeight;
-    }
-
-    getAPercent(): Size_ENGINE {
+    private get aPercent(): Size_ENGINE {
         return new Size_ENGINE(
             this.width / 100,
-            this.height / 100,
-        );
+            this.height / 100
+        )
     }
 
-    getPixels(
+    public pixels(
         percentages: Size_ENGINE
     ): Size_ENGINE {
-        const aPercent = this.getAPercent();
-        const width = aPercent.width * percentages.width;
-        const height = aPercent.height * percentages.height;
         return new Size_ENGINE(
-            width,
-            height
+            this.aPercent.width * percentages.width,
+            this.aPercent.height * percentages.height
         );
     }
 
-    getHalf(): Size_ENGINE {
-        const width = this.width / 2;
-        const height = this.height / 2;
+    public get half(): Size_ENGINE {
         return new Size_ENGINE(
-            width,
-            height
+            this.width / 2,
+            this.height / 2
         );
     }
 }

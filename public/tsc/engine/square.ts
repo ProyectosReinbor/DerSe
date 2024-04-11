@@ -6,27 +6,27 @@ import type { Size_ENGINE } from "./size";
 
 export class Square_ENGINE extends Position_ENGINE {
 
-    canvas: Canvas_ENGINE;
-    fillStyle: FillStyle;
-    strokeStyle: StrokeStyle;
-    lineWidth: number;
+    private canvas: Canvas_ENGINE;
+    private fillStyle: FillStyle;
+    private strokeStyle: StrokeStyle;
+    private lineWidth: number;
 
     constructor(
-        leftUp: Coordinate_ENGINE,
-        size: Size_ENGINE,
-        canvas: Canvas_ENGINE,
-        fillStyle: FillStyle,
-        strokeStyle: StrokeStyle,
-        lineWidth: number,
+        _leftUp: Coordinate_ENGINE,
+        _size: Size_ENGINE,
+        _canvas: Canvas_ENGINE,
+        _fillStyle: FillStyle,
+        _strokeStyle: StrokeStyle,
+        _lineWidth: number
     ) {
         super(
-            leftUp,
-            size,
+            _leftUp,
+            _size,
         );
-        this.canvas = canvas;
-        this.fillStyle = fillStyle;
-        this.strokeStyle = strokeStyle;
-        this.lineWidth = lineWidth;
+        this.canvas = _canvas;
+        this.fillStyle = _fillStyle;
+        this.strokeStyle = _strokeStyle;
+        this.lineWidth = _lineWidth;
     }
 
     drawSquare() {

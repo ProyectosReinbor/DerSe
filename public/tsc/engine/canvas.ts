@@ -5,28 +5,31 @@ import { Position_ENGINE } from "./position";
 import { Size_ENGINE } from "./size";
 
 export class Canvas_ENGINE extends Camera_ENGINE {
-  aPercent: Size_ENGINE = new Size_ENGINE(0, 0);
-  margin: Size_ENGINE = new Size_ENGINE(0, 0);
-  images: Images_ENGINE = new Images_ENGINE;
-  intervalBetweenFrames: number = 0;
-  time: number = 0;
-  timeBetweenFrames: number = 0;
-  element: HTMLCanvasElement;
-  context: CanvasRenderingContext2D;
+
+  private _aPercent: Size_ENGINE = new Size_ENGINE(0, 0);
+  private _margin: Size_ENGINE = new Size_ENGINE(0, 0);
+  private _images: Images_ENGINE = new Images_ENGINE;
+  private _framesPerSecond: number;
+  private _intervalBetweenFrames: number;
+  private _time: number = 0;
+  private _timeBetweenFrames: number = 0;
+  private _element: HTMLCanvasElement;
+  private _context: CanvasRenderingContext2D;
 
   drawScene() { }
-  touchstartScene: (toque: Coordinate_ENGINE) => void = () => { }
-  touchmoveScene: (toque: Coordinate_ENGINE) => void = () => { };
-  touchendScene: (toque: Coordinate_ENGINE) => void = () => { };
+  touchstartScene: (touch: Coordinate_ENGINE) => void = () => { }
+  touchmoveScene: (touch: Coordinate_ENGINE) => void = () => { };
+  touchendScene: (touch: Coordinate_ENGINE) => void = () => { };
 
   constructor(
-    leftUp: Coordinate_ENGINE,
-    framesPerSecond: number,
+    _leftUp: Coordinate_ENGINE,
+    _framesPerSecond: number,
   ) {
-    super(leftUp);
-    this.setFramesPerSecond(framesPerSecond);
-    this.element = window.document.getElementById("canvas") as HTMLCanvasElement;
-    this.context = this.element.getContext("2d") as CanvasRenderingContext2D;
+    super(_leftUp);
+    this._framesPerSecond = _framesPerSecond;
+    this._intervalBetweenFrames = 1000 / this._framesPerSecond;
+    this._element = window.document.getElementById("canvas") as HTMLCanvasElement;
+    this._context = this._element.getContext("2d") as CanvasRenderingContext2D;
 
     this.aspectRatio();
     window.addEventListener(
@@ -34,15 +37,15 @@ export class Canvas_ENGINE extends Camera_ENGINE {
       () => this.aspectRatio()
     );
 
-    this.element.addEventListener(
+    this._element.addEventListener(
       "touchstart",
       (event) => this.touchstartCanvas(event),
     );
-    this.element.addEventListener(
+    this._element.addEventListener(
       "touchmove",
       (event) => this.touchmoveCanvas(event),
     );
-    this.element.addEventListener(
+    this._element.addEventListener(
       "touchend",
       (event) => this.touchendCanvas(event)
     );
@@ -50,24 +53,16 @@ export class Canvas_ENGINE extends Camera_ENGINE {
     this.nextFrame(0);
   }
 
-  getFramesPerSecond(): number {
-    return 1000 / this.intervalBetweenFrames;
-  }
-
-  setFramesPerSecond(value: number) {
-    this.intervalBetweenFrames = 1000 / value;
-  }
-
   nextFrame(time: number) {
-    const difference = time - this.time;
-    if (difference < this.intervalBetweenFrames) {
+    const difference = time - this._time;
+    if (difference < this._intervalBetweenFrames) {
       requestAnimationFrame(
         time => this.nextFrame(time)
       );
       return;
     }
-    this.timeBetweenFrames = difference;
-    this.time = time;
+    this._timeBetweenFrames = difference;
+    this._time = time;
     this.drawCanvas();
     requestAnimationFrame(
       time => this.nextFrame(time)
@@ -87,26 +82,31 @@ export class Canvas_ENGINE extends Camera_ENGINE {
   }
 
   drawCanvas() {
-    this.context.clearRect(0, 0, this.element.width, this.element.height);
+    this._context.clearRect(
+      0,
+      0,
+      this._element.width,
+      this._element.height
+    );
     this.drawScene();
   }
 
   aspectRatio() {
     const screenSize = new Size_ENGINE(1280, 720);
 
-    this.element.width = screenSize.width;
-    this.element.height = screenSize.height;
+    this._element.width = screenSize.width;
+    this._element.height = screenSize.height;
 
-    this.aPercent.width = this.element.width / 100;
-    this.aPercent.height = this.element.height / 100;
+    this._aPercent.width = this._element.width / 100;
+    this._aPercent.height = this._element.height / 100;
   }
 
   getTouchCoordinate(touch: Touch | null) {
     if (touch === null)
       return false;
 
-    const left = this.margin.width / 2;
-    const top = this.margin.height / 2;
+    const left = this._margin.width / 2;
+    const top = this._margin.height / 2;
     return new Coordinate_ENGINE(
       touch.pageX - left,
       touch.pageY - top
@@ -197,18 +197,18 @@ export class Canvas_ENGINE extends Camera_ENGINE {
   }
 
   widthInPercentages(pixels: number) {
-    return pixels / this.aPercent.width;
+    return pixels / this._aPercent.width;
   }
 
   widthInPixels(percentage: number) {
-    return percentage * this.aPercent.width;
+    return percentage * this._aPercent.width;
   }
 
   heightInPercentages(pixels: number) {
-    return pixels / this.aPercent.height;
+    return pixels / this._aPercent.height;
   }
 
   heightInPixels(percentage: number) {
-    return percentage * this.aPercent.height;
+    return percentage * this._aPercent.height;
   }
 }

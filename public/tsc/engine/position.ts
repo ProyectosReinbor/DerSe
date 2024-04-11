@@ -1,99 +1,89 @@
 import { Coordinate_ENGINE } from "./coordinate";
-import type { Size_ENGINE } from "./size";
+import { Size_ENGINE } from "./size";
 
 export class Position_ENGINE {
 
-  private leftUp: Coordinate_ENGINE;
-  private size: Size_ENGINE;
+  private _leftUp: Coordinate_ENGINE;
+  private _size: Size_ENGINE;
+
+  public get leftUp(): Coordinate_ENGINE {
+    return this._leftUp;
+  }
+
+  public get size(): Size_ENGINE {
+    return this._size;
+  }
 
   constructor(
-    leftUp: Coordinate_ENGINE,
-    size: Size_ENGINE,
+    _leftUp: Coordinate_ENGINE,
+    _size: Size_ENGINE,
   ) {
-    this.leftUp = leftUp;
-    this.size = size;
+    this._leftUp = _leftUp;
+    this._size = _size;
   }
 
-  getLeftUp(): Coordinate_ENGINE {
-    return this.leftUp;
-  }
-
-  getSize(): Size_ENGINE {
-    return this.size;
-  }
-
-  getLeftDown(): Coordinate_ENGINE {
+  public get leftDown(): Coordinate_ENGINE {
     return new Coordinate_ENGINE(
-      this.leftUp.getX(),
-      this.leftUp.getY() + this.size.getHeight()
+      this._leftUp.x,
+      this._leftUp.y + this._size.height
     );
   }
 
-  getRightDown(): Coordinate_ENGINE {
+  public get rightDown(): Coordinate_ENGINE {
     return new Coordinate_ENGINE(
-      this.leftUp.getX() + this.size.getWidth(),
-      this.leftUp.getY() + this.size.getHeight(),
+      this._leftUp.x + this._size.width,
+      this._leftUp.y + this._size.height,
     );
   }
 
-  getRightUp(): Coordinate_ENGINE {
+  public get rightUp(): Coordinate_ENGINE {
     return new Coordinate_ENGINE(
-      this.leftUp.getX() + this.size.getWidth(),
-      this.leftUp.getY(),
+      this._leftUp.x + this._size.width,
+      this._leftUp.y,
     );
   }
 
-  getLeftUpPlusSizePixels(
+  public leftUpPlusSizePixels(
     percentages: Size_ENGINE
   ): Coordinate_ENGINE {
-    const sizePercentage = this.size.getPixels(percentages);
-    const x = this.leftUp.getX() + sizePercentage.getWidth();
-    const y = this.leftUp.getY() + sizePercentage.getHeight();
-    return new Coordinate_ENGINE(x, y);
+    const pixels = this._size.pixels(percentages);
+    return new Coordinate_ENGINE(
+      this._leftUp.x + pixels.width,
+      this._leftUp.y + pixels.height
+    );
   }
 
-  coordinateWithinPosition(
+  public coordinateWithinPosition(
     coordinate: Coordinate_ENGINE
   ): boolean {
-    const rightDown = this.getRightDown();
-    const coordinateX = coordinate.getX();
-    const coordinateY = coordinate.getY();
-    return this.leftUp.getX() <= coordinateX &&
-      this.leftUp.getY() <= coordinateY &&
-      rightDown.getX() >= coordinateX &&
-      rightDown.getY() >= coordinateY;
+    return this.leftUp.x <= coordinate.x &&
+      this.leftUp.y <= coordinate.y &&
+      this.rightDown.x >= coordinate.x &&
+      this.rightDown.y >= coordinate.y;
   }
 
-  positionWithinPosition(
+  public positionWithinPosition(
     position: Position_ENGINE
   ): boolean {
-    const rightDown = this.getRightDown();
-    const positionRightDown = position.getRightDown();
-    return this.leftUp.getX() <= position.leftUp.getX() &&
-      this.leftUp.getY() <= position.leftUp.getY() &&
-      rightDown.getX() >= positionRightDown.getX() &&
-      rightDown.getY() >= positionRightDown.getY();
+    return this.leftUp.x <= position.leftUp.x &&
+      this.leftUp.y <= position.leftUp.y &&
+      this.rightDown.x >= position.rightDown.x &&
+      this.rightDown.y >= position.rightDown.y;
   }
 
-  someVertexInside(
+  public someVertexWithinPosition(
     position: Position_ENGINE
   ): boolean {
     if (this.coordinateWithinPosition(position.leftUp))
       return true;
 
-    if (this.coordinateWithinPosition(
-      position.getLeftDown()
-    ))
+    if (this.coordinateWithinPosition(position.leftDown))
       return true;
 
-    if (this.coordinateWithinPosition(
-      position.getRightUp()
-    ))
+    if (this.coordinateWithinPosition(position.rightUp))
       return true;
 
-    if (this.coordinateWithinPosition(
-      position.getRightDown()
-    ))
+    if (this.coordinateWithinPosition(position.rightDown))
       return true;
 
     return false;

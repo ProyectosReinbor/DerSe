@@ -12,59 +12,58 @@ export class Camera_ENGINE extends Position_ENGINE {
         );
     }
 
-    insideCamera(
+    positionInsideTheChamber(
         position: Position_ENGINE
-    ) {
+    ): boolean {
         const doubleSize = new Size_ENGINE(
-            position.size.width * 2,
-            position.size.height * 2
+            position.getSize().getWidth() * 2,
+            position.getSize().getHeight() * 2
         );
 
         const vision = new Position_ENGINE(
             new Coordinate_ENGINE(
-                this.leftUp.x - position.size.width,
-                this.leftUp.y - position.size.height,
+                this.getLeftUp().getX() - position.getSize().getWidth(),
+                this.getLeftUp().getY() - position.getSize().getHeight(),
             ),
             new Size_ENGINE(
-                this.size.width + doubleSize.width,
-                this.size.height + doubleSize.height,
+                this.getSize().getWidth() + doubleSize.getWidth(),
+                this.getSize().getHeight() + doubleSize.getHeight(),
             )
         );
-        return vision.insidePosition(
+        return vision.positionWithinPosition(
             position
         );
     }
 
     positionOnCamera(
         position: Position_ENGINE
-    ) {
-        const insideCamera = this.insideCamera(position);
-        if (insideCamera === false)
+    ): Position_ENGINE | false {
+        if (this.positionInsideTheChamber(position) === false)
             return false;
 
         return new Position_ENGINE(
             new Coordinate_ENGINE(
-                position.leftUp.x - this.leftUp.x,
-                position.leftUp.y - this.leftUp.y,
+                position.getLeftUp().getX() - this.getLeftUp().getX(),
+                position.getLeftUp().getY() - this.getLeftUp().getY(),
             ),
             new Size_ENGINE(
-                position.size.width,
-                position.size.height
+                position.getSize().getWidth(),
+                position.getSize().getHeight()
             )
         );
     }
 
     focusPosition(
         position: Position_ENGINE
-    ) {
-        let x = position.leftUp.x - (this.size.width / 2);
-        x += position.size.width / 2;
+    ): void {
+        let x = position.getLeftUp().getX() - (this.getSize().getWidth() / 2);
+        x += position.getSize().getWidth() / 2;
 
-        let y = position.leftUp.y - (this.size.height / 2);
-        y += position.size.height / 2;
+        let y = position.getLeftUp().getY() - (this.getSize().getHeight() / 2);
+        y += position.getSize().getHeight() / 2;
 
-        this.leftUp.x = x;
-        this.leftUp.y = y;
+        this.getLeftUp().setX(x);
+        this.getLeftUp().setY(y);
     }
 
 }
