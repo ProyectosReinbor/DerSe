@@ -1,20 +1,18 @@
 {
   "name": "derse",
-  "module": "index.ts",
-  "type": "module",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
   "scripts": {
-    "start": "bun run index.ts",
-    "build": "bun build ./public/tsc/index.ts --outdir ./public/js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "devDependencies": {
-    "@types/bun": "latest"
-  },
-  "peerDependencies": {
-    "typescript": "^5.0.0"
+    "typescript": "^5.4.5"
   },
   "dependencies": {
-    "cohere-ai": "^7.8.0",
-    "install": "^0.13.0",
-    "tiktok-live-connector": "^1.1.4"
+    "express": "4.19.2"
   }
 }

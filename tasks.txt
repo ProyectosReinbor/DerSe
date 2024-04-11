@@ -7,3 +7,5 @@ add collisions with length - 1 for get the last floor
 and change vertical and horizontal with the direction
 get the last floor of the box
 and verify if exists collisions
+
+saved termux
