@@ -1,112 +1,107 @@
-// public/tsc/engine/coordinate.ts
+// game/engine/coordinate.ts
 class Coordinate_ENGINE {
   x;
   y;
-  constructor(x, y) {
-    this.x = x;
-    this.y = y;
+  constructor(_x, _y) {
+    this.x = _x;
+    this.y = _y;
   }
   isEqualTo(coordinate) {
     return this.x === coordinate.x && this.y === coordinate.y;
   }
 }
 
-// public/tsc/engine/position.ts
+// game/engine/position.ts
 class Position_ENGINE {
-  leftUp;
-  size;
-  constructor(leftUp, size) {
-    this.leftUp = leftUp;
-    this.size = size;
+  _leftUp;
+  _size;
+  get leftUp() {
+    return this._leftUp;
   }
-  leftDown() {
-    return new Coordinate_ENGINE(this.leftUp.x, this.leftUp.y + this.size.height);
+  get size() {
+    return this._size;
   }
-  rightDown() {
-    return new Coordinate_ENGINE(this.leftUp.x + this.size.width, this.leftUp.y + this.size.height);
+  constructor(_leftUp, _size) {
+    this._leftUp = _leftUp;
+    this._size = _size;
   }
-  rightUp() {
-    return new Coordinate_ENGINE(this.leftUp.x + this.size.width, this.leftUp.y);
+  get leftDown() {
+    return new Coordinate_ENGINE(this._leftUp.x, this._leftUp.y + this._size.height);
   }
-  leftUpPlusSizePercentages(percentages) {
-    const sizePercentage = this.size.percentage(percentages);
-    const x = this.leftUp.x + sizePercentage.width;
-    const y = this.leftUp.y + sizePercentage.height;
-    return new Coordinate_ENGINE(x, y);
+  get rightDown() {
+    return new Coordinate_ENGINE(this._leftUp.x + this._size.width, this._leftUp.y + this._size.height);
   }
-  insidePositionCoordinate(coordinate2) {
-    const rightDown = this.rightDown();
-    return this.leftUp.x <= coordinate2.x && this.leftUp.y <= coordinate2.y && rightDown.x >= coordinate2.x && rightDown.y >= coordinate2.y;
+  get rightUp() {
+    return new Coordinate_ENGINE(this._leftUp.x + this._size.width, this._leftUp.y);
   }
-  insidePosition(position) {
-    const rightDown = this.rightDown();
-    const positionRightDown = position.rightDown();
-    return this.leftUp.x <= position.leftUp.x && this.leftUp.y <= position.leftUp.y && rightDown.x >= positionRightDown.x && rightDown.y >= positionRightDown.y;
+  leftUpPlusSizePixels(percentages) {
+    const pixels = this._size.pixels(percentages);
+    return new Coordinate_ENGINE(this._leftUp.x + pixels.width, this._leftUp.y + pixels.height);
   }
-  someVertexInside(position) {
-    if (this.insidePositionCoordinate(position.leftUp))
+  coordinateWithinPosition(coordinate2) {
+    return this.leftUp.x <= coordinate2.x && this.leftUp.y <= coordinate2.y && this.rightDown.x >= coordinate2.x && this.rightDown.y >= coordinate2.y;
+  }
+  positionWithinPosition(position) {
+    return this.leftUp.x <= position.leftUp.x && this.leftUp.y <= position.leftUp.y && this.rightDown.x >= position.rightDown.x && this.rightDown.y >= position.rightDown.y;
+  }
+  someVertexWithinPosition(position) {
+    if (this.coordinateWithinPosition(position.leftUp))
       return true;
-    if (this.insidePositionCoordinate(position.leftDown()))
+    if (this.coordinateWithinPosition(position.leftDown))
       return true;
-    if (this.insidePositionCoordinate(position.rightUp()))
+    if (this.coordinateWithinPosition(position.rightUp))
       return true;
-    if (this.insidePositionCoordinate(position.rightDown()))
+    if (this.coordinateWithinPosition(position.rightDown))
       return true;
     return false;
   }
 }
 
-// public/tsc/engine/size.ts
+// game/engine/size.ts
 class Size_ENGINE {
   width;
   height;
-  constructor(width, height) {
-    this.width = width;
-    this.height = height;
+  constructor(_width, _height) {
+    this.width = _width;
+    this.height = _height;
   }
-  aPercent() {
+  get aPercent() {
     return new Size_ENGINE(this.width / 100, this.height / 100);
   }
-  percentage(percentages) {
-    const aPercent = this.aPercent();
-    const width = aPercent.width * percentages.width;
-    const height = aPercent.height * percentages.height;
-    return new Size_ENGINE(width, height);
+  pixels(percentages) {
+    return new Size_ENGINE(this.aPercent.width * percentages.width, this.aPercent.height * percentages.height);
   }
-  half() {
-    const width = this.width / 2;
-    const height = this.height / 2;
-    return new Size_ENGINE(width, height);
+  get half() {
+    return new Size_ENGINE(this.width / 2, this.height / 2);
   }
 }
 
-// public/tsc/engine/camera.ts
+// game/engine/camera.ts
 class Camera_ENGINE extends Position_ENGINE {
   constructor(leftUp) {
     super(leftUp, new Size_ENGINE(100, 100));
   }
-  insideCamera(position2) {
-    const doubleSize = new Size_ENGINE(position2.size.width * 2, position2.size.height * 2);
-    const vision = new Position_ENGINE(new Coordinate_ENGINE(this.leftUp.x - position2.size.width, this.leftUp.y - position2.size.height), new Size_ENGINE(this.size.width + doubleSize.width, this.size.height + doubleSize.height));
-    return vision.insidePosition(position2);
+  positionInsideTheChamber(position2) {
+    const doubleSize = new Size_ENGINE(position2.getSize().getWidth() * 2, position2.getSize().getHeight() * 2);
+    const vision = new Position_ENGINE(new Coordinate_ENGINE(this.getLeftUp().getX() - position2.getSize().getWidth(), this.getLeftUp().getY() - position2.getSize().getHeight()), new Size_ENGINE(this.getSize().getWidth() + doubleSize.getWidth(), this.getSize().getHeight() + doubleSize.getHeight()));
+    return vision.positionWithinPosition(position2);
   }
   positionOnCamera(position2) {
-    const insideCamera = this.insideCamera(position2);
-    if (insideCamera === false)
+    if (this.positionInsideTheChamber(position2) === false)
       return false;
-    return new Position_ENGINE(new Coordinate_ENGINE(position2.leftUp.x - this.leftUp.x, position2.leftUp.y - this.leftUp.y), new Size_ENGINE(position2.size.width, position2.size.height));
+    return new Position_ENGINE(new Coordinate_ENGINE(position2.getLeftUp().getX() - this.getLeftUp().getX(), position2.getLeftUp().getY() - this.getLeftUp().getY()), new Size_ENGINE(position2.getSize().getWidth(), position2.getSize().getHeight()));
   }
   focusPosition(position2) {
-    let x = position2.leftUp.x - this.size.width / 2;
-    x += position2.size.width / 2;
-    let y = position2.leftUp.y - this.size.height / 2;
-    y += position2.size.height / 2;
-    this.leftUp.x = x;
-    this.leftUp.y = y;
+    let x = position2.getLeftUp().getX() - this.getSize().getWidth() / 2;
+    x += position2.getSize().getWidth() / 2;
+    let y = position2.getLeftUp().getY() - this.getSize().getHeight() / 2;
+    y += position2.getSize().getHeight() / 2;
+    this.getLeftUp().setX(x);
+    this.getLeftUp().setY(y);
   }
 }
 
-// public/tsc/engine/images.ts
+// game/engine/images.ts
 class Images_ENGINE {
   notFound = [];
   images = {};
@@ -143,16 +138,17 @@ class Images_ENGINE {
   }
 }
 
-// public/tsc/engine/canvas.ts
+// game/engine/canvas.ts
 class Canvas_ENGINE extends Camera_ENGINE {
-  aPercent = new Size_ENGINE(0, 0);
-  margin = new Size_ENGINE(0, 0);
-  images = new Images_ENGINE;
-  intervalBetweenFrames = 0;
-  time = 0;
-  timeBetweenFrames = 0;
-  element;
-  context;
+  _aPercent = new Size_ENGINE(0, 0);
+  _margin = new Size_ENGINE(0, 0);
+  _images = new Images_ENGINE;
+  _framesPerSecond;
+  _intervalBetweenFrames;
+  _time = 0;
+  _timeBetweenFrames = 0;
+  _element;
+  _context;
   drawScene() {
   }
   touchstartScene = () => {
@@ -161,32 +157,27 @@ class Canvas_ENGINE extends Camera_ENGINE {
   };
   touchendScene = () => {
   };
-  constructor(leftUp, framesPerSecond) {
-    super(leftUp);
-    this.setFramesPerSecond(framesPerSecond);
-    this.element = window.document.getElementById("canvas");
-    this.context = this.element.getContext("2d");
+  constructor(_leftUp, _framesPerSecond) {
+    super(_leftUp);
+    this._framesPerSecond = _framesPerSecond;
+    this._intervalBetweenFrames = 1000 / this._framesPerSecond;
+    this._element = window.document.getElementById("canvas");
+    this._context = this._element.getContext("2d");
     this.aspectRatio();
     window.addEventListener("resize", () => this.aspectRatio());
-    this.element.addEventListener("touchstart", (event) => this.touchstartCanvas(event));
-    this.element.addEventListener("touchmove", (event) => this.touchmoveCanvas(event));
-    this.element.addEventListener("touchend", (event) => this.touchendCanvas(event));
+    this._element.addEventListener("touchstart", (event) => this.touchstartCanvas(event));
+    this._element.addEventListener("touchmove", (event) => this.touchmoveCanvas(event));
+    this._element.addEventListener("touchend", (event) => this.touchendCanvas(event));
     this.nextFrame(0);
   }
-  getFramesPerSecond() {
-    return 1000 / this.intervalBetweenFrames;
-  }
-  setFramesPerSecond(value) {
-    this.intervalBetweenFrames = 1000 / value;
-  }
   nextFrame(time) {
-    const difference = time - this.time;
-    if (difference < this.intervalBetweenFrames) {
+    const difference = time - this._time;
+    if (difference < this._intervalBetweenFrames) {
       requestAnimationFrame((time2) => this.nextFrame(time2));
       return;
     }
-    this.timeBetweenFrames = difference;
-    this.time = time;
+    this._timeBetweenFrames = difference;
+    this._time = time;
     this.drawCanvas();
     requestAnimationFrame((time2) => this.nextFrame(time2));
   }
@@ -197,21 +188,21 @@ class Canvas_ENGINE extends Camera_ENGINE {
     this.touchendScene = touchendScene;
   }
   drawCanvas() {
-    this.context.clearRect(0, 0, this.element.width, this.element.height);
+    this._context.clearRect(0, 0, this._element.width, this._element.height);
     this.drawScene();
   }
   aspectRatio() {
     const screenSize = new Size_ENGINE(1280, 720);
-    this.element.width = screenSize.width;
-    this.element.height = screenSize.height;
-    this.aPercent.width = this.element.width / 100;
-    this.aPercent.height = this.element.height / 100;
+    this._element.width = screenSize.width;
+    this._element.height = screenSize.height;
+    this._aPercent.width = this._element.width / 100;
+    this._aPercent.height = this._element.height / 100;
   }
   getTouchCoordinate(touch) {
     if (touch === null)
       return false;
-    const left = this.margin.width / 2;
-    const top = this.margin.height / 2;
+    const left = this._margin.width / 2;
+    const top = this._margin.height / 2;
     return new Coordinate_ENGINE(touch.pageX - left, touch.pageY - top);
   }
   touchstartCanvas(event) {
@@ -255,20 +246,20 @@ class Canvas_ENGINE extends Camera_ENGINE {
     return this.widthInPercentages(pixels);
   }
   widthInPercentages(pixels) {
-    return pixels / this.aPercent.width;
+    return pixels / this._aPercent.width;
   }
   widthInPixels(percentage) {
-    return percentage * this.aPercent.width;
+    return percentage * this._aPercent.width;
   }
   heightInPercentages(pixels) {
-    return pixels / this.aPercent.height;
+    return pixels / this._aPercent.height;
   }
   heightInPixels(percentage) {
-    return percentage * this.aPercent.height;
+    return percentage * this._aPercent.height;
   }
 }
 
-// public/tsc/engine/scene.ts
+// game/engine/scene.ts
 class Scene_ENGINE {
   canvas;
   draw = () => {
@@ -287,7 +278,7 @@ class Scene_ENGINE {
   }
 }
 
-// public/tsc/engine/plane.ts
+// game/engine/plane.ts
 class Plane_ENGINE {
   horizontal;
   vertical;
@@ -295,9 +286,27 @@ class Plane_ENGINE {
     this.horizontal = horizontal;
     this.vertical = vertical;
   }
+  getHorizontal() {
+    return this.horizontal;
+  }
+  getVertical() {
+    return this.vertical;
+  }
+  setHorizontal(newHorizontal) {
+    this.horizontal = newHorizontal;
+  }
+  setVertical(newVertical) {
+    this.vertical = newVertical;
+  }
+  addHorizontal(addend) {
+    this.horizontal += addend;
+  }
+  addVertical(addend) {
+    this.vertical += addend;
+  }
 }
 
-// public/tsc/game/mapMatrix.ts
+// game/game/mapMatrix.ts
 class MapMatrix_ENGINE {
   static length = new Plane_ENGINE(37, 21);
   static getEmptyBox() {
@@ -441,7 +450,7 @@ class MapMatrix_ENGINE {
   }
 }
 
-// public/tsc/engine/element.ts
+// game/engine/element.ts
 class Element_ENGINE extends Position_ENGINE {
   constructor(size3, indices) {
     super(new Coordinate_ENGINE(0, 0), size3);
@@ -461,7 +470,7 @@ class Element_ENGINE extends Position_ENGINE {
   }
 }
 
-// public/tsc/engine/image.ts
+// game/engine/image.ts
 class Image_ENGINE extends Position_ENGINE {
   canvas;
   route = false;
@@ -487,7 +496,7 @@ class Image_ENGINE extends Position_ENGINE {
   }
 }
 
-// public/tsc/engine/elements.ts
+// game/engine/elements.ts
 class Elements_ENGINE extends Image_ENGINE {
   element;
   constructor(leftUp, size3, canvas, route, element) {
@@ -506,44 +515,40 @@ class Elements_ENGINE extends Image_ENGINE {
   }
 }
 
-// public/tsc/engine/box.ts
+// game/engine/box.ts
 class Box_ENGINE extends Position_ENGINE {
   referenceIndex;
   constructor(leftUp, size3, referenceIndex) {
     super(leftUp, size3);
     this.referenceIndex = referenceIndex;
   }
+  getReferenceIndex() {
+    return this.referenceIndex;
+  }
 }
 
-// public/tsc/engine/boxes.ts
+// game/engine/boxes.ts
 class Boxes_ENGINE extends Coordinate_ENGINE {
   boxes = [];
   references = [];
-  canvas;
-  size;
+  boxSize;
   length;
   occupied;
-  constructor(x, y, canvas, size4, length, occupied) {
+  constructor(x, y, boxSize, length, occupied) {
     super(x, y);
-    this.canvas = canvas;
-    this.size = size4;
+    this.boxSize = boxSize;
     this.length = length;
     this.occupied = occupied;
   }
   collision(coordinate6) {
-    const position7 = new Position_ENGINE(coordinate6, new Size_ENGINE(this.size.width, this.size.height));
-    const boxIndicesLeftUp = (() => {
-      const coordinate7 = new Coordinate_ENGINE(position7.leftUp.x, position7.leftUp.y);
-      return this.getBoxIndices(coordinate7);
-    })();
-    const boxIndicesRightDown = (() => {
-      const positionRightDown = position7.rightDown();
-      const coordinate7 = new Coordinate_ENGINE(positionRightDown.x, positionRightDown.y);
-      return this.getBoxIndices(coordinate7);
-    })();
-    const boxIndices = new Plane_ENGINE(boxIndicesLeftUp.vertical, boxIndicesLeftUp.horizontal);
-    for (;boxIndices.vertical <= boxIndicesRightDown.vertical; boxIndices.vertical++) {
-      for (;boxIndices.horizontal <= boxIndicesRightDown.horizontal; boxIndices.horizontal++) {
+    const position7 = new Position_ENGINE(coordinate6, new Size_ENGINE(this.boxSize.getWidth(), this.boxSize.getHeight()));
+    const positionLeftUp = position7.getLeftUp();
+    const boxIndicesLeftUp = this.getBoxIndices(new Coordinate_ENGINE(positionLeftUp.getX(), positionLeftUp.getY()));
+    const positionRightDown = position7.getRightDown();
+    const boxIndicesRightDown = this.getBoxIndices(new Coordinate_ENGINE(positionRightDown.getX(), positionRightDown.getY()));
+    const boxIndices = new Plane_ENGINE(boxIndicesLeftUp.getVertical(), boxIndicesLeftUp.getHorizontal());
+    for (;boxIndices.getVertical() <= boxIndicesRightDown.getVertical(); boxIndices.addVertical(1)) {
+      for (;boxIndices.getHorizontal() <= boxIndicesRightDown.getHorizontal(); boxIndices.addHorizontal(1)) {
         const box2 = this.getBox(boxIndices);
         if (box2 === undefined)
           continue;
@@ -555,22 +560,22 @@ class Boxes_ENGINE extends Coordinate_ENGINE {
     return false;
   }
   getPosition(boxIndices) {
-    const x = boxIndices.horizontal * this.size.width;
-    const y = boxIndices.vertical * this.size.height;
-    const width = this.size.width * this.length.horizontal;
-    const height = this.size.height * this.length.vertical;
+    const x = boxIndices.getHorizontal() * this.boxSize.getWidth();
+    const y = boxIndices.getVertical() * this.boxSize.getHeight();
+    const width = this.boxSize.getWidth() * this.length.getHorizontal();
+    const height = this.boxSize.getHeight() * this.length.getVertical();
     return new Position_ENGINE(new Coordinate_ENGINE(x, y), new Size_ENGINE(width, height));
   }
   getBox(boxIndices) {
-    const boxesRow = this.boxes[boxIndices.vertical];
+    const boxesRow = this.boxes[boxIndices.getVertical()];
     if (boxesRow === undefined)
       return;
     const box2 = boxesRow[boxIndices.horizontal];
     return box2;
   }
   getBoxIndices(coordinate6) {
-    const horizontal = Math.floor(coordinate6.x / this.size.width);
-    const vertical = Math.floor(coordinate6.y / this.size.height);
+    const horizontal = Math.floor(coordinate6.x / this.boxSize.width);
+    const vertical = Math.floor(coordinate6.y / this.boxSize.height);
     return new Plane_ENGINE(horizontal, vertical);
   }
   boxesIndices(boxIndices, box2) {
@@ -582,7 +587,7 @@ class Boxes_ENGINE extends Coordinate_ENGINE {
   }
   setBox(boxIndices, referenceIndex) {
     const box2 = (() => {
-      const size4 = new Size_ENGINE(this.size.width, this.size.height);
+      const size4 = new Size_ENGINE(this.boxSize.width, this.boxSize.height);
       const leftUp = (() => {
         const distanceX = boxIndices.horizontal * size4.width;
         const distanceY = boxIndices.vertical * size4.height;
@@ -640,7 +645,7 @@ class Boxes_ENGINE extends Coordinate_ENGINE {
   }
 }
 
-// public/tsc/engine/imageBoxes.ts
+// game/engine/imageBoxes.ts
 class ImageBoxes_ENGINE extends Boxes_ENGINE {
   references = [];
   route;
@@ -661,7 +666,7 @@ class ImageBoxes_ENGINE extends Boxes_ENGINE {
   }
 }
 
-// public/tsc/engine/elementBoxes.ts
+// game/engine/elementBoxes.ts
 class ElementBoxes_ENGINE extends ImageBoxes_ENGINE {
   references = [];
   element;
@@ -682,7 +687,7 @@ class ElementBoxes_ENGINE extends ImageBoxes_ENGINE {
   }
 }
 
-// public/tsc/game/map/grounds.ts
+// game/game/map/grounds.ts
 class Grounds_ENGINE extends ElementBoxes_ENGINE {
   references = [];
   elementIndices;
@@ -764,7 +769,7 @@ class Grounds_ENGINE extends ElementBoxes_ENGINE {
   }
 }
 
-// public/tsc/game/map/flatsSand.ts
+// game/game/map/flatsSand.ts
 class FlatsSand_ENGINE extends Grounds_ENGINE {
   constructor(map, canvas) {
     super(map, canvas, "images/terrain/ground/flat.png", {
@@ -794,7 +799,7 @@ class FlatsSand_ENGINE extends Grounds_ENGINE {
   }
 }
 
-// public/tsc/game/map/elevations.ts
+// game/game/map/elevations.ts
 class Elevations_ENGINE extends Grounds_ENGINE {
   constructor(map, canvas) {
     super(map, canvas, "images/terrain/ground/elevation.png", {
@@ -824,7 +829,7 @@ class Elevations_ENGINE extends Grounds_ENGINE {
   }
 }
 
-// public/tsc/game/map/wallElevations.ts
+// game/game/map/wallElevations.ts
 class WallElevations_ENGINE extends ElementBoxes_ENGINE {
   elementIndices;
   constructor(map, canvas) {
@@ -875,7 +880,7 @@ class WallElevations_ENGINE extends ElementBoxes_ENGINE {
   }
 }
 
-// public/tsc/game/map/castle.ts
+// game/game/map/castle.ts
 class Castle_ENGINE extends Image_ENGINE {
   state = "construction";
   color = "blue";
@@ -893,7 +898,7 @@ class Castle_ENGINE extends Image_ENGINE {
   }
 }
 
-// public/tsc/game/map/castles.ts
+// game/game/map/castles.ts
 class Castles_ENGINE extends ImageBoxes_ENGINE {
   references = [];
   constructor(map, canvas) {
@@ -912,7 +917,7 @@ class Castles_ENGINE extends ImageBoxes_ENGINE {
   }
 }
 
-// public/tsc/game/map/water.ts
+// game/game/map/water.ts
 class Water_ENGINE extends ImageBoxes_ENGINE {
   constructor(map, canvas) {
     super(map.leftUp.x, map.leftUp.y, canvas, new Size_ENGINE(map.boxes.width, map.boxes.height), new Plane_ENGINE(1, 1), true, "images/terrain/water/water.png");
@@ -925,7 +930,7 @@ class Water_ENGINE extends ImageBoxes_ENGINE {
   }
 }
 
-// public/tsc/engine/animation.ts
+// game/engine/animation.ts
 class Animation_ENGINE {
   frames;
   intervalBetweenFrame = 0;
@@ -941,7 +946,7 @@ class Animation_ENGINE {
   }
 }
 
-// public/tsc/engine/animations.ts
+// game/engine/animations.ts
 class Animations_ENGINE extends Elements_ENGINE {
   timerNextFrame = 0;
   animation;
@@ -962,7 +967,7 @@ class Animations_ENGINE extends Elements_ENGINE {
   }
 }
 
-// public/tsc/engine/animationBoxes.ts
+// game/engine/animationBoxes.ts
 class AnimationBoxes_ENGINE extends ElementBoxes_ENGINE {
   references = [];
   animation;
@@ -983,7 +988,7 @@ class AnimationBoxes_ENGINE extends ElementBoxes_ENGINE {
   }
 }
 
-// public/tsc/game/map/foams.ts
+// game/game/map/foams.ts
 class Foams_ENGINE extends AnimationBoxes_ENGINE {
   constructor(map, canvas) {
     super(map.leftUp.x, map.leftUp.y, canvas, new Size_ENGINE(map.boxes.width, map.boxes.height), new Plane_ENGINE(3, 3), [
@@ -1005,7 +1010,7 @@ class Foams_ENGINE extends AnimationBoxes_ENGINE {
   }
 }
 
-// public/tsc/game/map/flatsGrass.ts
+// game/game/map/flatsGrass.ts
 class FlatsGrass_ENGINE extends Grounds_ENGINE {
   constructor(map, canvas) {
     super(map, canvas, "images/terrain/ground/flat.png", {
@@ -1035,7 +1040,7 @@ class FlatsGrass_ENGINE extends Grounds_ENGINE {
   }
 }
 
-// public/tsc/game/map/shadows.ts
+// game/game/map/shadows.ts
 class Shadows_ENGINE extends ImageBoxes_ENGINE {
   constructor(map, canvas) {
     super(map.leftUp.x, map.leftUp.y, canvas, new Size_ENGINE(map.boxes.width, map.boxes.height), new Plane_ENGINE(3, 3), [
@@ -1057,7 +1062,7 @@ class Shadows_ENGINE extends ImageBoxes_ENGINE {
   }
 }
 
-// public/tsc/game/map/stairsElevations.ts
+// game/game/map/stairsElevations.ts
 class StairsElevations_ENGINE extends ElementBoxes_ENGINE {
   elementIndices;
   constructor(map, canvas) {
@@ -1108,7 +1113,7 @@ class StairsElevations_ENGINE extends ElementBoxes_ENGINE {
   }
 }
 
-// public/tsc/game/map/flatElevations.ts
+// game/game/map/flatElevations.ts
 class FlatElevations_ENGINE extends ElementBoxes_ENGINE {
   elementIndices;
   constructor(map, canvas) {
@@ -1128,7 +1133,7 @@ class FlatElevations_ENGINE extends ElementBoxes_ENGINE {
   }
 }
 
-// public/tsc/game/map/trees.ts
+// game/game/map/trees.ts
 class Trees_ENGINE extends AnimationBoxes_ENGINE {
   states;
   constructor(map, canvas) {
@@ -1172,7 +1177,7 @@ class Trees_ENGINE extends AnimationBoxes_ENGINE {
   }
 }
 
-// public/tsc/engine/character/direction.ts
+// game/engine/character/direction.ts
 class Direction_ENGINE {
   x;
   y;
@@ -1215,7 +1220,7 @@ class Direction_ENGINE {
   }
 }
 
-// public/tsc/game/map/floor.ts
+// game/game/map/floor.ts
 class Floor_ENGINE {
   map;
   canvas;
@@ -1401,7 +1406,7 @@ class Floor_ENGINE {
   }
 }
 
-// public/tsc/game/map.ts
+// game/game/map.ts
 class Map_ENGINE extends Position_ENGINE {
   matrix = MapMatrix_ENGINE.get();
   floors;
@@ -1538,18 +1543,18 @@ class Map_ENGINE extends Position_ENGINE {
   }
 }
 
-// public/tsc/engine/square.ts
+// game/engine/square.ts
 class Square_ENGINE extends Position_ENGINE {
   canvas;
   fillStyle;
   strokeStyle;
   lineWidth;
-  constructor(leftUp, size16, canvas, fillStyle, strokeStyle, lineWidth) {
-    super(leftUp, size16);
-    this.canvas = canvas;
-    this.fillStyle = fillStyle;
-    this.strokeStyle = strokeStyle;
-    this.lineWidth = lineWidth;
+  constructor(_leftUp, _size, _canvas, _fillStyle, _strokeStyle, _lineWidth) {
+    super(_leftUp, _size);
+    this.canvas = _canvas;
+    this.fillStyle = _fillStyle;
+    this.strokeStyle = _strokeStyle;
+    this.lineWidth = _lineWidth;
   }
   drawSquare() {
     const positionOnCanvas = this.canvas.positionOnCanvas(this);
@@ -1570,7 +1575,7 @@ class Square_ENGINE extends Position_ENGINE {
   }
 }
 
-// public/tsc/engine/character.ts
+// game/engine/character.ts
 class Character_ENGINE extends Square_ENGINE {
   scale;
   animations;
@@ -1604,7 +1609,7 @@ class Character_ENGINE extends Square_ENGINE {
   }
 }
 
-// public/tsc/engine/text.ts
+// game/engine/text.ts
 class Text_ENGINE extends Position_ENGINE {
   canvas;
   value;
@@ -1619,11 +1624,11 @@ class Text_ENGINE extends Position_ENGINE {
     this.strokeStyle = strokeStyle;
     this.dungeonFont = dungeonFont;
   }
-  get font() {
-    let font = `${this.size.height}px`;
+  getFont() {
+    const font = `${this.size.height}px`;
     if (this.dungeonFont === true)
       font.concat(" Dungeon,");
-    return font.concat("sans - serif, arial");
+    return font.concat(" sans - serif, arial");
   }
   drawText() {
     if (this.value.length === 0)
@@ -1631,12 +1636,12 @@ class Text_ENGINE extends Position_ENGINE {
     const positionOnCamera = this.canvas.positionOnCamera(this);
     if (positionOnCamera === false)
       return;
-    this.canvas.context.font = this.font;
+    this.canvas.context.font = this.getFont();
     this.canvas.context.textAlign = "left";
     this.canvas.context.textBaseline = "top";
     positionOnCamera.size.width = this.canvas.context.measureText(this.value).width;
-    positionOnCamera.leftUp.x += this.size.width / 2;
-    positionOnCamera.leftUp.x -= positionOnCamera.size.width / 2;
+    positionOnCamera.leftUp.x += this.size.half.width;
+    positionOnCamera.leftUp.x -= positionOnCamera.size.half.width;
     if (this.fillStyle !== false) {
       this.canvas.context.fillStyle = this.fillStyle;
       this.canvas.context.fillText(this.value, positionOnCamera.leftUp.x, positionOnCamera.leftUp.y);
@@ -1648,7 +1653,7 @@ class Text_ENGINE extends Position_ENGINE {
   }
 }
 
-// public/tsc/game/userBar.ts
+// game/game/userBar.ts
 class UserBar_ENGINE extends Square_ENGINE {
   pawn;
   photo;
@@ -1672,7 +1677,7 @@ class UserBar_ENGINE extends Square_ENGINE {
   }
 }
 
-// public/tsc/game/pawn.ts
+// game/game/pawn.ts
 class Pawn_ENGINE extends Character_ENGINE {
   map;
   nickname;
@@ -1693,7 +1698,7 @@ class Pawn_ENGINE extends Character_ENGINE {
   }
 }
 
-// public/tsc/engine/line.ts
+// game/engine/line.ts
 class Line_ENGINE extends Position_ENGINE {
   canvas;
   fillStyle;
@@ -1733,7 +1738,7 @@ class Line_ENGINE extends Position_ENGINE {
   }
 }
 
-// public/tsc/game/sheep.ts
+// game/game/sheep.ts
 class Sheep_ENGINE extends Character_ENGINE {
   lineSight;
   state = "move";
@@ -1837,7 +1842,7 @@ class Sheep_ENGINE extends Character_ENGINE {
   }
 }
 
-// public/tsc/game/game.ts
+// game/game/game.ts
 class Game_ENGINE extends Scene_ENGINE {
   map;
   pawns = [];
@@ -1865,7 +1870,7 @@ class Game_ENGINE extends Scene_ENGINE {
   };
 }
 
-// public/tsc/index.ts
+// game/index.ts
 window.addEventListener("load", () => {
   const canvas2 = new Canvas_ENGINE(new Coordinate_ENGINE(0, 0), 24);
   const game2 = new Game_ENGINE(canvas2);
