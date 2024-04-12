@@ -2,16 +2,31 @@ import { Camera_ENGINE } from "./camera";
 import { Coordinate_ENGINE } from "./coordinate";
 import { Images_ENGINE } from "./images";
 import { Position_ENGINE } from "./position";
+import type { Scene_ENGINE } from "./scene";
 import { Size_ENGINE } from "./size";
+import { TouchEvents } from "./touchEvents";
 
 export class Canvas_ENGINE extends Camera_ENGINE {
 
+  private _touchEvents: TouchEvents;
+  public get touchEvents(): TouchEvents {
+    return this._touchEvents;
+  }
+
   private _aPercent: Size_ENGINE = new Size_ENGINE(0, 0);
-  private _margin: Size_ENGINE = new Size_ENGINE(0, 0);
   private _framesPerSecond: number;
   private _intervalBetweenFrames: number;
   private _time: number = 0;
+
+  private _margin: Size_ENGINE = new Size_ENGINE(0, 0);
+  public get margin(): Size_ENGINE {
+    return this._margin;
+  }
+
   private _element: HTMLCanvasElement;
+  public get element(): HTMLCanvasElement {
+    return this._element;
+  }
 
   private _images: Images_ENGINE = new Images_ENGINE;
   public get images(): Images_ENGINE {
@@ -28,10 +43,7 @@ export class Canvas_ENGINE extends Camera_ENGINE {
     return this._context;
   }
 
-  private _drawScene() { }
-  private _touchstartScene: (touch: Coordinate_ENGINE) => void = () => { }
-  private _touchmoveScene: (touch: Coordinate_ENGINE) => void = () => { };
-  private _touchendScene: (touch: Coordinate_ENGINE) => void = () => { };
+  private _scene: Scene_ENGINE | false = false;
 
   private _nextFrame(_time: number) {
     const difference = _time - this._time;
@@ -56,7 +68,10 @@ export class Canvas_ENGINE extends Camera_ENGINE {
       this._element.width,
       this._element.height
     );
-    this._drawScene();
+    if (this._scene === false)
+      return;
+
+    this._scene.draw();
   }
 
   private _aspectRatio() {
@@ -67,52 +82,6 @@ export class Canvas_ENGINE extends Camera_ENGINE {
 
     this._aPercent.width = this._element.width / 100;
     this._aPercent.height = this._element.height / 100;
-  }
-
-  private _touchCoordinate(_touch: Touch | null) {
-    if (_touch === null)
-      return false;
-
-    const left = this._margin.width / 2;
-    const top = this._margin.height / 2;
-    return new Coordinate_ENGINE(
-      _touch.pageX - left,
-      _touch.pageY - top
-    );
-  }
-
-  private _touchmoveCanvas(
-    _event: TouchEvent
-  ) {
-    _event.preventDefault();
-    for (
-      let index = 0;
-      index < _event.changedTouches.length;
-      index++
-    ) {
-      const touch = _event.changedTouches.item(index);
-      const coordinate = this._touchCoordinate(touch);
-      if (coordinate === false)
-        continue;
-
-      this._touchmoveScene(coordinate);
-    }
-  }
-
-  private _touchendCanvas(event: TouchEvent) {
-    event.preventDefault();
-    for (
-      let index = 0;
-      index < event.changedTouches.length;
-      index++
-    ) {
-      const touch = event.changedTouches.item(index);
-      const coordinate = this._touchCoordinate(touch);
-      if (coordinate === false)
-        continue;
-
-      this._touchendScene(coordinate);
-    }
   }
 
   private _widthInPercentages = (
@@ -140,6 +109,7 @@ export class Canvas_ENGINE extends Camera_ENGINE {
     this._intervalBetweenFrames = 1000 / this._framesPerSecond;
     this._element = window.document.getElementById("canvas") as HTMLCanvasElement;
     this._context = this._element.getContext("2d") as CanvasRenderingContext2D;
+    this._touchEvents = new TouchEvents(this);
 
     this._aspectRatio();
     window.addEventListener(
@@ -151,15 +121,9 @@ export class Canvas_ENGINE extends Camera_ENGINE {
   }
 
   public start(
-    _drawScene: () => void,
-    _touchstartScene: (touch: Coordinate_ENGINE) => void,
-    _touchmoveScene: (touch: Coordinate_ENGINE) => void,
-    _touchendScene: (touch: Coordinate_ENGINE) => void,
+    _scene: Scene_ENGINE,
   ): void {
-    this._drawScene = _drawScene;
-    this._touchstartScene = _touchstartScene;
-    this._touchmoveScene = _touchmoveScene;
-    this._touchendScene = _touchendScene;
+    this._scene = _scene;
   }
 
   public positionOnCanvas(
@@ -186,5 +150,12 @@ export class Canvas_ENGINE extends Camera_ENGINE {
   ): number {
     const pixels = this._heightInPixels(percentageHeight);
     return this._widthInPercentages(pixels);
+  }
+
+  public heightInPercentageWidth(
+    percentageWidth: number
+  ): number {
+    const pixels = this._widthInPixels(percentageWidth);
+    return this._heightInPercentages(pixels);
   }
 }

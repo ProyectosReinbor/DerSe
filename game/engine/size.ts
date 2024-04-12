@@ -2,13 +2,16 @@ export class Size_ENGINE {
 
     public width: number;
     public height: number;
+    public length: number;
 
     constructor(
         _width: number,
-        _height: number
+        _height: number,
+        _length: number
     ) {
         this.width = _width;
         this.height = _height;
+        this.length = _length;
     }
 
     private get _aPercent(): Size_ENGINE {

@@ -1,18 +1,6 @@
-import { Coordinate_ENGINE } from "./coordinate";
 import { Size_ENGINE } from "./size";
 
 export class Position_ENGINE {
-
-  protected _leftUp: Coordinate_ENGINE;
-  protected _size: Size_ENGINE;
-
-  public get leftUp(): Coordinate_ENGINE {
-    return this._leftUp;
-  }
-
-  public get size(): Size_ENGINE {
-    return this._size;
-  }
 
   constructor(
     _leftUp: Coordinate_ENGINE,
