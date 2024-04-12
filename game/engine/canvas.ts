@@ -81,25 +81,6 @@ export class Canvas_ENGINE extends Camera_ENGINE {
     );
   }
 
-  private _touchstartCanvas(
-    _event: TouchEvent
-  ) {
-    _event.preventDefault();
-
-    for (
-      let index = 0;
-      index < _event.changedTouches.length;
-      index++
-    ) {
-      const touch = _event.changedTouches.item(index);
-      const coordinate = this._touchCoordinate(touch);
-      if (coordinate === false)
-        continue;
-
-      this._touchstartScene(coordinate);
-    }
-  }
-
   private _touchmoveCanvas(
     _event: TouchEvent
   ) {
@@ -164,19 +145,6 @@ export class Canvas_ENGINE extends Camera_ENGINE {
     window.addEventListener(
       "resize",
       () => this._aspectRatio()
-    );
-
-    this._element.addEventListener(
-      "touchstart",
-      (event) => this._touchstartCanvas(event),
-    );
-    this._element.addEventListener(
-      "touchmove",
-      (event) => this._touchmoveCanvas(event),
-    );
-    this._element.addEventListener(
-      "touchend",
-      (event) => this._touchendCanvas(event)
     );
 
     this._nextFrame(0);

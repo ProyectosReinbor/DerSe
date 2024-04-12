@@ -3,59 +3,63 @@ import type { Coordinate_ENGINE } from "./coordinate";
 
 export class MoveCanvas {
 
-  touch: Coordinate_ENGINE | false = false;
-  moved: boolean = false;
-  canvas: Canvas_ENGINE;
-  moveHorizontal: boolean;
-  moveVertical: boolean;
+  private _touch: Coordinate_ENGINE | false = false;
+  private _moved: boolean = false;
+  private _canvas: Canvas_ENGINE;
+  private _moveHorizontal: boolean;
+  private _moveVertical: boolean;
 
   constructor(
-    canvas: Canvas_ENGINE,
-    moverHorizontal: boolean,
-    moverVertical: boolean,
+    _canvas: Canvas_ENGINE,
+    _moverHorizontal: boolean,
+    _moverVertical: boolean,
   ) {
-    this.canvas = canvas;
-    this.moveHorizontal = moverHorizontal;
-    this.moveVertical = moverVertical;
+    this._canvas = _canvas;
+    this._moveHorizontal = _moverHorizontal;
+    this._moveVertical = _moverVertical;
   }
 
-  touchstartMoveCamera(touch: Coordinate_ENGINE) {
-    this.moved = false;
-    this.touch = touch;
+  public touchstartMoveCamera(
+    touch: Coordinate_ENGINE
+  ) {
+    this._moved = false;
+    this._touch = touch;
   }
 
-  touchmoveMoveCamera(touch: Coordinate_ENGINE): boolean {
-    if (this.touch === false)
+  public touchmoveMoveCamera(
+    touch: Coordinate_ENGINE
+  ): boolean {
+    if (this._touch === false)
       return false;
 
     let moved = false;
 
-    if (this.moveHorizontal === true) {
-      const distance = this.touch.x - touch.x;
+    if (this._moveHorizontal === true) {
+      const distance = this._touch.x - touch.x;
       if (distance > 5 || distance < -5) {
-        this.canvas.leftUp.x += distance;
-        this.touch.x = touch.x;
+        this._canvas.leftUp.x += distance;
+        this._touch.x = touch.x;
         moved = true;
       }
     }
 
-    if (this.moveVertical === true) {
-      const distance = this.touch.y - touch.y;
+    if (this._moveVertical === true) {
+      const distance = this._touch.y - touch.y;
       if (distance > 5 || distance < -5) {
-        this.canvas.leftUp.y += distance;
-        this.touch.y = touch.y;
+        this._canvas.leftUp.y += distance;
+        this._touch.y = touch.y;
         moved = true;
       }
     }
 
     if (moved === true)
-      this.moved = true;
+      this._moved = true;
 
-    return this.moved;
+    return this._moved;
   }
 
-  touchendTouchCamera(): boolean {
-    this.touch = false;
-    return this.moved;
+  public touchendTouchCamera(): boolean {
+    this._touch = false;
+    return this._moved;
   }
 }
