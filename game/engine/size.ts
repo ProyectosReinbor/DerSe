@@ -11,7 +11,7 @@ export class Size_ENGINE {
         this.height = _height;
     }
 
-    private get aPercent(): Size_ENGINE {
+    private get _aPercent(): Size_ENGINE {
         return new Size_ENGINE(
             this.width / 100,
             this.height / 100
@@ -22,8 +22,8 @@ export class Size_ENGINE {
         percentages: Size_ENGINE
     ): Size_ENGINE {
         return new Size_ENGINE(
-            this.aPercent.width * percentages.width,
-            this.aPercent.height * percentages.height
+            this._aPercent.width * percentages.width,
+            this._aPercent.height * percentages.height
         );
     }
 

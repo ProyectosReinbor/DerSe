@@ -6,10 +6,10 @@ import type { Size_ENGINE } from "./size";
 
 export class Square_ENGINE extends Position_ENGINE {
 
-    private canvas: Canvas_ENGINE;
-    private fillStyle: FillStyle;
-    private strokeStyle: StrokeStyle;
-    private lineWidth: number;
+    protected _canvas: Canvas_ENGINE;
+    private _fillStyle: FillStyle;
+    private _strokeStyle: StrokeStyle;
+    private _lineWidth: number;
 
     constructor(
         _leftUp: Coordinate_ENGINE,
@@ -23,37 +23,37 @@ export class Square_ENGINE extends Position_ENGINE {
             _leftUp,
             _size,
         );
-        this.canvas = _canvas;
-        this.fillStyle = _fillStyle;
-        this.strokeStyle = _strokeStyle;
-        this.lineWidth = _lineWidth;
+        this._canvas = _canvas;
+        this._fillStyle = _fillStyle;
+        this._strokeStyle = _strokeStyle;
+        this._lineWidth = _lineWidth;
     }
 
-    drawSquare() {
-        const positionOnCanvas = this.canvas.positionOnCanvas(this);
+    public drawSquare() {
+        const positionOnCanvas = this._canvas.positionOnCanvas(this);
         if (positionOnCanvas === false)
             return;
 
-        this.canvas.context.beginPath();
-
-        this.canvas.context.rect(
+        const context = this._canvas.context;
+        context.beginPath();
+        context.rect(
             positionOnCanvas.leftUp.x,
             positionOnCanvas.leftUp.y,
             positionOnCanvas.size.width,
             positionOnCanvas.size.height
         );
 
-        if (this.fillStyle !== false) {
-            this.canvas.context.fillStyle = this.fillStyle;
-            this.canvas.context.fill();
+        if (this._fillStyle !== false) {
+            context.fillStyle = this._fillStyle;
+            context.fill();
         }
 
-        if (this.strokeStyle !== false) {
-            this.canvas.context.strokeStyle = this.strokeStyle;
-            this.canvas.context.lineWidth = this.lineWidth;
-            this.canvas.context.stroke();
+        if (this._strokeStyle !== false) {
+            context.strokeStyle = this._strokeStyle;
+            context.lineWidth = this._lineWidth;
+            context.stroke();
         }
 
-        this.canvas.context.closePath();
+        context.closePath();
     }
 }   

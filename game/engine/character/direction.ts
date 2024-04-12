@@ -2,21 +2,19 @@ export type XDirection_ENGINE = "left" | "right" | "center";
 export type YDirection_ENGINE = "up" | "down" | "center";
 
 export class Direction_ENGINE {
-    private x: XDirection_ENGINE;
-    private y: YDirection_ENGINE;
+
+    public x: XDirection_ENGINE;
+    public y: YDirection_ENGINE;
+
     constructor(
-        x: XDirection_ENGINE,
-        y: YDirection_ENGINE,
+        _x: XDirection_ENGINE,
+        _y: YDirection_ENGINE,
     ) {
-        this.x = x;
-        this.y = y;
+        this.x = _x;
+        this.y = _y;
     }
 
-    getX(): XDirection_ENGINE {
-        return this.x;
-    }
-
-    getNumberX(): 0 | 1 | -1 {
+    public get numberX(): 0 | 1 | -1 {
         if (this.x === "left")
             return -1;
 
@@ -29,11 +27,7 @@ export class Direction_ENGINE {
         throw new Error("invalid  direction x");
     }
 
-    getY(): YDirection_ENGINE {
-        return this.y;
-    }
-
-    getNumberY(): 0 | 1 | -1 {
+    public get numberY(): 0 | 1 | -1 {
         if (this.y === "up")
             return -1;
 
@@ -46,19 +40,10 @@ export class Direction_ENGINE {
         throw new Error("invalid direction y");
     }
 
-    setX(x: XDirection_ENGINE) {
-        this.x = x;
-    }
-
-    setY(y: YDirection_ENGINE) {
-        this.y = y;
-    }
-
-    isEqualTo(
-        directionX: XDirection_ENGINE,
-        directionY: YDirection_ENGINE,
-    ) {
-        return this.x === directionX &&
-            this.y === directionY;
+    public isEqualTo(
+        direction: Direction_ENGINE
+    ): boolean {
+        return this.x === direction.x &&
+            this.y === direction.y;
     }
 }

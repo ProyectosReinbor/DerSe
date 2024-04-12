@@ -3,8 +3,8 @@ import { Size_ENGINE } from "./size";
 
 export class Position_ENGINE {
 
-  private _leftUp: Coordinate_ENGINE;
-  private _size: Size_ENGINE;
+  protected _leftUp: Coordinate_ENGINE;
+  protected _size: Size_ENGINE;
 
   public get leftUp(): Coordinate_ENGINE {
     return this._leftUp;

@@ -3,22 +3,22 @@ import type { Coordinate_ENGINE } from "./coordinate";
 
 export class Scene_ENGINE {
 
-    canvas: Canvas_ENGINE;
-    draw: () => void = () => { }
-    touchstart: (touch: Coordinate_ENGINE) => void = () => { }
-    touchmove: (touch: Coordinate_ENGINE) => void = () => { }
-    touchend: (touch: Coordinate_ENGINE) => void = () => { }
+    private _canvas: Canvas_ENGINE;
+    private _draw: () => void = () => { }
+    private _touchstart: (touch: Coordinate_ENGINE) => void = () => { }
+    private _touchmove: (touch: Coordinate_ENGINE) => void = () => { }
+    private _touchend: (touch: Coordinate_ENGINE) => void = () => { }
 
     constructor(canvas: Canvas_ENGINE) {
-        this.canvas = canvas;
+        this._canvas = canvas;
     }
 
-    async start() {
-        await this.canvas.start(
-            () => this.draw(),
-            (touch: Coordinate_ENGINE) => this.touchstart(touch),
-            (touch: Coordinate_ENGINE) => this.touchmove(touch),
-            (touch: Coordinate_ENGINE) => this.touchend(touch),
+    public start(): void {
+        this._canvas.start(
+            () => this._draw(),
+            (touch: Coordinate_ENGINE) => this._touchstart(touch),
+            (touch: Coordinate_ENGINE) => this._touchmove(touch),
+            (touch: Coordinate_ENGINE) => this._touchend(touch),
         );
     }
 }

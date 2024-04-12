@@ -1,5 +1,4 @@
 import { Box_ENGINE } from "./box";
-import type { Canvas_ENGINE } from "./canvas";
 import { Coordinate_ENGINE } from "./coordinate";
 import { Plane_ENGINE } from "./plane";
 import { Position_ENGINE } from "./position";
@@ -34,44 +33,44 @@ export class Boxes_ENGINE extends Coordinate_ENGINE {
         const position = new Position_ENGINE(
             coordinate,
             new Size_ENGINE(
-                this.boxSize.getWidth(),
-                this.boxSize.getHeight()
+                this.boxSize.width,
+                this.boxSize.height
             )
         );
 
-        const positionLeftUp = position.getLeftUp();
+        const positionLeftUp = position.leftUp;
         const boxIndicesLeftUp = this.getBoxIndices(
             new Coordinate_ENGINE(
-                positionLeftUp.getX(),
-                positionLeftUp.getY()
+                positionLeftUp.x,
+                positionLeftUp.y
             )
         );
 
-        const positionRightDown = position.getRightDown();
+        const positionRightDown = position.rightDown;
         const boxIndicesRightDown = this.getBoxIndices(
             new Coordinate_ENGINE(
-                positionRightDown.getX(),
-                positionRightDown.getY()
+                positionRightDown.x,
+                positionRightDown.y
             )
         );
 
         const boxIndices = new Plane_ENGINE(
-            boxIndicesLeftUp.getVertical(),
-            boxIndicesLeftUp.getHorizontal()
+            boxIndicesLeftUp.vertical,
+            boxIndicesLeftUp.horizontal
         );
         for (;
-            boxIndices.getVertical() <= boxIndicesRightDown.getVertical();
-            boxIndices.addVertical(1)
+            boxIndices.vertical <= boxIndicesRightDown.vertical;
+            boxIndices.vertical++
         ) {
             for (;
-                boxIndices.getHorizontal() <= boxIndicesRightDown.getHorizontal();
-                boxIndices.addHorizontal(1)
+                boxIndices.horizontal <= boxIndicesRightDown.horizontal;
+                boxIndices.horizontal++
             ) {
                 const box = this.getBox(boxIndices);
                 if (box === undefined)
                     continue;
 
-                if (box.someVertexInside(position) === false)
+                if (box.someVertexWithinPosition(position) === false)
                     continue;
 
                 return box;
@@ -81,10 +80,10 @@ export class Boxes_ENGINE extends Coordinate_ENGINE {
     }
 
     getPosition(boxIndices: Plane_ENGINE): Position_ENGINE {
-        const x = boxIndices.getHorizontal() * this.boxSize.getWidth();
-        const y = boxIndices.getVertical() * this.boxSize.getHeight();
-        const width = this.boxSize.getWidth() * this.length.getHorizontal();
-        const height = this.boxSize.getHeight() * this.length.getVertical();
+        const x = boxIndices.horizontal * this.boxSize.width;
+        const y = boxIndices.vertical * this.boxSize.height;
+        const width = this.boxSize.width * this.length.horizontal;
+        const height = this.boxSize.height * this.length.vertical;
         return new Position_ENGINE(
             new Coordinate_ENGINE(x, y),
             new Size_ENGINE(
@@ -95,7 +94,7 @@ export class Boxes_ENGINE extends Coordinate_ENGINE {
     }
 
     getBox(boxIndices: Plane_ENGINE): Box_ENGINE | undefined {
-        const boxesRow = this.boxes[boxIndices.getVertical()];
+        const boxesRow = this.boxes[boxIndices.vertical];
         if (boxesRow === undefined)
             return undefined;
 
