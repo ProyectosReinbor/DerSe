@@ -1,69 +1,56 @@
-import { Coordinate_ENGINE } from "./coordinate";
-import { Position_ENGINE } from "./position";
-import { Size_ENGINE } from "./size";
+import { Coordenadas } from "./coordenadas";
+import { Medidas } from "./medidas";
+import { Objeto } from "./objeto";
 
-export class Camera_ENGINE extends Position_ENGINE {
-    constructor(
-        leftUp: Coordinate_ENGINE,
-    ) {
+export class Camara extends Objeto {
+    constructor(izquierdaSuperior: Coordenadas) {
         super(
-            leftUp,
-            new Size_ENGINE(100, 100)
+            izquierdaSuperior,
+            new Medidas(100, 100)
         );
     }
 
-    positionInsideTheChamber(
-        position: Position_ENGINE
-    ): boolean {
-        const doubleSize = new Size_ENGINE(
-            position.size.width * 2,
-            position.size.height * 2
+    objetoAdentroDeCamara(objeto: Objeto): boolean {
+        const dobleDeMedidas = new Medidas(
+            objeto.medidas.ancho * 2,
+            objeto.medidas.alto * 2
         );
 
-        const vision = new Position_ENGINE(
-            new Coordinate_ENGINE(
-                this.leftUp.x - position.size.width,
-                this.leftUp.y - position.size.height,
+        const vision = new Objeto(
+            new Coordenadas(
+                this.izquierdaSuperior.x - objeto.medidas.ancho,
+                this.izquierdaSuperior.y - objeto.medidas.alto,
             ),
-            new Size_ENGINE(
-                this.size.width + doubleSize.width,
-                this.size.height + doubleSize.height
+            new Medidas(
+                this.medidas.ancho + dobleDeMedidas.ancho,
+                this.medidas.alto + dobleDeMedidas.alto
             )
         );
-        return vision.positionWithinPosition(
-            position
-        );
+        return vision.objetoAdentro(objeto);
     }
 
-    positionOnCamera(
-        position: Position_ENGINE
-    ): Position_ENGINE | false {
-        if (this.positionInsideTheChamber(position) === false)
+    objetoEnCamara(objeto: Objeto): Objeto | false {
+        if (this.objetoAdentroDeCamara(objeto) === false)
             return false;
 
-        return new Position_ENGINE(
-            new Coordinate_ENGINE(
-                position.leftUp.x - this.leftUp.x,
-                position.leftUp.y - this.leftUp.y,
+        return new Objeto(
+            new Coordenadas(
+                objeto.izquierdaSuperior.x - this.izquierdaSuperior.x,
+                objeto.izquierdaSuperior.y - this.izquierdaSuperior.y,
             ),
-            new Size_ENGINE(
-                position.size.width,
-                position.size.height
+            new Medidas(
+                objeto.medidas.ancho,
+                objeto.medidas.alto
             )
         );
     }
 
-    focusPosition(
-        position: Position_ENGINE
-    ): void {
-        let x = position.leftUp.x - (this.size.width / 2);
-        x += position.size.width / 2;
+    enfocar(objeto: Objeto): void {
+        this.izquierdaSuperior.x = objeto.izquierdaSuperior.x - this.medidas.mitad.ancho
+            + objeto.medidas.mitad.ancho;
 
-        let y = position.leftUp.y - (this.size.height / 2);
-        y += position.size.height / 2;
-
-        this.leftUp.x = x;
-        this.leftUp.y = y;
+        this.izquierdaSuperior.y = objeto.izquierdaSuperior.y - this.medidas.mitad.alto
+            + objeto.medidas.mitad.alto;
     }
 
 }

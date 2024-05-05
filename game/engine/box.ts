@@ -1,24 +1,20 @@
-import type { Coordinate_ENGINE } from "./coordinate";
-import { Position_ENGINE } from "./position";
-import type { Size_ENGINE } from "./size";
+import type { Coordenadas } from "./coordenadas";
+import type { Medidas } from "./medidas";
+import { Objeto } from "./objeto";
 
-export class Box_ENGINE extends Position_ENGINE {
+export class Box_ENGINE extends Objeto {
 
-    private _referenceIndex: number;
+    indice: number;
 
     constructor(
-        leftUp: Coordinate_ENGINE,
-        size: Size_ENGINE,
-        referenceIndex: number,
+        leftUp: Coordenadas,
+        size: Medidas,
+        indice: number,
     ) {
         super(
             leftUp,
             size,
         );
-        this._referenceIndex = referenceIndex;
-    }
-
-    get referenceIndex(): number {
-        return this._referenceIndex;
+        this.indice = indice;
     }
 }

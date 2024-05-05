@@ -1,17 +1,12 @@
-import { Animation_ENGINE } from "./animation";
-import { Animations_ENGINE } from "./animations";
+import type { Animacion } from "./animacion";
+import type { Animaciones } from "./animaciones";
 import type { OccupiedBoxes } from "./boxes";
-import type { Canvas_ENGINE } from "./canvas";
-import { Element_ENGINE } from "./element";
 import { ElementBoxes_ENGINE } from "./elementBoxes";
-import type { PathImage_ENGINE } from "./image";
-import { Plane_ENGINE } from "./plane";
-import { Size_ENGINE } from "./size";
 
-export class AnimationBoxes_ENGINE extends ElementBoxes_ENGINE {
+export class CasillasConAnimacion extends ElementBoxes_ENGINE {
 
-    override references: Animations_ENGINE[] = [];
-    animation: Animation_ENGINE;
+    override referencias: Animaciones[] = [];
+    animation: Animacion;
 
     constructor(
         x: number,

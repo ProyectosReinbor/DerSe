@@ -5,17 +5,17 @@ Bun.serve({
         if (url.pathname === "/") {
             const res = await Bun.build({
                 entrypoints: ['./game/index.ts'],
-                outdir: './public/js',
+                outdir: './/js',
             });
             if (res.logs.length > 0) {
                 console.log(res.logs);
             }
             return new Response(
-                Bun.file(`public/index.html`)
+                Bun.file(`/index.html`)
             );
         }
         return new Response(
-            Bun.file(`public${url.pathname}`)
+            Bun.file(`${url.pathname}`)
         );
     },
 });

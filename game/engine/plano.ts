@@ -1,7 +1,7 @@
-export class Plane_ENGINE {
+export class Plano {
 
-    public horizontal: number;
-    public vertical: number;
+    horizontal: number;
+    vertical: number;
 
     constructor(
         horizontal: number,

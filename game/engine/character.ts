@@ -11,10 +11,10 @@ import { Square_ENGINE } from "./square";
 
 export class Character_ENGINE extends Square_ENGINE {
 
-    private _scale: Size_ENGINE;
-    private _animations: Animations_ENGINE;
-    private _speed: Coordinate_ENGINE;
-    private _direction: Direction_ENGINE;
+    _scale: Size_ENGINE;
+    _animations: Animations_ENGINE;
+    _speed: Coordinate_ENGINE;
+    _direction: Direction_ENGINE;
 
     constructor(
         _leftUp: Coordinate_ENGINE,
@@ -54,7 +54,7 @@ export class Character_ENGINE extends Square_ENGINE {
         this._direction = _direction;
     }
 
-    protected movedCharacter(): Coordinate_ENGINE | false {
+    movedCharacter(): Coordinate_ENGINE | false {
         if (this._direction.isEqualTo(
             new Direction_ENGINE("center", "center")
         ))
@@ -70,7 +70,7 @@ export class Character_ENGINE extends Square_ENGINE {
         return new Coordinate_ENGINE(newX, newY);
     }
 
-    public drawCharacter() {
+    drawCharacter() {
         this.drawSquare();
         this._animations = new Animations_ENGINE(
             new Coordinate_ENGINE(

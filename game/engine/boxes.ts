@@ -1,18 +1,14 @@
 import { Box_ENGINE } from "./box";
-import { Coordinate_ENGINE } from "./coordinate";
-import { Plane_ENGINE } from "./plane";
-import { Position_ENGINE } from "./position";
-import { Size_ENGINE } from "./size";
 
 export type OccupiedBoxes = true | boolean[][];
 
 export class Boxes_ENGINE extends Coordinate_ENGINE {
 
-    private boxes: Box_ENGINE[][] = [];
-    private references: Position_ENGINE[] = [];
-    private boxSize: Size_ENGINE;
-    private length: Plane_ENGINE;
-    private occupied: OccupiedBoxes;
+    boxes: Box_ENGINE[][] = [];
+    references: Position_ENGINE[] = [];
+    boxSize: Size_ENGINE;
+    length: Plane_ENGINE;
+    occupied: OccupiedBoxes;
 
     constructor(
         x: number,
@@ -108,7 +104,7 @@ export class Boxes_ENGINE extends Coordinate_ENGINE {
         return new Plane_ENGINE(horizontal, vertical);
     }
 
-    private boxesIndices(
+    boxesIndices(
         boxIndices: Plane_ENGINE,
         box: Box_ENGINE,
     ) {
@@ -120,7 +116,7 @@ export class Boxes_ENGINE extends Coordinate_ENGINE {
         this.boxes[boxIndices.vertical] = row;
     }
 
-    private setBox(
+    setBox(
         boxIndices: Plane_ENGINE,
         referenceIndex: number,
     ) {
@@ -149,7 +145,7 @@ export class Boxes_ENGINE extends Coordinate_ENGINE {
         );
     }
 
-    private occupiedBoxes(
+    occupiedBoxes(
         initialReferenceIndices: Plane_ENGINE,
         indexesBoxOccupy: Plane_ENGINE,
         referenceIndex: number,
@@ -185,7 +181,7 @@ export class Boxes_ENGINE extends Coordinate_ENGINE {
         return this.references[referenceIndex];
     }
 
-    protected referencesPush(
+    referencesPush(
         boxIndices: Plane_ENGINE,
         reference: Position_ENGINE,
     ): number | undefined {
