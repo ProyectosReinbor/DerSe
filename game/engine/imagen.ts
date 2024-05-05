@@ -31,7 +31,7 @@ export class Imagen extends Objeto {
     return this.lienzo.imagines.cargarImagen(this.ruta);
   }
 
-  drawImage() {
+  dibujarImagen() {
     if (this.imagen === false)
       return;
 

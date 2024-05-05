@@ -2,19 +2,19 @@ import type { Coordenadas } from "./coordenadas";
 import type { Medidas } from "./medidas";
 import { Objeto } from "./objeto";
 
-export class Box_ENGINE extends Objeto {
+export class Casilla extends Objeto {
 
-    indice: number;
+    indiceObjeto: number;
 
     constructor(
         leftUp: Coordenadas,
         size: Medidas,
-        indice: number,
+        indiceObjeto: number,
     ) {
         super(
             leftUp,
             size,
         );
-        this.indice = indice;
+        this.indiceObjeto = indiceObjeto;
     }
 }

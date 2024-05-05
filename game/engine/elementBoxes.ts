@@ -1,56 +1,58 @@
-import type { OccupiedBoxes } from "./boxes";
-import type { Canvas_ENGINE } from "./canvas";
-import { Element_ENGINE } from "./element";
-import { Elements_ENGINE } from "./elements";
-import type { PathImage_ENGINE } from "./image";
-import { ImageBoxes_ENGINE } from "./imageBoxes";
-import { Plane_ENGINE } from "./plane";
-import { Size_ENGINE } from "./size";
+import { Casillas, type CasillasOcupadas } from "./casillas";
+import { Elemento } from "./elemento";
+import { Elementos } from "./elementos";
+import type { RutaImagen } from "./imagen";
+import type { Lienzo } from "./lienzo";
+import type { Medidas } from "./medidas";
+import type { Plano } from "./plano";
 
-export class ElementBoxes_ENGINE extends ImageBoxes_ENGINE {
+export class CasillasElementos extends Casillas {
 
-    override references: Elements_ENGINE[] = [];
-    element: Element_ENGINE;
+    elementos: Elementos[] = [];
+    lienzo: Lienzo;
+    ruta: RutaImagen | false;
+    elemento: Elemento;
 
     constructor(
         x: number,
         y: number,
-        canvas: Canvas_ENGINE,
-        size: Size_ENGINE,
-        length: Plane_ENGINE,
-        occupied: OccupiedBoxes,
-        route: PathImage_ENGINE | false,
-        element: Element_ENGINE,
+        medidasCasilla: Medidas,
+        longitudCasillasOcupadas: Plano,
+        casillasOcupadas: CasillasOcupadas,
+        lienzo: Lienzo,
+        ruta: RutaImagen | false,
+        elemento: Elemento,
     ) {
         super(
             x,
             y,
-            canvas,
-            size,
-            length,
-            occupied,
-            route,
+            medidasCasilla,
+            longitudCasillasOcupadas,
+            casillasOcupadas
         );
-        this.element = element;
+        this.lienzo = lienzo;
+        this.ruta = ruta;
+        this.elemento = elemento;
     }
 
-    override referencePush(boxIndices: Plane_ENGINE): Elements_ENGINE | undefined {
-        const position = this.getPosition(boxIndices);
-        const reference = new Elements_ENGINE(
-            position.leftUp,
-            position.size,
-            this.canvas,
-            this.route,
-            new Element_ENGINE(
-                new Size_ENGINE(
-                    this.element.size.width,
-                    this.element.size.height
-                ),
-                new Plane_ENGINE(
-                    this.element.getIndices().horizontal,
-                    this.element.getIndices().vertical
-                )
+    agregarElementos(indicesCasilla: Plano) {
+        const objeto = this.nuevoObjeto(indicesCasilla);
+        const elemento = new Elemento(
+            new Meidas(
+                this.element.size.width,
+                this.element.size.height
+            ),
+            new Plane_ENGINE(
+                this.element.getIndices().horizontal,
+                this.element.getIndices().vertical
             )
+        )
+        const elementos = new Elementos(
+            objeto.izquierdaSuperior,
+            objeto.medidas,
+            this.lienzo,
+            this.ruta,
+
         );
 
         const indexReference = this.referencesPush(
