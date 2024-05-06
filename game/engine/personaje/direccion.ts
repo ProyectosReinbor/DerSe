@@ -1,20 +1,20 @@
-export type XDirection_ENGINE = "left" | "right" | "center";
-export type YDirection_ENGINE = "up" | "down" | "center";
+export type DireccionX = "left" | "right" | "center";
+export type DireccionY = "up" | "down" | "center";
 
-export class Direction_ENGINE {
+export class Direccion {
 
-    x: XDirection_ENGINE;
-    y: YDirection_ENGINE;
+    x: DireccionX;
+    y: DireccionY;
 
     constructor(
-        _x: XDirection_ENGINE,
-        _y: YDirection_ENGINE,
+        x: DireccionX,
+        y: DireccionY,
     ) {
-        this.x = _x;
-        this.y = _y;
+        this.x = x;
+        this.y = y;
     }
 
-    get numberX(): 0 | 1 | -1 {
+    get xNumero() {
         if (this.x === "left")
             return -1;
 
@@ -27,7 +27,7 @@ export class Direction_ENGINE {
         throw new Error("invalid  direction x");
     }
 
-    get numberY(): 0 | 1 | -1 {
+    get yNumero() {
         if (this.y === "up")
             return -1;
 
@@ -40,9 +40,7 @@ export class Direction_ENGINE {
         throw new Error("invalid direction y");
     }
 
-    isEqualTo(
-        direction: Direction_ENGINE
-    ): boolean {
+    igualA(direction: Direccion) {
         return this.x === direction.x &&
             this.y === direction.y;
     }

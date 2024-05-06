@@ -1,15 +1,14 @@
-import type { Canvas_ENGINE } from "./canvas";
-import type { Coordinate_ENGINE } from "./coordinate";
-import { Position_ENGINE } from "./position";
-import { Size_ENGINE } from "./size";
+import type { Coordenadas } from "./coordenadas";
+import type { Lienzo } from "./lienzo";
+import { Objeto } from "./objeto";
 
-export class Curve_ENGINE extends Position_ENGINE {
+export class Curva extends Objeto {
 
-  canvas: Canvas_ENGINE;
-  checkPoint: Coordinate_ENGINE;
+  lienzo: Lienzo;
+  : Coordenadas;
 
   constructor(
-    leftUp: Coordinate_ENGINE,
+    izquierdaSuperior: Coordenadas,
     rightDown: Coordinate_ENGINE,
     canvas: Canvas_ENGINE,
     checkPoint: Coordinate_ENGINE,

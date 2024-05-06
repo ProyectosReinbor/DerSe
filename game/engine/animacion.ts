@@ -11,11 +11,11 @@ export class Animacion {
     this.intervaloEntreCuadros = intervaloEntreCuadros;
   }
 
-  get framesPerSecond() {
+  get cuadrosPorSegundo() {
     return 1000 / this.intervaloEntreCuadros;
   }
 
-  set framesPerSecond(value: number) {
+  set cuadrosPorSegundo(value: number) {
     this.intervaloEntreCuadros = 1000 / value;
   }
 }

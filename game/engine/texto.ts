@@ -1,5 +1,5 @@
 import type { Lienzo } from "./lienzo";
-import type { FillStyle, StrokeStyle } from "./context";
+import type { FillStyle, StrokeStyle } from "./contexto";
 import type { Coordenadas } from "./coordenadas";
 import type { Medidas } from "./medidas";
 import { Objeto } from "./objeto";

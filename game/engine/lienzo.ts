@@ -1,6 +1,7 @@
 import { Camara } from "./camera";
 import { Coordenadas } from "./coordenadas";
 import type { Escena } from "./escena";
+import { EventosToques } from "./eventosToques";
 import { Imagines } from "./imagines";
 import { Medidas } from "./medidas";
 import { Objeto } from "./objeto";
@@ -17,6 +18,7 @@ export class Lienzo extends Camara {
   tiempoEntreCuadros: number = 0;
   contexto: CanvasRenderingContext2D;
   escena: Escena | false = false;
+  eventosToques: EventosToques;
 
   siguienteCuadro(tiempo: number) {
     const diferncia = tiempo - this.tiempo;
@@ -75,7 +77,7 @@ export class Lienzo extends Camara {
       "resize",
       () => this.relacionAspecto()
     );
-
+    this.eventosToques = new EventosToques(this);
     this.siguienteCuadro(0);
   }
 
