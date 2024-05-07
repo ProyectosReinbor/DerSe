@@ -42,7 +42,7 @@ export class Teclado extends Cuadrado {
     this.teclasMinusculas = this.obtenerTeclas([
       "1234567890",
       "qwertyuiop",
-      "asdfghjkl_",
+      "asdfghjkl",
       "zxcvbnm@.,"
     ]);
     this.shift = new Shift(lienzo, this);

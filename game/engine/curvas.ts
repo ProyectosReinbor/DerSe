@@ -1,16 +1,16 @@
 
-import { Curve_ENGINE } from "./curve.js";
+import { CurveENGINE } from "./curve.js";
 
-export class Curves_ENGINE {
+export class CurvesENGINE {
 
-  curves: Curve_ENGINE[] = [];
-  canvas: Canvas_ENGINE;
+  curves: CurveENGINE[] = [];
+  canvas: CanvasENGINE;
   fillStyle: FillStyle;
   strokeStyle: StrokeStyle;
   lineWidth: number;
 
   constructor(
-    canvas: Canvas_ENGINE,
+    canvas: CanvasENGINE,
     fillStyle: FillStyle,
     strokeStyle: StrokeStyle,
     lineWidth: number,
@@ -22,12 +22,12 @@ export class Curves_ENGINE {
   }
 
   addCurve(
-    leftUp: Coordinate_ENGINE,
-    rightDown: Coordinate_ENGINE,
-    checkPoint: Coordinate_ENGINE,
+    leftUp: CoordinateENGINE,
+    rightDown: CoordinateENGINE,
+    checkPoint: CoordinateENGINE,
   ) {
     this.curves.push(
-      new Curve_ENGINE(
+      new CurveENGINE(
         leftUp,
         rightDown,
         this.canvas,

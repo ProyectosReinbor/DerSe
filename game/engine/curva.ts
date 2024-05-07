@@ -1,56 +1,56 @@
 import type { Coordenadas } from "./coordenadas";
 import type { Lienzo } from "./lienzo";
+import { Medidas } from "./medidas";
 import { Objeto } from "./objeto";
 
 export class Curva extends Objeto {
 
   lienzo: Lienzo;
-  : Coordenadas;
+  puntoControl: Coordenadas;
 
   constructor(
     izquierdaSuperior: Coordenadas,
-    rightDown: Coordinate_ENGINE,
-    canvas: Canvas_ENGINE,
-    checkPoint: Coordinate_ENGINE,
+    derechaInferior: Coordenadas,
+    lienzo: Lienzo,
+    puntoControl: Coordenadas,
   ) {
-    const size = new Size_ENGINE(
-      rightDown.x - leftUp.x,
-      rightDown.y - leftUp.y
+    const medidas = new Medidas(
+      derechaInferior.x - izquierdaSuperior.x,
+      derechaInferior.y - izquierdaSuperior.y
     );
     super(
-      leftUp,
-      size,
+      izquierdaSuperior,
+      medidas,
     );
-    this.canvas = canvas;
-    this.checkPoint = checkPoint;
+    this.lienzo = lienzo;
+    this.puntoControl = puntoControl;
   }
 
-  drawCurve() {
-    const positionOnCanvas = this.canvas.positionOnCanvas(this);
-    if (positionOnCanvas === false)
+  dibujarCurva() {
+    const objetoEnLienzo = this.lienzo.objetoEnLienzo(this);
+    if (objetoEnLienzo === false)
       return;
 
-    const checkPointOnCanvas = this.canvas.positionOnCanvas(
-      new Position_ENGINE(
-        this.checkPoint,
-        new Size_ENGINE(0, 0)
+    const puntoControlEnLienzo = this.lienzo.objetoEnLienzo(
+      new Objeto(
+        this.puntoControl,
+        new Medidas(0, 0),
       )
     );
-    if (checkPointOnCanvas === false)
+    if (puntoControlEnLienzo === false)
       return;
 
-    this.canvas.context.moveTo(
-      positionOnCanvas.leftUp.x,
-      positionOnCanvas.leftUp.y
+    this.lienzo.contexto.moveTo(
+      objetoEnLienzo.izquierdaSuperior.x,
+      objetoEnLienzo.izquierdaSuperior.y
     );
 
-    const positionOnCanvasRightDown = positionOnCanvas.rightDown();
 
-    this.canvas.context.quadraticCurveTo(
-      checkPointOnCanvas.leftUp.x,
-      checkPointOnCanvas.leftUp.y,
-      positionOnCanvasRightDown.x,
-      positionOnCanvasRightDown.y
+    this.lienzo.contexto.quadraticCurveTo(
+      puntoControlEnLienzo.izquierdaSuperior.x,
+      puntoControlEnLienzo.izquierdaSuperior.y,
+      objetoEnLienzo.derechaInferior.x,
+      objetoEnLienzo.derechaInferior.y
     );
   }
 }

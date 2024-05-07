@@ -1,6 +1,6 @@
 import { Circle } from "../circle";
 import { Cuadrado } from "../cuadrado";
-import { Curves_ENGINE } from "../curves";
+import { CurvesENGINE } from "../curves";
 import type { EntradaTexto } from "../entradaTexto";
 import type { Lienzo } from "../lienzo";
 import { Medidas } from "../medidas";
@@ -10,7 +10,7 @@ export class Ocultar extends Cuadrado {
   valor: string = "";
   entradaTexto: EntradaTexto;
   encendido: boolean;
-  parpado: Curves_ENGINE;
+  parpado: CurvesENGINE;
   pupila: Circle;
 
   constructor(
@@ -32,13 +32,13 @@ export class Ocultar extends Cuadrado {
     );
     this.entradaTexto = entradaTexto;
     this.encendido = encendido;
-    this.parpado = new Curves_ENGINE(
+    this.parpado = new CurvesENGINE(
       canvas,
       false,
       "#fff",
       0.5
     );
-    this.eyelid = new Curves_ENGINE(
+    this.eyelid = new CurvesENGINE(
       canvas,
       false,
       "#fff",
@@ -46,32 +46,32 @@ export class Ocultar extends Cuadrado {
     );
     this.eyelid.addCurve(
       input.leftUpPlusSizePercentages(
-        new Size_ENGINE(89, 50)
+        new SizeENGINE(89, 50)
       ),
       input.leftUpPlusSizePercentages(
-        new Size_ENGINE(97, 50)
+        new SizeENGINE(97, 50)
       ),
       input.leftUpPlusSizePercentages(
-        new Size_ENGINE(93, 70)
+        new SizeENGINE(93, 70)
       )
     );
     this.eyelid.addCurve(
       input.leftUpPlusSizePercentages(
-        new Size_ENGINE(89, 50)
+        new SizeENGINE(89, 50)
       ),
       input.leftUpPlusSizePercentages(
-        new Size_ENGINE(97, 50)
+        new SizeENGINE(97, 50)
       ),
       input.leftUpPlusSizePercentages(
-        new Size_ENGINE(93, 20)
+        new SizeENGINE(93, 20)
       )
     );
     this.iris = new Circle(
       input.leftUpPlusSizePercentages(
-        new Size_ENGINE(87, 36)
+        new SizeENGINE(87, 36)
       ),
       input.size.percentage(
-        new Size_ENGINE(12, 26)
+        new SizeENGINE(12, 26)
       ),
       canvas,
       0,
@@ -83,7 +83,7 @@ export class Ocultar extends Cuadrado {
     );
   }
 
-  touchendHide(touch: Coordinate_ENGINE) {
+  touchendHide(touch: CoordinateENGINE) {
     if (this.insidePositionCoordinate(touch) === false)
       return false;
 

@@ -42,7 +42,7 @@ export class CasillasElementos extends Casillas {
                 this.element.size.width,
                 this.element.size.height
             ),
-            new Plane_ENGINE(
+            new PlaneENGINE(
                 this.element.getIndices().horizontal,
                 this.element.getIndices().vertical
             )
