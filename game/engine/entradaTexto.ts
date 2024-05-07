@@ -70,7 +70,7 @@ export class EntradaTexto extends Cuadrado {
         if (this.valor.length === 0)
             return this.parametrosInformacion.valor;
 
-        if (this.ocultar.switchedOn === false)
+        if (this.ocultar.encendido === false)
             return this.valor;
 
         return this.ocultar.encryption;

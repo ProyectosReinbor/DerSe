@@ -1,4 +1,4 @@
-import type { FillStyle, StrokeStyle } from "./context.js";
+import type { FillStyle, StrokeStyle } from "./contexto.js";
 import type { Coordenadas } from "./coordenadas.js";
 import type { Lienzo } from "./lienzo.js";
 import { Linea } from "./linea.js";

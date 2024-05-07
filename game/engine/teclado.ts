@@ -1,23 +1,23 @@
-import { Keys_ENGINE } from "./keyboard/keys";
-import { Shift_ENGINE } from "./keyboard/shift";
-import { Enter_ENGINE } from "./keyboard/enter";
-import { Space_ENGINE } from "./keyboard/space";
-import { Delete_ENGINE } from "./keyboard/delete";
-import { CloseQuestion_ENGINE } from "./keyboard/closeQuestion";
-import { Finish_ENGINE } from "./keyboard/finish";
-import type { Input_ENGINE } from "./input";
+
 import { Cuadrado } from "./cuadrado";
+import type { EntradaTexto } from "./entradaTexto";
+import type { Borrar } from "./teclado/borrar";
+import type { CerrarPregunta } from "./teclado/cerrarPregunta";
+import type { Enter } from "./teclado/enter";
+import type { Espacio } from "./teclado/espacio";
+import type { Shift } from "./teclado/shift";
+import type { Teclas } from "./teclado/teclas";
 
 export class Teclado extends Cuadrado {
 
-  entrada: Input_ENGINE | false = false;
-  shiftKeys: Keys_ENGINE[];
-  keys: Keys_ENGINE[];
-  shift: Shift_ENGINE;
-  enter: Enter_ENGINE;
-  space: Space_ENGINE;
-  delete: Delete_ENGINE;
-  closeQuestion: CloseQuestion_ENGINE;
+  entrada: EntradaTexto | false = false;
+  teclasMayusculas: Teclas[];
+  teclasMinusculas: Teclas[];
+  shift: Shift;
+  enter: Enter;
+  espacio: Espacio;
+  borrar: Borrar;
+  cerrarPregunta: CerrarPregunta;
   finish: Finish_ENGINE;
 
   constructor(canvas: Canvas_ENGINE) {
