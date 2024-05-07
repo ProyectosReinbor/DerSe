@@ -1,12 +1,16 @@
 
+import { Coordenadas } from "./coordenadas";
 import { Cuadrado } from "./cuadrado";
 import type { EntradaTexto } from "./entradaTexto";
-import type { Borrar } from "./teclado/borrar";
-import type { CerrarPregunta } from "./teclado/cerrarPregunta";
-import type { Enter } from "./teclado/enter";
-import type { Espacio } from "./teclado/espacio";
-import type { Shift } from "./teclado/shift";
-import type { Teclas } from "./teclado/teclas";
+import type { Lienzo } from "./lienzo";
+import { Medidas } from "./medidas";
+import { Borrar } from "./teclado/borrar";
+import { CerrarPregunta } from "./teclado/cerrarPregunta";
+import { Enter } from "./teclado/enter";
+import { Espacio } from "./teclado/espacio";
+import { Shift } from "./teclado/shift";
+import { Teclas } from "./teclado/teclas";
+import { Terminar } from "./teclado/terminar";
 
 export class Teclado extends Cuadrado {
 
@@ -18,138 +22,138 @@ export class Teclado extends Cuadrado {
   espacio: Espacio;
   borrar: Borrar;
   cerrarPregunta: CerrarPregunta;
-  finish: Finish_ENGINE;
+  terminar: Terminar;
 
-  constructor(canvas: Canvas_ENGINE) {
+  constructor(lienzo: Lienzo) {
     super(
-      new Coordinate_ENGINE(5, 35),
-      new Size_ENGINE(90, 60),
-      canvas,
+      new Coordenadas(5, 35),
+      new Medidas(90, 60),
+      lienzo,
       "#21618C",
       false,
       0,
     );
-    this.shiftKeys = this.getKeys([
+    this.teclasMayusculas = this.obtenerTeclas([
       "1234567890",
       "QWERTYUIOP",
       "ASDFGHJKL",
       "ZXCVBNM@.,"
     ]);
-    this.keys = this.getKeys([
+    this.teclasMinusculas = this.obtenerTeclas([
       "1234567890",
       "qwertyuiop",
       "asdfghjkl_",
       "zxcvbnm@.,"
     ]);
-    this.shift = new Shift_ENGINE(canvas, this);
-    this.enter = new Enter_ENGINE(canvas, this);
-    this.space = new Space_ENGINE(canvas, this);
-    this.delete = new Delete_ENGINE(canvas, this);
-    this.closeQuestion = new CloseQuestion_ENGINE(canvas, this);
-    this.finish = new Finish_ENGINE(canvas, this);
+    this.shift = new Shift(lienzo, this);
+    this.enter = new Enter(lienzo, this);
+    this.espacio = new Espacio(lienzo, this);
+    this.borrar = new Borrar(lienzo, this);
+    this.cerrarPregunta = new CerrarPregunta(lienzo, this);
+    this.terminar = new Terminar(lienzo, this);
   }
 
-  getKeys(keys: string[]) {
-    const size = this.size.percentage(
-      new Size_ENGINE(97, 80)
+  obtenerTeclas(teclas: string[]) {
+    const medidas = this.medidas.porcentaje(
+      new Medidas(97, 80)
     );
-    size.height /= keys.length;
-    return keys.map((characters, index) => {
-      const left = size.aPercent().width * index;
-      const nextIndex = index + 1;
-      const top = size.height * nextIndex;
-      return new Keys_ENGINE(
-        this.leftUp.x + left,
-        this.leftUp.y + top,
-        this.canvas,
-        characters,
+    medidas.alto /= teclas.length;
+    return teclas.map((caracteres, indice) => {
+      const izquierda = medidas.unPorciento.ancho * indice;
+      const siguienteIndice = indice + 1;
+      const superior = medidas.alto * siguienteIndice;
+      return new Teclas(
+        this.izquierdaSuperior.x + izquierda,
+        this.izquierdaSuperior.y + superior,
+        this.lienzo,
+        caracteres,
         {
-          size,
-          text: {
-            size: new Size_ENGINE(0, 9),
+          medidas,
+          texto: {
+            medidas: new Medidas(0, 9),
           },
-          keyPress: (character: string) => {
-            if (this.input === false) return;
-            this.input.addChar(character);
+          presionarTecla: (caracter: string) => {
+            if (this.entrada === false)
+              return;
+
+            this.entrada.agregarCaracter(caracter);
           }
         }
       )
     });
   }
 
-  touchstartKeyboard(touch: Coordinate_ENGINE) {
-    if (this.input === false)
+  toqueEmpezado(toque: Coordenadas) {
+    if (this.entrada === false)
       return;
 
-    this.delete.touchstartDelete(touch);
+    this.borrar.toqueEmpezado(toque);
   }
 
-  touchmoveKeyboard(touch: Coordinate_ENGINE) {
-    if (this.input === false)
+  toqueMovido(toque: Coordenadas) {
+    if (this.entrada === false)
       return;
 
-    this.delete.touchmoveDelete(touch);
+    this.borrar.toqueMovido(toque);
   }
 
-  touchendKeyboard(touch: Coordinate_ENGINE) {
-    if (this.input === false)
+  toqueTerminado(toque: Coordenadas) {
+    if (this.entrada === false)
       return;
 
-    if (this.delete.touchendDelete() === true)
+    if (this.borrar.toqueTerminado() === true)
       return;
 
-    if (this.space.touchendSpace(touch) === true)
+    if (this.espacio.toqueTerminado(toque) === true)
       return;
 
-    if (this.shift.touchendShift(touch) === true)
+    if (this.shift.toqueTerminado(toque) === true)
       return;
 
-    if (this.closeQuestion.touchendCloseQuestion(touch) === true)
+    if (this.cerrarPregunta.toqueTerminado(toque) === true)
       return;
 
-    if (this.finish.touchendFinish(touch) === true)
+    if (this.terminar.toqueTerminado(toque) === true)
       return;
 
-    if (this.enter.touchendEnter(touch) === true)
+    if (this.enter.toqueTerminado(toque) === true)
       return;
 
-    if (this.shift.uppercase === true) {
-      const touchendKeys = this.shiftKeys.some(
-        keys => keys.touchendKeys(touch)
+    if (this.shift.mayusculas === true) {
+      const toqueTerminado = this.teclasMayusculas.some(
+        teclaMayuscula => teclaMayuscula.toqueTerminado(toque)
       );
-      if (touchendKeys === true)
+      if (toqueTerminado === true)
         return;
-
     }
-    else if (this.shift.uppercase === false) {
-      const touchendKeys = this.keys.some(
-        keys => keys.touchendKeys(touch)
+    else {
+      const toqueTerminado = this.teclasMinusculas.some(
+        teclaMinuscula => teclaMinuscula.toqueTerminado(toque)
       );
-      if (touchendKeys === true)
+      if (toqueTerminado === true)
         return;
-
     }
   }
 
-  drawKeyboard() {
-    if (this.input === false)
+  dibujarTeclado() {
+    if (this.entrada === false)
       return;
 
-    this.drawSquare();
-    if (this.shift.uppercase === true)
-      this.shiftKeys.forEach(
-        keys => keys.drawKeys()
+    this.dibujarCuadrado();
+    if (this.shift.mayusculas === true)
+      this.teclasMayusculas.forEach(
+        teclaMayuscula => teclaMayuscula.dibujarTeclas()
       );
-    else if (this.shift.uppercase === false)
-      this.keys.forEach(
-        keys => keys.drawKeys()
+    else
+      this.teclasMinusculas.forEach(
+        teclaMinuscula => teclaMinuscula.dibujarTeclas()
       );
 
-    this.delete.drawDelete();
-    this.shift.drawShift();
-    this.enter.drawEnter();
-    this.space.drawButton();
-    this.closeQuestion.drawButton();
-    this.finish.drawFinish();
+    this.borrar.dibujarBorrar();
+    this.shift.dibujarShift();
+    this.enter.dibujarEnter();
+    this.espacio.dibujarBoton();
+    this.cerrarPregunta.dibujarBoton();
+    this.terminar.dibujarTerminar();
   }
 }

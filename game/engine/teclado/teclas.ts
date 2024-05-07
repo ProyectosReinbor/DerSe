@@ -57,7 +57,7 @@ export class Teclas extends Coordenadas {
     }
   }
 
-  terminarToque(toque: Coordenadas) {
+  toqueTerminado(toque: Coordenadas) {
     return this.teclas.some(
       teclas => teclas.terminarToque(toque)
     );

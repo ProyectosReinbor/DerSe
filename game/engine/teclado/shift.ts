@@ -58,7 +58,7 @@ export class Shift extends Cuadrado {
     );
   }
 
-  terminarToque(toque: Coordenadas) {
+  toqueTerminado(toque: Coordenadas) {
     if (this.coordenadasAdentro(toque) === false)
       return false;
 

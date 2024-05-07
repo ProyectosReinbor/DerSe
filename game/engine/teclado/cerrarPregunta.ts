@@ -37,7 +37,7 @@ export class CerrarPregunta extends Boton {
     this.teclado = teclado;
   }
 
-  terminoToque(toque: Coordenadas) {
+  toqueTerminado(toque: Coordenadas) {
     if (this.coordenadasAdentro(toque) === false)
       return false;
 
