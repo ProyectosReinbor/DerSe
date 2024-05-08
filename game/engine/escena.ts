@@ -1,4 +1,4 @@
-import type { Lienzo } from "./canvas";
+import type { Lienzo } from "./lienzo";
 import type { Coordenadas } from "./coordenadas";
 
 export class Escena {

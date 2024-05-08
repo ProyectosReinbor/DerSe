@@ -1,56 +1,59 @@
 
-import { CurveENGINE } from "./curve.js";
+import type { FillStyle, StrokeStyle } from "./contexto.js";
+import type { Coordenadas } from "./coordenadas.js";
+import { Curva } from "./curva.js";
+import type { Lienzo } from "./lienzo.js";
 
-export class CurvesENGINE {
+export class Curvas {
 
-  curves: CurveENGINE[] = [];
-  canvas: CanvasENGINE;
+  curvas: Curva[] = [];
+  lienzo: Lienzo;
   fillStyle: FillStyle;
   strokeStyle: StrokeStyle;
   lineWidth: number;
 
   constructor(
-    canvas: CanvasENGINE,
+    lienzo: Lienzo,
     fillStyle: FillStyle,
     strokeStyle: StrokeStyle,
     lineWidth: number,
   ) {
-    this.canvas = canvas;
+    this.lienzo = lienzo;
     this.fillStyle = fillStyle;
     this.strokeStyle = strokeStyle;
     this.lineWidth = lineWidth;
   }
 
-  addCurve(
-    leftUp: CoordinateENGINE,
-    rightDown: CoordinateENGINE,
-    checkPoint: CoordinateENGINE,
+  agregarCurva(
+    izquierdaSuperior: Coordenadas,
+    derechaInferior: Coordenadas,
+    puntoControl: Coordenadas,
   ) {
-    this.curves.push(
-      new CurveENGINE(
-        leftUp,
-        rightDown,
-        this.canvas,
-        checkPoint,
+    this.curvas.push(
+      new Curva(
+        izquierdaSuperior,
+        derechaInferior,
+        this.lienzo,
+        puntoControl,
       )
     );
   }
 
-  drawCurves() {
-    this.canvas.context.beginPath();
-    this.curves.forEach(curve => curve.drawCurve());
+  dibujarCurvas() {
+    this.lienzo.contexto.beginPath();
+    this.curvas.forEach(curva => curva.dibujarCurva());
 
     if (this.strokeStyle !== false) {
-      this.canvas.context.strokeStyle = this.strokeStyle;
-      this.canvas.context.lineWidth = this.lineWidth;
-      this.canvas.context.stroke();
+      this.lienzo.contexto.strokeStyle = this.strokeStyle;
+      this.lienzo.contexto.lineWidth = this.lineWidth;
+      this.lienzo.contexto.stroke();
     }
 
     if (this.fillStyle !== false) {
-      this.canvas.context.fillStyle = this.fillStyle;
-      this.canvas.context.fill();
+      this.lienzo.contexto.fillStyle = this.fillStyle;
+      this.lienzo.contexto.fill();
     }
 
-    this.canvas.context.closePath();
+    this.lienzo.contexto.closePath();
   }
 }

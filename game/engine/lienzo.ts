@@ -1,4 +1,4 @@
-import { Camara } from "./camera";
+import { Camara } from "./camara";
 import { Coordenadas } from "./coordenadas";
 import type { Escena } from "./escena";
 import { EventosToques } from "./eventosToques";

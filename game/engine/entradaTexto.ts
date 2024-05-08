@@ -57,7 +57,7 @@ export class EntradaTexto extends Cuadrado {
 
         this.lienzo.eventosToques.toques.forEach(
             toque => {
-                if (this.ocultar.touchendHide(toque) === true)
+                if (this.ocultar.toqueTerminado(toque) === true)
                     return;
 
                 if (this.coordenadasAdentro(toque) === false)
@@ -73,13 +73,13 @@ export class EntradaTexto extends Cuadrado {
         if (this.ocultar.encendido === false)
             return this.valor;
 
-        return this.ocultar.encryption;
+        return this.ocultar.valorEncriptado;
     }
 
     dibujarEntradaTexto() {
         this.dibujarCuadrado();
         this.texto.valor = this.valorTexto;
-        this.ocultar.drawHide();
+        this.ocultar.dibujarOcultar();
         this.texto.dibujarTexto();
     }
 

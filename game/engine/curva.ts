@@ -45,7 +45,6 @@ export class Curva extends Objeto {
       objetoEnLienzo.izquierdaSuperior.y
     );
 
-
     this.lienzo.contexto.quadraticCurveTo(
       puntoControlEnLienzo.izquierdaSuperior.x,
       puntoControlEnLienzo.izquierdaSuperior.y,

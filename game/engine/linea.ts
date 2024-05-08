@@ -1,4 +1,4 @@
-import type { FillStyle, StrokeStyle } from "./context";
+import type { FillStyle, StrokeStyle } from "./contexto";
 import type { Coordenadas } from "./coordenadas";
 import type { Lienzo } from "./lienzo";
 import { Medidas } from "./medidas";

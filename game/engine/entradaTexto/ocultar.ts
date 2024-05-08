@@ -1,6 +1,7 @@
-import { Circle } from "../circle";
+import { Circulo } from "../circulo";
+import type { Coordenadas } from "../coordenadas";
 import { Cuadrado } from "../cuadrado";
-import { CurvesENGINE } from "../curves";
+import { Curvas } from "../curvas";
 import type { EntradaTexto } from "../entradaTexto";
 import type { Lienzo } from "../lienzo";
 import { Medidas } from "../medidas";
@@ -10,8 +11,8 @@ export class Ocultar extends Cuadrado {
   valor: string = "";
   entradaTexto: EntradaTexto;
   encendido: boolean;
-  parpado: CurvesENGINE;
-  pupila: Circle;
+  parpado: Curvas;
+  pupila: Circulo;
 
   constructor(
     entradaTexto: EntradaTexto,
@@ -32,48 +33,42 @@ export class Ocultar extends Cuadrado {
     );
     this.entradaTexto = entradaTexto;
     this.encendido = encendido;
-    this.parpado = new CurvesENGINE(
-      canvas,
+    this.parpado = new Curvas(
+      lienzo,
       false,
       "#fff",
       0.5
     );
-    this.eyelid = new CurvesENGINE(
-      canvas,
-      false,
-      "#fff",
-      0.5
-    );
-    this.eyelid.addCurve(
-      input.leftUpPlusSizePercentages(
-        new SizeENGINE(89, 50)
+    this.parpado.agregarCurva(
+      entradaTexto.izquierdaSuperiorMasPorcentajeMedidas(
+        new Medidas(89, 50)
       ),
-      input.leftUpPlusSizePercentages(
-        new SizeENGINE(97, 50)
+      entradaTexto.izquierdaSuperiorMasPorcentajeMedidas(
+        new Medidas(97, 50)
       ),
-      input.leftUpPlusSizePercentages(
-        new SizeENGINE(93, 70)
+      entradaTexto.izquierdaSuperiorMasPorcentajeMedidas(
+        new Medidas(93, 70)
       )
     );
-    this.eyelid.addCurve(
-      input.leftUpPlusSizePercentages(
-        new SizeENGINE(89, 50)
+    this.parpado.agregarCurva(
+      entradaTexto.izquierdaSuperiorMasPorcentajeMedidas(
+        new Medidas(89, 50)
       ),
-      input.leftUpPlusSizePercentages(
-        new SizeENGINE(97, 50)
+      entradaTexto.izquierdaSuperiorMasPorcentajeMedidas(
+        new Medidas(97, 50)
       ),
-      input.leftUpPlusSizePercentages(
-        new SizeENGINE(93, 20)
+      entradaTexto.izquierdaSuperiorMasPorcentajeMedidas(
+        new Medidas(93, 20)
       )
     );
-    this.iris = new Circle(
-      input.leftUpPlusSizePercentages(
-        new SizeENGINE(87, 36)
+    this.pupila = new Circulo(
+      entradaTexto.izquierdaSuperiorMasPorcentajeMedidas(
+        new Medidas(87, 36)
       ),
-      input.size.percentage(
-        new SizeENGINE(12, 26)
+      entradaTexto.medidas.porcentaje(
+        new Medidas(12, 26)
       ),
-      canvas,
+      lienzo,
       0,
       360,
       false,
@@ -83,33 +78,33 @@ export class Ocultar extends Cuadrado {
     );
   }
 
-  touchendHide(touch: CoordinateENGINE) {
-    if (this.insidePositionCoordinate(touch) === false)
+  toqueTerminado(toque: Coordenadas) {
+    if (this.coordenadasAdentro(toque) === false)
       return false;
 
-    this.switchedOn = !this.switchedOn;
+    this.encendido = !this.encendido;
     return true;
   }
 
-  drawHide() {
-    this.drawSquare();
-    this.eyelid.drawCurves();
-    this.iris.drawCircle();
+  dibujarOcultar() {
+    this.dibujarCuadrado();
+    this.parpado.dibujarCurvas();
+    this.pupila.dibujarCirculo();
   }
 
-  get encryption() {
-    if (this.value.length === this.input.value.length)
-      return this.value;
+  get valorEncriptado() {
+    if (this.valor.length === this.entradaTexto.valor.length)
+      return this.valor;
 
-    const words = this.input.value.split(" ");
-    for (const index in words) {
-      const word = words[index];
-      if (word === undefined)
+    const palabras = this.entradaTexto.valor.split(" ");
+    for (const indice in palabras) {
+      const palabra = palabras[indice];
+      if (palabra === undefined)
         continue;
 
-      words[index] = new Array(word.length).fill("*").join("");
+      palabras[indice] = new Array(palabra.length).fill("*").join("");
     }
-    this.value = words.join(" ");
-    return this.value;
+    this.valor = palabras.join(" ");
+    return this.valor;
   }
 }
