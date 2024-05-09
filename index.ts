@@ -4,8 +4,8 @@ Bun.serve({
         const url = new URL(request.url);
         if (url.pathname === "/") {
             const res = await Bun.build({
-                entrypoints: ['./game/index.ts'],
-                outdir: './/js',
+                entrypoints: ['./typescript/index.ts'],
+                outdir: './js',
             });
             if (res.logs.length > 0) {
                 console.log(res.logs);

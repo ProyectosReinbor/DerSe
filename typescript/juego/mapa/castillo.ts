@@ -1,8 +1,3 @@
-import type { Canvas_ENGINE } from "../../engine/canvas";
-import type { Coordinate_ENGINE } from "../../engine/coordinate";
-import { Image_ENGINE } from "../../engine/image";
-import type { Size_ENGINE } from "../../engine/size";
-
 export type CastleState = "construction" | "ready" | "destroyed";
 export type CastleColor = "blue" | "purple" | "red" | "yellow";
 

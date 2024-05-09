@@ -1,19 +1,17 @@
-import { Animacion } from "./animacion";
-import { Animaciones } from "./animaciones";
 import { Casillas, type CasillasOcupadas } from "./casillas";
 import { Elemento } from "./elemento";
+import { Elementos } from "./elementos";
 import type { RutaImagen } from "./imagen";
 import type { Lienzo } from "./lienzo";
 import { Medidas } from "./medidas";
 import { Plano } from "./plano";
 
-export class CasillasAnimaciones extends Casillas {
+export class CasillasElementos extends Casillas {
 
-    animaciones: Animaciones[] = [];
+    elementos: Elementos[] = [];
     lienzo: Lienzo;
     ruta: RutaImagen | false;
     elemento: Elemento;
-    animacion: Animacion;
 
     constructor(
         x: number,
@@ -24,22 +22,20 @@ export class CasillasAnimaciones extends Casillas {
         lienzo: Lienzo,
         ruta: RutaImagen | false,
         elemento: Elemento,
-        animacion: Animacion
     ) {
         super(
             x,
             y,
             medidasCasilla,
             longitudCasillasOcupadas,
-            casillasOcupadas,
+            casillasOcupadas
         );
         this.lienzo = lienzo;
         this.ruta = ruta;
         this.elemento = elemento;
-        this.animacion = animacion;
     }
 
-    agregarAnimaciones(indicesCasilla: Plano) {
+    agregarElementos(indicesCasilla: Plano) {
         const objeto = this.nuevoObjeto(indicesCasilla);
         const elemento = new Elemento(
             new Medidas(
@@ -47,37 +43,33 @@ export class CasillasAnimaciones extends Casillas {
                 this.elemento.medidas.alto
             ),
             new Plano(
-                0,
+                this.elemento.indices.horizontal,
                 this.elemento.indices.vertical
             )
-        );
-        const animacion = new Animacion(
-            this.animacion.cuadros,
-            this.animacion.cuadrosPorSegundo
-        );
-        const animaciones = new Animaciones(
+        )
+        const elementos = new Elementos(
             objeto.izquierdaSuperior,
             objeto.medidas,
             this.lienzo,
             this.ruta,
-            elemento,
-            animacion
+            elemento
         );
-        const indiceAnimaciones = this.animaciones.length;
+
+        const indiceElementos = this.elementos.length;
         const agregado = this.agregarObjeto(
             indicesCasilla,
-            indiceAnimaciones
+            indiceElementos
         );
         if (agregado === "ya esta agregado")
             return "ya esta agregado";
 
-        this.animaciones[indiceAnimaciones] = animaciones;
-        return true;
+        this.elementos[indiceElementos] = elementos;
+        return indiceElementos;
     }
 
-    dibujarAnimaciones() {
-        this.animaciones.forEach(
-            animaciones => animaciones.dibujarAnimacion()
+    dibujarElementos() {
+        this.elementos.forEach(
+            elemento => elemento.dibujarElemento()
         );
     }
 }

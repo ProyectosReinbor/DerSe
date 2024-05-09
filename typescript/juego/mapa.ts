@@ -1,30 +1,24 @@
-import {
-    type FloorMatrix_MapMatrix,
-    MapMatrix_ENGINE
-} from "./mapMatrix.js";
-import { Floor_ENGINE } from "./map/floor.js";
-import { Position_ENGINE } from "../engine/position.js";
-import { Size_ENGINE } from "../engine/size.js";
-import type { Canvas_ENGINE } from "../engine/canvas.js";
-import { Coordinate_ENGINE } from "../engine/coordinate.js";
-import { Direction_ENGINE } from "../engine/character/direction.js";
+import { Coordenadas } from "../motor/coordenadas";
+import type { Lienzo } from "../motor/lienzo";
+import { Medidas } from "../motor/medidas";
+import { Objeto } from "../motor/objeto";
 
-export class Map_ENGINE extends Position_ENGINE {
+export class Mapa extends Objeto {
 
     matrix: FloorMatrix_MapMatrix[] = MapMatrix_ENGINE.get();
     floors: Floor_ENGINE[];
-    boxes: Size_ENGINE;
-    canvas: Canvas_ENGINE;
+    mediasCasillas: Medidas;
+    lienzo: Lienzo;
 
-    constructor(canvas: Canvas_ENGINE) {
+    constructor(lienzo: Lienzo) {
         super(
-            new Coordinate_ENGINE(0, 0),
-            new Size_ENGINE(100, 100)
+            new Coordenadas(0, 0),
+            new Medidas(100, 100)
         );
-        this.canvas = canvas;
-        this.boxes = new Size_ENGINE(
+        this.lienzo = lienzo;
+        this.mediasCasillas = new Medidas(
             0,
-            this.size.height / MapMatrix_ENGINE.length.vertical,
+            this.medidas.alto / MapMatrix_ENGINE.length.vertical,
         );
         this.boxes.width = this.canvas.widthInPercentageHeight(this.boxes.height)
         this.floors = this.matrix.map((matrix) => {

@@ -1,14 +1,8 @@
-import type { Canvas_ENGINE } from "../engine/canvas.js";
-import { Coordinate_ENGINE } from "../engine/coordinate.js";
-import type { PathImage_ENGINE } from "../engine/image.js";
-import { Scene_ENGINE } from "../engine/scene.js";
-import { Map_ENGINE } from "./map.js";
-import { Pawn_ENGINE } from "./pawn.js";
-import { Sheep_ENGINE } from "./sheep.js";
+import { Escena } from "../motor/escena";
 
-export class Game_ENGINE extends Scene_ENGINE {
+export class Juego extends Escena {
 
-    map: Map_ENGINE;
+    mapa: Map_ENGINE;
     pawns: Pawn_ENGINE[] = [];
     sheepGroup: Sheep_ENGINE[] = [];
 
