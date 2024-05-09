@@ -1,100 +1,101 @@
-import type { Canvas_ENGINE } from "../../engine/canvas";
-import { Element_ENGINE } from "../../engine/element";
-import { ElementBoxes_ENGINE } from "../../engine/elementBoxes";
-import type { Elements_ENGINE } from "../../engine/elements";
-import { Plane_ENGINE } from "../../engine/plane";
-import { Size_ENGINE } from "../../engine/size";
-import type { Map_ENGINE } from "../map";
+import { CasillasElementos } from "../../motor/casillasElementos";
+import { Elemento } from "../../motor/elemento";
+import type { Lienzo } from "../../motor/lienzo";
+import { Medidas } from "../../motor/medidas";
+import { Plano } from "../../motor/plano";
+import type { Mapa } from "../mapa";
 
-export type StairElevationState = "left" | "center" | "right" | "only";
-export type StairElevationElementIndices = {
-    [key in StairElevationState]: Plane_ENGINE;
+export type EstadoEscaleras = "izquierda" | "centro" | "derecha" | "solo";
+export type EstadoElementoIndicesEscaleras = {
+    [key in EstadoEscaleras]: Plano;
 };
 
-export class StairsElevations_ENGINE extends ElementBoxes_ENGINE {
+export class Escaleras extends CasillasElementos {
 
-    elementIndices: StairElevationElementIndices;
+    estadosElementoIndices: EstadoElementoIndicesEscaleras;
 
     constructor(
-        map: Map_ENGINE,
-        canvas: Canvas_ENGINE,
+        mapa: Mapa,
+        lienzo: Lienzo,
     ) {
         super(
-            map.leftUp.x,
-            map.leftUp.y,
-            canvas,
-            new Size_ENGINE(
-                map.boxes.width,
-                map.boxes.height
+            mapa.izquierdaSuperior.x,
+            mapa.izquierdaSuperior.y,
+            new Medidas(
+                mapa.mediasCasillas.ancho,
+                mapa.mediasCasillas.alto
             ),
-            new Plane_ENGINE(1, 1),
+            new Plano(1, 1),
             true,
+            lienzo,
             "images/terrain/ground/elevation.png",
-            new Element_ENGINE(
-                new Size_ENGINE(64, 64),
-                new Plane_ENGINE(0, 0)
+            new Elemento(
+                new Medidas(64, 64),
+                new Plano(0, 0)
             )
         );
-        this.elementIndices = {
-            left: new Plane_ENGINE(0, 7),
-            center: new Plane_ENGINE(1, 7),
-            right: new Plane_ENGINE(2, 7),
-            only: new Plane_ENGINE(3, 7)
+        this.estadosElementoIndices = {
+            izquierda: new Plano(0, 7),
+            centro: new Plano(1, 7),
+            derecha: new Plano(2, 7),
+            solo: new Plano(3, 7)
         };
     }
 
-    positionStairElevation(boxIndices: Plane_ENGINE): StairElevationState {
-        const leftBoxIndices = new Plane_ENGINE(
-            boxIndices.horizontal - 1,
-            boxIndices.vertical,
+    estadoSegunPosicion(indicesCasilla: Plano): EstadoEscaleras {
+        const indicesCasillaIzquierda = new Plano(
+            indicesCasilla.horizontal - 1,
+            indicesCasilla.vertical
         );
-        const rightBoxIndices = new Plane_ENGINE(
-            boxIndices.horizontal + 1,
-            boxIndices.vertical,
+        const indicesCasillaDerecha = new Plano(
+            indicesCasilla.horizontal + 1,
+            indicesCasilla.vertical
         );
 
-        const left = this.getBox(leftBoxIndices) !== undefined;
-        const right = this.getBox(rightBoxIndices) !== undefined;
+        const izquierda = this.obtenerCasilla(indicesCasillaIzquierda) !== undefined;
+        const derecha = this.obtenerCasilla(indicesCasillaDerecha) !== undefined;
 
-        const isLeft = !left && right;
-        if (isLeft) return "left";
+        const esIzquierda = !izquierda && derecha;
+        if (esIzquierda)
+            return "izquierda";
 
-        const isCenter = left && right;
-        if (isCenter) return "center";
+        const esCentro = izquierda && derecha;
+        if (esCentro)
+            return "centro";
 
-        const isRight = left && !right;
-        if (isRight) return "right";
+        const esDerecha = izquierda && !derecha;
+        if (esDerecha)
+            return "derecha";
 
-        const isOnly = !left && !right;
-        if (isOnly) return "only";
+        const esSolo = !izquierda && !derecha;
+        if (esSolo)
+            return "solo";
 
         throw new Error("invalid element");
     }
 
-    refreshElements(): void {
-        this.references.forEach(elements => {
-            const boxIndices = this.getBoxIndices(elements.leftUp);
-            const position = this.positionStairElevation(boxIndices);
-            const indices = this.elementIndices[position];
-            elements.element.setIndices(
-                new Plane_ENGINE(
-                    indices.horizontal,
-                    indices.vertical
-                )
+    actualizarElementos() {
+        this.elementos.forEach(elemento => {
+            const indicesCasilla = this.obtenerIndicesCasilla(elemento.izquierdaSuperior);
+            const nombreEstado = this.estadoSegunPosicion(indicesCasilla);
+            const indices = this.estadosElementoIndices[nombreEstado];
+            elemento.elemento.indices = new Plano(
+                indices.horizontal,
+                indices.vertical
             );
         });
     }
 
-    setStairsElevations(boxIndices: Plane_ENGINE): Elements_ENGINE | undefined {
-        const stairElevation = this.referencePush(boxIndices);
-        if (stairElevation === undefined)
-            return undefined;
+    agregarEscaleras(indicesCasilla: Plano) {
+        const indiceElementos = this.agregarElementos(indicesCasilla);
+        if (indiceElementos === "ya esta agregado")
+            return "ya esta agregado";
 
-        this.refreshElements();
-        return stairElevation;
+        this.actualizarElementos();
+        return indiceElementos;
     }
 
-    drawStairsElevations(): void {
-        this.drawElements();
+    dibujarEscaleras() {
+        this.dibujarElementos();
     }
 }

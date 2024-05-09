@@ -1,43 +1,43 @@
-import type { Canvas_ENGINE } from "../../engine/canvas";
-import { Plane_ENGINE } from "../../engine/plane";
-import type { Map_ENGINE } from "../map";
-import { Grounds_ENGINE } from "./grounds";
+import type { Lienzo } from "../../motor/lienzo";
+import { Plano } from "../../motor/plano";
+import type { Mapa } from "../mapa";
+import { Terreno } from "./terreno";
 
-export class Elevations_ENGINE extends Grounds_ENGINE {
+export class Elevaciones extends Terreno {
     constructor(
-        map: Map_ENGINE,
-        canvas: Canvas_ENGINE,
+        mapa: Mapa,
+        lienzo: Lienzo,
     ) {
         super(
-            map,
-            canvas,
+            mapa,
+            lienzo,
             "images/terrain/ground/elevation.png",
             {
-                leftUp: new Plane_ENGINE(0, 0),
-                up: new Plane_ENGINE(1, 0),
-                rightUp: new Plane_ENGINE(2, 0),
-                left: new Plane_ENGINE(0, 1),
-                center: new Plane_ENGINE(1, 1),
-                right: new Plane_ENGINE(2, 1),
-                leftDown: new Plane_ENGINE(0, 2),
-                down: new Plane_ENGINE(1, 2),
-                rightDown: new Plane_ENGINE(2, 2),
-                horizontalLeft: new Plane_ENGINE(0, 4),
-                horizontalCenter: new Plane_ENGINE(1, 4),
-                horizontalRight: new Plane_ENGINE(2, 4),
-                verticalUp: new Plane_ENGINE(3, 0),
-                verticalCenter: new Plane_ENGINE(3, 1),
-                verticalDown: new Plane_ENGINE(3, 2),
-                only: new Plane_ENGINE(3, 4)
+                izquierdaSuperior: new Plano(0, 0),
+                superior: new Plano(1, 0),
+                derechaSuperior: new Plano(2, 0),
+                izquierda: new Plano(0, 1),
+                centro: new Plano(1, 1),
+                derecha: new Plano(2, 1),
+                izquierdaInferior: new Plano(0, 2),
+                inferior: new Plano(1, 2),
+                derechaInferior: new Plano(2, 2),
+                horizontalIzquierda: new Plano(0, 4),
+                horizontalCentro: new Plano(1, 4),
+                horizontalDerecha: new Plano(2, 4),
+                verticalSuperior: new Plano(3, 0),
+                verticalCentro: new Plano(3, 1),
+                verticalInferior: new Plano(3, 2),
+                solo: new Plano(3, 4)
             }
         );
     }
 
-    pushElevation(boxIndices: Plane_ENGINE) {
-        this.pushGround(boxIndices);
+    agregarElevacion(indicesCasilla: Plano) {
+        this.agregarTerreno(indicesCasilla);
     }
 
-    drawElevations() {
-        this.drawGrounds();
+    dibujarElevaciones() {
+        this.dibujarTerreno();
     }
 }

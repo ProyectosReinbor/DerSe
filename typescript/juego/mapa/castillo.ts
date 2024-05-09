@@ -1,40 +1,45 @@
-export type CastleState = "construction" | "ready" | "destroyed";
-export type CastleColor = "blue" | "purple" | "red" | "yellow";
+import type { Coordenadas } from "../../motor/coordenadas";
+import { Imagen } from "../../motor/imagen";
+import type { Lienzo } from "../../motor/lienzo";
+import type { Medidas } from "../../motor/medidas";
 
-export class Castle_ENGINE extends Image_ENGINE {
+export type EstadoCastillo = "construccion" | "listo" | "destruccion";
+export type ColorCastillo = "azul" | "morado" | "rojo" | "amarillo";
 
-    state: CastleState = "construction";
-    color: CastleColor = "blue";
+export class Castillo extends Imagen {
+
+    estado: EstadoCastillo = "construccion";
+    color: ColorCastillo = "azul";
 
     constructor(
-        leftUp: Coordinate_ENGINE,
-        size: Size_ENGINE,
-        canvas: Canvas_ENGINE,
-        state: CastleState,
-        color: CastleColor,
+        superiorIzquierda: Coordenadas,
+        medidas: Medidas,
+        lienzo: Lienzo,
+        estado: EstadoCastillo,
+        color: ColorCastillo,
     ) {
         super(
-            leftUp,
-            size,
-            canvas,
+            superiorIzquierda,
+            medidas,
+            lienzo,
             false,
         );
-        this.imageCastle(
-            state,
+        this.imagenCastillo(
+            estado,
             color
         );
     }
 
-    imageCastle(
-        newState: CastleState,
-        newColor: CastleColor
+    imagenCastillo(
+        nuevoEstado: EstadoCastillo,
+        nuevoColor: ColorCastillo
     ) {
-        this.state = newState;
-        this.color = newColor;
-        let file: CastleState | CastleColor = this.state;
-        if (this.state === "ready")
+        this.estado = nuevoEstado;
+        this.color = nuevoColor;
+        let file: EstadoCastillo | ColorCastillo = this.estado;
+        if (this.estado === "listo")
             file = this.color;
 
-        this.route = `images/factions/knights/buildings/castle/${file}.png`;
+        this.ruta = `images/factions/knights/buildings/castle/${file}.png`;
     }
 }

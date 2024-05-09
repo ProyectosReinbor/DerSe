@@ -1,65 +1,57 @@
-import type { Canvas_ENGINE } from "../../engine/canvas";
-import { ImageBoxes_ENGINE } from "../../engine/imageBoxes";
-import { Plane_ENGINE } from "../../engine/plane";
-import { Size_ENGINE } from "../../engine/size";
-import type { Map_ENGINE } from "../map";
-import {
-    Castle_ENGINE,
-    type CastleColor,
-    type CastleState
-} from "./castle";
+import { CasillasImagenes } from "../../motor/casillasImagenes";
+import type { Lienzo } from "../../motor/lienzo";
+import { Medidas } from "../../motor/medidas";
+import { Plano } from "../../motor/plano";
+import type { Mapa } from "../mapa";
+import { Castillo, type ColorCastillo, type EstadoCastillo } from "./castillo";
 
+export class Castillos extends CasillasImagenes {
 
-
-export class Castles_ENGINE extends ImageBoxes_ENGINE {
-
-    override references: Castle_ENGINE[] = [];
+    override imagines: Castillo[] = [];
 
     constructor(
-        map: Map_ENGINE,
-        canvas: Canvas_ENGINE,
+        mapa: Mapa,
+        lienzo: Lienzo,
     ) {
         super(
-            map.leftUp.x,
-            map.leftUp.y,
-            canvas,
-            new Size_ENGINE(
-                map.boxes.width,
-                map.boxes.height
+            mapa.izquierdaSuperior.x,
+            mapa.izquierdaSuperior.y,
+            new Medidas(
+                mapa.mediasCasillas.ancho,
+                mapa.mediasCasillas.alto
             ),
-            new Plane_ENGINE(4, 3),
+            new Plano(4, 3),
             true,
+            lienzo,
             false
         );
     }
 
-    castlePush(
-        boxIndices: Plane_ENGINE,
-        state: CastleState,
-        color: CastleColor,
-    ): number | undefined {
-        const position = this.getPosition(boxIndices);
-        const reference = new Castle_ENGINE(
-            position.leftUp,
-            position.size,
-            this.canvas,
-            state,
-            color
-        );
+    agregarCastillo(
+        indicesCasilla: Plano,
+        estado: EstadoCastillo,
+        color: ColorCastillo,
+    ) {
+        const indiceImagen = this.agregarImagen(indicesCasilla);
+        if (indiceImagen === "ya esta agregado")
+            return "ya esta agregado";
 
-        const indexReference = this.referencesPush(
-            boxIndices,
-            reference
-        );
-        if (indexReference === undefined)
+        const imagen = this.imagines[indiceImagen];
+        if (imagen === undefined)
             return undefined;
 
-        // return this.references[indexReference];
-        return 0;
+        this.imagines[indiceImagen] = new Castillo(
+            imagen.izquierdaSuperior,
+            imagen.medidas,
+            this.lienzo,
+            estado,
+            color
+        );
+        return indiceImagen;
     }
 
 
-    drawCastles(): void {
-        this.drawImages();
+    dibujarCastillo() {
+        this.dibujarImagenes();
     }
 }

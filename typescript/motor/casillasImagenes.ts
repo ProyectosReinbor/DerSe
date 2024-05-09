@@ -46,7 +46,7 @@ export class CasillasImagenes extends Casillas {
             return "ya esta agregado";
 
         this.imagines[indiceImagen] = imagen;
-        return true;
+        return indiceImagen;
     }
 
     dibujarImagenes() {

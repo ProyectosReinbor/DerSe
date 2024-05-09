@@ -1,52 +1,54 @@
-import { Animation_ENGINE } from "../../engine/animation";
-import { AnimationBoxes_ENGINE } from "../../engine/animationBoxes";
-import type { Animations_ENGINE } from "../../engine/animations";
-import type { Canvas_ENGINE } from "../../engine/canvas";
-import { Element_ENGINE } from "../../engine/element";
-import { Plane_ENGINE } from "../../engine/plane";
-import { Size_ENGINE } from "../../engine/size";
-import type { Map_ENGINE } from "../map";
+import { Animacion } from "../../motor/animacion";
+import { CasillasAnimaciones } from "../../motor/casillasAnimaciones";
+import { Elemento } from "../../motor/elemento";
+import type { Lienzo } from "../../motor/lienzo";
+import { Medidas } from "../../motor/medidas";
+import { Plano } from "../../motor/plano";
+import type { Mapa } from "../mapa";
 
-
-export class Foams_ENGINE extends AnimationBoxes_ENGINE {
+export class Espumas extends CasillasAnimaciones {
     constructor(
-        map: Map_ENGINE,
-        canvas: Canvas_ENGINE,
+        mapa: Mapa,
+        lienzo: Lienzo,
     ) {
         super(
-            map.leftUp.x,
-            map.leftUp.y,
-            canvas,
-            new Size_ENGINE(
-                map.boxes.width,
-                map.boxes.height
+            mapa.izquierdaSuperior.x,
+            mapa.izquierdaSuperior.y,
+            new Medidas(
+                mapa.mediasCasillas.ancho,
+                mapa.mediasCasillas.alto
             ),
-            new Plane_ENGINE(3, 3),
+            new Plano(3, 3),
             [
                 [true, false, false],
                 [false, false, false],
                 [false, false, false]
             ],
+            lienzo,
             "images/terrain/water/foam.png",
-            new Element_ENGINE(
-                new Size_ENGINE(192, 192),
-                new Plane_ENGINE(0, 0)
+            new Elemento(
+                new Medidas(192, 192),
+                new Plano(0, 0)
             ),
-            new Animation_ENGINE(8, 8)
+            new Animacion(8, 8)
         );
     }
 
-    pushFoam(boxIndices: Plane_ENGINE): Animations_ENGINE | undefined {
-        const foam = this.referencePush(boxIndices);
-        if (foam === undefined)
+    agregarEspuma(indicesCasilla: Plano) {
+        const indiceAnimaciones = this.agregarAnimaciones(indicesCasilla);
+        if (indiceAnimaciones === "ya esta agregado")
+            return "ya esta agregado";
+
+        const animaciones = this.animaciones[indiceAnimaciones];
+        if (animaciones === undefined)
             return undefined;
 
-        foam.leftUp.x -= this.size.width;
-        foam.leftUp.y -= this.size.height;
-        return foam;
+        animaciones.izquierdaSuperior.x -= this.medidasCasilla.ancho;
+        animaciones.izquierdaSuperior.y -= this.medidasCasilla.alto;
+        return indiceAnimaciones;
     }
 
-    drawFoams() {
-        this.drawAnimations();
+    dibujarEspumas() {
+        this.dibujarAnimaciones();
     }
 }
