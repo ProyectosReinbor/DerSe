@@ -7,7 +7,7 @@ export class Mapa extends Objeto {
 
     matrix: FloorMatrix_MapMatrix[] = MapMatrix_ENGINE.get();
     floors: Floor_ENGINE[];
-    mediasCasillas: Medidas;
+    medidasCasillas: Medidas;
     lienzo: Lienzo;
 
     constructor(lienzo: Lienzo) {
@@ -16,7 +16,7 @@ export class Mapa extends Objeto {
             new Medidas(100, 100)
         );
         this.lienzo = lienzo;
-        this.mediasCasillas = new Medidas(
+        this.medidasCasillas = new Medidas(
             0,
             this.medidas.alto / MapMatrix_ENGINE.length.vertical,
         );

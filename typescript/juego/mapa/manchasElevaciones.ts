@@ -1,59 +1,68 @@
-import type { Canvas_ENGINE } from "../../engine/canvas";
-import { Element_ENGINE } from "../../engine/element";
-import { ElementBoxes_ENGINE } from "../../engine/elementBoxes";
-import type { Elements_ENGINE } from "../../engine/elements";
-import { Plane_ENGINE } from "../../engine/plane";
-import { Size_ENGINE } from "../../engine/size";
-import type { Map_ENGINE } from "../map";
+import { CasillasElementos } from "../../motor/casillasElementos";
+import { Elemento } from "../../motor/elemento";
+import type { Lienzo } from "../../motor/lienzo";
+import { Medidas } from "../../motor/medidas";
+import { Plano } from "../../motor/plano";
+import type { Mapa } from "../mapa";
 
-export type FlatElevationState = "grass" | "sand";
-export type FlatElevationElementIndices = {
-    [key in FlatElevationState]: Plane_ENGINE;
+export type EstadoManchasElevaciones = "pasto" | "arena";
+export type EstadosElementoIndicesManchasElevaciones = {
+    [key in EstadoManchasElevaciones]: Plano;
 }
 
-export class FlatElevations_ENGINE extends ElementBoxes_ENGINE {
-    elementIndices: FlatElevationElementIndices;
+export class ManchasElevaciones extends CasillasElementos {
+    estadosElementoIndices: EstadosElementoIndicesManchasElevaciones;
     constructor(
-        map: Map_ENGINE,
-        canvas: Canvas_ENGINE,
+        mapa: Mapa,
+        lienzo: Lienzo,
     ) {
         super(
-            map.leftUp.x,
-            map.leftUp.y,
-            canvas,
-            new Size_ENGINE(
-                map.boxes.width,
-                map.boxes.height
+            mapa.izquierdaSuperior.x,
+            mapa.izquierdaSuperior.y,
+            new Medidas(
+                mapa.medidasCasillas.ancho,
+                mapa.medidasCasillas.alto
             ),
-            new Plane_ENGINE(1, 1),
+            new Plano(1, 1),
             true,
+            lienzo,
             "images/terrain/ground/flat.png",
-            new Element_ENGINE(
-                new Size_ENGINE(64, 64),
-                new Plane_ENGINE(0, 0)
+            new Elemento(
+                new Medidas(64, 64),
+                new Plano(0, 0)
             )
         );
-        this.elementIndices = {
-            grass: new Plane_ENGINE(4, 0),
-            sand: new Plane_ENGINE(9, 0)
+        this.estadosElementoIndices = {
+            pasto: new Plano(4, 0),
+            arena: new Plano(9, 0)
         };
     }
 
-    pushFlatElevation(
-        boxIndices: Plane_ENGINE,
-        state: FlatElevationState,
-    ): Elements_ENGINE | undefined {
-        const indices = this.elementIndices[state];
-        this.element.setIndices(
-            new Plane_ENGINE(
-                indices.horizontal,
-                indices.vertical
-            )
+    agregarManchasElevaciones(
+        indicesCasilla: Plano,
+        estado: EstadoManchasElevaciones
+    ) {
+        const elementoIndices = this.estadosElementoIndices[estado];
+        this.elemento.indices = new Plano(
+            elementoIndices.horizontal,
+            elementoIndices.vertical
         );
-        return this.referencePush(boxIndices);
+        const indiceElementos = this.agregarElementos(indicesCasilla);
+        if (indiceElementos === "ya esta agregado")
+            return "ya esta agregado";
+
+        const elementos = this.elementos[indiceElementos];
+        if (elementos === undefined)
+            return undefined;
+
+        elementos.elemento.indices = new Plano(
+            elementoIndices.horizontal,
+            elementoIndices.vertical
+        );
+        return indiceElementos;
     }
 
-    drawFlatElevations(): void {
-        this.drawElements();
+    dibujarManchasElevaciones() {
+        this.dibujarElementos();
     }
 }           

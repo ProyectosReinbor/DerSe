@@ -1,100 +1,106 @@
-import type { Canvas_ENGINE } from "../../engine/canvas";
-import { Element_ENGINE } from "../../engine/element";
-import { ElementBoxes_ENGINE } from "../../engine/elementBoxes";
-import type { Elements_ENGINE } from "../../engine/elements";
-import { Plane_ENGINE } from "../../engine/plane";
-import { Size_ENGINE } from "../../engine/size";
-import type { Map_ENGINE } from "../map";
+import { CasillasElementos } from "../../motor/casillasElementos";
+import { Elemento } from "../../motor/elemento";
+import type { Lienzo } from "../../motor/lienzo";
+import { Medidas } from "../../motor/medidas";
+import { Plano } from "../../motor/plano";
+import type { Mapa } from "../mapa";
 
-export type WallElevationState = "left" | "center" | "right" | "only";
 
-export type WallElevationElementIndices = {
-    [key in WallElevationState]: Plane_ENGINE;
+export type EstadoParedElevaciones = "izquierda" | "centro" | "derecha" | "solo";
+
+export type EstadosElementoIndicesParedElevaciones = {
+    [key in EstadoParedElevaciones]: Plano;
 };
 
-export class WallElevations_ENGINE extends ElementBoxes_ENGINE {
+export class ParedElevaciones extends CasillasElementos {
 
-    elementIndices: WallElevationElementIndices;
+    estadosElementoIndices: EstadosElementoIndicesParedElevaciones;
 
     constructor(
-        map: Map_ENGINE,
-        canvas: Canvas_ENGINE,
+        mapa: Mapa,
+        lienzo: Lienzo,
     ) {
         super(
-            map.leftUp.x,
-            map.leftUp.y,
-            canvas,
-            new Size_ENGINE(
-                map.boxes.width,
-                map.boxes.height
+            mapa.izquierdaSuperior.x,
+            mapa.izquierdaSuperior.y,
+            new Medidas(
+                mapa.medidasCasillas.ancho,
+                mapa.medidasCasillas.alto
             ),
-            new Plane_ENGINE(1, 1),
+            new Plano(1, 1),
             true,
+            lienzo,
             "images/terrain/ground/elevation.png",
-            new Element_ENGINE(
-                new Size_ENGINE(64, 64),
-                new Plane_ENGINE(0, 0)
+            new Elemento(
+                new Medidas(64, 64),
+                new Plano(0, 0)
             )
         );
-        this.elementIndices = {
-            left: new Plane_ENGINE(0, 3),
-            center: new Plane_ENGINE(1, 3),
-            right: new Plane_ENGINE(2, 3),
-            only: new Plane_ENGINE(3, 5)
+        this.estadosElementoIndices = {
+            izquierda: new Plano(0, 3),
+            centro: new Plano(1, 3),
+            derecha: new Plano(2, 3),
+            solo: new Plano(3, 5)
         };
     }
 
-    wallElevationPosition(boxIndices: Plane_ENGINE): WallElevationState {
-        const leftBoxes = new Plane_ENGINE(
-            boxIndices.horizontal - 1,
-            boxIndices.vertical,
+    estadoConPosicion(indicesCasilla: Plano): EstadoParedElevaciones {
+        const indicesCasillaIzquierda = new Plano(
+            indicesCasilla.horizontal - 1,
+            indicesCasilla.vertical,
         );
-        const rightBoxes = new Plane_ENGINE(
-            boxIndices.horizontal + 1,
-            boxIndices.vertical,
+        const indicesCasillaDerecha = new Plano(
+            indicesCasilla.horizontal + 1,
+            indicesCasilla.vertical,
         );
-        const left = this.getBox(leftBoxes) !== undefined;
-        const right = this.getBox(rightBoxes) !== undefined;
+        const izquierda = this.obtenerCasilla(indicesCasillaIzquierda) !== undefined;
+        const derecha = this.obtenerCasilla(indicesCasillaDerecha) !== undefined;
 
-        const isLeft = !left && right;
-        if (isLeft) return "left";
+        const esIzquierda = !izquierda && derecha;
+        if (esIzquierda)
+            return "izquierda";
 
-        const isCenter = left && right;
-        if (isCenter) return "center";
+        const esCentro = izquierda && derecha;
+        if (esCentro)
+            return "centro";
 
-        const isRight = left && !right;
-        if (isRight) return "right";
+        const esDerecha = izquierda && !derecha;
+        if (esDerecha)
+            return "derecha";
 
-        const isVertical = !left && !right;
-        if (isVertical) return "only";
+        const esVertical = !izquierda && !derecha;
+        if (esVertical)
+            return "solo";
 
         throw new Error("invalid element");
     }
 
-    refreshElements() {
-        this.references.forEach(elements => {
-            const boxIndices = this.getBoxIndices(elements.leftUp);
-            const position = this.wallElevationPosition(boxIndices);
-            const indices = this.elementIndices[position];
-            elements.element.setIndices(
-                new Plane_ENGINE(
-                    indices.horizontal,
-                    indices.vertical
-                )
+    actualizarElementos() {
+        this.elementos.forEach(elementos => {
+            const indicesCasilla = this.obtenerIndicesCasilla(elementos.izquierdaSuperior);
+            const estado = this.estadoConPosicion(indicesCasilla);
+            const indices = this.estadosElementoIndices[estado];
+            elementos.elemento.indices = new Plano(
+                indices.horizontal,
+                indices.vertical
             );
         });
     }
 
-    pushWallElevation(boxIndices: Plane_ENGINE): Elements_ENGINE | undefined {
-        const wallElevation = this.referencePush(boxIndices);
-        if (wallElevation === undefined)
+    agregarParedElevaciones(indicesCasilla: Plano) {
+        const indiceElementos = this.agregarElementos(indicesCasilla);
+        if (indiceElementos === "ya esta agregado")
+            return "ya esta agregado";
+
+        const elementos = this.elementos[indiceElementos];
+        if (elementos === undefined)
             return undefined;
 
-        this.refreshElements();
-        return wallElevation;
+        this.actualizarElementos();
+        return indiceElementos;
     }
 
-    drawWallElevations() {
-        this.drawElements();
+    dibujarParedElevaciones() {
+        this.dibujarElementos();
     }
 } 
