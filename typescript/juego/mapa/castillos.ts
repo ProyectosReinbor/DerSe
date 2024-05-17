@@ -17,8 +17,8 @@ export class Castillos extends CasillasImagenes {
             mapa.izquierdaSuperior.x,
             mapa.izquierdaSuperior.y,
             new Medidas(
-                mapa.mediasCasillas.ancho,
-                mapa.mediasCasillas.alto
+                mapa.medidasCasilla.ancho,
+                mapa.medidasCasilla.alto
             ),
             new Plano(4, 3),
             true,
@@ -50,8 +50,7 @@ export class Castillos extends CasillasImagenes {
         return indiceImagen;
     }
 
-
-    dibujarCastillo() {
+    dibujarCastillos() {
         this.dibujarImagenes();
     }
 }

@@ -1,45 +1,48 @@
+import { Coordenadas } from "../motor/coordenadas";
 import { Escena } from "../motor/escena";
+import type { Lienzo } from "../motor/lienzo";
+import { Mapa } from "./mapa";
+import { Oveja } from "./oveja";
+import { Peon } from "./peon";
+import type { RegaloTiktok } from "./tiktok";
 
 export class Juego extends Escena {
 
-    mapa: Map_ENGINE;
-    pawns: Pawn_ENGINE[] = [];
-    sheepGroup: Sheep_ENGINE[] = [];
+    mapa: Mapa;
+    peones: Peon[] = [];
+    ovejas: Oveja[] = [];
 
-    constructor(canvas: Canvas_ENGINE) {
-        super(canvas);
-        this.map = new Map_ENGINE(canvas);
-        this.sheepGroup = [
-            new Sheep_ENGINE(
-                new Coordinate_ENGINE(35, 50),
+    constructor(lienzo: Lienzo) {
+        super(lienzo);
+        this.mapa = new Mapa(lienzo);
+        this.ovejas = [
+            new Oveja(
+                new Coordenadas(
+                    35, 50),
                 // Math.floor(Math.random() * this.map.size.width),
                 // Math.floor(Math.random() * this.map.size.height)
                 // }),
-                this.map,
-                canvas
+                this.mapa,
+                lienzo
             )
         ];
     }
 
-    tiktokGift(gift: {
-        giftName: string;
-        giftPictureUrl: string;
-        repeatCount: number;
-        nickname: string;
-        profilePictureUrl: PathImage_ENGINE;
-    }) {
-        const exist = this.pawns.some((pawn) => pawn.nickname === gift.nickname);
-        if (exist === true) return;
-        this.pawns.push(
-            new Pawn_ENGINE(
-                new Coordinate_ENGINE(
-                    Math.floor(Math.random() * this.map.size.width),
-                    Math.floor(Math.random() * this.map.size.height),
+    regaloTiktok(regalo: RegaloTiktok) {
+        const existe = this.peones.some(
+            (peon) => peon.apodo === regalo.nickname
+        );
+        if (existe === true) return;
+        this.peones.push(
+            new Peon(
+                new Coordenadas(
+                    Math.floor(Math.random() * this.mapa.medidas.ancho),
+                    Math.floor(Math.random() * this.mapa.medidas.alto),
                 ),
-                this.map,
-                this.canvas,
+                this.mapa,
+                this.lienzo,
                 "blue",
-                gift.nickname,
+                regalo.nickname,
             )
         );
     }
@@ -53,12 +56,12 @@ export class Juego extends Escena {
     }
 
     override draw = () => {
-        this.map.drawMap();
-        this.pawns.forEach(
-            pawn => pawn.drawPawn()
+        this.mapa.dibujarMapa();
+        this.peones.forEach(
+            pawn => pawn.dibujarPeon()
         );
-        this.sheepGroup.forEach(
-            sheep => sheep.drawSheep()
+        this.ovejas.forEach(
+            oveja => oveja.dibujar()
         );
     }
 }

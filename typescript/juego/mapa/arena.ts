@@ -4,7 +4,7 @@ import type { Mapa } from "../mapa";
 import { Terreno } from "./terreno";
 
 
-export class FlatsSand_ENGINE extends Terreno {
+export class Arena extends Terreno {
     constructor(
         mapa: Mapa,
         lienzo: Lienzo,

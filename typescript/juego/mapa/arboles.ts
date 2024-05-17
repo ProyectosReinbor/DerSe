@@ -6,7 +6,7 @@ import { Medidas } from "../../motor/medidas";
 import { Plano } from "../../motor/plano";
 import type { Mapa } from "../mapa";
 
-export type EstadoArbol = "motion" | "attacked" | "felled";
+export type EstadoArbol = "movimiento" | "talar" | "derribado";
 export type EstadosArbol = {
     [key in EstadoArbol]: {
         animacion: Animacion;
@@ -28,8 +28,8 @@ export class Arboles extends CasillasAnimaciones {
             mapa.izquierdaSuperior.x,
             mapa.izquierdaSuperior.y,
             new Medidas(
-                mapa.mediasCasillas.ancho,
-                mapa.mediasCasillas.alto
+                mapa.medidasCasilla.ancho,
+                mapa.medidasCasilla.alto
             ),
             new Plano(3, 3),
             [
@@ -46,19 +46,19 @@ export class Arboles extends CasillasAnimaciones {
             new Animacion(4, 4)
         );
         this.estados = {
-            motion: {
+            movimiento: {
                 animacion: new Animacion(4, 4),
                 elemento: {
                     indices: new Plano(0, 0)
                 }
             },
-            attacked: {
+            talar: {
                 animacion: new Animacion(2, 2),
                 elemento: {
                     indices: new Plano(0, 1)
                 }
             },
-            felled: {
+            derribado: {
                 animacion: new Animacion(1, 1),
                 elemento: {
                     indices: new Plano(0, 2)

@@ -1,64 +1,58 @@
-import { Animation_ENGINE } from "../engine/animation";
-import type { Canvas_ENGINE } from "../engine/canvas";
-import { Character_ENGINE } from "../engine/character";
-import { Direction_ENGINE } from "../engine/character/direction";
-import { Coordinate_ENGINE } from "../engine/coordinate";
-import { Element_ENGINE } from "../engine/element";
-import { Plane_ENGINE } from "../engine/plane";
-import { Size_ENGINE } from "../engine/size";
-import type { Map_ENGINE } from "./map";
-import { UserBar_ENGINE } from "./userBar";
+import { Animacion } from "../motor/animacion";
+import { Coordenadas } from "../motor/coordenadas";
+import { Elemento } from "../motor/elemento";
+import type { Lienzo } from "../motor/lienzo";
+import { Medidas } from "../motor/medidas";
+import { Personaje } from "../motor/personaje";
+import { Direccion } from "../motor/personaje/direccion";
+import { Plano } from "../motor/plano";
+import { BarraUsuario } from "./barraUsuario";
+import type { Mapa } from "./mapa";
 
-export type PawnColor = "blue" | "purple" | "red" | "yellow";
+export type ColorPeon = "blue" | "purple" | "red" | "yellow";
 
-export class Pawn_ENGINE extends Character_ENGINE {
+export class Peon extends Personaje {
 
-    map: Map_ENGINE;
-    nickname: string;
-    userBar: UserBar_ENGINE;
+    mapa: Mapa;
+    apodo: string;
+    barraUsuario: BarraUsuario;
 
     constructor(
-        leftUp: Coordinate_ENGINE,
-        map: Map_ENGINE,
-        canvas: Canvas_ENGINE,
-        color: PawnColor,
-        nickname: string,
+        izquierdaSuperior: Coordenadas,
+        mapa: Mapa,
+        lienzo: Lienzo,
+        color: ColorPeon,
+        apodo: string,
     ) {
         super(
-            leftUp,
-            new Size_ENGINE(
-                map.boxes.width,
-                map.boxes.height
+            izquierdaSuperior,
+            new Medidas(
+                mapa.medidasCasilla.ancho,
+                mapa.medidasCasilla.alto
             ),
-            canvas,
+            lienzo,
             "#fff",
             false,
             0,
-            new Size_ENGINE(3, 3),
+            new Medidas(3, 3),
             {
-                route: `images/factions/knights/troops/pawn/${color}.png`,
-                element: new Element_ENGINE(
-                    new Size_ENGINE(192, 192),
-                    new Plane_ENGINE(6, 6)
+                ruta: `images/factions/knights/troops/pawn/${color}.png`,
+                elemento: new Elemento(
+                    new Medidas(192, 192),
+                    new Plano(6, 6)
                 ),
-                animation: new Animation_ENGINE(6, 6),
+                animacion: new Animacion(6, 6),
             },
-            new Coordinate_ENGINE(2, 2),
-            new Direction_ENGINE("center", "center"),
+            new Coordenadas(2, 2),
+            new Direccion("centro", "centro"),
         );
-        this.map = map;
-        this.nickname = nickname;
-        this.userBar = new UserBar_ENGINE(
-            this,
-            new Size_ENGINE(0, 0),
-            this.canvas,
-            false,
-            this.nickname
-        )
+        this.mapa = mapa;
+        this.apodo = apodo;
+        this.barraUsuario = new BarraUsuario(this, new Medidas(0, 0), lienzo, false, apodo);
     }
 
-    drawPawn() {
-        this.drawCharacter();
-        this.userBar.drawUserBar();
+    dibujarPeon() {
+        this.dibujarPersonaje();
+        this.barraUsuario.dibujarBarraUsuario();
     }
 }

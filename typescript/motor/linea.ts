@@ -19,18 +19,28 @@ export class Linea extends Objeto {
     strokeStyle: StrokeStyle,
     lineWidth: number
   ) {
-    const medidas = new Medidas(
-      derechaInferior.x - izquierdaSuperior.x,
-      derechaInferior.y - izquierdaSuperior.y
-    );
     super(
       izquierdaSuperior,
-      medidas
+      new Medidas(
+        derechaInferior.x - izquierdaSuperior.x,
+        derechaInferior.y - izquierdaSuperior.y
+      )
     );
     this.lienzo = lienzo;
     this.fillStyle = fillStyle;
     this.strokeStyle = strokeStyle;
     this.lineWidth = lineWidth;
+  }
+
+  cambiarPosicion(
+    izquierdaSuperior: Coordenadas,
+    derechaInferior: Coordenadas,
+  ) {
+    this.izquierdaSuperior = izquierdaSuperior;
+    this.medidas = new Medidas(
+      derechaInferior.x - izquierdaSuperior.x,
+      derechaInferior.y - izquierdaSuperior.y
+    );
   }
 
   dibujarLinea() {

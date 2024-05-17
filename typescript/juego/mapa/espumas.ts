@@ -15,8 +15,8 @@ export class Espumas extends CasillasAnimaciones {
             mapa.izquierdaSuperior.x,
             mapa.izquierdaSuperior.y,
             new Medidas(
-                mapa.mediasCasillas.ancho,
-                mapa.mediasCasillas.alto
+                mapa.medidasCasilla.ancho,
+                mapa.medidasCasilla.alto
             ),
             new Plano(3, 3),
             [

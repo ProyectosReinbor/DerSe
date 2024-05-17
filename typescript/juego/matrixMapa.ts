@@ -1,263 +1,266 @@
-import { Plane_ENGINE } from "../engine/plane";
+import { Plano } from "../motor/plano";
+import type { EstadoArbol } from "./mapa/arboles";
+import type { ColorCastillo, EstadoCastillo } from "./mapa/castillo";
+import type { EstadoManchaElevacion } from "./mapa/manchasElevaciones";
 
-type Foam = {
-    flatSand: boolean;
+type Espuma = {
+    arena: boolean;
 };
 
-type Elevation = {
-    floor: number;
-    shadow: boolean;
-    flatGrass: boolean;
+type Elevacion = {
+    piso: number;
+    sombra: boolean;
+    pasto: boolean;
 };
 
-type WallElevation = {
-    shadow: true,
-    flatElevation: "sand" | "grass" | false
+type ParedElevacion = {
+    sombra: true,
+    mancha: EstadoManchaElevacion | false
 };
 
-type StairElevation = {
-    shadow: true,
-    flatElevation: "sand" | "grass" | false
+type Escalera = {
+    sombra: true,
+    mancha: EstadoManchaElevacion | false
 };
 
-type Castle = {
-    color: "blue" | "purple" | "red" | "yellow";
-    state: "construction" | "ready" | "destroyed";
+type Castillo = {
+    color: ColorCastillo;
+    estado: EstadoCastillo;
 };
 
-type Trees = {
-    animation: "motion" | "attacked" | "felled";
+type Arbol = {
+    estado: EstadoArbol;
 };
 
-type Box = {
-    water: boolean;
-    foam: false | Foam;
-    elevation: false | Elevation;
-    wallElevation: false | WallElevation;
-    stairElevation: false | StairElevation;
-    castle: false | Castle;
-    trees: false | Trees;
+type Casilla = {
+    agua: boolean;
+    espuma: false | Espuma;
+    elevacion: false | Elevacion;
+    paredElevacion: false | ParedElevacion;
+    escalera: false | Escalera;
+    castillo: false | Castillo;
+    arbol: false | Arbol;
 };
 
-type GetBoxFloor = (boxIndices: Plane_ENGINE) => Box;
+type ObtenerPisoCasillas = (indicesCasilla: Plano) => Casilla;
 
-export type FloorMatrix_MapMatrix = Box[][];
+export type MatrizPiso = Casilla[][];
 
-export class MapMatrix_ENGINE {
-    static length = new Plane_ENGINE(37, 21);
+export class MatrizMapa {
+    static longitudes = new Plano(37, 21);
 
-    static getEmptyBox(): Box {
+    static obtenerCasillaVacia(): Casilla {
         return {
-            water: false,
-            foam: false,
-            elevation: false,
-            wallElevation: false,
-            stairElevation: false,
-            castle: false,
-            trees: false,
+            agua: false,
+            espuma: false,
+            elevacion: false,
+            paredElevacion: false,
+            escalera: false,
+            castillo: false,
+            arbol: false,
         };
     }
 
-    static getFloor0Box(boxIndices: Plane_ENGINE): Box {
-        const box = MapMatrix_ENGINE.getEmptyBox();
-        box.water = true;
+    static obtenerCasillaPiso0(indicesCasilla: Plano) {
+        const casilla = MatrizMapa.obtenerCasillaVacia();
+        casilla.agua = true;
         if (
-            boxIndices.vertical >= 3 && boxIndices.vertical <= 19 &&
-            boxIndices.horizontal >= 1 && boxIndices.horizontal <= 35
+            indicesCasilla.vertical >= 3 && indicesCasilla.vertical <= 19 &&
+            indicesCasilla.horizontal >= 1 && indicesCasilla.horizontal <= 35
         )
-            box.foam = {
-                flatSand: true
+            casilla.espuma = {
+                arena: true
             };
 
         if (
-            boxIndices.vertical === 14 &&
-            boxIndices.horizontal >= 11 && boxIndices.horizontal <= 13
+            indicesCasilla.vertical === 14 &&
+            indicesCasilla.horizontal >= 11 && indicesCasilla.horizontal <= 13
         )
-            box.stairElevation = {
-                shadow: true,
-                flatElevation: (boxIndices.horizontal === 11) ? "sand" : false
+            casilla.escalera = {
+                sombra: true,
+                mancha: (indicesCasilla.horizontal === 11) ? "arena" : false
             };
 
-        return box;
+        return casilla;
     }
 
-    static getFloor1Box(boxIndices: Plane_ENGINE): Box {
-        const box = MapMatrix_ENGINE.getEmptyBox();
+    static obtenerCasillaPiso1(indicesCasilla: Plano) {
+        const casilla = MatrizMapa.obtenerCasillaVacia();
 
         if (
-            boxIndices.horizontal >= 2 && boxIndices.horizontal <= 34 &&
-            boxIndices.vertical >= 2 && boxIndices.vertical <= 13
+            indicesCasilla.horizontal >= 2 && indicesCasilla.horizontal <= 34 &&
+            indicesCasilla.vertical >= 2 && indicesCasilla.vertical <= 13
         )
-            box.elevation = {
-                floor: 1,
-                shadow: boxIndices.vertical >= 3,
-                flatGrass: true
+            casilla.elevacion = {
+                piso: 1,
+                sombra: indicesCasilla.vertical >= 3,
+                pasto: true
             };
 
         if (
-            boxIndices.horizontal >= 2 && boxIndices.horizontal <= 10 &&
-            boxIndices.vertical === 14
+            indicesCasilla.horizontal >= 2 && indicesCasilla.horizontal <= 10 &&
+            indicesCasilla.vertical === 14
         )
-            box.elevation = {
-                floor: 1,
-                shadow: true,
-                flatGrass: true
+            casilla.elevacion = {
+                piso: 1,
+                sombra: true,
+                pasto: true
             };
 
         if (
-            boxIndices.horizontal >= 14 && boxIndices.horizontal <= 34 &&
-            boxIndices.vertical === 14
+            indicesCasilla.horizontal >= 14 && indicesCasilla.horizontal <= 34 &&
+            indicesCasilla.vertical === 14
         )
-            box.elevation = {
-                floor: 1,
-                shadow: true,
-                flatGrass: true
+            casilla.elevacion = {
+                piso: 1,
+                sombra: true,
+                pasto: true
             };
 
         if (
-            boxIndices.vertical === 15 &&
-            boxIndices.horizontal >= 2 && boxIndices.horizontal <= 10
+            indicesCasilla.vertical === 15 &&
+            indicesCasilla.horizontal >= 2 && indicesCasilla.horizontal <= 10
         ) {
-            const flatElevationRandom = Math.round(Math.random());
-            box.wallElevation = {
-                shadow: true,
-                flatElevation: (flatElevationRandom === 0) ? "sand" : false
+            const manchaAleatoria = Math.round(Math.random());
+            casilla.paredElevacion = {
+                sombra: true,
+                mancha: (manchaAleatoria === 0) ? "arena" : false
             };
         }
 
         if (
-            boxIndices.vertical === 15 &&
-            boxIndices.horizontal >= 14 && boxIndices.horizontal <= 34
+            indicesCasilla.vertical === 15 &&
+            indicesCasilla.horizontal >= 14 && indicesCasilla.horizontal <= 34
         ) {
-            const flatElevationRandom = Math.round(Math.random());
-            box.wallElevation = {
-                shadow: true,
-                flatElevation: (flatElevationRandom === 0) ? "sand" : false
+            const manchaAleatoria = Math.round(Math.random());
+            casilla.paredElevacion = {
+                sombra: true,
+                mancha: (manchaAleatoria === 0) ? "arena" : false
             };
         }
 
         if (
-            boxIndices.vertical === 7 &&
-            boxIndices.horizontal >= 11 && boxIndices.horizontal <= 13
+            indicesCasilla.vertical === 7 &&
+            indicesCasilla.horizontal >= 11 && indicesCasilla.horizontal <= 13
         ) {
-            box.stairElevation = {
-                shadow: true,
-                flatElevation: (boxIndices.horizontal === 9) ? "grass" : false
+            casilla.escalera = {
+                sombra: true,
+                mancha: (indicesCasilla.horizontal === 9) ? "pasto" : false
             };
         }
 
-        if (boxIndices.vertical === 3 && boxIndices.horizontal === 14) {
-            box.trees = {
-                animation: "felled"
+        if (indicesCasilla.vertical === 3 && indicesCasilla.horizontal === 14) {
+            casilla.arbol = {
+                estado: "derribado"
             }
         }
 
-        return box;
+        return casilla;
     }
 
-    static getFloor2Box(boxIndices: Plane_ENGINE): Box {
-        const box = MapMatrix_ENGINE.getEmptyBox();
+    static obtenerCasillaPiso2(indicesCasilla: Plano) {
+        const casilla = MatrizMapa.obtenerCasillaVacia();
 
         if (
-            boxIndices.horizontal >= 6 && boxIndices.horizontal <= 30 &&
-            boxIndices.vertical >= 1 && boxIndices.vertical <= 6
+            indicesCasilla.horizontal >= 6 && indicesCasilla.horizontal <= 30 &&
+            indicesCasilla.vertical >= 1 && indicesCasilla.vertical <= 6
         ) {
-            box.elevation = {
-                floor: 2,
-                shadow: boxIndices.vertical >= 3,
-                flatGrass: true
+            casilla.elevacion = {
+                piso: 2,
+                sombra: indicesCasilla.vertical >= 3,
+                pasto: true
             };
         }
         if (
-            boxIndices.horizontal >= 6 && boxIndices.horizontal <= 10 &&
-            boxIndices.vertical === 7
+            indicesCasilla.horizontal >= 6 && indicesCasilla.horizontal <= 10 &&
+            indicesCasilla.vertical === 7
         ) {
-            box.elevation = {
-                floor: 2,
-                shadow: true,
-                flatGrass: true
-            };
-        }
-
-        if (
-            boxIndices.horizontal >= 14 && boxIndices.horizontal <= 30 &&
-            boxIndices.vertical === 7
-        ) {
-            box.elevation = {
-                floor: 2,
-                shadow: true,
-                flatGrass: true
+            casilla.elevacion = {
+                piso: 2,
+                sombra: true,
+                pasto: true
             };
         }
 
         if (
-            boxIndices.vertical === 8 &&
-            boxIndices.horizontal >= 6 && boxIndices.horizontal <= 10
+            indicesCasilla.horizontal >= 14 && indicesCasilla.horizontal <= 30 &&
+            indicesCasilla.vertical === 7
         ) {
-            const flatElevationRandom = Math.round(Math.random());
-            box.wallElevation = {
-                shadow: true,
-                flatElevation: (flatElevationRandom === 0) ? "grass" : false
+            casilla.elevacion = {
+                piso: 2,
+                sombra: true,
+                pasto: true
             };
         }
 
         if (
-            boxIndices.vertical === 8 &&
-            boxIndices.horizontal >= 14 && boxIndices.horizontal <= 30
+            indicesCasilla.vertical === 8 &&
+            indicesCasilla.horizontal >= 6 && indicesCasilla.horizontal <= 10
         ) {
-            const flatElevationRandom = Math.round(Math.random());
-            box.wallElevation = {
-                shadow: true,
-                flatElevation: (flatElevationRandom === 0) ? "grass" : false
+            const manchaAleatoria = Math.round(Math.random());
+            casilla.paredElevacion = {
+                sombra: true,
+                mancha: (manchaAleatoria === 0) ? "pasto" : false
             };
         }
 
-        return box;
+        if (
+            indicesCasilla.vertical === 8 &&
+            indicesCasilla.horizontal >= 14 && indicesCasilla.horizontal <= 30
+        ) {
+            const manchaAleatoria = Math.round(Math.random());
+            casilla.paredElevacion = {
+                sombra: true,
+                mancha: (manchaAleatoria === 0) ? "pasto" : false
+            };
+        }
+
+        return casilla;
     }
 
-    static getBoxFloors: GetBoxFloor[] = [
-        MapMatrix_ENGINE.getFloor0Box,
-        MapMatrix_ENGINE.getFloor1Box,
-        MapMatrix_ENGINE.getFloor2Box,
+    static obtenerPisosCasillas: ObtenerPisoCasillas[] = [
+        MatrizMapa.obtenerCasillaPiso0,
+        MatrizMapa.obtenerCasillaPiso1,
+        MatrizMapa.obtenerCasillaPiso2,
     ];
 
-    static get(): FloorMatrix_MapMatrix[] {
-        const map: FloorMatrix_MapMatrix[] = [];
+    static get obtener(): MatrizPiso[] {
+        const mapa: MatrizPiso[] = [];
         for (
-            let floor = 0;
-            floor < MapMatrix_ENGINE.getBoxFloors.length;
-            floor++
+            let piso = 0;
+            piso < MatrizMapa.obtenerPisosCasillas.length;
+            piso++
         ) {
-            map[floor] = [];
-            const floorMatrix = map[floor];
-            if (floorMatrix === undefined)
+            mapa[piso] = [];
+            const matrizPiso = mapa[piso];
+            if (matrizPiso === undefined)
                 continue;
 
-            const boxIndices = new Plane_ENGINE(0, 0);
+            const indicesCasilla = new Plano(0, 0);
 
             for (
-                boxIndices.vertical = 0;
-                boxIndices.vertical < MapMatrix_ENGINE.length.vertical;
-                boxIndices.vertical++
+                indicesCasilla.vertical = 0;
+                indicesCasilla.vertical < MatrizMapa.longitudes.vertical;
+                indicesCasilla.vertical++
             ) {
-                floorMatrix[boxIndices.vertical] = [];
-                const row = floorMatrix[boxIndices.vertical];
-                if (row === undefined)
+                matrizPiso[indicesCasilla.vertical] = [];
+                const fila = matrizPiso[indicesCasilla.vertical];
+                if (fila === undefined)
                     continue;
 
                 for (
-                    boxIndices.horizontal = 0;
-                    boxIndices.horizontal < MapMatrix_ENGINE.length.horizontal;
-                    boxIndices.horizontal++
+                    indicesCasilla.horizontal = 0;
+                    indicesCasilla.horizontal < MatrizMapa.longitudes.horizontal;
+                    indicesCasilla.horizontal++
                 ) {
-                    const getBoxFloor = MapMatrix_ENGINE.getBoxFloors[floor];
-                    if (getBoxFloor === undefined)
+                    const obtenerPisoCasillas = MatrizMapa.obtenerPisosCasillas[piso];
+                    if (obtenerPisoCasillas === undefined)
                         continue;
 
-                    row[boxIndices.horizontal] = getBoxFloor(boxIndices);
+                    fila[indicesCasilla.horizontal] = obtenerPisoCasillas(indicesCasilla);
                 }
             }
         }
-        return map;
+        return mapa;
     }
 }

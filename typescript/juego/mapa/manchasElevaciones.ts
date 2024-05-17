@@ -5,13 +5,13 @@ import { Medidas } from "../../motor/medidas";
 import { Plano } from "../../motor/plano";
 import type { Mapa } from "../mapa";
 
-export type EstadoManchasElevaciones = "pasto" | "arena";
-export type EstadosElementoIndicesManchasElevaciones = {
-    [key in EstadoManchasElevaciones]: Plano;
+export type EstadoManchaElevacion = "pasto" | "arena";
+export type EstadosElementoIndicesManchaElevacion = {
+    [key in EstadoManchaElevacion]: Plano;
 }
 
-export class ManchasElevaciones extends CasillasElementos {
-    estadosElementoIndices: EstadosElementoIndicesManchasElevaciones;
+export class ManchasElevacion extends CasillasElementos {
+    estadosElementoIndices: EstadosElementoIndicesManchaElevacion;
     constructor(
         mapa: Mapa,
         lienzo: Lienzo,
@@ -20,8 +20,8 @@ export class ManchasElevaciones extends CasillasElementos {
             mapa.izquierdaSuperior.x,
             mapa.izquierdaSuperior.y,
             new Medidas(
-                mapa.medidasCasillas.ancho,
-                mapa.medidasCasillas.alto
+                mapa.medidasCasilla.ancho,
+                mapa.medidasCasilla.alto
             ),
             new Plano(1, 1),
             true,
@@ -38,9 +38,9 @@ export class ManchasElevaciones extends CasillasElementos {
         };
     }
 
-    agregarManchasElevaciones(
+    agregarManchaElevacion(
         indicesCasilla: Plano,
-        estado: EstadoManchasElevaciones
+        estado: EstadoManchaElevacion
     ) {
         const elementoIndices = this.estadosElementoIndices[estado];
         this.elemento.indices = new Plano(

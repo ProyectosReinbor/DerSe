@@ -1,3 +1,13 @@
+import type { RutaImagen } from "../motor/imagen";
+
+export type RegaloTiktok = {
+    giftName: string;
+    giftPictureUrl: string;
+    repeatCount: number;
+    nickname: string;
+    profilePictureUrl: RutaImagen;
+};
+
 // export const Tiktok = (
 //     giftCallback,
 //     chatCallback

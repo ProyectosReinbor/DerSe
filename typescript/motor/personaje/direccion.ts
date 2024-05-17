@@ -1,5 +1,5 @@
-export type DireccionX = "left" | "right" | "center";
-export type DireccionY = "up" | "down" | "center";
+export type DireccionX = "izquierda" | "derecha" | "centro";
+export type DireccionY = "arriba" | "abajo" | "centro";
 
 export class Direccion {
 
@@ -15,26 +15,26 @@ export class Direccion {
     }
 
     get xNumero() {
-        if (this.x === "left")
+        if (this.x === "izquierda")
             return -1;
 
-        if (this.x === "right")
+        if (this.x === "derecha")
             return 1;
 
-        if (this.x === "center")
+        if (this.x === "centro")
             return 0;
 
         throw new Error("invalid  direction x");
     }
 
     get yNumero() {
-        if (this.y === "up")
+        if (this.y === "arriba")
             return -1;
 
-        if (this.y === "down")
+        if (this.y === "abajo")
             return 1;
 
-        if (this.y === "center")
+        if (this.y === "centro")
             return 0;
 
         throw new Error("invalid direction y");

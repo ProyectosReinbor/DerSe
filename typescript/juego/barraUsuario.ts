@@ -1,64 +1,64 @@
-import type { Canvas_ENGINE } from "../engine/canvas";
-import { Coordinate_ENGINE } from "../engine/coordinate";
-import { Image_ENGINE, type PathImage_ENGINE } from "../engine/image";
-import { Size_ENGINE } from "../engine/size";
-import { Square_ENGINE } from "../engine/square";
-import { Text_ENGINE } from "../engine/text";
-import type { Pawn_ENGINE } from "./pawn";
+import { Coordenadas } from "../motor/coordenadas";
+import { Cuadrado } from "../motor/cuadrado";
+import { Imagen, type RutaImagen } from "../motor/imagen";
+import type { Lienzo } from "../motor/lienzo";
+import { Medidas } from "../motor/medidas";
+import { Texto } from "../motor/texto";
+import type { Peon } from "./peon";
 
-export class UserBar_ENGINE extends Square_ENGINE {
+export class BarraUsuario extends Cuadrado {
 
-    pawn: Pawn_ENGINE;
-    photo: Image_ENGINE;
-    name: Text_ENGINE;
+    peon: Peon;
+    foto: Imagen;
+    apodo: Texto;
 
     constructor(
-        pawn: Pawn_ENGINE,
-        size: Size_ENGINE,
-        canvas: Canvas_ENGINE,
-        photoRoute: PathImage_ENGINE | false,
-        nickname: string,
+        peon: Peon,
+        medidas: Medidas,
+        lienzo: Lienzo,
+        rutaFoto: RutaImagen | false,
+        apodo: string,
     ) {
         super(
-            new Coordinate_ENGINE(0, 0),
-            size,
-            canvas,
+            new Coordenadas(0, 0),
+            medidas,
+            lienzo,
             "#416177",
             "#fff",
             0.5,
         );
-        this.pawn = pawn;
-        this.photo = new Image_ENGINE(
-            new Coordinate_ENGINE(0, 0),
-            new Size_ENGINE(
-                this.size.width * 0.3,
-                this.size.height,
+        this.peon = peon;
+        this.foto = new Imagen(
+            new Coordenadas(0, 0),
+            new Medidas(
+                this.medidas.ancho * 0.3,
+                this.medidas.alto,
             ),
-            this.canvas,
-            photoRoute,
+            this.lienzo,
+            rutaFoto,
         );
-        this.name = new Text_ENGINE(
-            new Coordinate_ENGINE(0, 0),
-            this.size.percentage(
-                new Size_ENGINE(70, 100)
+        this.apodo = new Texto(
+            new Coordenadas(0, 0),
+            this.medidas.porcentaje(
+                new Medidas(70, 100)
             ),
-            this.canvas,
-            nickname,
+            this.lienzo,
+            apodo,
             "#fff",
             false,
             false,
         );
     }
 
-    drawUserBar() {
-        this.leftUp.x = this.pawn.leftUp.x;
-        this.leftUp.y = this.pawn.leftUp.y - this.size.height;
-        this.photo.leftUp.x = this.leftUp.x;
-        this.photo.leftUp.y = this.leftUp.y;
-        this.name.leftUp.x = this.leftUp.x + this.photo.size.width;
-        this.name.leftUp.y = this.leftUp.y;
-        this.drawSquare();
-        this.photo.drawImage();
-        this.name.drawText();
+    dibujarBarraUsuario() {
+        this.izquierdaSuperior.x = this.peon.izquierdaSuperior.x;
+        this.izquierdaSuperior.y = this.peon.izquierdaSuperior.y - this.medidas.alto;
+        this.foto.izquierdaSuperior.x = this.izquierdaSuperior.x;
+        this.foto.izquierdaSuperior.y = this.izquierdaSuperior.y;
+        this.apodo.izquierdaSuperior.x = this.izquierdaSuperior.x + this.foto.medidas.ancho;
+        this.apodo.izquierdaSuperior.y = this.izquierdaSuperior.y;
+        this.dibujarCuadrado();
+        this.foto.dibujarImagen();
+        this.apodo.dibujarTexto();
     }
 }

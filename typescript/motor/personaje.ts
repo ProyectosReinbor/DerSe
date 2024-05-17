@@ -56,7 +56,7 @@ export class Personaje extends Cuadrado {
 
     mover(): Coordenadas | false {
         if (this.direccion.igualA(
-            new Direccion("center", "center")
+            new Direccion("centro", "centro")
         ))
             return false;
 

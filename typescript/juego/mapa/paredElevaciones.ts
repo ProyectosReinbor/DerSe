@@ -6,15 +6,15 @@ import { Plano } from "../../motor/plano";
 import type { Mapa } from "../mapa";
 
 
-export type EstadoParedElevaciones = "izquierda" | "centro" | "derecha" | "solo";
+export type EstadoParedesElevacion = "izquierda" | "centro" | "derecha" | "solo";
 
-export type EstadosElementoIndicesParedElevaciones = {
-    [key in EstadoParedElevaciones]: Plano;
+export type EstadosElementoIndicesParedesElevacion = {
+    [key in EstadoParedesElevacion]: Plano;
 };
 
-export class ParedElevaciones extends CasillasElementos {
+export class ParedesElevacion extends CasillasElementos {
 
-    estadosElementoIndices: EstadosElementoIndicesParedElevaciones;
+    estadosElementoIndices: EstadosElementoIndicesParedesElevacion;
 
     constructor(
         mapa: Mapa,
@@ -24,8 +24,8 @@ export class ParedElevaciones extends CasillasElementos {
             mapa.izquierdaSuperior.x,
             mapa.izquierdaSuperior.y,
             new Medidas(
-                mapa.medidasCasillas.ancho,
-                mapa.medidasCasillas.alto
+                mapa.medidasCasilla.ancho,
+                mapa.medidasCasilla.alto
             ),
             new Plano(1, 1),
             true,
@@ -44,7 +44,7 @@ export class ParedElevaciones extends CasillasElementos {
         };
     }
 
-    estadoConPosicion(indicesCasilla: Plano): EstadoParedElevaciones {
+    estadoConPosicion(indicesCasilla: Plano): EstadoParedesElevacion {
         const indicesCasillaIzquierda = new Plano(
             indicesCasilla.horizontal - 1,
             indicesCasilla.vertical,
@@ -100,7 +100,7 @@ export class ParedElevaciones extends CasillasElementos {
         return indiceElementos;
     }
 
-    dibujarParedElevaciones() {
+    dibujarParedesElevacion() {
         this.dibujarElementos();
     }
 } 

@@ -1,43 +1,47 @@
-import type { Canvas_ENGINE } from "../../engine/canvas";
-import type { Image_ENGINE } from "../../engine/image";
-import { ImageBoxes_ENGINE } from "../../engine/imageBoxes";
-import { Plane_ENGINE } from "../../engine/plane";
-import { Size_ENGINE } from "../../engine/size";
-import type { Map_ENGINE } from "../map";
+import { CasillasImagenes } from "../../motor/casillasImagenes";
+import type { Lienzo } from "../../motor/lienzo";
+import { Medidas } from "../../motor/medidas";
+import { Plano } from "../../motor/plano";
+import type { Mapa } from "../mapa";
 
-
-export class Shadows_ENGINE extends ImageBoxes_ENGINE {
+export class Sombras extends CasillasImagenes {
     constructor(
-        map: Map_ENGINE,
-        canvas: Canvas_ENGINE,
+        mapa: Mapa,
+        lienzo: Lienzo,
     ) {
         super(
-            map.leftUp.x,
-            map.leftUp.y,
-            canvas,
-            new Size_ENGINE(
-                map.boxes.width,
-                map.boxes.height
+            mapa.izquierdaSuperior.x,
+            mapa.izquierdaSuperior.y,
+            new Medidas(
+                mapa.medidasCasilla.ancho,
+                mapa.medidasCasilla.alto
             ),
-            new Plane_ENGINE(3, 3),
+            new Plano(3, 3),
             [
                 [true, false, false],
                 [false, false, false],
                 [false, false, false]
             ],
+            lienzo,
             "images/terrain/ground/shadows.png",
         );
     }
 
-    pushShadow(boxIndices: Plane_ENGINE): Image_ENGINE | undefined {
-        const shadow = this.referencePush(boxIndices);
-        if (shadow === undefined) return undefined;
-        shadow.leftUp.x -= this.size.width;
-        shadow.leftUp.y -= this.size.height;
-        return shadow;
+    agregarSombra(indicesCasilla: Plano) {
+        const indiceImagen = this.agregarImagen(indicesCasilla);
+        if (indiceImagen === "ya esta agregado")
+            return "ya esta agregado";
+
+        const sombra = this.imagines[indiceImagen];
+        if (sombra === undefined)
+            return undefined;
+
+        sombra.izquierdaSuperior.x -= this.medidasCasilla.ancho;
+        sombra.izquierdaSuperior.y -= this.medidasCasilla.ancho;
+        return indiceImagen;
     }
 
-    drawShadows() {
-        this.drawImages();
+    dibujarSombras() {
+        this.dibujarImagenes();
     }
 }           
