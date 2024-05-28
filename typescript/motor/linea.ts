@@ -23,7 +23,8 @@ export class Linea extends Objeto {
       izquierdaSuperior,
       new Medidas(
         derechaInferior.x - izquierdaSuperior.x,
-        derechaInferior.y - izquierdaSuperior.y
+        derechaInferior.y - izquierdaSuperior.y,
+        derechaInferior.z - izquierdaSuperior.z
       )
     );
     this.lienzo = lienzo;
@@ -39,7 +40,8 @@ export class Linea extends Objeto {
     this.izquierdaSuperior = izquierdaSuperior;
     this.medidas = new Medidas(
       derechaInferior.x - izquierdaSuperior.x,
-      derechaInferior.y - izquierdaSuperior.y
+      derechaInferior.y - izquierdaSuperior.y,
+      derechaInferior.z - izquierdaSuperior.z
     );
   }
 

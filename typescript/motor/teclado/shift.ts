@@ -17,10 +17,10 @@ export class Shift extends Cuadrado {
   ) {
     super(
       teclado.izquierdaSuperiorMasPorcentajeMedidas(
-        new Medidas(2, 3)
+        new Medidas(2, 3, 100)
       ),
       teclado.medidas.porcentaje(
-        new Medidas(9, 14)
+        new Medidas(9, 14, 100)
       ),
       lienzo,
       "#21618C",
@@ -37,12 +37,12 @@ export class Shift extends Cuadrado {
       0
     );
     this.triangulo.agregarLineaConPorcentajes(
-      new Medidas(50, 20),
-      new Medidas(10, 50)
+      new Medidas(50, 20, 100),
+      new Medidas(10, 50, 100)
     );
     this.triangulo.agregarLineaConPorcentajes(
-      new Medidas(90, 50),
-      new Medidas(50, 20)
+      new Medidas(90, 50, 100),
+      new Medidas(50, 20, 100)
     );
     this.lineas = new Lineas(
       this.izquierdaSuperior,
@@ -53,8 +53,8 @@ export class Shift extends Cuadrado {
       2,
     );
     this.lineas.agregarLineaConPorcentajes(
-      new Medidas(50, 50),
-      new Medidas(50, 80)
+      new Medidas(50, 50, 100),
+      new Medidas(50, 80, 100)
     );
   }
 

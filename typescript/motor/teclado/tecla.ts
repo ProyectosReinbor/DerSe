@@ -18,7 +18,13 @@ export class Tecla extends Boton {
         fillStyle: FillStyle,
         strokeStyle: StrokeStyle,
         lineWidth: number,
-        texto: Texto,
+        texto: {
+            medidas: Medidas;
+            valor: string;
+            fillStyle: FillStyle;
+            strokeStyle: StrokeStyle;
+            dungeonFont: boolean;
+        },
         presionarTecla: PresionarTecla,
     ) {
         super(

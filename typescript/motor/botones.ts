@@ -4,8 +4,6 @@ import { Coordenadas } from "./coordenadas";
 import type { Lienzo } from "./lienzo";
 import { Medidas } from "./medidas";
 import { Objeto } from "./objeto";
-import type { Plano } from "./plano";
-import { Texto } from "./texto";
 
 type ParametrosBoton = {
   medidas: Medidas;
@@ -35,7 +33,7 @@ export class Botones extends Objeto {
   }
 
   agregarBoton(
-    casillas: Plano,
+    casillas: Coordenadas,
     parametrosBoton: {
       fillStyle: FillStyle;
       strokeStyle: StrokeStyle;
@@ -50,32 +48,30 @@ export class Botones extends Objeto {
   ) {
     const medidas = new Medidas(
       this.parametrosBoton.medidas.ancho,
-      this.parametrosBoton.medidas.alto
+      this.parametrosBoton.medidas.alto,
+      this.parametrosBoton.medidas.profundidad
     );
-    const izquierda = medidas.ancho * casillas.horizontal;
-    const superior = medidas.alto * casillas.vertical;
+    const izquierda = medidas.ancho * casillas.x;
+    const superior = medidas.alto * casillas.y;
     const boton = new Boton(
       new Coordenadas(
         this.izquierdaSuperior.x + superior,
         this.izquierdaSuperior.y + izquierda,
+        this.izquierdaSuperior.z,
       ),
       medidas,
       this.lienzo,
       parametrosBoton.fillStyle,
       parametrosBoton.strokeStyle,
       parametrosBoton.lineWidth,
-      new Texto(
-        new Coordenadas(0, 0),
-        new Medidas(
+      {
+        medidas: new Medidas(
           0,
-          this.parametrosBoton.texto.medidas.alto
+          this.parametrosBoton.texto.medidas.alto,
+          1
         ),
-        this.lienzo,
-        parametrosBoton.texto.valor,
-        parametrosBoton.texto.fillStyle,
-        parametrosBoton.texto.strokeStyle,
-        parametrosBoton.texto.dungeonFont
-      )
+        ...parametrosBoton.texto
+      },
     );
     this.botones.push(boton);
   }

@@ -1,4 +1,3 @@
-import { Coordenadas } from "../motor/coordenadas";
 import { Escena } from "../motor/escena";
 import type { Lienzo } from "../motor/lienzo";
 import { Mapa } from "./mapa";
@@ -15,17 +14,17 @@ export class Juego extends Escena {
     constructor(lienzo: Lienzo) {
         super(lienzo);
         this.mapa = new Mapa(lienzo);
-        this.ovejas = [
-            new Oveja(
-                new Coordenadas(
-                    35, 50),
-                // Math.floor(Math.random() * this.map.size.width),
-                // Math.floor(Math.random() * this.map.size.height)
-                // }),
-                this.mapa,
-                lienzo
-            )
-        ];
+        // this.ovejas = [
+        //     new Oveja(
+        //         new Coordenadas(
+        //             35, 50),
+        //         // Math.floor(Math.random() * this.map.size.width),
+        //         // Math.floor(Math.random() * this.map.size.height)
+        //         // }),
+        //         this.mapa,
+        //         lienzo
+        //     )
+        // ];
     }
 
     regaloTiktok(regalo: RegaloTiktok) {

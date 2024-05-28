@@ -17,10 +17,10 @@ export class Enter extends Cuadrado {
   ) {
     super(
       teclado.izquierdaSuperiorMasPorcentajeMedidas(
-        new Medidas(13, 3)
+        new Medidas(13, 3, 100)
       ),
       teclado.medidas.porcentaje(
-        new Medidas(12, 14)
+        new Medidas(12, 14, 100)
       ),
       lienzo,
       "#21618C",
@@ -36,12 +36,12 @@ export class Enter extends Cuadrado {
       0
     );
     this.triangulo.agregarLineaConPorcentajes(
-      new Medidas(10, 60),
-      new Medidas(30, 40)
+      new Medidas(10, 60, 100),
+      new Medidas(30, 40, 100)
     );
     this.triangulo.agregarLineaConPorcentajes(
-      new Medidas(30, 80),
-      new Medidas(10, 60)
+      new Medidas(30, 80, 100),
+      new Medidas(10, 60, 100)
     );
     this.lineas = new Lineas(
       this.izquierdaSuperior,
@@ -52,12 +52,12 @@ export class Enter extends Cuadrado {
       0.5,
     );
     this.lineas.agregarLineaConPorcentajes(
-      new Medidas(20, 60),
-      new Medidas(80, 60)
+      new Medidas(20, 60, 100),
+      new Medidas(80, 60, 100)
     );
     this.lineas.agregarLineaConPorcentajes(
-      new Medidas(80, 20),
-      new Medidas(0, 0)
+      new Medidas(80, 20, 100),
+      new Medidas(0, 0, 0)
     );
     this.teclado = teclado;
   }

@@ -1,11 +1,11 @@
 import { Animacion } from "./animacion";
 import { Animaciones } from "./animaciones";
 import { Casillas, type CasillasOcupadas } from "./casillas";
+import { Coordenadas } from "./coordenadas";
 import { Elemento } from "./elemento";
 import type { RutaImagen } from "./imagen";
 import type { Lienzo } from "./lienzo";
 import { Medidas } from "./medidas";
-import { Plano } from "./plano";
 
 export class CasillasAnimaciones extends Casillas {
 
@@ -18,8 +18,9 @@ export class CasillasAnimaciones extends Casillas {
     constructor(
         x: number,
         y: number,
+        z: number,
         medidasCasilla: Medidas,
-        longitudCasillasOcupadas: Plano,
+        longitudCasillasOcupadas: Coordenadas,
         casillasOcupadas: CasillasOcupadas,
         lienzo: Lienzo,
         ruta: RutaImagen | false,
@@ -29,6 +30,7 @@ export class CasillasAnimaciones extends Casillas {
         super(
             x,
             y,
+            z,
             medidasCasilla,
             longitudCasillasOcupadas,
             casillasOcupadas,
@@ -39,16 +41,18 @@ export class CasillasAnimaciones extends Casillas {
         this.animacion = animacion;
     }
 
-    agregarAnimaciones(indicesCasilla: Plano) {
+    agregarAnimaciones(indicesCasilla: Coordenadas) {
         const objeto = this.nuevoObjeto(indicesCasilla);
         const elemento = new Elemento(
             new Medidas(
                 this.elemento.medidas.ancho,
-                this.elemento.medidas.alto
+                this.elemento.medidas.alto,
+                this.elemento.medidas.profundidad
             ),
-            new Plano(
+            new Coordenadas(
                 0,
-                this.elemento.indices.vertical
+                this.elemento.indices.vertical,
+                0,
             )
         );
         const animacion = new Animacion(

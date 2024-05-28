@@ -16,7 +16,8 @@ export class Curva extends Objeto {
   ) {
     const medidas = new Medidas(
       derechaInferior.x - izquierdaSuperior.x,
-      derechaInferior.y - izquierdaSuperior.y
+      derechaInferior.y - izquierdaSuperior.y,
+      derechaInferior.z - izquierdaSuperior.z
     );
     super(
       izquierdaSuperior,
@@ -34,7 +35,7 @@ export class Curva extends Objeto {
     const puntoControlEnLienzo = this.lienzo.objetoEnLienzo(
       new Objeto(
         this.puntoControl,
-        new Medidas(0, 0),
+        new Medidas(0, 0, 0),
       )
     );
     if (puntoControlEnLienzo === false)

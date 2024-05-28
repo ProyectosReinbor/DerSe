@@ -1,10 +1,9 @@
 import { Circulo } from "../circulo";
-import type { Coordenadas } from "../coordenadas";
+import type { Coordenadas2 } from "../coordenadas2";
 import { Cuadrado } from "../cuadrado";
 import { Curvas } from "../curvas";
 import type { EntradaTexto } from "../entradaTexto";
 import type { Lienzo } from "../lienzo";
-import { Medidas } from "../medidas";
 
 export class Ocultar extends Cuadrado {
 
@@ -21,10 +20,10 @@ export class Ocultar extends Cuadrado {
   ) {
     super(
       entradaTexto.izquierdaSuperiorMasPorcentajeMedidas(
-        new Medidas(88, 20)
+        new Medidas3(88, 20, 100)
       ),
       entradaTexto.medidas.porcentaje(
-        new Medidas(10, 60)
+        new Medidas3(10, 60, 100)
       ),
       lienzo,
       "#AED6F1",
@@ -41,32 +40,32 @@ export class Ocultar extends Cuadrado {
     );
     this.parpado.agregarCurva(
       entradaTexto.izquierdaSuperiorMasPorcentajeMedidas(
-        new Medidas(89, 50)
+        new Medidas(89, 50, 100)
       ),
       entradaTexto.izquierdaSuperiorMasPorcentajeMedidas(
-        new Medidas(97, 50)
+        new Medidas(97, 50, 100)
       ),
       entradaTexto.izquierdaSuperiorMasPorcentajeMedidas(
-        new Medidas(93, 70)
+        new Medidas(93, 70, 100)
       )
     );
     this.parpado.agregarCurva(
       entradaTexto.izquierdaSuperiorMasPorcentajeMedidas(
-        new Medidas(89, 50)
+        new Medidas(89, 50, 100)
       ),
       entradaTexto.izquierdaSuperiorMasPorcentajeMedidas(
-        new Medidas(97, 50)
+        new Medidas(97, 50, 100)
       ),
       entradaTexto.izquierdaSuperiorMasPorcentajeMedidas(
-        new Medidas(93, 20)
+        new Medidas(93, 20, 100)
       )
     );
     this.pupila = new Circulo(
       entradaTexto.izquierdaSuperiorMasPorcentajeMedidas(
-        new Medidas(87, 36)
+        new Medidas(87, 36, 100)
       ),
       entradaTexto.medidas.porcentaje(
-        new Medidas(12, 26)
+        new Medidas(12, 26, 100)
       ),
       lienzo,
       0,
@@ -78,7 +77,7 @@ export class Ocultar extends Cuadrado {
     );
   }
 
-  toqueTerminado(toque: Coordenadas) {
+  toqueTerminado(toque: Coordenadas2) {
     if (this.coordenadasAdentro(toque) === false)
       return false;
 

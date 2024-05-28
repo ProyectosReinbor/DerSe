@@ -1,267 +1,21 @@
-// game/engine/coordinate.ts
-class Coordinate_ENGINE {
+// typescript/motor/coordenadas.ts
+class Coordenadas {
   x;
   y;
-  constructor(_x, _y) {
-    this.x = _x;
-    this.y = _y;
+  z;
+  constructor(x, y, z) {
+    this.x = x;
+    this.y = y;
+    this.z = z;
   }
-  isEqualTo(coordinate) {
-    return this.x === coordinate.x && this.y === coordinate.y;
-  }
-}
-
-// game/engine/position.ts
-class Position_ENGINE {
-  _leftUp;
-  _size;
-  get leftUp() {
-    return this._leftUp;
-  }
-  get size() {
-    return this._size;
-  }
-  constructor(_leftUp, _size) {
-    this._leftUp = _leftUp;
-    this._size = _size;
-  }
-  get leftDown() {
-    return new Coordinate_ENGINE(this._leftUp.x, this._leftUp.y + this._size.height);
-  }
-  get rightDown() {
-    return new Coordinate_ENGINE(this._leftUp.x + this._size.width, this._leftUp.y + this._size.height);
-  }
-  get rightUp() {
-    return new Coordinate_ENGINE(this._leftUp.x + this._size.width, this._leftUp.y);
-  }
-  leftUpPlusSizePixels(percentages) {
-    const pixels = this._size.pixels(percentages);
-    return new Coordinate_ENGINE(this._leftUp.x + pixels.width, this._leftUp.y + pixels.height);
-  }
-  coordinateWithinPosition(coordinate2) {
-    return this.leftUp.x <= coordinate2.x && this.leftUp.y <= coordinate2.y && this.rightDown.x >= coordinate2.x && this.rightDown.y >= coordinate2.y;
-  }
-  positionWithinPosition(position) {
-    return this.leftUp.x <= position.leftUp.x && this.leftUp.y <= position.leftUp.y && this.rightDown.x >= position.rightDown.x && this.rightDown.y >= position.rightDown.y;
-  }
-  someVertexWithinPosition(position) {
-    if (this.coordinateWithinPosition(position.leftUp))
-      return true;
-    if (this.coordinateWithinPosition(position.leftDown))
-      return true;
-    if (this.coordinateWithinPosition(position.rightUp))
-      return true;
-    if (this.coordinateWithinPosition(position.rightDown))
-      return true;
-    return false;
+  igualA(coordenadas) {
+    return this.x === coordenadas.x && this.y === coordenadas.y && this.z === coordenadas.z;
   }
 }
 
-// game/engine/size.ts
-class Size_ENGINE {
-  width;
-  height;
-  constructor(_width, _height) {
-    this.width = _width;
-    this.height = _height;
-  }
-  get aPercent() {
-    return new Size_ENGINE(this.width / 100, this.height / 100);
-  }
-  pixels(percentages) {
-    return new Size_ENGINE(this.aPercent.width * percentages.width, this.aPercent.height * percentages.height);
-  }
-  get half() {
-    return new Size_ENGINE(this.width / 2, this.height / 2);
-  }
-}
-
-// game/engine/camera.ts
-class Camera_ENGINE extends Position_ENGINE {
-  constructor(leftUp) {
-    super(leftUp, new Size_ENGINE(100, 100));
-  }
-  positionInsideTheChamber(position2) {
-    const doubleSize = new Size_ENGINE(position2.getSize().getWidth() * 2, position2.getSize().getHeight() * 2);
-    const vision = new Position_ENGINE(new Coordinate_ENGINE(this.getLeftUp().getX() - position2.getSize().getWidth(), this.getLeftUp().getY() - position2.getSize().getHeight()), new Size_ENGINE(this.getSize().getWidth() + doubleSize.getWidth(), this.getSize().getHeight() + doubleSize.getHeight()));
-    return vision.positionWithinPosition(position2);
-  }
-  positionOnCamera(position2) {
-    if (this.positionInsideTheChamber(position2) === false)
-      return false;
-    return new Position_ENGINE(new Coordinate_ENGINE(position2.getLeftUp().getX() - this.getLeftUp().getX(), position2.getLeftUp().getY() - this.getLeftUp().getY()), new Size_ENGINE(position2.getSize().getWidth(), position2.getSize().getHeight()));
-  }
-  focusPosition(position2) {
-    let x = position2.getLeftUp().getX() - this.getSize().getWidth() / 2;
-    x += position2.getSize().getWidth() / 2;
-    let y = position2.getLeftUp().getY() - this.getSize().getHeight() / 2;
-    y += position2.getSize().getHeight() / 2;
-    this.getLeftUp().setX(x);
-    this.getLeftUp().setY(y);
-  }
-}
-
-// game/engine/images.ts
-class Images_ENGINE {
-  notFound = [];
-  images = {};
-  loadingImage = false;
-  getImage(route) {
-    if (this.loadingImage === true)
-      return false;
-    if (this.notFound.includes(route) === true)
-      return false;
-    const image = this.images[route];
-    if (image === undefined) {
-      this.uploadImage(route);
-      return false;
-    }
-    return image;
-  }
-  uploadImage(route) {
-    if (this.notFound.includes(route) === true)
-      return;
-    const image = this.images[route];
-    if (image !== undefined)
-      return;
-    this.loadingImage = true;
-    const newImage = new Image;
-    newImage.addEventListener("load", () => {
-      this.loadingImage = false;
-      this.images[route] = newImage;
-    });
-    newImage.addEventListener("error", () => {
-      throw new Error(`image ${route} is not found`);
-      this.notFound.push(route);
-    });
-    newImage.src = route;
-  }
-}
-
-// game/engine/canvas.ts
-class Canvas_ENGINE extends Camera_ENGINE {
-  _aPercent = new Size_ENGINE(0, 0);
-  _margin = new Size_ENGINE(0, 0);
-  _images = new Images_ENGINE;
-  _framesPerSecond;
-  _intervalBetweenFrames;
-  _time = 0;
-  _timeBetweenFrames = 0;
-  _element;
-  _context;
-  drawScene() {
-  }
-  touchstartScene = () => {
-  };
-  touchmoveScene = () => {
-  };
-  touchendScene = () => {
-  };
-  constructor(_leftUp, _framesPerSecond) {
-    super(_leftUp);
-    this._framesPerSecond = _framesPerSecond;
-    this._intervalBetweenFrames = 1000 / this._framesPerSecond;
-    this._element = window.document.getElementById("canvas");
-    this._context = this._element.getContext("2d");
-    this.aspectRatio();
-    window.addEventListener("resize", () => this.aspectRatio());
-    this._element.addEventListener("touchstart", (event) => this.touchstartCanvas(event));
-    this._element.addEventListener("touchmove", (event) => this.touchmoveCanvas(event));
-    this._element.addEventListener("touchend", (event) => this.touchendCanvas(event));
-    this.nextFrame(0);
-  }
-  nextFrame(time) {
-    const difference = time - this._time;
-    if (difference < this._intervalBetweenFrames) {
-      requestAnimationFrame((time2) => this.nextFrame(time2));
-      return;
-    }
-    this._timeBetweenFrames = difference;
-    this._time = time;
-    this.drawCanvas();
-    requestAnimationFrame((time2) => this.nextFrame(time2));
-  }
-  async start(drawScene, touchstartScene, touchmoveScene, touchendScene) {
-    this.drawScene = drawScene;
-    this.touchstartScene = touchstartScene;
-    this.touchmoveScene = touchmoveScene;
-    this.touchendScene = touchendScene;
-  }
-  drawCanvas() {
-    this._context.clearRect(0, 0, this._element.width, this._element.height);
-    this.drawScene();
-  }
-  aspectRatio() {
-    const screenSize = new Size_ENGINE(1280, 720);
-    this._element.width = screenSize.width;
-    this._element.height = screenSize.height;
-    this._aPercent.width = this._element.width / 100;
-    this._aPercent.height = this._element.height / 100;
-  }
-  getTouchCoordinate(touch) {
-    if (touch === null)
-      return false;
-    const left = this._margin.width / 2;
-    const top = this._margin.height / 2;
-    return new Coordinate_ENGINE(touch.pageX - left, touch.pageY - top);
-  }
-  touchstartCanvas(event) {
-    event.preventDefault();
-    for (let index = 0;index < event.changedTouches.length; index++) {
-      const touch = event.changedTouches.item(index);
-      const coordinate4 = this.getTouchCoordinate(touch);
-      if (coordinate4 === false)
-        continue;
-      this.touchstartScene(coordinate4);
-    }
-  }
-  touchmoveCanvas(event) {
-    event.preventDefault();
-    for (let index = 0;index < event.changedTouches.length; index++) {
-      const touch = event.changedTouches.item(index);
-      const coordinate4 = this.getTouchCoordinate(touch);
-      if (coordinate4 === false)
-        continue;
-      this.touchmoveScene(coordinate4);
-    }
-  }
-  touchendCanvas(event) {
-    event.preventDefault();
-    for (let index = 0;index < event.changedTouches.length; index++) {
-      const touch = event.changedTouches.item(index);
-      const coordinate4 = this.getTouchCoordinate(touch);
-      if (coordinate4 === false)
-        continue;
-      this.touchendScene(coordinate4);
-    }
-  }
-  positionOnCanvas(position3) {
-    const positionOnCamera = this.positionOnCamera(position3);
-    if (positionOnCamera === false)
-      return false;
-    return new Position_ENGINE(new Coordinate_ENGINE(this.widthInPixels(positionOnCamera.leftUp.x), this.heightInPixels(positionOnCamera.leftUp.y)), new Size_ENGINE(this.widthInPixels(positionOnCamera.size.width), this.heightInPixels(positionOnCamera.size.height)));
-  }
-  widthInPercentageHeight(percentageHeight) {
-    const pixels = this.heightInPixels(percentageHeight);
-    return this.widthInPercentages(pixels);
-  }
-  widthInPercentages(pixels) {
-    return pixels / this._aPercent.width;
-  }
-  widthInPixels(percentage) {
-    return percentage * this._aPercent.width;
-  }
-  heightInPercentages(pixels) {
-    return pixels / this._aPercent.height;
-  }
-  heightInPixels(percentage) {
-    return percentage * this._aPercent.height;
-  }
-}
-
-// game/engine/scene.ts
-class Scene_ENGINE {
-  canvas;
+// typescript/motor/escena.ts
+class Escena {
+  lienzo;
   draw = () => {
   };
   touchstart = () => {
@@ -270,1609 +24,1688 @@ class Scene_ENGINE {
   };
   touchend = () => {
   };
-  constructor(canvas) {
-    this.canvas = canvas;
+  constructor(lienzo) {
+    this.lienzo = lienzo;
   }
-  async start() {
-    await this.canvas.start(() => this.draw(), (touch) => this.touchstart(touch), (touch) => this.touchmove(touch), (touch) => this.touchend(touch));
-  }
-}
-
-// game/engine/plane.ts
-class Plane_ENGINE {
-  horizontal;
-  vertical;
-  constructor(horizontal, vertical) {
-    this.horizontal = horizontal;
-    this.vertical = vertical;
-  }
-  getHorizontal() {
-    return this.horizontal;
-  }
-  getVertical() {
-    return this.vertical;
-  }
-  setHorizontal(newHorizontal) {
-    this.horizontal = newHorizontal;
-  }
-  setVertical(newVertical) {
-    this.vertical = newVertical;
-  }
-  addHorizontal(addend) {
-    this.horizontal += addend;
-  }
-  addVertical(addend) {
-    this.vertical += addend;
+  start() {
+    this.lienzo.empezar(this);
   }
 }
 
-// game/game/mapMatrix.ts
-class MapMatrix_ENGINE {
-  static length = new Plane_ENGINE(37, 21);
-  static getEmptyBox() {
-    return {
-      water: false,
-      foam: false,
-      elevation: false,
-      wallElevation: false,
-      stairElevation: false,
-      castle: false,
-      trees: false
-    };
+// typescript/motor/medidas.ts
+class Medidas {
+  ancho;
+  alto;
+  constructor(ancho, alto) {
+    this.ancho = ancho;
+    this.alto = alto;
   }
-  static getFloor0Box(boxIndices) {
-    const box = MapMatrix_ENGINE.getEmptyBox();
-    box.water = true;
-    if (boxIndices.vertical >= 3 && boxIndices.vertical <= 19 && boxIndices.horizontal >= 1 && boxIndices.horizontal <= 35)
-      box.foam = {
-        flatSand: true
-      };
-    if (boxIndices.vertical === 14 && boxIndices.horizontal >= 11 && boxIndices.horizontal <= 13)
-      box.stairElevation = {
-        shadow: true,
-        flatElevation: boxIndices.horizontal === 11 ? "sand" : false
-      };
-    return box;
+  get unPorciento() {
+    return new Medidas(this.ancho / 100, this.alto / 100);
   }
-  static getFloor1Box(boxIndices) {
-    const box = MapMatrix_ENGINE.getEmptyBox();
-    if (boxIndices.horizontal >= 2 && boxIndices.horizontal <= 34 && boxIndices.vertical >= 2 && boxIndices.vertical <= 13)
-      box.elevation = {
-        floor: 1,
-        shadow: boxIndices.vertical >= 3,
-        flatGrass: true
-      };
-    if (boxIndices.horizontal >= 2 && boxIndices.horizontal <= 10 && boxIndices.vertical === 14)
-      box.elevation = {
-        floor: 1,
-        shadow: true,
-        flatGrass: true
-      };
-    if (boxIndices.horizontal >= 14 && boxIndices.horizontal <= 34 && boxIndices.vertical === 14)
-      box.elevation = {
-        floor: 1,
-        shadow: true,
-        flatGrass: true
-      };
-    if (boxIndices.vertical === 15 && boxIndices.horizontal >= 2 && boxIndices.horizontal <= 10) {
-      const flatElevationRandom = Math.round(Math.random());
-      box.wallElevation = {
-        shadow: true,
-        flatElevation: flatElevationRandom === 0 ? "sand" : false
-      };
-    }
-    if (boxIndices.vertical === 15 && boxIndices.horizontal >= 14 && boxIndices.horizontal <= 34) {
-      const flatElevationRandom = Math.round(Math.random());
-      box.wallElevation = {
-        shadow: true,
-        flatElevation: flatElevationRandom === 0 ? "sand" : false
-      };
-    }
-    if (boxIndices.vertical === 7 && boxIndices.horizontal >= 11 && boxIndices.horizontal <= 13) {
-      box.stairElevation = {
-        shadow: true,
-        flatElevation: boxIndices.horizontal === 9 ? "grass" : false
-      };
-    }
-    if (boxIndices.vertical === 3 && boxIndices.horizontal === 14) {
-      box.trees = {
-        animation: "felled"
-      };
-    }
-    return box;
+  porcentaje(porcentajes) {
+    return new Medidas(this.unPorciento.ancho * porcentajes.ancho, this.unPorciento.alto * porcentajes.alto);
   }
-  static getFloor2Box(boxIndices) {
-    const box = MapMatrix_ENGINE.getEmptyBox();
-    if (boxIndices.horizontal >= 6 && boxIndices.horizontal <= 30 && boxIndices.vertical >= 1 && boxIndices.vertical <= 6) {
-      box.elevation = {
-        floor: 2,
-        shadow: boxIndices.vertical >= 3,
-        flatGrass: true
-      };
-    }
-    if (boxIndices.horizontal >= 6 && boxIndices.horizontal <= 10 && boxIndices.vertical === 7) {
-      box.elevation = {
-        floor: 2,
-        shadow: true,
-        flatGrass: true
-      };
-    }
-    if (boxIndices.horizontal >= 14 && boxIndices.horizontal <= 30 && boxIndices.vertical === 7) {
-      box.elevation = {
-        floor: 2,
-        shadow: true,
-        flatGrass: true
-      };
-    }
-    if (boxIndices.vertical === 8 && boxIndices.horizontal >= 6 && boxIndices.horizontal <= 10) {
-      const flatElevationRandom = Math.round(Math.random());
-      box.wallElevation = {
-        shadow: true,
-        flatElevation: flatElevationRandom === 0 ? "grass" : false
-      };
-    }
-    if (boxIndices.vertical === 8 && boxIndices.horizontal >= 14 && boxIndices.horizontal <= 30) {
-      const flatElevationRandom = Math.round(Math.random());
-      box.wallElevation = {
-        shadow: true,
-        flatElevation: flatElevationRandom === 0 ? "grass" : false
-      };
-    }
-    return box;
-  }
-  static getBoxFloors = [
-    MapMatrix_ENGINE.getFloor0Box,
-    MapMatrix_ENGINE.getFloor1Box,
-    MapMatrix_ENGINE.getFloor2Box
-  ];
-  static get() {
-    const map = [];
-    for (let floor = 0;floor < MapMatrix_ENGINE.getBoxFloors.length; floor++) {
-      map[floor] = [];
-      const floorMatrix = map[floor];
-      if (floorMatrix === undefined)
-        continue;
-      const boxIndices = new Plane_ENGINE(0, 0);
-      for (boxIndices.vertical = 0;boxIndices.vertical < MapMatrix_ENGINE.length.vertical; boxIndices.vertical++) {
-        floorMatrix[boxIndices.vertical] = [];
-        const row = floorMatrix[boxIndices.vertical];
-        if (row === undefined)
-          continue;
-        for (boxIndices.horizontal = 0;boxIndices.horizontal < MapMatrix_ENGINE.length.horizontal; boxIndices.horizontal++) {
-          const getBoxFloor = MapMatrix_ENGINE.getBoxFloors[floor];
-          if (getBoxFloor === undefined)
-            continue;
-          row[boxIndices.horizontal] = getBoxFloor(boxIndices);
-        }
-      }
-    }
-    return map;
+  get mitad() {
+    return new Medidas(this.ancho / 2, this.alto / 2);
   }
 }
 
-// game/engine/element.ts
-class Element_ENGINE extends Position_ENGINE {
-  constructor(size3, indices) {
-    super(new Coordinate_ENGINE(0, 0), size3);
-    this.setIndices(indices);
+// typescript/motor/objeto.ts
+class Objeto {
+  izquierdaSuperior;
+  medidas;
+  constructor(izquierdaSuperior, medidas) {
+    this.izquierdaSuperior = izquierdaSuperior;
+    this.medidas = medidas;
   }
-  setIndices(newIndices) {
-    this.leftUp.x = this.size.width * newIndices.horizontal;
-    this.leftUp.y = this.size.height * newIndices.vertical;
+  get izquierdaInferior() {
+    return new Coordenadas(this.izquierdaSuperior.x, this.izquierdaSuperior.y + this.medidas.alto);
   }
-  getIndices() {
-    return new Plane_ENGINE(this.leftUp.x / this.size.width, this.leftUp.y / this.size.height);
+  get derechaInferior() {
+    return new Coordenadas(this.izquierdaSuperior.x + this.medidas.ancho, this.izquierdaSuperior.y + this.medidas.alto);
   }
-  nextFrame(frames) {
-    this.setIndices(new Plane_ENGINE(this.getIndices().horizontal + 1, this.getIndices().vertical));
-    if (this.getIndices().horizontal >= frames)
-      this.setIndices(new Plane_ENGINE(0, this.getIndices().vertical));
+  get derechaSuperior() {
+    return new Coordenadas(this.izquierdaSuperior.x + this.medidas.ancho, this.izquierdaSuperior.y);
   }
-}
-
-// game/engine/image.ts
-class Image_ENGINE extends Position_ENGINE {
-  canvas;
-  route = false;
-  constructor(leftUp, size3, canvas, route) {
-    super(leftUp, size3);
-    this.canvas = canvas;
-    this.route = route;
+  izquierdaSuperiorMasPorcentajeMedidas(porcentajes) {
+    const porcentaje = this.medidas.porcentaje(porcentajes);
+    return new Coordenadas(this.izquierdaSuperior.x + porcentaje.ancho, this.izquierdaSuperior.y + porcentaje.alto);
   }
-  getImage() {
-    if (this.route === false)
-      return false;
-    return this.canvas.images.getImage(this.route);
+  coordenadasAdentro(coordenadas2) {
+    return this.izquierdaSuperior.x <= coordenadas2.x && this.izquierdaSuperior.y <= coordenadas2.y && this.derechaInferior.x >= coordenadas2.x && this.derechaInferior.y >= coordenadas2.y;
   }
-  drawImage() {
-    const image = this.getImage();
-    if (image === false)
-      return;
-    const positionOnTheCanvas = this.canvas.positionOnCanvas(this);
-    if (positionOnTheCanvas === false)
-      return;
-    this.canvas.context.imageSmoothingEnabled = false;
-    this.canvas.context.drawImage(image, positionOnTheCanvas.leftUp.x, positionOnTheCanvas.leftUp.y, positionOnTheCanvas.size.width, positionOnTheCanvas.size.height);
+  objetoAdentro(objeto) {
+    return this.izquierdaSuperior.x <= objeto.izquierdaSuperior.x && this.izquierdaSuperior.y <= objeto.izquierdaSuperior.y && this.derechaInferior.x >= objeto.derechaInferior.x && this.derechaInferior.y >= objeto.derechaInferior.y;
   }
-}
-
-// game/engine/elements.ts
-class Elements_ENGINE extends Image_ENGINE {
-  element;
-  constructor(leftUp, size3, canvas, route, element) {
-    super(leftUp, size3, canvas, route);
-    this.element = element;
-  }
-  drawElement() {
-    const image2 = this.getImage();
-    if (image2 === false)
-      return;
-    const positionOnCanvas = this.canvas.positionOnCanvas(this);
-    if (positionOnCanvas === false)
-      return;
-    this.canvas.context.imageSmoothingEnabled = false;
-    this.canvas.context.drawImage(image2, this.element.leftUp.x, this.element.leftUp.y, this.element.size.width, this.element.size.height, positionOnCanvas.leftUp.x, positionOnCanvas.leftUp.y, positionOnCanvas.size.width, positionOnCanvas.size.height);
-  }
-}
-
-// game/engine/box.ts
-class Box_ENGINE extends Position_ENGINE {
-  referenceIndex;
-  constructor(leftUp, size3, referenceIndex) {
-    super(leftUp, size3);
-    this.referenceIndex = referenceIndex;
-  }
-  getReferenceIndex() {
-    return this.referenceIndex;
-  }
-}
-
-// game/engine/boxes.ts
-class Boxes_ENGINE extends Coordinate_ENGINE {
-  boxes = [];
-  references = [];
-  boxSize;
-  length;
-  occupied;
-  constructor(x, y, boxSize, length, occupied) {
-    super(x, y);
-    this.boxSize = boxSize;
-    this.length = length;
-    this.occupied = occupied;
-  }
-  collision(coordinate6) {
-    const position7 = new Position_ENGINE(coordinate6, new Size_ENGINE(this.boxSize.getWidth(), this.boxSize.getHeight()));
-    const positionLeftUp = position7.getLeftUp();
-    const boxIndicesLeftUp = this.getBoxIndices(new Coordinate_ENGINE(positionLeftUp.getX(), positionLeftUp.getY()));
-    const positionRightDown = position7.getRightDown();
-    const boxIndicesRightDown = this.getBoxIndices(new Coordinate_ENGINE(positionRightDown.getX(), positionRightDown.getY()));
-    const boxIndices = new Plane_ENGINE(boxIndicesLeftUp.getVertical(), boxIndicesLeftUp.getHorizontal());
-    for (;boxIndices.getVertical() <= boxIndicesRightDown.getVertical(); boxIndices.addVertical(1)) {
-      for (;boxIndices.getHorizontal() <= boxIndicesRightDown.getHorizontal(); boxIndices.addHorizontal(1)) {
-        const box2 = this.getBox(boxIndices);
-        if (box2 === undefined)
-          continue;
-        if (box2.someVertexInside(position7) === false)
-          continue;
-        return box2;
-      }
-    }
+  algunVerticeAdentro(objeto) {
+    if (this.coordenadasAdentro(objeto.izquierdaSuperior))
+      return true;
+    if (this.coordenadasAdentro(objeto.izquierdaInferior))
+      return true;
+    if (this.coordenadasAdentro(objeto.derechaSuperior))
+      return true;
+    if (this.coordenadasAdentro(objeto.derechaInferior))
+      return true;
     return false;
   }
-  getPosition(boxIndices) {
-    const x = boxIndices.getHorizontal() * this.boxSize.getWidth();
-    const y = boxIndices.getVertical() * this.boxSize.getHeight();
-    const width = this.boxSize.getWidth() * this.length.getHorizontal();
-    const height = this.boxSize.getHeight() * this.length.getVertical();
-    return new Position_ENGINE(new Coordinate_ENGINE(x, y), new Size_ENGINE(width, height));
-  }
-  getBox(boxIndices) {
-    const boxesRow = this.boxes[boxIndices.getVertical()];
-    if (boxesRow === undefined)
-      return;
-    const box2 = boxesRow[boxIndices.horizontal];
-    return box2;
-  }
-  getBoxIndices(coordinate6) {
-    const horizontal = Math.floor(coordinate6.x / this.boxSize.width);
-    const vertical = Math.floor(coordinate6.y / this.boxSize.height);
-    return new Plane_ENGINE(horizontal, vertical);
-  }
-  boxesIndices(boxIndices, box2) {
-    let row = this.boxes[boxIndices.vertical];
-    if (row === undefined)
-      row = [];
-    row[boxIndices.horizontal] = box2;
-    this.boxes[boxIndices.vertical] = row;
-  }
-  setBox(boxIndices, referenceIndex) {
-    const box2 = (() => {
-      const size4 = new Size_ENGINE(this.boxSize.width, this.boxSize.height);
-      const leftUp = (() => {
-        const distanceX = boxIndices.horizontal * size4.width;
-        const distanceY = boxIndices.vertical * size4.height;
-        return new Coordinate_ENGINE(this.x + distanceX, this.y + distanceY);
-      })();
-      return new Box_ENGINE(leftUp, size4, referenceIndex);
-    })();
-    this.boxesIndices(boxIndices, box2);
-  }
-  occupiedBoxes(initialReferenceIndices, indexesBoxOccupy, referenceIndex) {
-    const boxIndices = (() => {
-      const horizontal = initialReferenceIndices.horizontal + indexesBoxOccupy.vertical;
-      const vertical = initialReferenceIndices.vertical + indexesBoxOccupy.horizontal;
-      return new Plane_ENGINE(horizontal, vertical);
-    })();
-    let boxesRow = this.boxes[boxIndices.vertical];
-    if (boxesRow === undefined)
-      boxesRow = [];
-    let box2 = this.getBox(boxIndices);
-    if (box2 !== undefined)
-      return;
-    this.setBox(boxIndices, referenceIndex);
-  }
-  referencePush(boxIndices) {
-    const reference = this.getPosition(boxIndices);
-    const referenceIndex = this.referencesPush(boxIndices, reference);
-    if (referenceIndex === undefined)
-      return;
-    return this.references[referenceIndex];
-  }
-  referencesPush(boxIndices, reference) {
-    const box2 = this.getBox(boxIndices);
-    if (box2 !== undefined)
-      return;
-    this.references.push(reference);
-    const referenceIndex = this.references.length - 1;
-    if (this.occupied === true) {
-      for (let vertical = 0;vertical < this.length.vertical; vertical++) {
-        for (let horizontal = 0;horizontal < this.length.horizontal; horizontal++) {
-          const indexesBoxOccupy = new Plane_ENGINE(horizontal, vertical);
-          this.occupiedBoxes(boxIndices, indexesBoxOccupy, referenceIndex);
-        }
-      }
-    } else {
-      this.occupied.forEach((row, vertical) => {
-        row.forEach((value, horizontal) => {
-          if (value === false)
-            return;
-          const indexesBoxOccupy = new Plane_ENGINE(horizontal, vertical);
-          this.occupiedBoxes(boxIndices, indexesBoxOccupy, referenceIndex);
-        });
-      });
-    }
-    return referenceIndex;
-  }
 }
 
-// game/engine/imageBoxes.ts
-class ImageBoxes_ENGINE extends Boxes_ENGINE {
-  references = [];
-  route;
-  constructor(x, y, canvas, size4, length, occupied, route) {
-    super(x, y, canvas, size4, length, occupied);
-    this.route = route;
-  }
-  referencePush(boxIndices) {
-    const position7 = this.getPosition(boxIndices);
-    const reference = new Image_ENGINE(position7.leftUp, position7.size, this.canvas, this.route);
-    const indexReference = this.referencesPush(boxIndices, reference);
-    if (indexReference === undefined)
-      return;
-    return this.references[indexReference];
-  }
-  drawImages() {
-    this.references.forEach((image3) => image3.drawImage());
-  }
-}
-
-// game/engine/elementBoxes.ts
-class ElementBoxes_ENGINE extends ImageBoxes_ENGINE {
-  references = [];
-  element;
-  constructor(x, y, canvas, size5, length, occupied, route, element2) {
-    super(x, y, canvas, size5, length, occupied, route);
-    this.element = element2;
-  }
-  referencePush(boxIndices) {
-    const position7 = this.getPosition(boxIndices);
-    const reference = new Elements_ENGINE(position7.leftUp, position7.size, this.canvas, this.route, new Element_ENGINE(new Size_ENGINE(this.element.size.width, this.element.size.height), new Plane_ENGINE(this.element.getIndices().horizontal, this.element.getIndices().vertical)));
-    const indexReference = this.referencesPush(boxIndices, reference);
-    if (indexReference === undefined)
-      return;
-    return this.references[indexReference];
-  }
-  drawElements() {
-    this.references.forEach((elements2) => elements2.drawElement());
-  }
-}
-
-// game/game/map/grounds.ts
-class Grounds_ENGINE extends ElementBoxes_ENGINE {
-  references = [];
-  elementIndices;
-  constructor(map, canvas, route, elementIndices) {
-    super(map.leftUp.x, map.leftUp.y, canvas, new Size_ENGINE(map.boxes.width, map.boxes.height), new Plane_ENGINE(1, 1), true, route, new Element_ENGINE(new Size_ENGINE(64, 64), elementIndices.only));
-    this.elementIndices = elementIndices;
-  }
-  refreshElements() {
-    this.references.forEach((elements2) => {
-      const boxIndices = this.getBoxIndices(elements2.leftUp);
-      const groundPosition = this.groundPosition(boxIndices);
-      const indices = this.elementIndices[groundPosition];
-      elements2.element.setIndices(new Plane_ENGINE(indices.horizontal, indices.vertical));
-    });
-  }
-  pushGround(boxIndices) {
-    const ground = this.referencePush(boxIndices);
-    this.refreshElements();
-    return ground;
-  }
-  groundPosition(boxIndices) {
-    const leftBoxes = new Plane_ENGINE(boxIndices.horizontal - 1, boxIndices.vertical);
-    const rightBoxes = new Plane_ENGINE(boxIndices.horizontal + 1, boxIndices.vertical);
-    const upBoxes = new Plane_ENGINE(boxIndices.horizontal, boxIndices.vertical - 1);
-    const downBoxes = new Plane_ENGINE(boxIndices.horizontal, boxIndices.vertical + 1);
-    const left = this.getBox(leftBoxes) !== undefined;
-    const right = this.getBox(rightBoxes) !== undefined;
-    const up = this.getBox(upBoxes) !== undefined;
-    const down = this.getBox(downBoxes) !== undefined;
-    const isLeftUp = !up && down && !left && right;
-    if (isLeftUp)
-      return "leftUp";
-    const isUp = !up && down && left && right;
-    if (isUp)
-      return "up";
-    const isRightUp = !up && down && left && !right;
-    if (isRightUp)
-      return "rightUp";
-    const isLeft = up && down && !left && right;
-    if (isLeft)
-      return "left";
-    const isCenter = up && down && left && right;
-    if (isCenter)
-      return "center";
-    const isRight = up && down && left && !right;
-    if (isRight)
-      return "right";
-    const isLeftDown = up && !down && !left && right;
-    if (isLeftDown)
-      return "leftDown";
-    const isDown = up && !down && left && right;
-    if (isDown)
-      return "down";
-    const isRightDown = up && !down && left && !right;
-    if (isRightDown)
-      return "rightDown";
-    const isHorizontalLeft = !up && !down && !left && right;
-    if (isHorizontalLeft)
-      return "horizontalLeft";
-    const isHorizontalCenter = !up && !down && left && right;
-    if (isHorizontalCenter)
-      return "horizontalCenter";
-    const isHorizontalRight = !up && !down && left && !right;
-    if (isHorizontalRight)
-      return "horizontalRight";
-    const isVerticalUp = !up && down && !left && !right;
-    if (isVerticalUp)
-      return "verticalUp";
-    const isVerticalCenter = up && down && !left && !right;
-    if (isVerticalCenter)
-      return "verticalCenter";
-    const isVerticalDown = up && !down && !left && !right;
-    if (isVerticalDown)
-      return "verticalDown";
-    return "only";
-  }
-  drawGrounds() {
-    this.drawElements();
-  }
-}
-
-// game/game/map/flatsSand.ts
-class FlatsSand_ENGINE extends Grounds_ENGINE {
-  constructor(map, canvas) {
-    super(map, canvas, "images/terrain/ground/flat.png", {
-      leftUp: new Plane_ENGINE(5, 0),
-      up: new Plane_ENGINE(6, 0),
-      rightUp: new Plane_ENGINE(7, 0),
-      left: new Plane_ENGINE(5, 1),
-      center: new Plane_ENGINE(6, 1),
-      right: new Plane_ENGINE(7, 1),
-      leftDown: new Plane_ENGINE(5, 2),
-      down: new Plane_ENGINE(6, 2),
-      rightDown: new Plane_ENGINE(7, 2),
-      horizontalLeft: new Plane_ENGINE(5, 3),
-      horizontalCenter: new Plane_ENGINE(6, 3),
-      horizontalRight: new Plane_ENGINE(7, 3),
-      verticalUp: new Plane_ENGINE(8, 0),
-      verticalCenter: new Plane_ENGINE(8, 1),
-      verticalDown: new Plane_ENGINE(8, 2),
-      only: new Plane_ENGINE(8, 3)
-    });
-  }
-  pushFlatSand(boxIndices) {
-    return this.pushGround(boxIndices);
-  }
-  drawFlatsSand() {
-    this.drawGrounds();
-  }
-}
-
-// game/game/map/elevations.ts
-class Elevations_ENGINE extends Grounds_ENGINE {
-  constructor(map, canvas) {
-    super(map, canvas, "images/terrain/ground/elevation.png", {
-      leftUp: new Plane_ENGINE(0, 0),
-      up: new Plane_ENGINE(1, 0),
-      rightUp: new Plane_ENGINE(2, 0),
-      left: new Plane_ENGINE(0, 1),
-      center: new Plane_ENGINE(1, 1),
-      right: new Plane_ENGINE(2, 1),
-      leftDown: new Plane_ENGINE(0, 2),
-      down: new Plane_ENGINE(1, 2),
-      rightDown: new Plane_ENGINE(2, 2),
-      horizontalLeft: new Plane_ENGINE(0, 4),
-      horizontalCenter: new Plane_ENGINE(1, 4),
-      horizontalRight: new Plane_ENGINE(2, 4),
-      verticalUp: new Plane_ENGINE(3, 0),
-      verticalCenter: new Plane_ENGINE(3, 1),
-      verticalDown: new Plane_ENGINE(3, 2),
-      only: new Plane_ENGINE(3, 4)
-    });
-  }
-  pushElevation(boxIndices) {
-    this.pushGround(boxIndices);
-  }
-  drawElevations() {
-    this.drawGrounds();
-  }
-}
-
-// game/game/map/wallElevations.ts
-class WallElevations_ENGINE extends ElementBoxes_ENGINE {
-  elementIndices;
-  constructor(map, canvas) {
-    super(map.leftUp.x, map.leftUp.y, canvas, new Size_ENGINE(map.boxes.width, map.boxes.height), new Plane_ENGINE(1, 1), true, "images/terrain/ground/elevation.png", new Element_ENGINE(new Size_ENGINE(64, 64), new Plane_ENGINE(0, 0)));
-    this.elementIndices = {
-      left: new Plane_ENGINE(0, 3),
-      center: new Plane_ENGINE(1, 3),
-      right: new Plane_ENGINE(2, 3),
-      only: new Plane_ENGINE(3, 5)
-    };
-  }
-  wallElevationPosition(boxIndices) {
-    const leftBoxes = new Plane_ENGINE(boxIndices.horizontal - 1, boxIndices.vertical);
-    const rightBoxes = new Plane_ENGINE(boxIndices.horizontal + 1, boxIndices.vertical);
-    const left = this.getBox(leftBoxes) !== undefined;
-    const right = this.getBox(rightBoxes) !== undefined;
-    const isLeft = !left && right;
-    if (isLeft)
-      return "left";
-    const isCenter = left && right;
-    if (isCenter)
-      return "center";
-    const isRight = left && !right;
-    if (isRight)
-      return "right";
-    const isVertical = !left && !right;
-    if (isVertical)
-      return "only";
-    throw new Error("invalid element");
-  }
-  refreshElements() {
-    this.references.forEach((elements2) => {
-      const boxIndices = this.getBoxIndices(elements2.leftUp);
-      const position7 = this.wallElevationPosition(boxIndices);
-      const indices = this.elementIndices[position7];
-      elements2.element.setIndices(new Plane_ENGINE(indices.horizontal, indices.vertical));
-    });
-  }
-  pushWallElevation(boxIndices) {
-    const wallElevation = this.referencePush(boxIndices);
-    if (wallElevation === undefined)
-      return;
-    this.refreshElements();
-    return wallElevation;
-  }
-  drawWallElevations() {
-    this.drawElements();
-  }
-}
-
-// game/game/map/castle.ts
-class Castle_ENGINE extends Image_ENGINE {
-  state = "construction";
-  color = "blue";
-  constructor(leftUp, size7, canvas, state, color) {
-    super(leftUp, size7, canvas, false);
-    this.imageCastle(state, color);
-  }
-  imageCastle(newState, newColor) {
-    this.state = newState;
-    this.color = newColor;
-    let file = this.state;
-    if (this.state === "ready")
-      file = this.color;
-    this.route = `images/factions/knights/buildings/castle/${file}.png`;
-  }
-}
-
-// game/game/map/castles.ts
-class Castles_ENGINE extends ImageBoxes_ENGINE {
-  references = [];
-  constructor(map, canvas) {
-    super(map.leftUp.x, map.leftUp.y, canvas, new Size_ENGINE(map.boxes.width, map.boxes.height), new Plane_ENGINE(4, 3), true, false);
-  }
-  castlePush(boxIndices, state, color) {
-    const position7 = this.getPosition(boxIndices);
-    const reference = new Castle_ENGINE(position7.leftUp, position7.size, this.canvas, state, color);
-    const indexReference = this.referencesPush(boxIndices, reference);
-    if (indexReference === undefined)
-      return;
-    return 0;
-  }
-  drawCastles() {
-    this.drawImages();
-  }
-}
-
-// game/game/map/water.ts
-class Water_ENGINE extends ImageBoxes_ENGINE {
-  constructor(map, canvas) {
-    super(map.leftUp.x, map.leftUp.y, canvas, new Size_ENGINE(map.boxes.width, map.boxes.height), new Plane_ENGINE(1, 1), true, "images/terrain/water/water.png");
-  }
-  pushWater(boxIndices) {
-    return this.referencePush(boxIndices);
-  }
-  drawWater() {
-    this.drawImages();
-  }
-}
-
-// game/engine/animation.ts
-class Animation_ENGINE {
-  frames;
-  intervalBetweenFrame = 0;
-  constructor(frames, framesPerSecond) {
-    this.frames = frames;
-    this.framesPerSecond = framesPerSecond;
-  }
-  get framesPerSecond() {
-    return 1000 / this.intervalBetweenFrame;
-  }
-  set framesPerSecond(value) {
-    this.intervalBetweenFrame = 1000 / value;
-  }
-}
-
-// game/engine/animations.ts
-class Animations_ENGINE extends Elements_ENGINE {
-  timerNextFrame = 0;
-  animation;
-  constructor(leftUp, size9, canvas, route, element4, animation) {
-    super(leftUp, size9, canvas, route, element4);
-    this.animation = animation;
-  }
-  nextFrame() {
-    this.timerNextFrame += this.canvas.timeBetweenFrames;
-    if (this.timerNextFrame < this.animation.intervalBetweenFrame)
-      return;
-    this.timerNextFrame = 0;
-    this.element.nextFrame(this.animation.frames);
-  }
-  drawAnimation() {
-    this.nextFrame();
-    this.drawElement();
-  }
-}
-
-// game/engine/animationBoxes.ts
-class AnimationBoxes_ENGINE extends ElementBoxes_ENGINE {
-  references = [];
-  animation;
-  constructor(x, y, canvas, size10, length, occupied, route, element5, animation2) {
-    super(x, y, canvas, size10, length, occupied, route, element5);
-    this.animation = animation2;
-  }
-  referencePush(boxIndices) {
-    const position7 = this.getPosition(boxIndices);
-    const reference = new Animations_ENGINE(position7.leftUp, position7.size, this.canvas, this.route, new Element_ENGINE(new Size_ENGINE(this.element.size.width, this.element.size.height), new Plane_ENGINE(0, this.element.getIndices().vertical)), new Animation_ENGINE(this.animation.frames, this.animation.framesPerSecond));
-    const indexReference = this.referencesPush(boxIndices, reference);
-    if (indexReference === undefined)
-      return;
-    return this.references[indexReference];
-  }
-  drawAnimations() {
-    this.references.forEach((animations2) => animations2.drawAnimation());
-  }
-}
-
-// game/game/map/foams.ts
-class Foams_ENGINE extends AnimationBoxes_ENGINE {
-  constructor(map, canvas) {
-    super(map.leftUp.x, map.leftUp.y, canvas, new Size_ENGINE(map.boxes.width, map.boxes.height), new Plane_ENGINE(3, 3), [
-      [true, false, false],
-      [false, false, false],
-      [false, false, false]
-    ], "images/terrain/water/foam.png", new Element_ENGINE(new Size_ENGINE(192, 192), new Plane_ENGINE(0, 0)), new Animation_ENGINE(8, 8));
-  }
-  pushFoam(boxIndices) {
-    const foam = this.referencePush(boxIndices);
-    if (foam === undefined)
-      return;
-    foam.leftUp.x -= this.size.width;
-    foam.leftUp.y -= this.size.height;
-    return foam;
-  }
-  drawFoams() {
-    this.drawAnimations();
-  }
-}
-
-// game/game/map/flatsGrass.ts
-class FlatsGrass_ENGINE extends Grounds_ENGINE {
-  constructor(map, canvas) {
-    super(map, canvas, "images/terrain/ground/flat.png", {
-      leftUp: new Plane_ENGINE(0, 0),
-      up: new Plane_ENGINE(1, 0),
-      rightUp: new Plane_ENGINE(2, 0),
-      left: new Plane_ENGINE(0, 1),
-      center: new Plane_ENGINE(1, 1),
-      right: new Plane_ENGINE(2, 1),
-      leftDown: new Plane_ENGINE(0, 2),
-      down: new Plane_ENGINE(1, 2),
-      rightDown: new Plane_ENGINE(2, 2),
-      horizontalLeft: new Plane_ENGINE(0, 3),
-      horizontalCenter: new Plane_ENGINE(1, 3),
-      horizontalRight: new Plane_ENGINE(2, 3),
-      verticalUp: new Plane_ENGINE(3, 0),
-      verticalCenter: new Plane_ENGINE(3, 1),
-      verticalDown: new Plane_ENGINE(3, 2),
-      only: new Plane_ENGINE(3, 3)
-    });
-  }
-  pushFlatGrass(boxIndices) {
-    return this.pushGround(boxIndices);
-  }
-  drawFlatsGrass() {
-    this.drawGrounds();
-  }
-}
-
-// game/game/map/shadows.ts
-class Shadows_ENGINE extends ImageBoxes_ENGINE {
-  constructor(map, canvas) {
-    super(map.leftUp.x, map.leftUp.y, canvas, new Size_ENGINE(map.boxes.width, map.boxes.height), new Plane_ENGINE(3, 3), [
-      [true, false, false],
-      [false, false, false],
-      [false, false, false]
-    ], "images/terrain/ground/shadows.png");
-  }
-  pushShadow(boxIndices) {
-    const shadow = this.referencePush(boxIndices);
-    if (shadow === undefined)
-      return;
-    shadow.leftUp.x -= this.size.width;
-    shadow.leftUp.y -= this.size.height;
-    return shadow;
-  }
-  drawShadows() {
-    this.drawImages();
-  }
-}
-
-// game/game/map/stairsElevations.ts
-class StairsElevations_ENGINE extends ElementBoxes_ENGINE {
-  elementIndices;
-  constructor(map, canvas) {
-    super(map.leftUp.x, map.leftUp.y, canvas, new Size_ENGINE(map.boxes.width, map.boxes.height), new Plane_ENGINE(1, 1), true, "images/terrain/ground/elevation.png", new Element_ENGINE(new Size_ENGINE(64, 64), new Plane_ENGINE(0, 0)));
-    this.elementIndices = {
-      left: new Plane_ENGINE(0, 7),
-      center: new Plane_ENGINE(1, 7),
-      right: new Plane_ENGINE(2, 7),
-      only: new Plane_ENGINE(3, 7)
-    };
-  }
-  positionStairElevation(boxIndices) {
-    const leftBoxIndices = new Plane_ENGINE(boxIndices.horizontal - 1, boxIndices.vertical);
-    const rightBoxIndices = new Plane_ENGINE(boxIndices.horizontal + 1, boxIndices.vertical);
-    const left = this.getBox(leftBoxIndices) !== undefined;
-    const right = this.getBox(rightBoxIndices) !== undefined;
-    const isLeft = !left && right;
-    if (isLeft)
-      return "left";
-    const isCenter = left && right;
-    if (isCenter)
-      return "center";
-    const isRight = left && !right;
-    if (isRight)
-      return "right";
-    const isOnly = !left && !right;
-    if (isOnly)
-      return "only";
-    throw new Error("invalid element");
-  }
-  refreshElements() {
-    this.references.forEach((elements3) => {
-      const boxIndices = this.getBoxIndices(elements3.leftUp);
-      const position7 = this.positionStairElevation(boxIndices);
-      const indices = this.elementIndices[position7];
-      elements3.element.setIndices(new Plane_ENGINE(indices.horizontal, indices.vertical));
-    });
-  }
-  setStairsElevations(boxIndices) {
-    const stairElevation = this.referencePush(boxIndices);
-    if (stairElevation === undefined)
-      return;
-    this.refreshElements();
-    return stairElevation;
-  }
-  drawStairsElevations() {
-    this.drawElements();
-  }
-}
-
-// game/game/map/flatElevations.ts
-class FlatElevations_ENGINE extends ElementBoxes_ENGINE {
-  elementIndices;
-  constructor(map, canvas) {
-    super(map.leftUp.x, map.leftUp.y, canvas, new Size_ENGINE(map.boxes.width, map.boxes.height), new Plane_ENGINE(1, 1), true, "images/terrain/ground/flat.png", new Element_ENGINE(new Size_ENGINE(64, 64), new Plane_ENGINE(0, 0)));
-    this.elementIndices = {
-      grass: new Plane_ENGINE(4, 0),
-      sand: new Plane_ENGINE(9, 0)
-    };
-  }
-  pushFlatElevation(boxIndices, state) {
-    const indices = this.elementIndices[state];
-    this.element.setIndices(new Plane_ENGINE(indices.horizontal, indices.vertical));
-    return this.referencePush(boxIndices);
-  }
-  drawFlatElevations() {
-    this.drawElements();
-  }
-}
-
-// game/game/map/trees.ts
-class Trees_ENGINE extends AnimationBoxes_ENGINE {
-  states;
-  constructor(map, canvas) {
-    super(map.leftUp.x, map.leftUp.y, canvas, new Size_ENGINE(map.boxes.width, map.boxes.height), new Plane_ENGINE(3, 3), [
-      [true, false, false],
-      [true, false, false],
-      [false, false, false]
-    ], "images/resources/tree.png", new Element_ENGINE(new Size_ENGINE(192, 192), new Plane_ENGINE(0, 0)), new Animation_ENGINE(4, 4));
-    this.states = {
-      motion: {
-        animation: new Animation_ENGINE(4, 4),
-        element: {
-          indices: new Plane_ENGINE(0, 0)
-        }
-      },
-      attacked: {
-        animation: new Animation_ENGINE(2, 2),
-        element: {
-          indices: new Plane_ENGINE(0, 1)
-        }
-      },
-      felled: {
-        animation: new Animation_ENGINE(1, 1),
-        element: {
-          indices: new Plane_ENGINE(0, 2)
-        }
-      }
-    };
-  }
-  pushTree(boxIndices, state) {
-    const tree = this.states[state];
-    const animations2 = this.referencePush(boxIndices);
-    if (animations2 === undefined)
-      return;
-    animations2.element.setIndices(new Plane_ENGINE(tree.element.indices.horizontal, tree.element.indices.vertical));
-    animations2.animation = new Animation_ENGINE(tree.animation.frames, tree.animation.framesPerSecond);
-    return animations2;
-  }
-  drawTrees() {
-    this.drawAnimations();
-  }
-}
-
-// game/engine/character/direction.ts
-class Direction_ENGINE {
+// typescript/motor/personaje/direccion.ts
+class Direccion {
   x;
   y;
   constructor(x, y) {
     this.x = x;
     this.y = y;
   }
-  getX() {
-    return this.x;
-  }
-  getNumberX() {
-    if (this.x === "left")
+  get xNumero() {
+    if (this.x === "izquierda")
       return -1;
-    if (this.x === "right")
+    if (this.x === "derecha")
       return 1;
-    if (this.x === "center")
+    if (this.x === "centro")
       return 0;
     throw new Error("invalid  direction x");
   }
-  getY() {
-    return this.y;
-  }
-  getNumberY() {
-    if (this.y === "up")
+  get yNumero() {
+    if (this.y === "arriba")
       return -1;
-    if (this.y === "down")
+    if (this.y === "abajo")
       return 1;
-    if (this.y === "center")
+    if (this.y === "centro")
       return 0;
     throw new Error("invalid direction y");
   }
-  setX(x) {
-    this.x = x;
-  }
-  setY(y) {
-    this.y = y;
-  }
-  isEqualTo(directionX, directionY) {
-    return this.x === directionX && this.y === directionY;
+  igualA(direction) {
+    return this.x === direction.x && this.y === direction.y;
   }
 }
 
-// game/game/map/floor.ts
-class Floor_ENGINE {
-  map;
-  canvas;
-  water;
-  foams;
-  flatsSand;
-  elevations;
-  flatsGrass;
-  shadows;
-  wallElevations;
-  stairsElevation;
-  flatElevations;
-  castles;
-  trees;
-  constructor(map, canvas) {
-    this.map = map;
-    this.canvas = canvas;
-    this.water = new Water_ENGINE(this.map, this.canvas);
-    this.foams = new Foams_ENGINE(this.map, this.canvas);
-    this.flatsSand = new FlatsSand_ENGINE(this.map, this.canvas);
-    this.elevations = new Elevations_ENGINE(this.map, this.canvas);
-    this.flatsGrass = new FlatsGrass_ENGINE(this.map, this.canvas);
-    this.shadows = new Shadows_ENGINE(this.map, this.canvas);
-    this.wallElevations = new WallElevations_ENGINE(this.map, this.canvas);
-    this.stairsElevation = new StairsElevations_ENGINE(this.map, this.canvas);
-    this.flatElevations = new FlatElevations_ENGINE(this.map, this.canvas);
-    this.castles = new Castles_ENGINE(this.map, this.canvas);
-    this.trees = new Trees_ENGINE(this.map, this.canvas);
+// typescript/motor/plano.ts
+class Plano {
+  horizontal;
+  vertical;
+  constructor(horizontal, vertical) {
+    this.horizontal = horizontal;
+    this.vertical = vertical;
   }
-  pushFloor(matrix) {
-    matrix.forEach((row, vertical) => {
-      row.forEach((box3, horizontal) => {
-        const boxIndices = new Plane_ENGINE(horizontal, vertical);
-        if (box3.water === true)
-          this.water.pushWater(boxIndices);
-        if (box3.foam !== false) {
-          this.foams.pushFoam(boxIndices);
-          if (box3.foam.flatSand === true)
-            this.flatsSand.pushFlatSand(boxIndices);
+}
+
+// typescript/motor/casilla.ts
+class Casilla extends Objeto {
+  indiceObjeto;
+  constructor(leftUp, size, indiceObjeto) {
+    super(leftUp, size);
+    this.indiceObjeto = indiceObjeto;
+  }
+}
+
+// typescript/motor/casillas.ts
+class Casillas extends Coordenadas {
+  casillas = [];
+  medidasCasilla;
+  longitudCasillasOcupadas;
+  casillasOcupadas;
+  constructor(x, y, medidasCasilla, longitudCasillasOcupadas, casillasOcupadas) {
+    super(x, y);
+    this.medidasCasilla = medidasCasilla;
+    this.longitudCasillasOcupadas = longitudCasillasOcupadas;
+    this.casillasOcupadas = casillasOcupadas;
+  }
+  colision(coordenada) {
+    const objeto3 = new Objeto(coordenada, new Medidas(this.medidasCasilla.ancho, this.medidasCasilla.alto));
+    const indicesCasillaIzquierdaSuperior = this.obtenerIndicesCasilla(new Coordenadas(objeto3.izquierdaSuperior.x, objeto3.izquierdaSuperior.y));
+    const indicesCasillaDerechaInferior = this.obtenerIndicesCasilla(new Coordenadas(objeto3.derechaInferior.x, objeto3.derechaInferior.y));
+    const indicesCasilla = new Plano(indicesCasillaIzquierdaSuperior.vertical, indicesCasillaIzquierdaSuperior.horizontal);
+    for (;indicesCasilla.vertical <= indicesCasillaDerechaInferior.vertical; indicesCasilla.vertical++) {
+      for (;indicesCasilla.horizontal <= indicesCasillaDerechaInferior.horizontal; indicesCasilla.horizontal++) {
+        const casilla2 = this.obtenerCasilla(indicesCasilla);
+        if (casilla2 === undefined)
+          continue;
+        if (casilla2.algunVerticeAdentro(objeto3) === false)
+          continue;
+        return casilla2;
+      }
+    }
+    return false;
+  }
+  nuevoObjeto(indicesCasilla) {
+    const x = indicesCasilla.horizontal * this.medidasCasilla.ancho;
+    const y = indicesCasilla.vertical * this.medidasCasilla.alto;
+    const ancho = this.medidasCasilla.ancho * this.longitudCasillasOcupadas.horizontal;
+    const alto = this.medidasCasilla.alto * this.longitudCasillasOcupadas.vertical;
+    return new Objeto(new Coordenadas(x, y), new Medidas(ancho, alto));
+  }
+  obtenerCasilla(indicesCasilla) {
+    const columnaCasillas = this.casillas[indicesCasilla.vertical];
+    if (columnaCasillas === undefined)
+      return;
+    return columnaCasillas[indicesCasilla.horizontal];
+  }
+  obtenerIndicesCasilla(coordenada) {
+    const horizontal = Math.floor(coordenada.x / this.medidasCasilla.ancho);
+    const vertical = Math.floor(coordenada.y / this.medidasCasilla.alto);
+    return new Plano(horizontal, vertical);
+  }
+  asignarCasillaIndices(casillaIndices, casilla2) {
+    let fila = this.casillas[casillaIndices.vertical];
+    if (fila === undefined)
+      fila = [];
+    fila[casillaIndices.horizontal] = casilla2;
+    this.casillas[casillaIndices.vertical] = fila;
+  }
+  asignarCasilla(indicesCasilla, indiceObjeto) {
+    const medidas2 = new Medidas(this.medidasCasilla.ancho, this.medidasCasilla.alto);
+    const distanceX = indicesCasilla.horizontal * medidas2.ancho;
+    const distanceY = indicesCasilla.vertical * medidas2.alto;
+    const superiorIzquierda = new Coordenadas(this.x + distanceX, this.y + distanceY);
+    const casilla2 = new Casilla(superiorIzquierda, medidas2, indiceObjeto);
+    this.asignarCasillaIndices(indicesCasilla, casilla2);
+  }
+  asignarCasillasOcupadas(indicesInicialesObjeto, indicesCasillasOcupadas, indiceObjeto) {
+    const horizontal = indicesInicialesObjeto.horizontal + indicesCasillasOcupadas.vertical;
+    const vertical = indicesInicialesObjeto.vertical + indicesCasillasOcupadas.horizontal;
+    const indicesCasilla = new Plano(horizontal, vertical);
+    let filaCasillas = this.casillas[indicesCasilla.vertical];
+    if (filaCasillas === undefined)
+      filaCasillas = [];
+    const casilla2 = this.obtenerCasilla(indicesCasilla);
+    if (casilla2 !== undefined)
+      return;
+    this.asignarCasilla(indicesCasilla, indiceObjeto);
+  }
+  agregarObjeto(indicesCasilla, indiceObjeto) {
+    const casilla2 = this.obtenerCasilla(indicesCasilla);
+    if (casilla2 !== undefined)
+      return "ya esta agregado";
+    if (this.casillasOcupadas === true) {
+      for (let vertical = 0;vertical < this.longitudCasillasOcupadas.vertical; vertical++) {
+        for (let horizontal = 0;horizontal < this.longitudCasillasOcupadas.horizontal; horizontal++) {
+          const indicesCasillasOcupadas = new Plano(horizontal, vertical);
+          this.asignarCasillasOcupadas(indicesCasilla, indicesCasillasOcupadas, indiceObjeto);
         }
-        if (box3.elevation !== false) {
-          if (box3.elevation.shadow === true)
-            this.shadows.pushShadow(boxIndices);
-          if (box3.elevation.flatGrass === true)
-            this.flatsGrass.pushFlatGrass(boxIndices);
-          this.elevations.pushElevation(boxIndices);
+      }
+    } else {
+      this.casillasOcupadas.forEach((fila, vertical) => {
+        fila.forEach((ocupar, horizontal) => {
+          if (ocupar === false)
+            return;
+          const indexesBoxOccupy = new Plano(horizontal, vertical);
+          this.asignarCasillasOcupadas(indicesCasilla, indexesBoxOccupy, indiceObjeto);
+        });
+      });
+    }
+    return true;
+  }
+}
+
+// typescript/motor/imagen.ts
+class Imagen extends Objeto {
+  lienzo;
+  ruta = false;
+  constructor(superiorIzquierda, medidas2, lienzo, ruta) {
+    super(superiorIzquierda, medidas2);
+    this.lienzo = lienzo;
+    this.ruta = ruta;
+  }
+  get imagen() {
+    if (this.ruta === false)
+      return false;
+    return this.lienzo.imagines.cargarImagen(this.ruta);
+  }
+  dibujarImagen() {
+    if (this.imagen === false)
+      return;
+    const objetoEnLienzo = this.lienzo.objetoEnLienzo(this);
+    if (objetoEnLienzo === false)
+      return;
+    this.lienzo.contexto.imageSmoothingEnabled = false;
+    this.lienzo.contexto.drawImage(this.imagen, objetoEnLienzo.izquierdaSuperior.x, objetoEnLienzo.izquierdaSuperior.y, objetoEnLienzo.medidas.ancho, objetoEnLienzo.medidas.alto);
+  }
+}
+
+// typescript/motor/casillasImagenes.ts
+class CasillasImagenes extends Casillas {
+  imagines = [];
+  lienzo;
+  ruta;
+  constructor(x, y, medidasCasillas, longitudCasillasOcupadas, casillasOcupadas, lienzo, ruta) {
+    super(x, y, medidasCasillas, longitudCasillasOcupadas, casillasOcupadas);
+    this.lienzo = lienzo;
+    this.ruta = ruta;
+  }
+  agregarImagen(indicesCasilla) {
+    const objeto4 = this.nuevoObjeto(indicesCasilla);
+    const imagen2 = new Imagen(objeto4.izquierdaSuperior, objeto4.medidas, this.lienzo, this.ruta);
+    const indiceImagen = this.imagines.length;
+    const agregado = this.agregarObjeto(indicesCasilla, indiceImagen);
+    if (agregado === "ya esta agregado")
+      return "ya esta agregado";
+    this.imagines[indiceImagen] = imagen2;
+    return indiceImagen;
+  }
+  dibujarImagenes() {
+    this.imagines.forEach((imagen2) => imagen2.dibujarImagen());
+  }
+}
+
+// typescript/juego/mapa/agua.ts
+class Agua extends CasillasImagenes {
+  constructor(mapa, lienzo) {
+    super(mapa.izquierdaSuperior.x, mapa.izquierdaSuperior.y, new Medidas(mapa.medidasCasilla.ancho, mapa.medidasCasilla.alto), new Plano(1, 1), true, lienzo, "images/terrain/water/water.png");
+  }
+  agregarAgua(indicesCasilla) {
+    return this.agregarImagen(indicesCasilla);
+  }
+  dibujarAgua() {
+    this.dibujarImagenes();
+  }
+}
+
+// typescript/motor/animacion.ts
+class Animacion {
+  cuadros;
+  intervaloEntreCuadros = 0;
+  constructor(cuadros, intervaloEntreCuadros) {
+    this.cuadros = cuadros;
+    this.intervaloEntreCuadros = intervaloEntreCuadros;
+  }
+  get cuadrosPorSegundo() {
+    return 1000 / this.intervaloEntreCuadros;
+  }
+  set cuadrosPorSegundo(value) {
+    this.intervaloEntreCuadros = 1000 / value;
+  }
+}
+
+// typescript/motor/elementos.ts
+class Elementos extends Imagen {
+  elemento;
+  constructor(izquierdaSuperior, medidas3, lienzo, ruta, elemento) {
+    super(izquierdaSuperior, medidas3, lienzo, ruta);
+    this.elemento = elemento;
+  }
+  dibujarElemento() {
+    if (this.imagen === false)
+      return;
+    const objetoEnLienzo = this.lienzo.objetoEnLienzo(this);
+    if (objetoEnLienzo === false)
+      return;
+    this.lienzo.contexto.imageSmoothingEnabled = false;
+    this.lienzo.contexto.drawImage(this.imagen, this.elemento.izquierdaSuperior.x, this.elemento.izquierdaSuperior.y, this.elemento.medidas.ancho, this.elemento.medidas.alto, objetoEnLienzo.izquierdaSuperior.x, objetoEnLienzo.izquierdaSuperior.y, objetoEnLienzo.medidas.ancho, objetoEnLienzo.medidas.alto);
+  }
+}
+
+// typescript/motor/animaciones.ts
+class Animaciones extends Elementos {
+  temporizadorSiguienteCuadro = 0;
+  animacion;
+  constructor(izquierdaSuperior, medidas3, lienzo, ruta, elemento, animacion) {
+    super(izquierdaSuperior, medidas3, lienzo, ruta, elemento);
+    this.animacion = animacion;
+  }
+  siguienteCuadro() {
+    this.temporizadorSiguienteCuadro += this.lienzo.tiempoEntreCuadros;
+    if (this.temporizadorSiguienteCuadro < this.animacion.intervaloEntreCuadros)
+      return;
+    this.temporizadorSiguienteCuadro = 0;
+    this.elemento.siguienteCuadro(this.animacion.cuadros);
+  }
+  dibujarAnimacion() {
+    this.siguienteCuadro();
+    this.dibujarElemento();
+  }
+}
+
+// typescript/motor/elemento.ts
+class Elemento extends Objeto {
+  constructor(medidas3, indices) {
+    super(new Coordenadas(0, 0), medidas3);
+    this.indices = indices;
+  }
+  set indices(valor) {
+    this.izquierdaSuperior.x = this.medidas.ancho * valor.horizontal;
+    this.izquierdaSuperior.y = this.medidas.alto * valor.vertical;
+  }
+  get indices() {
+    return new Plano(this.izquierdaSuperior.x / this.medidas.ancho, this.izquierdaSuperior.y / this.medidas.alto);
+  }
+  siguienteCuadro(cuadros) {
+    this.indices = new Plano(this.indices.horizontal + 1, this.indices.vertical);
+    if (this.indices.horizontal >= cuadros)
+      this.indices = new Plano(0, this.indices.vertical);
+  }
+}
+
+// typescript/motor/casillasAnimaciones.ts
+class CasillasAnimaciones extends Casillas {
+  animaciones = [];
+  lienzo;
+  ruta;
+  elemento;
+  animacion;
+  constructor(x, y, medidasCasilla, longitudCasillasOcupadas, casillasOcupadas, lienzo, ruta, elemento2, animacion2) {
+    super(x, y, medidasCasilla, longitudCasillasOcupadas, casillasOcupadas);
+    this.lienzo = lienzo;
+    this.ruta = ruta;
+    this.elemento = elemento2;
+    this.animacion = animacion2;
+  }
+  agregarAnimaciones(indicesCasilla) {
+    const objeto5 = this.nuevoObjeto(indicesCasilla);
+    const elemento2 = new Elemento(new Medidas(this.elemento.medidas.ancho, this.elemento.medidas.alto), new Plano(0, this.elemento.indices.vertical));
+    const animacion2 = new Animacion(this.animacion.cuadros, this.animacion.cuadrosPorSegundo);
+    const animaciones2 = new Animaciones(objeto5.izquierdaSuperior, objeto5.medidas, this.lienzo, this.ruta, elemento2, animacion2);
+    const indiceAnimaciones = this.animaciones.length;
+    const agregado = this.agregarObjeto(indicesCasilla, indiceAnimaciones);
+    if (agregado === "ya esta agregado")
+      return "ya esta agregado";
+    this.animaciones[indiceAnimaciones] = animaciones2;
+    return indiceAnimaciones;
+  }
+  dibujarAnimaciones() {
+    this.animaciones.forEach((animaciones2) => animaciones2.dibujarAnimacion());
+  }
+}
+
+// typescript/juego/mapa/arboles.ts
+class Arboles extends CasillasAnimaciones {
+  estados;
+  constructor(mapa, lienzo) {
+    super(mapa.izquierdaSuperior.x, mapa.izquierdaSuperior.y, new Medidas(mapa.medidasCasilla.ancho, mapa.medidasCasilla.alto), new Plano(3, 3), [
+      [true, false, false],
+      [true, false, false],
+      [false, false, false]
+    ], lienzo, "images/resources/tree.png", new Elemento(new Medidas(192, 192), new Plano(0, 0)), new Animacion(4, 4));
+    this.estados = {
+      movimiento: {
+        animacion: new Animacion(4, 4),
+        elemento: {
+          indices: new Plano(0, 0)
         }
-        if (box3.wallElevation !== false) {
-          if (box3.wallElevation.shadow === true)
-            this.shadows.pushShadow(boxIndices);
-          this.wallElevations.pushWallElevation(boxIndices);
-          if (box3.wallElevation.flatElevation !== false)
-            this.flatElevations.pushFlatElevation(boxIndices, box3.wallElevation.flatElevation);
+      },
+      talar: {
+        animacion: new Animacion(2, 2),
+        elemento: {
+          indices: new Plano(0, 1)
         }
-        if (box3.stairElevation !== false) {
-          if (box3.stairElevation.shadow === true)
-            this.shadows.pushShadow(boxIndices);
-          this.stairsElevation.setStairsElevations(boxIndices);
-          if (box3.stairElevation.flatElevation !== false)
-            this.flatElevations.pushFlatElevation(boxIndices, box3.stairElevation.flatElevation);
+      },
+      derribado: {
+        animacion: new Animacion(1, 1),
+        elemento: {
+          indices: new Plano(0, 2)
         }
-        if (box3.castle !== false) {
-          this.castles.castlePush(boxIndices, box3.castle.state, box3.castle.color);
+      }
+    };
+  }
+  agregarArbol(indicesCasilla, nombreEstado) {
+    const estado = this.estados[nombreEstado];
+    const indiceAnimaciones = this.agregarAnimaciones(indicesCasilla);
+    if (indiceAnimaciones === "ya esta agregado")
+      return "ya esta agregado";
+    const animaciones2 = this.animaciones[indiceAnimaciones];
+    if (animaciones2 === undefined)
+      return;
+    animaciones2.elemento.indices = new Plano(estado.elemento.indices.horizontal, estado.elemento.indices.vertical);
+    animaciones2.animacion = new Animacion(estado.animacion.cuadros, estado.animacion.cuadrosPorSegundo);
+    return indiceAnimaciones;
+  }
+  dibujarArboles() {
+    this.dibujarAnimaciones();
+  }
+}
+
+// typescript/motor/casillasElementos.ts
+class CasillasElementos extends Casillas {
+  elementos = [];
+  lienzo;
+  ruta;
+  elemento;
+  constructor(x, y, medidasCasilla, longitudCasillasOcupadas, casillasOcupadas, lienzo, ruta, elemento4) {
+    super(x, y, medidasCasilla, longitudCasillasOcupadas, casillasOcupadas);
+    this.lienzo = lienzo;
+    this.ruta = ruta;
+    this.elemento = elemento4;
+  }
+  agregarElementos(indicesCasilla) {
+    const objeto5 = this.nuevoObjeto(indicesCasilla);
+    const elemento4 = new Elemento(new Medidas(this.elemento.medidas.ancho, this.elemento.medidas.alto), new Plano(this.elemento.indices.horizontal, this.elemento.indices.vertical));
+    const elementos3 = new Elementos(objeto5.izquierdaSuperior, objeto5.medidas, this.lienzo, this.ruta, elemento4);
+    const indiceElementos = this.elementos.length;
+    const agregado = this.agregarObjeto(indicesCasilla, indiceElementos);
+    if (agregado === "ya esta agregado")
+      return "ya esta agregado";
+    this.elementos[indiceElementos] = elementos3;
+    return indiceElementos;
+  }
+  dibujarElementos() {
+    this.elementos.forEach((elemento4) => elemento4.dibujarElemento());
+  }
+}
+
+// typescript/juego/mapa/terreno.ts
+class Terreno extends CasillasElementos {
+  estadosElementoIndices;
+  constructor(mapa, lienzo, ruta, estadosElementoIndices) {
+    super(mapa.izquierdaSuperior.x, mapa.izquierdaSuperior.y, new Medidas(mapa.medidasCasilla.ancho, mapa.medidasCasilla.alto), new Plano(1, 1), true, lienzo, ruta, new Elemento(new Medidas(64, 64), new Plano(0, 0)));
+    this.estadosElementoIndices = estadosElementoIndices;
+  }
+  actualizarElementos() {
+    this.elementos.forEach((elemento5) => {
+      const indicesCasilla = this.obtenerIndicesCasilla(elemento5.izquierdaSuperior);
+      const nombreEstado = this.estadoSegunPosicion(indicesCasilla);
+      const indices = this.estadosElementoIndices[nombreEstado];
+      elemento5.elemento.indices = new Plano(indices.horizontal, indices.vertical);
+    });
+  }
+  agregarTerreno(indicesCasilla) {
+    const indiceElementos = this.agregarElementos(indicesCasilla);
+    if (indiceElementos === "ya esta agregado")
+      return "ya esta agregado";
+    this.actualizarElementos();
+    return indiceElementos;
+  }
+  estadoSegunPosicion(indicesCasilla) {
+    const indicesCasillaIzquierda = new Plano(indicesCasilla.horizontal - 1, indicesCasilla.vertical);
+    const indicesCasillaDerecha = new Plano(indicesCasilla.horizontal + 1, indicesCasilla.vertical);
+    const indicesCasillaSuperior = new Plano(indicesCasilla.horizontal, indicesCasilla.vertical - 1);
+    const indicesCasillaInferior = new Plano(indicesCasilla.horizontal, indicesCasilla.vertical + 1);
+    const izquierda = this.obtenerCasilla(indicesCasillaIzquierda) !== undefined;
+    const derecha = this.obtenerCasilla(indicesCasillaDerecha) !== undefined;
+    const superior = this.obtenerCasilla(indicesCasillaSuperior) !== undefined;
+    const inferior = this.obtenerCasilla(indicesCasillaInferior) !== undefined;
+    const esIzquierdaSuperior = !superior && inferior && !izquierda && derecha;
+    if (esIzquierdaSuperior)
+      return "izquierdaSuperior";
+    const esSuperior = !superior && inferior && izquierda && derecha;
+    if (esSuperior)
+      return "superior";
+    const esDerechaSuperior = !superior && inferior && izquierda && !derecha;
+    if (esDerechaSuperior)
+      return "derechaSuperior";
+    const esIzquierda = superior && inferior && !izquierda && derecha;
+    if (esIzquierda)
+      return "izquierda";
+    const esCentro = superior && inferior && izquierda && derecha;
+    if (esCentro)
+      return "centro";
+    const esDerecha = superior && inferior && izquierda && !derecha;
+    if (esDerecha)
+      return "derecha";
+    const esIzquierdaInferior = superior && !inferior && !izquierda && derecha;
+    if (esIzquierdaInferior)
+      return "izquierdaInferior";
+    const esInferior = superior && !inferior && izquierda && derecha;
+    if (esInferior)
+      return "inferior";
+    const esDerechaInferior = superior && !inferior && izquierda && !derecha;
+    if (esDerechaInferior)
+      return "derechaInferior";
+    const esHorizontalIzquierda = !superior && !inferior && !izquierda && derecha;
+    if (esHorizontalIzquierda)
+      return "horizontalIzquierda";
+    const esHorizontalCentro = !superior && !inferior && izquierda && derecha;
+    if (esHorizontalCentro)
+      return "horizontalCentro";
+    const esHorizontalDerecha = !superior && !inferior && izquierda && !derecha;
+    if (esHorizontalDerecha)
+      return "horizontalDerecha";
+    const esVerticalSuperior = !superior && inferior && !izquierda && !derecha;
+    if (esVerticalSuperior)
+      return "verticalSuperior";
+    const esVerticalCentro = superior && inferior && !izquierda && !derecha;
+    if (esVerticalCentro)
+      return "verticalCentro";
+    const esVerticalInferior = superior && !inferior && !izquierda && !derecha;
+    if (esVerticalInferior)
+      return "verticalInferior";
+    return "solo";
+  }
+  dibujarTerreno() {
+    this.dibujarElementos();
+  }
+}
+
+// typescript/juego/mapa/arena.ts
+class Arena extends Terreno {
+  constructor(mapa, lienzo) {
+    super(mapa, lienzo, "images/terrain/ground/flat.png", {
+      izquierdaSuperior: new Plano(5, 0),
+      superior: new Plano(6, 0),
+      derechaSuperior: new Plano(7, 0),
+      izquierda: new Plano(5, 1),
+      centro: new Plano(6, 1),
+      derecha: new Plano(7, 1),
+      izquierdaInferior: new Plano(5, 2),
+      inferior: new Plano(6, 2),
+      derechaInferior: new Plano(7, 2),
+      horizontalIzquierda: new Plano(5, 3),
+      horizontalCentro: new Plano(6, 3),
+      horizontalDerecha: new Plano(7, 3),
+      verticalSuperior: new Plano(8, 0),
+      verticalCentro: new Plano(8, 1),
+      verticalInferior: new Plano(8, 2),
+      solo: new Plano(8, 3)
+    });
+  }
+  agregarArena(indicesCasilla) {
+    return this.agregarTerreno(indicesCasilla);
+  }
+  dibujarArena() {
+    this.dibujarTerreno();
+  }
+}
+
+// typescript/juego/mapa/castillo.ts
+class Castillo extends Imagen {
+  estado = "construccion";
+  color = "azul";
+  constructor(superiorIzquierda, medidas7, lienzo, estado, color) {
+    super(superiorIzquierda, medidas7, lienzo, false);
+    this.imagenCastillo(estado, color);
+  }
+  imagenCastillo(nuevoEstado, nuevoColor) {
+    this.estado = nuevoEstado;
+    this.color = nuevoColor;
+    let file = this.estado;
+    if (this.estado === "listo")
+      file = this.color;
+    this.ruta = `images/factions/knights/buildings/castle/${file}.png`;
+  }
+}
+
+// typescript/juego/mapa/castillos.ts
+class Castillos extends CasillasImagenes {
+  imagines = [];
+  constructor(mapa, lienzo) {
+    super(mapa.izquierdaSuperior.x, mapa.izquierdaSuperior.y, new Medidas(mapa.medidasCasilla.ancho, mapa.medidasCasilla.alto), new Plano(4, 3), true, lienzo, false);
+  }
+  agregarCastillo(indicesCasilla, estado, color) {
+    const indiceImagen = this.agregarImagen(indicesCasilla);
+    if (indiceImagen === "ya esta agregado")
+      return "ya esta agregado";
+    const imagen4 = this.imagines[indiceImagen];
+    if (imagen4 === undefined)
+      return;
+    this.imagines[indiceImagen] = new Castillo(imagen4.izquierdaSuperior, imagen4.medidas, this.lienzo, estado, color);
+    return indiceImagen;
+  }
+  dibujarCastillos() {
+    this.dibujarImagenes();
+  }
+}
+
+// typescript/juego/mapa/elevaciones.ts
+class Elevaciones extends Terreno {
+  constructor(mapa, lienzo) {
+    super(mapa, lienzo, "images/terrain/ground/elevation.png", {
+      izquierdaSuperior: new Plano(0, 0),
+      superior: new Plano(1, 0),
+      derechaSuperior: new Plano(2, 0),
+      izquierda: new Plano(0, 1),
+      centro: new Plano(1, 1),
+      derecha: new Plano(2, 1),
+      izquierdaInferior: new Plano(0, 2),
+      inferior: new Plano(1, 2),
+      derechaInferior: new Plano(2, 2),
+      horizontalIzquierda: new Plano(0, 4),
+      horizontalCentro: new Plano(1, 4),
+      horizontalDerecha: new Plano(2, 4),
+      verticalSuperior: new Plano(3, 0),
+      verticalCentro: new Plano(3, 1),
+      verticalInferior: new Plano(3, 2),
+      solo: new Plano(3, 4)
+    });
+  }
+  agregarElevacion(indicesCasilla) {
+    this.agregarTerreno(indicesCasilla);
+  }
+  dibujarElevaciones() {
+    this.dibujarTerreno();
+  }
+}
+
+// typescript/juego/mapa/escaleras.ts
+class Escaleras extends CasillasElementos {
+  estadosElementoIndices;
+  constructor(mapa, lienzo) {
+    super(mapa.izquierdaSuperior.x, mapa.izquierdaSuperior.y, new Medidas(mapa.medidasCasilla.ancho, mapa.medidasCasilla.alto), new Plano(1, 1), true, lienzo, "images/terrain/ground/elevation.png", new Elemento(new Medidas(64, 64), new Plano(0, 0)));
+    this.estadosElementoIndices = {
+      izquierda: new Plano(0, 7),
+      centro: new Plano(1, 7),
+      derecha: new Plano(2, 7),
+      solo: new Plano(3, 7)
+    };
+  }
+  estadoSegunPosicion(indicesCasilla) {
+    const indicesCasillaIzquierda = new Plano(indicesCasilla.horizontal - 1, indicesCasilla.vertical);
+    const indicesCasillaDerecha = new Plano(indicesCasilla.horizontal + 1, indicesCasilla.vertical);
+    const izquierda = this.obtenerCasilla(indicesCasillaIzquierda) !== undefined;
+    const derecha = this.obtenerCasilla(indicesCasillaDerecha) !== undefined;
+    const esIzquierda = !izquierda && derecha;
+    if (esIzquierda)
+      return "izquierda";
+    const esCentro = izquierda && derecha;
+    if (esCentro)
+      return "centro";
+    const esDerecha = izquierda && !derecha;
+    if (esDerecha)
+      return "derecha";
+    const esSolo = !izquierda && !derecha;
+    if (esSolo)
+      return "solo";
+    throw new Error("invalid element");
+  }
+  actualizarElementos() {
+    this.elementos.forEach((elemento6) => {
+      const indicesCasilla = this.obtenerIndicesCasilla(elemento6.izquierdaSuperior);
+      const nombreEstado = this.estadoSegunPosicion(indicesCasilla);
+      const indices = this.estadosElementoIndices[nombreEstado];
+      elemento6.elemento.indices = new Plano(indices.horizontal, indices.vertical);
+    });
+  }
+  agregarEscaleras(indicesCasilla) {
+    const indiceElementos = this.agregarElementos(indicesCasilla);
+    if (indiceElementos === "ya esta agregado")
+      return "ya esta agregado";
+    this.actualizarElementos();
+    return indiceElementos;
+  }
+  dibujarEscaleras() {
+    this.dibujarElementos();
+  }
+}
+
+// typescript/juego/mapa/espumas.ts
+class Espumas extends CasillasAnimaciones {
+  constructor(mapa, lienzo) {
+    super(mapa.izquierdaSuperior.x, mapa.izquierdaSuperior.y, new Medidas(mapa.medidasCasilla.ancho, mapa.medidasCasilla.alto), new Plano(3, 3), [
+      [true, false, false],
+      [false, false, false],
+      [false, false, false]
+    ], lienzo, "images/terrain/water/foam.png", new Elemento(new Medidas(192, 192), new Plano(0, 0)), new Animacion(8, 8));
+  }
+  agregarEspuma(indicesCasilla) {
+    const indiceAnimaciones = this.agregarAnimaciones(indicesCasilla);
+    if (indiceAnimaciones === "ya esta agregado")
+      return "ya esta agregado";
+    const animaciones2 = this.animaciones[indiceAnimaciones];
+    if (animaciones2 === undefined)
+      return;
+    animaciones2.izquierdaSuperior.x -= this.medidasCasilla.ancho;
+    animaciones2.izquierdaSuperior.y -= this.medidasCasilla.alto;
+    return indiceAnimaciones;
+  }
+  dibujarEspumas() {
+    this.dibujarAnimaciones();
+  }
+}
+
+// typescript/juego/mapa/manchasElevaciones.ts
+class ManchasElevacion extends CasillasElementos {
+  estadosElementoIndices;
+  constructor(mapa, lienzo) {
+    super(mapa.izquierdaSuperior.x, mapa.izquierdaSuperior.y, new Medidas(mapa.medidasCasilla.ancho, mapa.medidasCasilla.alto), new Plano(1, 1), true, lienzo, "images/terrain/ground/flat.png", new Elemento(new Medidas(64, 64), new Plano(0, 0)));
+    this.estadosElementoIndices = {
+      pasto: new Plano(4, 0),
+      arena: new Plano(9, 0)
+    };
+  }
+  agregarManchaElevacion(indicesCasilla, estado) {
+    const elementoIndices = this.estadosElementoIndices[estado];
+    this.elemento.indices = new Plano(elementoIndices.horizontal, elementoIndices.vertical);
+    const indiceElementos = this.agregarElementos(indicesCasilla);
+    if (indiceElementos === "ya esta agregado")
+      return "ya esta agregado";
+    const elementos3 = this.elementos[indiceElementos];
+    if (elementos3 === undefined)
+      return;
+    elementos3.elemento.indices = new Plano(elementoIndices.horizontal, elementoIndices.vertical);
+    return indiceElementos;
+  }
+  dibujarManchasElevaciones() {
+    this.dibujarElementos();
+  }
+}
+
+// typescript/juego/mapa/paredElevaciones.ts
+class ParedesElevacion extends CasillasElementos {
+  estadosElementoIndices;
+  constructor(mapa, lienzo) {
+    super(mapa.izquierdaSuperior.x, mapa.izquierdaSuperior.y, new Medidas(mapa.medidasCasilla.ancho, mapa.medidasCasilla.alto), new Plano(1, 1), true, lienzo, "images/terrain/ground/elevation.png", new Elemento(new Medidas(64, 64), new Plano(0, 0)));
+    this.estadosElementoIndices = {
+      izquierda: new Plano(0, 3),
+      centro: new Plano(1, 3),
+      derecha: new Plano(2, 3),
+      solo: new Plano(3, 5)
+    };
+  }
+  estadoConPosicion(indicesCasilla) {
+    const indicesCasillaIzquierda = new Plano(indicesCasilla.horizontal - 1, indicesCasilla.vertical);
+    const indicesCasillaDerecha = new Plano(indicesCasilla.horizontal + 1, indicesCasilla.vertical);
+    const izquierda = this.obtenerCasilla(indicesCasillaIzquierda) !== undefined;
+    const derecha = this.obtenerCasilla(indicesCasillaDerecha) !== undefined;
+    const esIzquierda = !izquierda && derecha;
+    if (esIzquierda)
+      return "izquierda";
+    const esCentro = izquierda && derecha;
+    if (esCentro)
+      return "centro";
+    const esDerecha = izquierda && !derecha;
+    if (esDerecha)
+      return "derecha";
+    const esVertical = !izquierda && !derecha;
+    if (esVertical)
+      return "solo";
+    throw new Error("invalid element");
+  }
+  actualizarElementos() {
+    this.elementos.forEach((elementos3) => {
+      const indicesCasilla = this.obtenerIndicesCasilla(elementos3.izquierdaSuperior);
+      const estado = this.estadoConPosicion(indicesCasilla);
+      const indices = this.estadosElementoIndices[estado];
+      elementos3.elemento.indices = new Plano(indices.horizontal, indices.vertical);
+    });
+  }
+  agregarParedElevaciones(indicesCasilla) {
+    const indiceElementos = this.agregarElementos(indicesCasilla);
+    if (indiceElementos === "ya esta agregado")
+      return "ya esta agregado";
+    const elementos3 = this.elementos[indiceElementos];
+    if (elementos3 === undefined)
+      return;
+    this.actualizarElementos();
+    return indiceElementos;
+  }
+  dibujarParedesElevacion() {
+    this.dibujarElementos();
+  }
+}
+
+// typescript/juego/mapa/pasto.ts
+class Pasto extends Terreno {
+  constructor(mapa, lienzo) {
+    super(mapa, lienzo, "images/terrain/ground/flat.png", {
+      izquierdaSuperior: new Plano(0, 0),
+      superior: new Plano(1, 0),
+      derechaSuperior: new Plano(2, 0),
+      izquierda: new Plano(0, 1),
+      centro: new Plano(1, 1),
+      derecha: new Plano(2, 1),
+      izquierdaInferior: new Plano(0, 2),
+      inferior: new Plano(1, 2),
+      derechaInferior: new Plano(2, 2),
+      horizontalIzquierda: new Plano(0, 3),
+      horizontalCentro: new Plano(1, 3),
+      horizontalDerecha: new Plano(2, 3),
+      verticalSuperior: new Plano(3, 0),
+      verticalCentro: new Plano(3, 1),
+      verticalInferior: new Plano(3, 2),
+      solo: new Plano(3, 3)
+    });
+  }
+  agregarPasto(indicesCasilla) {
+    return this.agregarTerreno(indicesCasilla);
+  }
+  dibujarPasto() {
+    this.dibujarTerreno();
+  }
+}
+
+// typescript/juego/mapa/sombras.ts
+class Sombras extends CasillasImagenes {
+  constructor(mapa, lienzo) {
+    super(mapa.izquierdaSuperior.x, mapa.izquierdaSuperior.y, new Medidas(mapa.medidasCasilla.ancho, mapa.medidasCasilla.alto), new Plano(3, 3), [
+      [true, false, false],
+      [false, false, false],
+      [false, false, false]
+    ], lienzo, "images/terrain/ground/shadows.png");
+  }
+  agregarSombra(indicesCasilla) {
+    const indiceImagen = this.agregarImagen(indicesCasilla);
+    if (indiceImagen === "ya esta agregado")
+      return "ya esta agregado";
+    const sombra = this.imagines[indiceImagen];
+    if (sombra === undefined)
+      return;
+    sombra.izquierdaSuperior.x -= this.medidasCasilla.ancho;
+    sombra.izquierdaSuperior.y -= this.medidasCasilla.ancho;
+    return indiceImagen;
+  }
+  dibujarSombras() {
+    this.dibujarImagenes();
+  }
+}
+
+// typescript/juego/mapa/piso.ts
+class Piso {
+  mapa;
+  lienzo;
+  agua;
+  espumas;
+  arena;
+  elevaciones;
+  pasto;
+  sombras;
+  paredesElevacion;
+  escaleras;
+  manchasElevacion;
+  castillos;
+  arboles;
+  constructor(mapa, lienzo) {
+    this.mapa = mapa;
+    this.lienzo = lienzo;
+    this.agua = new Agua(this.mapa, this.lienzo);
+    this.espumas = new Espumas(this.mapa, this.lienzo);
+    this.arena = new Arena(this.mapa, this.lienzo);
+    this.elevaciones = new Elevaciones(this.mapa, this.lienzo);
+    this.pasto = new Pasto(this.mapa, this.lienzo);
+    this.sombras = new Sombras(this.mapa, this.lienzo);
+    this.paredesElevacion = new ParedesElevacion(this.mapa, this.lienzo);
+    this.escaleras = new Escaleras(this.mapa, this.lienzo);
+    this.manchasElevacion = new ManchasElevacion(this.mapa, this.lienzo);
+    this.castillos = new Castillos(this.mapa, this.lienzo);
+    this.arboles = new Arboles(this.mapa, this.lienzo);
+  }
+  agregarPiso(matriz) {
+    matriz.forEach((fila, vertical) => {
+      fila.forEach((casilla2, horizontal) => {
+        const indicesCasilla = new Plano(horizontal, vertical);
+        if (casilla2.agua === true)
+          this.agua.agregarAgua(indicesCasilla);
+        if (casilla2.espuma !== false) {
+          this.espumas.agregarEspuma(indicesCasilla);
+          if (casilla2.espuma.arena === true)
+            this.arena.agregarArena(indicesCasilla);
         }
-        if (box3.trees !== false) {
-          this.trees.pushTree(boxIndices, box3.trees.animation);
+        if (casilla2.elevacion !== false) {
+          if (casilla2.elevacion.sombra === true)
+            this.sombras.agregarSombra(indicesCasilla);
+          if (casilla2.elevacion.pasto === true)
+            this.pasto.agregarPasto(indicesCasilla);
+          this.elevaciones.agregarElevacion(indicesCasilla);
         }
+        if (casilla2.paredElevacion !== false) {
+          if (casilla2.paredElevacion.sombra === true)
+            this.sombras.agregarSombra(indicesCasilla);
+          this.paredesElevacion.agregarParedElevaciones(indicesCasilla);
+          if (casilla2.paredElevacion.mancha !== false)
+            this.manchasElevacion.agregarManchaElevacion(indicesCasilla, casilla2.paredElevacion.mancha);
+        }
+        if (casilla2.escalera !== false) {
+          if (casilla2.escalera.sombra === true)
+            this.sombras.agregarSombra(indicesCasilla);
+          this.escaleras.agregarEscaleras(indicesCasilla);
+          if (casilla2.escalera.mancha !== false)
+            this.manchasElevacion.agregarManchaElevacion(indicesCasilla, casilla2.escalera.mancha);
+        }
+        if (casilla2.castillo !== false) {
+          this.castillos.agregarCastillo(indicesCasilla, casilla2.castillo.estado, casilla2.castillo.color);
+        }
+        if (casilla2.arbol !== false)
+          this.arboles.agregarArbol(indicesCasilla, casilla2.arbol.estado);
       });
     });
   }
-  aboveFloor(coordinate7) {
-    const flatSand = this.flatsSand.collision(coordinate7) !== false;
-    const elevations2 = this.elevations.collision(coordinate7) !== false;
-    const stairsElevations2 = this.stairsElevation.collision(coordinate7) !== false;
-    if (flatSand === true)
+  sobrePiso(coordenadas5) {
+    const arena2 = this.arena.colision(coordenadas5) !== false;
+    const elevaciones2 = this.elevaciones.colision(coordenadas5) !== false;
+    const escaleras2 = this.escaleras.colision(coordenadas5) !== false;
+    if (arena2 === true)
       return true;
-    if (elevations2 === true)
+    if (elevaciones2 === true)
       return true;
-    if (stairsElevations2 === true)
+    if (escaleras2 === true)
       return true;
-    console.log(flatSand, elevations2, stairsElevations2);
     return false;
   }
-  collisionFloor(coordinate7, lastCoordinate) {
-    if (coordinate7.x === lastCoordinate.x && coordinate7.y === lastCoordinate.y)
+  colision(coordenadas5, ultimasCoordenadas) {
+    if (coordenadas5.x === ultimasCoordenadas.x && coordenadas5.y === ultimasCoordenadas.y)
       throw new Error("the initial and final coordinates are the same");
-    const flatSandCollisionCoordinate = this.flatsSand.collision(coordinate7) instanceof Box_ENGINE;
-    const elevationsCollisionCoordinate = this.elevations.collision(coordinate7) instanceof Box_ENGINE;
-    const wallElevationsCollisionCoordinate = this.wallElevations.collision(coordinate7) instanceof Box_ENGINE;
-    const stairsElevationsCollisionCoordinate = this.stairsElevation.collision(coordinate7) instanceof Box_ENGINE;
-    const direction2 = (() => {
-      let horizontal = "center";
-      if (coordinate7.x > lastCoordinate.x)
-        horizontal = "left";
-      else if (coordinate7.x < lastCoordinate.x)
-        horizontal = "right";
-      let vertical = "center";
-      if (coordinate7.y > lastCoordinate.y)
-        vertical = "up";
-      else if (coordinate7.y < lastCoordinate.y)
-        vertical = "down";
-      return new Direction_ENGINE(horizontal, vertical);
-    })();
-    const nextCoordinate = new Coordinate_ENGINE(coordinate7.x, coordinate7.y);
-    const collisionCoordinate = new Coordinate_ENGINE(coordinate7.x, coordinate7.y);
-    const collisionNextCoordinate = () => {
-      const flatSandCollisionNextCoordinate = this.flatsSand.collision(nextCoordinate) instanceof Box_ENGINE;
-      const elevationsCollisionNextCoordinate = this.elevations.collision(nextCoordinate) instanceof Box_ENGINE;
-      const wallElevationsCollisionNextCoordinate = this.wallElevations.collision(nextCoordinate) instanceof Box_ENGINE;
-      const stairsElevationsCollisionNextCoordinate = this.stairsElevation.collision(nextCoordinate) instanceof Box_ENGINE;
-      if (flatSandCollisionCoordinate === true) {
-        if (flatSandCollisionNextCoordinate === true)
+    const arenaColision = this.arena.colision(coordenadas5);
+    const elevacionColision = this.elevaciones.colision(coordenadas5);
+    const paredElevacionColision = this.paredesElevacion.colision(coordenadas5);
+    const escalerasColision = this.escaleras.colision(coordenadas5);
+    let horizontal = "centro";
+    if (coordenadas5.x > ultimasCoordenadas.x)
+      horizontal = "izquierda";
+    else if (coordenadas5.x < ultimasCoordenadas.x)
+      horizontal = "derecha";
+    let vertical = "centro";
+    if (coordenadas5.y > ultimasCoordenadas.y)
+      vertical = "arriba";
+    else if (coordenadas5.y < ultimasCoordenadas.y)
+      vertical = "abajo";
+    const direccion2 = new Direccion(horizontal, vertical);
+    const siguientesCoordenadas = new Coordenadas(coordenadas5.x, coordenadas5.y);
+    const colisionSiguientesCoordenadas = () => {
+      const arenaColisionSiguiente = this.arena.colision(siguientesCoordenadas);
+      const elevacionColisionSiguiente = this.elevaciones.colision(siguientesCoordenadas);
+      const paredElevacionColisionSiguiente = this.paredesElevacion.colision(siguientesCoordenadas);
+      const escalerasColisionSiguiente = this.escaleras.colision(siguientesCoordenadas);
+      if (arenaColision !== false) {
+        if (arenaColisionSiguiente !== false)
           return false;
-        if (elevationsCollisionNextCoordinate === true)
+        if (elevacionColisionSiguiente !== false)
           return true;
-        if (wallElevationsCollisionNextCoordinate === true)
+        if (paredElevacionColisionSiguiente !== false)
           return true;
-        if (stairsElevationsCollisionNextCoordinate === true)
+        if (escalerasColisionSiguiente !== false)
           return false;
         return true;
       }
-      if (elevationsCollisionCoordinate === true) {
-        if (elevationsCollisionNextCoordinate === true)
+      if (elevacionColision !== false) {
+        if (elevacionColisionSiguiente !== false)
           return false;
-        if (wallElevationsCollisionNextCoordinate === true)
+        if (paredElevacionColisionSiguiente !== false)
           return true;
-        if (stairsElevationsCollisionNextCoordinate === true)
+        if (escalerasColisionSiguiente !== false)
           return false;
         return true;
       }
-      if (wallElevationsCollisionCoordinate === true)
+      if (paredElevacionColision !== false)
         return true;
-      else if (stairsElevationsCollisionCoordinate === true) {
-        if (elevationsCollisionNextCoordinate === true)
+      if (escalerasColision !== false) {
+        if (elevacionColisionSiguiente !== false)
           return false;
-        if (wallElevationsCollisionNextCoordinate === true)
+        if (paredElevacionColisionSiguiente !== false)
           return true;
-        if (stairsElevationsCollisionNextCoordinate === true)
+        if (escalerasColisionSiguiente !== false)
           return false;
         return true;
       }
-      throw new Error("invalid coordinate collision");
+      throw new Error("colision no encontrada");
     };
-    const conditionInX = () => {
-      const directionX = direction2.getX();
-      if (directionX === "left")
-        return lastCoordinate.x < nextCoordinate.x;
-      else if (directionX === "right")
-        return nextCoordinate.x < lastCoordinate.x;
+    const horizontalIgual = () => {
+      if (direccion2.x === "izquierda")
+        return ultimasCoordenadas.x < siguientesCoordenadas.x;
+      if (direccion2.x === "derecha")
+        return siguientesCoordenadas.x < ultimasCoordenadas.x;
       return false;
     };
-    const conditionInY = () => {
-      const directionY = direction2.getY();
-      if (directionY === "up")
-        return lastCoordinate.y < nextCoordinate.y;
-      else if (directionY === "down")
-        return nextCoordinate.y < lastCoordinate.y;
+    const verticalIgual = () => {
+      if (direccion2.y === "arriba")
+        return ultimasCoordenadas.y < siguientesCoordenadas.y;
+      if (direccion2.y === "abajo")
+        return siguientesCoordenadas.y < ultimasCoordenadas.y;
       return false;
     };
-    while (conditionInX() || conditionInY()) {
-      nextCoordinate.x += this.map.boxes.width * direction2.getNumberX();
-      nextCoordinate.y += this.map.boxes.height * direction2.getNumberY();
-      const collision = collisionNextCoordinate();
-      if (collision === true)
-        return collisionCoordinate;
-      collisionCoordinate.x = nextCoordinate.x;
-      collisionCoordinate.y = nextCoordinate.y;
+    while (horizontalIgual() || verticalIgual()) {
+      siguientesCoordenadas.x += this.mapa.medidasCasilla.ancho * direccion2.xNumero;
+      siguientesCoordenadas.y += this.mapa.medidasCasilla.alto * direccion2.yNumero;
+      const colision = colisionSiguientesCoordenadas();
+      if (colision === true)
+        return new Coordenadas(siguientesCoordenadas.x, siguientesCoordenadas.y);
     }
-    throw new Error("no floor collision");
+    throw new Error("no colision en piso");
   }
-  drawMap() {
-    this.water.drawWater();
-    this.foams.drawFoams();
-    this.flatsSand.drawFlatsSand();
-    this.shadows.drawShadows();
-    this.elevations.drawElevations();
-    this.wallElevations.drawWallElevations();
-    this.flatsGrass.drawFlatsGrass();
-    this.stairsElevation.drawStairsElevations();
-    this.flatElevations.drawFlatElevations();
-    this.castles.drawCastles();
-    this.trees.drawTrees();
+  dibujarPiso() {
+    this.agua.dibujarAgua();
+    this.espumas.dibujarEspumas();
+    this.arena.dibujarArena();
+    this.sombras.dibujarSombras();
+    this.elevaciones.dibujarElevaciones();
+    this.paredesElevacion.dibujarParedesElevacion();
+    this.pasto.dibujarPasto();
+    this.escaleras.dibujarEscaleras();
+    this.manchasElevacion.dibujarManchasElevaciones();
+    this.castillos.dibujarCastillos();
+    this.arboles.dibujarArboles();
   }
 }
 
-// game/game/map.ts
-class Map_ENGINE extends Position_ENGINE {
-  matrix = MapMatrix_ENGINE.get();
-  floors;
-  boxes;
-  canvas;
-  constructor(canvas) {
-    super(new Coordinate_ENGINE(0, 0), new Size_ENGINE(100, 100));
-    this.canvas = canvas;
-    this.boxes = new Size_ENGINE(0, this.size.height / MapMatrix_ENGINE.length.vertical);
-    this.boxes.width = this.canvas.widthInPercentageHeight(this.boxes.height);
-    this.floors = this.matrix.map((matrix) => {
-      const floor2 = new Floor_ENGINE(this, this.canvas);
-      floor2.pushFloor(matrix);
-      return floor2;
+// typescript/juego/matrixMapa.ts
+class MatrizMapa {
+  static longitudes = new Plano(37, 21);
+  static obtenerCasillaVacia() {
+    return {
+      agua: false,
+      espuma: false,
+      elevacion: false,
+      paredElevacion: false,
+      escalera: false,
+      castillo: false,
+      arbol: false
+    };
+  }
+  static obtenerCasillaPiso0(indicesCasilla) {
+    const casilla2 = MatrizMapa.obtenerCasillaVacia();
+    casilla2.agua = true;
+    if (indicesCasilla.vertical >= 3 && indicesCasilla.vertical <= 19 && indicesCasilla.horizontal >= 1 && indicesCasilla.horizontal <= 35)
+      casilla2.espuma = {
+        arena: true
+      };
+    if (indicesCasilla.vertical === 14 && indicesCasilla.horizontal >= 11 && indicesCasilla.horizontal <= 13)
+      casilla2.escalera = {
+        sombra: true,
+        mancha: indicesCasilla.horizontal === 11 ? "arena" : false
+      };
+    return casilla2;
+  }
+  static obtenerCasillaPiso1(indicesCasilla) {
+    const casilla2 = MatrizMapa.obtenerCasillaVacia();
+    if (indicesCasilla.horizontal >= 2 && indicesCasilla.horizontal <= 34 && indicesCasilla.vertical >= 2 && indicesCasilla.vertical <= 13)
+      casilla2.elevacion = {
+        piso: 1,
+        sombra: indicesCasilla.vertical >= 3,
+        pasto: true
+      };
+    if (indicesCasilla.horizontal >= 2 && indicesCasilla.horizontal <= 10 && indicesCasilla.vertical === 14)
+      casilla2.elevacion = {
+        piso: 1,
+        sombra: true,
+        pasto: true
+      };
+    if (indicesCasilla.horizontal >= 14 && indicesCasilla.horizontal <= 34 && indicesCasilla.vertical === 14)
+      casilla2.elevacion = {
+        piso: 1,
+        sombra: true,
+        pasto: true
+      };
+    if (indicesCasilla.vertical === 15 && indicesCasilla.horizontal >= 2 && indicesCasilla.horizontal <= 10) {
+      const manchaAleatoria = Math.round(Math.random());
+      casilla2.paredElevacion = {
+        sombra: true,
+        mancha: manchaAleatoria === 0 ? "arena" : false
+      };
+    }
+    if (indicesCasilla.vertical === 15 && indicesCasilla.horizontal >= 14 && indicesCasilla.horizontal <= 34) {
+      const manchaAleatoria = Math.round(Math.random());
+      casilla2.paredElevacion = {
+        sombra: true,
+        mancha: manchaAleatoria === 0 ? "arena" : false
+      };
+    }
+    if (indicesCasilla.vertical === 7 && indicesCasilla.horizontal >= 11 && indicesCasilla.horizontal <= 13) {
+      casilla2.escalera = {
+        sombra: true,
+        mancha: indicesCasilla.horizontal === 9 ? "pasto" : false
+      };
+    }
+    if (indicesCasilla.vertical === 3 && indicesCasilla.horizontal === 14) {
+      casilla2.arbol = {
+        estado: "derribado"
+      };
+    }
+    return casilla2;
+  }
+  static obtenerCasillaPiso2(indicesCasilla) {
+    const casilla2 = MatrizMapa.obtenerCasillaVacia();
+    if (indicesCasilla.horizontal >= 6 && indicesCasilla.horizontal <= 30 && indicesCasilla.vertical >= 1 && indicesCasilla.vertical <= 6) {
+      casilla2.elevacion = {
+        piso: 2,
+        sombra: indicesCasilla.vertical >= 3,
+        pasto: true
+      };
+    }
+    if (indicesCasilla.horizontal >= 6 && indicesCasilla.horizontal <= 10 && indicesCasilla.vertical === 7) {
+      casilla2.elevacion = {
+        piso: 2,
+        sombra: true,
+        pasto: true
+      };
+    }
+    if (indicesCasilla.horizontal >= 14 && indicesCasilla.horizontal <= 30 && indicesCasilla.vertical === 7) {
+      casilla2.elevacion = {
+        piso: 2,
+        sombra: true,
+        pasto: true
+      };
+    }
+    if (indicesCasilla.vertical === 8 && indicesCasilla.horizontal >= 6 && indicesCasilla.horizontal <= 10) {
+      const manchaAleatoria = Math.round(Math.random());
+      casilla2.paredElevacion = {
+        sombra: true,
+        mancha: manchaAleatoria === 0 ? "pasto" : false
+      };
+    }
+    if (indicesCasilla.vertical === 8 && indicesCasilla.horizontal >= 14 && indicesCasilla.horizontal <= 30) {
+      const manchaAleatoria = Math.round(Math.random());
+      casilla2.paredElevacion = {
+        sombra: true,
+        mancha: manchaAleatoria === 0 ? "pasto" : false
+      };
+    }
+    return casilla2;
+  }
+  static obtenerPisosCasillas = [
+    MatrizMapa.obtenerCasillaPiso0,
+    MatrizMapa.obtenerCasillaPiso1,
+    MatrizMapa.obtenerCasillaPiso2
+  ];
+  static get obtener() {
+    const mapa = [];
+    for (let piso = 0;piso < MatrizMapa.obtenerPisosCasillas.length; piso++) {
+      mapa[piso] = [];
+      const matrizPiso = mapa[piso];
+      if (matrizPiso === undefined)
+        continue;
+      const indicesCasilla = new Plano(0, 0);
+      for (indicesCasilla.vertical = 0;indicesCasilla.vertical < MatrizMapa.longitudes.vertical; indicesCasilla.vertical++) {
+        matrizPiso[indicesCasilla.vertical] = [];
+        const fila = matrizPiso[indicesCasilla.vertical];
+        if (fila === undefined)
+          continue;
+        for (indicesCasilla.horizontal = 0;indicesCasilla.horizontal < MatrizMapa.longitudes.horizontal; indicesCasilla.horizontal++) {
+          const obtenerPisoCasillas = MatrizMapa.obtenerPisosCasillas[piso];
+          if (obtenerPisoCasillas === undefined)
+            continue;
+          fila[indicesCasilla.horizontal] = obtenerPisoCasillas(indicesCasilla);
+        }
+      }
+    }
+    return mapa;
+  }
+}
+
+// typescript/juego/mapa.ts
+class Mapa extends Objeto {
+  matriz = MatrizMapa.obtener;
+  pisos;
+  medidasCasilla;
+  lienzo;
+  constructor(lienzo) {
+    super(new Coordenadas(0, 0), new Medidas(100, 100));
+    this.lienzo = lienzo;
+    this.medidasCasilla = new Medidas(0, this.medidas.alto / MatrizMapa.longitudes.vertical);
+    this.medidasCasilla.ancho = this.lienzo.anchoEnPorcentajeAltura(this.medidasCasilla.alto);
+    this.pisos = this.matriz.map((matrizPiso) => {
+      const piso2 = new Piso(this, this.lienzo);
+      console.log(matrizPiso);
+      piso2.agregarPiso(matrizPiso);
+      return piso2;
     });
   }
-  indexFloorOn(coordinate8) {
-    for (let floorIndex = this.floors.length - 1;floorIndex >= 0; floorIndex--) {
-      const floor2 = this.floors[floorIndex];
-      if (floor2 === undefined)
+  sobrePiso(coordenadas6) {
+    for (let indicePiso = this.pisos.length - 1;indicePiso >= 0; indicePiso--) {
+      const piso2 = this.pisos[indicePiso];
+      if (piso2 === undefined)
         continue;
-      if (floor2.aboveFloor(coordinate8) === false)
+      if (piso2.sobrePiso(coordenadas6) === false)
         continue;
+      return indicePiso;
     }
+    return false;
   }
-  collisionMap(coordinate8, lastCoordinate) {
-    console.log(coordinate8, lastCoordinate);
-    for (let floorIndex = this.floors.length - 1;floorIndex >= 0; floorIndex--) {
-      const floor2 = this.floors[floorIndex];
-      if (floor2 === undefined)
+  colision(coordenadas6, ultimasCoordenadas) {
+    for (let indicePiso = this.pisos.length - 1;indicePiso >= 0; indicePiso--) {
+      const piso2 = this.pisos[indicePiso];
+      if (piso2 === undefined)
         continue;
-      if (floor2.aboveFloor(coordinate8) === false)
+      if (piso2.sobrePiso(coordenadas6) === false)
         continue;
-      const collisionFloor = floor2.collisionFloor(coordinate8, lastCoordinate);
-      const nextFloorIndex = floorIndex + 1;
-      const nextFloor = this.floors[nextFloorIndex];
-      if (nextFloor === undefined)
-        return collisionFloor;
-      const flatSand = floor2.flatsSand.collision(coordinate8) !== false;
-      const elevations2 = floor2.elevations.collision(coordinate8) !== false;
-      const wallElevations2 = floor2.wallElevations.collision(coordinate8) !== false;
-      const stairsElevations2 = floor2.stairsElevation.collision(coordinate8) !== false;
-      const direction3 = (() => {
-        const value = new Direction_ENGINE("center", "center");
-        if (coordinate8.x > lastCoordinate.x)
-          value.setX("left");
-        else if (coordinate8.x < lastCoordinate.x)
-          value.setX("right");
-        if (coordinate8.y > lastCoordinate.y)
-          value.setY("up");
-        else if (coordinate8.y < lastCoordinate.y)
-          value.setY("down");
-        return value;
-      })();
-      const nextCoordinate = new Coordinate_ENGINE(coordinate8.x, coordinate8.y);
-      let newCoordinate = new Coordinate_ENGINE(coordinate8.x, coordinate8.y);
-      const collisionNextCoordinate = () => {
-        const nextFlatSand = nextFloor.flatsSand.collision(nextCoordinate) !== false;
-        const nextElevations = nextFloor.elevations.collision(nextCoordinate) !== false;
-        const nextWallElevations = nextFloor.wallElevations.collision(nextCoordinate) !== false;
-        const nextStairsElevations = nextFloor.stairsElevation.collision(nextCoordinate) !== false;
-        if (flatSand === true) {
-          if (nextFlatSand === true)
+      const colision = piso2.colision(coordenadas6, ultimasCoordenadas);
+      const indiceSiguientePiso = indicePiso + 1;
+      const siguientePiso = this.pisos[indiceSiguientePiso];
+      if (siguientePiso === undefined)
+        return colision;
+      const arena2 = piso2.arena.colision(coordenadas6) !== false;
+      const elevacion = piso2.elevaciones.colision(coordenadas6) !== false;
+      const paredElevacion = piso2.paredesElevacion.colision(coordenadas6) !== false;
+      const escalera = piso2.escaleras.colision(coordenadas6) !== false;
+      const direccion3 = new Direccion("centro", "centro");
+      if (coordenadas6.x > ultimasCoordenadas.x)
+        direccion3.x = "izquierda";
+      else if (coordenadas6.x < ultimasCoordenadas.x)
+        direccion3.x = "derecha";
+      if (coordenadas6.y > ultimasCoordenadas.y)
+        direccion3.y = "arriba";
+      else if (coordenadas6.y < ultimasCoordenadas.y)
+        direccion3.y = "abajo";
+      const siguientesCoordenadas = new Coordenadas(coordenadas6.x, coordenadas6.y);
+      const colisionSiguientesCoordenadas = () => {
+        const arenaSiguientePiso = siguientePiso.arena.colision(siguientesCoordenadas) !== false;
+        const elevacionSiguientePiso = siguientePiso.elevaciones.colision(siguientesCoordenadas) !== false;
+        const paredElevacionSiguientePiso = siguientePiso.paredesElevacion.colision(siguientesCoordenadas) !== false;
+        const escaleraSiguientePiso = siguientePiso.escaleras.colision(siguientesCoordenadas) !== false;
+        if (arena2 === true) {
+          if (arenaSiguientePiso === true)
             return true;
-          if (nextElevations === true)
+          if (elevacionSiguientePiso === true)
             return true;
-          if (nextWallElevations === true)
+          if (paredElevacionSiguientePiso === true)
             return true;
-          if (nextStairsElevations === true)
+          if (escaleraSiguientePiso === true)
             return false;
         }
-        if (elevations2 === true) {
-          if (nextFlatSand === true)
+        if (elevacion === true) {
+          if (arenaSiguientePiso === true)
             return true;
-          if (nextElevations === true)
+          if (elevacionSiguientePiso === true)
             return true;
-          if (nextWallElevations === true)
+          if (paredElevacionSiguientePiso === true)
             return true;
-          if (nextStairsElevations === true)
+          if (escaleraSiguientePiso === true)
             return false;
         }
-        if (wallElevations2 === true) {
-          if (nextFlatSand === true)
+        if (paredElevacion === true) {
+          if (arenaSiguientePiso === true)
             return true;
-          if (nextElevations === true)
+          if (elevacionSiguientePiso === true)
             return true;
-          if (nextWallElevations === true)
+          if (paredElevacionSiguientePiso === true)
             return true;
-          if (nextStairsElevations === true)
+          if (escaleraSiguientePiso === true)
             return false;
         }
-        if (stairsElevations2 === true) {
-          if (nextFlatSand === true)
+        if (escalera === true) {
+          if (arenaSiguientePiso === true)
             return false;
-          if (nextElevations === true)
+          if (elevacionSiguientePiso === true)
             return false;
-          if (nextWallElevations === true)
+          if (paredElevacionSiguientePiso === true)
             return false;
-          if (nextStairsElevations === true)
+          if (escaleraSiguientePiso === true)
             return false;
         }
         return true;
       };
-      const conditionInX = () => {
-        const directionX = direction3.getX();
-        if (directionX === "left")
-          return lastCoordinate.x < nextCoordinate.x;
-        else if (directionX === "right")
-          return nextCoordinate.x < lastCoordinate.x;
+      const horizontalIgual = () => {
+        if (direccion3.x === "izquierda")
+          return ultimasCoordenadas.x < siguientesCoordenadas.x;
+        if (direccion3.x === "derecha")
+          return siguientesCoordenadas.x < ultimasCoordenadas.x;
         return false;
       };
-      const conditionInY = () => {
-        const directionY = direction3.getY();
-        if (directionY === "up")
-          return lastCoordinate.y < nextCoordinate.y;
-        else if (directionY === "down") {
-          return nextCoordinate.y < lastCoordinate.y;
+      const verticalIgual = () => {
+        if (direccion3.y === "arriba")
+          return ultimasCoordenadas.y < siguientesCoordenadas.y;
+        else if (direccion3.y === "abajo") {
+          return siguientesCoordenadas.y < ultimasCoordenadas.y;
         }
         return false;
       };
-      while (conditionInX() || conditionInY()) {
-        nextCoordinate.x += this.boxes.width * direction3.getNumberX();
-        nextCoordinate.y += this.boxes.height * direction3.getNumberY();
-        const collision = collisionNextCoordinate();
-        if (collision === true)
-          return newCoordinate;
-        newCoordinate = new Coordinate_ENGINE(nextCoordinate.x, nextCoordinate.y);
+      while (horizontalIgual() || verticalIgual()) {
+        siguientesCoordenadas.x += this.medidasCasilla.ancho * direccion3.xNumero;
+        siguientesCoordenadas.y += this.medidasCasilla.alto * direccion3.yNumero;
+        const colision2 = colisionSiguientesCoordenadas();
+        if (colision2 === true)
+          return new Coordenadas(siguientesCoordenadas.x, siguientesCoordenadas.y);
       }
     }
     throw new Error("no floors");
   }
-  drawMap() {
-    this.floors.forEach((floor2) => floor2.drawMap());
+  dibujarMapa() {
+    this.pisos.forEach((piso2) => piso2.dibujarPiso());
   }
 }
 
-// game/engine/square.ts
-class Square_ENGINE extends Position_ENGINE {
-  canvas;
+// typescript/motor/cuadrado.ts
+class Cuadrado extends Objeto {
+  lienzo;
   fillStyle;
   strokeStyle;
   lineWidth;
-  constructor(_leftUp, _size, _canvas, _fillStyle, _strokeStyle, _lineWidth) {
-    super(_leftUp, _size);
-    this.canvas = _canvas;
-    this.fillStyle = _fillStyle;
-    this.strokeStyle = _strokeStyle;
-    this.lineWidth = _lineWidth;
-  }
-  drawSquare() {
-    const positionOnCanvas = this.canvas.positionOnCanvas(this);
-    if (positionOnCanvas === false)
-      return;
-    this.canvas.context.beginPath();
-    this.canvas.context.rect(positionOnCanvas.leftUp.x, positionOnCanvas.leftUp.y, positionOnCanvas.size.width, positionOnCanvas.size.height);
-    if (this.fillStyle !== false) {
-      this.canvas.context.fillStyle = this.fillStyle;
-      this.canvas.context.fill();
-    }
-    if (this.strokeStyle !== false) {
-      this.canvas.context.strokeStyle = this.strokeStyle;
-      this.canvas.context.lineWidth = this.lineWidth;
-      this.canvas.context.stroke();
-    }
-    this.canvas.context.closePath();
-  }
-}
-
-// game/engine/character.ts
-class Character_ENGINE extends Square_ENGINE {
-  scale;
-  animations;
-  speed;
-  direction;
-  constructor(leftUp, size17, canvas, fillStyle, strokeStyle, lineWidth, scale, animations3, speed, direction3) {
-    super(leftUp, size17, canvas, fillStyle, strokeStyle, lineWidth);
-    this.scale = scale;
-    this.canvas = canvas;
-    this.animations = new Animations_ENGINE(new Coordinate_ENGINE(0, 0), new Size_ENGINE(0, 0), canvas, animations3.route, animations3.element, animations3.animation);
-    this.speed = speed;
-    this.direction = direction3;
-  }
-  movedCharacter() {
-    if (this.direction.isEqualTo("center", "center"))
-      return false;
-    const secondsBetweenFrames = this.canvas.timeBetweenFrames / 1000;
-    const speedX = this.speed.x * secondsBetweenFrames;
-    const speedY = this.speed.y * secondsBetweenFrames;
-    const distanceX = speedX * this.direction.getNumberX();
-    const distanceY = speedY * this.direction.getNumberY();
-    const newX = this.leftUp.x + distanceX;
-    const newY = this.leftUp.y + distanceY;
-    return new Coordinate_ENGINE(newX, newY);
-  }
-  drawCharacter() {
-    this.drawSquare();
-    this.animations.size = new Size_ENGINE(this.scale.width * this.size.width, this.scale.height * this.size.height);
-    this.animations.leftUp = new Coordinate_ENGINE(this.leftUp.x + this.size.width / 2 - this.animations.size.width / 2, this.leftUp.y + this.size.height / 2 - this.animations.size.height / 2);
-    this.animations.drawAnimation();
-  }
-}
-
-// game/engine/text.ts
-class Text_ENGINE extends Position_ENGINE {
-  canvas;
-  value;
-  fillStyle;
-  strokeStyle;
-  dungeonFont;
-  constructor(leftUp, size17, canvas, value, fillStyle, strokeStyle, dungeonFont) {
-    super(leftUp, size17);
-    this.canvas = canvas;
-    this.value = value;
-    this.fillStyle = fillStyle;
-    this.strokeStyle = strokeStyle;
-    this.dungeonFont = dungeonFont;
-  }
-  getFont() {
-    const font = `${this.size.height}px`;
-    if (this.dungeonFont === true)
-      font.concat(" Dungeon,");
-    return font.concat(" sans - serif, arial");
-  }
-  drawText() {
-    if (this.value.length === 0)
-      return;
-    const positionOnCamera = this.canvas.positionOnCamera(this);
-    if (positionOnCamera === false)
-      return;
-    this.canvas.context.font = this.getFont();
-    this.canvas.context.textAlign = "left";
-    this.canvas.context.textBaseline = "top";
-    positionOnCamera.size.width = this.canvas.context.measureText(this.value).width;
-    positionOnCamera.leftUp.x += this.size.half.width;
-    positionOnCamera.leftUp.x -= positionOnCamera.size.half.width;
-    if (this.fillStyle !== false) {
-      this.canvas.context.fillStyle = this.fillStyle;
-      this.canvas.context.fillText(this.value, positionOnCamera.leftUp.x, positionOnCamera.leftUp.y);
-    }
-    if (this.strokeStyle !== false) {
-      this.canvas.context.strokeStyle = this.strokeStyle;
-      this.canvas.context.strokeText(this.value, positionOnCamera.leftUp.x, positionOnCamera.leftUp.y);
-    }
-  }
-}
-
-// game/game/userBar.ts
-class UserBar_ENGINE extends Square_ENGINE {
-  pawn;
-  photo;
-  name;
-  constructor(pawn, size18, canvas, photoRoute, nickname) {
-    super(new Coordinate_ENGINE(0, 0), size18, canvas, "#416177", "#fff", 0.5);
-    this.pawn = pawn;
-    this.photo = new Image_ENGINE(new Coordinate_ENGINE(0, 0), new Size_ENGINE(this.size.width * 0.3, this.size.height), this.canvas, photoRoute);
-    this.name = new Text_ENGINE(new Coordinate_ENGINE(0, 0), this.size.percentage(new Size_ENGINE(70, 100)), this.canvas, nickname, "#fff", false, false);
-  }
-  drawUserBar() {
-    this.leftUp.x = this.pawn.leftUp.x;
-    this.leftUp.y = this.pawn.leftUp.y - this.size.height;
-    this.photo.leftUp.x = this.leftUp.x;
-    this.photo.leftUp.y = this.leftUp.y;
-    this.name.leftUp.x = this.leftUp.x + this.photo.size.width;
-    this.name.leftUp.y = this.leftUp.y;
-    this.drawSquare();
-    this.photo.drawImage();
-    this.name.drawText();
-  }
-}
-
-// game/game/pawn.ts
-class Pawn_ENGINE extends Character_ENGINE {
-  map;
-  nickname;
-  userBar;
-  constructor(leftUp, map, canvas, color, nickname) {
-    super(leftUp, new Size_ENGINE(map.boxes.width, map.boxes.height), canvas, "#fff", false, 0, new Size_ENGINE(3, 3), {
-      route: `images/factions/knights/troops/pawn/${color}.png`,
-      element: new Element_ENGINE(new Size_ENGINE(192, 192), new Plane_ENGINE(6, 6)),
-      animation: new Animation_ENGINE(6, 6)
-    }, new Coordinate_ENGINE(2, 2), new Direction_ENGINE("center", "center"));
-    this.map = map;
-    this.nickname = nickname;
-    this.userBar = new UserBar_ENGINE(this, new Size_ENGINE(0, 0), this.canvas, false, this.nickname);
-  }
-  drawPawn() {
-    this.drawCharacter();
-    this.userBar.drawUserBar();
-  }
-}
-
-// game/engine/line.ts
-class Line_ENGINE extends Position_ENGINE {
-  canvas;
-  fillStyle;
-  strokeStyle;
-  lineWidth;
-  constructor(leftUp, rightDown, canvas, fillStyle, strokeStyle, lineWidth) {
-    const size20 = new Size_ENGINE(rightDown.x - leftUp.x, rightDown.y - leftUp.y);
-    super(leftUp, size20);
-    this.canvas = canvas;
+  constructor(izquierdaSuperior, medidas14, lienzo, fillStyle, strokeStyle, lineWidth) {
+    super(izquierdaSuperior, medidas14);
+    this.lienzo = lienzo;
     this.fillStyle = fillStyle;
     this.strokeStyle = strokeStyle;
     this.lineWidth = lineWidth;
   }
-  setPosition(leftUp, rightDown) {
-    const size20 = new Size_ENGINE(rightDown.x - leftUp.x, rightDown.y - leftUp.y);
-    this.leftUp = leftUp;
-    this.size = size20;
-  }
-  drawLine() {
-    const positionOnCanvas = this.canvas.positionOnCanvas(this);
-    if (positionOnCanvas === false)
+  dibujarCuadrado() {
+    const posicionEnLienzo = this.lienzo.objetoEnLienzo(this);
+    if (posicionEnLienzo === false)
       return;
-    this.canvas.context.beginPath();
-    this.canvas.context.lineTo(positionOnCanvas.leftUp.x, positionOnCanvas.leftUp.y);
-    const positionOnCanvasRightDown = positionOnCanvas.rightDown();
-    this.canvas.context.lineTo(positionOnCanvasRightDown.x, positionOnCanvasRightDown.y);
-    if (this.strokeStyle !== false) {
-      this.canvas.context.lineWidth = this.lineWidth;
-      this.canvas.context.strokeStyle = this.strokeStyle;
-      this.canvas.context.stroke();
-    }
+    this.lienzo.contexto.beginPath();
+    this.lienzo.contexto.rect(posicionEnLienzo.izquierdaSuperior.x, posicionEnLienzo.izquierdaSuperior.y, posicionEnLienzo.medidas.ancho, posicionEnLienzo.medidas.alto);
     if (this.fillStyle !== false) {
-      this.canvas.context.fillStyle = this.fillStyle;
-      this.canvas.context.fill();
+      this.lienzo.contexto.fillStyle = this.fillStyle;
+      this.lienzo.contexto.fill();
     }
-    this.canvas.context.closePath();
+    if (this.strokeStyle !== false) {
+      this.lienzo.contexto.strokeStyle = this.strokeStyle;
+      this.lienzo.contexto.lineWidth = this.lineWidth;
+      this.lienzo.contexto.stroke();
+    }
+    this.lienzo.contexto.closePath();
   }
 }
 
-// game/game/sheep.ts
-class Sheep_ENGINE extends Character_ENGINE {
-  lineSight;
-  state = "move";
-  states = {
-    move: {
-      animation: new Animation_ENGINE(8, 8),
-      element: {
-        indices: new Plane_ENGINE(0, 0)
-      }
-    },
-    jump: {
-      animation: new Animation_ENGINE(6, 6),
-      element: {
-        indices: new Plane_ENGINE(0, 1)
-      }
-    }
-  };
-  jumpTimer = 0;
-  map;
-  constructor(leftUp, map, canvas) {
-    super(leftUp, new Size_ENGINE(map.boxes.width, map.boxes.height), canvas, "#fff", false, 0, new Size_ENGINE(3, 3), {
-      route: "images/resources/sheep/left.png",
-      element: new Element_ENGINE(new Size_ENGINE(128, 128), new Plane_ENGINE(0, 0)),
-      animation: new Animation_ENGINE(8, 8)
-    }, new Coordinate_ENGINE(1000, 1000), new Direction_ENGINE("center", "down"));
-    this.map = map;
-    this.state = "move";
-    this.lineSight = new Line_ENGINE(new Coordinate_ENGINE(0, 0), new Coordinate_ENGINE(0, 0), this.canvas, false, "#333", 2);
+// typescript/motor/personaje.ts
+class Personaje extends Cuadrado {
+  escala;
+  animaciones;
+  velocidad;
+  direccion;
+  constructor(izquierdaSuperior, medidas15, lienzo, fillStyle, strokeStyle, lineWidth, escala, parametrosAnimaciones, velocidad, direccion4) {
+    super(izquierdaSuperior, medidas15, lienzo, fillStyle, strokeStyle, lineWidth);
+    this.escala = escala;
+    this.lienzo = lienzo;
+    this.velocidad = velocidad;
+    this.direccion = direccion4;
+    this.animaciones = new Animaciones(new Coordenadas(0, 0), new Medidas(0, 0), lienzo, parametrosAnimaciones.ruta, parametrosAnimaciones.elemento, parametrosAnimaciones.animacion);
   }
-  lineSightPosition() {
-    const leftUp = (() => {
-      const halfSizeWidth = this.size.width / 2;
-      const halfSizeHeight = this.size.height / 2;
-      const x = this.leftUp.x + halfSizeWidth;
-      const y = this.leftUp.y + halfSizeHeight;
-      return new Coordinate_ENGINE(x, y);
-    })();
-    const rightDown = (() => {
-      const percentages = (() => {
-        const lineReach = 120;
-        const percentageCenter = 50;
-        const lineScopeX = lineReach * this.direction.getNumberX();
-        const lineScopeY = lineReach * this.direction.getNumberY();
-        return new Size_ENGINE(lineScopeX + percentageCenter, lineScopeY + percentageCenter);
-      })();
-      return this.leftUpPlusSizePercentages(percentages);
-    })();
-    this.lineSight.setPosition(leftUp, rightDown);
+  mover() {
+    if (this.direccion.igualA(new Direccion("centro", "centro")))
+      return false;
+    const segundosEntreCuadros = this.lienzo.tiempoEntreCuadros / 1000;
+    const velocidadX = this.velocidad.x * segundosEntreCuadros;
+    const velocidadY = this.velocidad.y * segundosEntreCuadros;
+    const distanciaX = velocidadX * this.direccion.xNumero;
+    const distanciaY = velocidadY * this.direccion.yNumero;
+    const nuevaX = this.izquierdaSuperior.x + distanciaX;
+    const nuevaY = this.izquierdaSuperior.y + distanciaY;
+    return new Coordenadas(nuevaX, nuevaY);
   }
-  moveSheep() {
-    this.lineSightPosition();
-    const moved = this.movedCharacter();
-    if (moved === false)
-      return;
-    const lineSightCollisionMap = this.map.collisionMap(this.leftUp, this.lineSight.rightDown());
-    this.leftUp.x = lineSightCollisionMap.x;
-    this.leftUp.y = lineSightCollisionMap.y;
-    const random1 = Math.round(Math.random());
-    const random2 = Math.round(Math.random());
-    this.direction.setX(random1 === 0 ? "left" : "right");
-    this.direction.setY(random2 === 0 ? "up" : "down");
-    const random3 = Math.round(Math.random() * 2);
-    if (random3 === 0)
-      this.direction.setY("center");
-    else if (random3 === 1)
-      this.direction.setX("center");
-  }
-  jumpSheep() {
-    if (this.state !== "jump")
-      return;
-    const secondsBetweenFrames = this.canvas.timeBetweenFrames / 1000;
-    this.jumpTimer += secondsBetweenFrames;
-    const seconds = this.animations.animation.frames / this.animations.animation.framesPerSecond;
-    if (this.jumpTimer >= seconds) {
-      this.state = "move";
-      this.jumpTimer = 0;
-      return;
-    }
-  }
-  refreshState() {
-    let character3 = this.states[this.state];
-    if (this.animations.element.getIndices().vertical === character3.element.indices.vertical)
-      return;
-    this.animations.element.setIndices(new Plane_ENGINE(character3.element.indices.horizontal, character3.element.indices.vertical));
-    this.animations.animation.frames = character3.animation.frames;
-    this.animations.animation.framesPerSecond = character3.animation.framesPerSecond;
-  }
-  imageAccordingDirectionMovement() {
-    const directionX = this.direction.getX();
-    if (directionX === "center")
-      return;
-    this.animations.route = `images/resources/sheep/${directionX}.png`;
-  }
-  drawSheep() {
-    this.refreshState();
-    this.moveSheep();
-    this.jumpSheep();
-    this.imageAccordingDirectionMovement();
-    this.drawCharacter();
-    this.lineSight.drawLine();
+  dibujarPersonaje() {
+    this.dibujarCuadrado();
+    this.animaciones = new Animaciones(new Coordenadas(this.izquierdaSuperior.x + this.medidas.mitad.ancho - this.animaciones.medidas.mitad.ancho, this.izquierdaSuperior.y + this.medidas.mitad.alto - this.animaciones.medidas.mitad.alto), new Medidas(this.escala.ancho * this.medidas.ancho, this.escala.alto * this.medidas.alto), this.lienzo, this.animaciones.ruta, this.animaciones.elemento, this.animaciones.animacion);
+    this.animaciones.dibujarAnimacion();
   }
 }
 
-// game/game/game.ts
-class Game_ENGINE extends Scene_ENGINE {
-  map;
-  pawns = [];
-  sheepGroup = [];
-  constructor(canvas) {
-    super(canvas);
-    this.map = new Map_ENGINE(canvas);
-    this.sheepGroup = [
-      new Sheep_ENGINE(new Coordinate_ENGINE(35, 50), this.map, canvas)
-    ];
+// typescript/motor/texto.ts
+class Texto extends Objeto {
+  lienzo;
+  valor;
+  fillStyle;
+  strokeStyle;
+  dungeonFont;
+  get font() {
+    const font = `${this.medidas.alto}px`;
+    if (this.dungeonFont === true)
+      font.concat(" Dungeon,");
+    return font.concat(" sans - serif, arial");
   }
-  tiktokGift(gift) {
-    const exist = this.pawns.some((pawn2) => pawn2.nickname === gift.nickname);
-    if (exist === true)
+  constructor(izquierdaSuperior, medidas15, lienzo, valor, fillStyle, strokeStyle, dungeonFont) {
+    super(izquierdaSuperior, medidas15);
+    this.lienzo = lienzo;
+    this.valor = valor;
+    this.fillStyle = fillStyle;
+    this.strokeStyle = strokeStyle;
+    this.dungeonFont = dungeonFont;
+  }
+  dibujarTexto() {
+    if (this.valor.length === 0)
       return;
-    this.pawns.push(new Pawn_ENGINE(new Coordinate_ENGINE(Math.floor(Math.random() * this.map.size.width), Math.floor(Math.random() * this.map.size.height)), this.map, this.canvas, "blue", gift.nickname));
+    const objetoEnLienzo = this.lienzo.objetoEnLienzo(this);
+    if (objetoEnLienzo === false)
+      return;
+    this.lienzo.contexto.font = this.font;
+    this.lienzo.contexto.textAlign = "left";
+    this.lienzo.contexto.textBaseline = "top";
+    objetoEnLienzo.medidas.ancho = this.lienzo.contexto.measureText(this.valor).width;
+    objetoEnLienzo.izquierdaSuperior.x += this.medidas.mitad.ancho;
+    objetoEnLienzo.izquierdaSuperior.x -= objetoEnLienzo.medidas.mitad.ancho;
+    if (this.fillStyle !== false) {
+      this.lienzo.contexto.fillStyle = this.fillStyle;
+      this.lienzo.contexto.fillText(this.valor, objetoEnLienzo.izquierdaSuperior.x, objetoEnLienzo.izquierdaSuperior.y);
+    }
+    if (this.strokeStyle !== false) {
+      this.lienzo.contexto.strokeStyle = this.strokeStyle;
+      this.lienzo.contexto.strokeText(this.valor, objetoEnLienzo.izquierdaSuperior.x, objetoEnLienzo.izquierdaSuperior.y);
+    }
+  }
+}
+
+// typescript/juego/barraUsuario.ts
+class BarraUsuario extends Cuadrado {
+  peon;
+  foto;
+  apodo;
+  constructor(peon, medidas16, lienzo, rutaFoto, apodo) {
+    super(new Coordenadas(0, 0), medidas16, lienzo, "#416177", "#fff", 0.5);
+    this.peon = peon;
+    this.foto = new Imagen(new Coordenadas(0, 0), new Medidas(this.medidas.ancho * 0.3, this.medidas.alto), this.lienzo, rutaFoto);
+    this.apodo = new Texto(new Coordenadas(0, 0), this.medidas.porcentaje(new Medidas(70, 100)), this.lienzo, apodo, "#fff", false, false);
+  }
+  dibujarBarraUsuario() {
+    this.izquierdaSuperior.x = this.peon.izquierdaSuperior.x;
+    this.izquierdaSuperior.y = this.peon.izquierdaSuperior.y - this.medidas.alto;
+    this.foto.izquierdaSuperior.x = this.izquierdaSuperior.x;
+    this.foto.izquierdaSuperior.y = this.izquierdaSuperior.y;
+    this.apodo.izquierdaSuperior.x = this.izquierdaSuperior.x + this.foto.medidas.ancho;
+    this.apodo.izquierdaSuperior.y = this.izquierdaSuperior.y;
+    this.dibujarCuadrado();
+    this.foto.dibujarImagen();
+    this.apodo.dibujarTexto();
+  }
+}
+
+// typescript/juego/peon.ts
+class Peon extends Personaje {
+  mapa;
+  apodo;
+  barraUsuario;
+  constructor(izquierdaSuperior, mapa, lienzo, color, apodo) {
+    super(izquierdaSuperior, new Medidas(mapa.medidasCasilla.ancho, mapa.medidasCasilla.alto), lienzo, "#fff", false, 0, new Medidas(3, 3), {
+      ruta: `images/factions/knights/troops/pawn/${color}.png`,
+      elemento: new Elemento(new Medidas(192, 192), new Plano(6, 6)),
+      animacion: new Animacion(6, 6)
+    }, new Coordenadas(2, 2), new Direccion("centro", "centro"));
+    this.mapa = mapa;
+    this.apodo = apodo;
+    this.barraUsuario = new BarraUsuario(this, new Medidas(0, 0), lienzo, false, apodo);
+  }
+  dibujarPeon() {
+    this.dibujarPersonaje();
+    this.barraUsuario.dibujarBarraUsuario();
+  }
+}
+
+// typescript/juego/juego.ts
+class Juego extends Escena {
+  mapa;
+  peones = [];
+  ovejas = [];
+  constructor(lienzo) {
+    super(lienzo);
+    this.mapa = new Mapa(lienzo);
+  }
+  regaloTiktok(regalo) {
+    const existe = this.peones.some((peon2) => peon2.apodo === regalo.nickname);
+    if (existe === true)
+      return;
+    this.peones.push(new Peon(new Coordenadas(Math.floor(Math.random() * this.mapa.medidas.ancho), Math.floor(Math.random() * this.mapa.medidas.alto)), this.mapa, this.lienzo, "blue", regalo.nickname));
   }
   tiktokChat(chat) {
     console.log(chat);
   }
   draw = () => {
-    this.map.drawMap();
-    this.pawns.forEach((pawn2) => pawn2.drawPawn());
-    this.sheepGroup.forEach((sheep2) => sheep2.drawSheep());
+    this.mapa.dibujarMapa();
+    this.peones.forEach((pawn) => pawn.dibujarPeon());
+    this.ovejas.forEach((oveja) => oveja.dibujar());
   };
 }
 
-// game/index.ts
+// typescript/motor/camara.ts
+class Camara extends Objeto {
+  constructor(izquierdaSuperior) {
+    super(izquierdaSuperior, new Medidas(100, 100));
+  }
+  objetoAdentroDeCamara(objeto9) {
+    const dobleDeMedidas = new Medidas(objeto9.medidas.ancho * 2, objeto9.medidas.alto * 2);
+    const vision = new Objeto(new Coordenadas(this.izquierdaSuperior.x - objeto9.medidas.ancho, this.izquierdaSuperior.y - objeto9.medidas.alto), new Medidas(this.medidas.ancho + dobleDeMedidas.ancho, this.medidas.alto + dobleDeMedidas.alto));
+    return vision.objetoAdentro(objeto9);
+  }
+  objetoEnCamara(objeto9) {
+    if (this.objetoAdentroDeCamara(objeto9) === false)
+      return false;
+    return new Objeto(new Coordenadas(objeto9.izquierdaSuperior.x - this.izquierdaSuperior.x, objeto9.izquierdaSuperior.y - this.izquierdaSuperior.y), new Medidas(objeto9.medidas.ancho, objeto9.medidas.alto));
+  }
+  enfocar(objeto9) {
+    this.izquierdaSuperior.x = objeto9.izquierdaSuperior.x - this.medidas.mitad.ancho + objeto9.medidas.mitad.ancho;
+    this.izquierdaSuperior.y = objeto9.izquierdaSuperior.y - this.medidas.mitad.alto + objeto9.medidas.mitad.alto;
+  }
+}
+
+// typescript/motor/eventosToques.ts
+class EventosToques {
+  lienzo;
+  modoToque = false;
+  toques = [];
+  teclasPresionadas = [];
+  teclasSoltadas = [];
+  coordenadasToque(toque) {
+    if (toque === null)
+      return false;
+    const left = this.lienzo.margen.ancho / 2;
+    const top = this.lienzo.margen.alto / 2;
+    return new Coordenadas(toque.pageX - left, toque.pageY - top);
+  }
+  asignarCoordenadasToque(evento) {
+    this.toques = [];
+    for (let indice = 0;indice < evento.changedTouches.length; indice++) {
+      const toque = evento.changedTouches.item(indice);
+      const coordenadas12 = this.coordenadasToque(toque);
+      if (coordenadas12 === false)
+        continue;
+      this.toques[indice] = coordenadas12;
+    }
+  }
+  empezarToque(evento) {
+    evento.preventDefault();
+    this.modoToque = "empezar";
+    this.asignarCoordenadasToque(evento);
+  }
+  moverToque(evento) {
+    evento.preventDefault();
+    this.modoToque = "mover";
+    this.asignarCoordenadasToque(evento);
+  }
+  terminarToque(evento) {
+    evento.preventDefault();
+    this.modoToque = "terminar";
+    this.asignarCoordenadasToque(evento);
+  }
+  presionarTecla(evento) {
+    if (this.teclasPresionadas.includes(evento.key))
+      return;
+    this.teclasPresionadas.push(evento.key);
+  }
+  soltarTecla(evento) {
+    this.teclasPresionadas = this.teclasPresionadas.filter((tecla) => tecla !== evento.key);
+    if (this.teclasSoltadas.includes(evento.key))
+      return;
+    this.teclasSoltadas.push(evento.key);
+  }
+  constructor(lienzo) {
+    this.lienzo = lienzo;
+    this.lienzo.elemento.addEventListener("touchstart", (evento) => this.empezarToque(evento));
+    this.lienzo.elemento.addEventListener("touchmove", (evento) => this.moverToque(evento));
+    this.lienzo.elemento.addEventListener("touchend", (evento) => this.terminarToque(evento));
+    this.lienzo.elemento.addEventListener("keydown", (evento) => this.presionarTecla(evento));
+    this.lienzo.elemento.addEventListener("keyup", (evento) => this.soltarTecla(evento));
+  }
+  actualizar() {
+    this.modoToque = false;
+    this.teclasSoltadas = [];
+  }
+}
+
+// typescript/motor/imagines.ts
+class Imagines {
+  rutasNoEncontradas = [];
+  imagenesCargadas = {};
+  cargandoImagenes = false;
+  cargarImagen(ruta) {
+    if (this.cargandoImagenes === true)
+      return false;
+    if (this.rutasNoEncontradas.includes(ruta) === true)
+      return false;
+    const imagen5 = this.imagenesCargadas[ruta];
+    if (imagen5 === undefined) {
+      this.buscarImagen(ruta);
+      return false;
+    }
+    return imagen5;
+  }
+  buscarImagen(ruta) {
+    if (this.rutasNoEncontradas.includes(ruta) === true)
+      return;
+    const imagen5 = this.imagenesCargadas[ruta];
+    if (imagen5 !== undefined)
+      return;
+    this.cargandoImagenes = true;
+    const imagenNueva = new Image;
+    imagenNueva.addEventListener("load", () => {
+      this.cargandoImagenes = false;
+      this.imagenesCargadas[ruta] = imagenNueva;
+    });
+    imagenNueva.addEventListener("error", () => {
+      throw new Error(`image ${ruta} is not found`);
+      this.rutasNoEncontradas.push(ruta);
+    });
+    imagenNueva.src = ruta;
+  }
+}
+
+// typescript/motor/lienzo.ts
+class Lienzo extends Camara {
+  unPorciento = new Medidas(0, 0);
+  cuadrosPorSegundo;
+  intervaloEntreCuadros;
+  tiempo = 0;
+  margen = new Medidas(0, 0);
+  elemento;
+  imagines = new Imagines;
+  tiempoEntreCuadros = 0;
+  contexto;
+  escena = false;
+  eventosToques;
+  siguienteCuadro(tiempo) {
+    const diferncia = tiempo - this.tiempo;
+    if (diferncia < this.intervaloEntreCuadros) {
+      requestAnimationFrame((tiempo2) => this.siguienteCuadro(tiempo2));
+      return;
+    }
+    this.tiempoEntreCuadros = diferncia;
+    this.tiempo = tiempo;
+    this.dibujarLienzo();
+    requestAnimationFrame((tiempo2) => this.siguienteCuadro(tiempo2));
+  }
+  dibujarLienzo() {
+    this.contexto.clearRect(0, 0, this.elemento.width, this.elemento.height);
+    if (this.escena === false)
+      return;
+    this.escena.draw();
+  }
+  relacionAspecto() {
+    const medidasPantalla = new Medidas(1280, 720);
+    this.elemento.width = medidasPantalla.ancho;
+    this.elemento.height = medidasPantalla.alto;
+    this.unPorciento.ancho = this.elemento.width / 100;
+    this.unPorciento.alto = this.elemento.height / 100;
+  }
+  anchoEnPorcentaje = (pixeles) => pixeles / this.unPorciento.ancho;
+  anchoEnPixeles = (porcentaje) => porcentaje * this.unPorciento.ancho;
+  alturaEnPorcentaje = (pixeles) => pixeles / this.unPorciento.alto;
+  alturaEnPixeles = (porcentaje) => porcentaje * this.unPorciento.alto;
+  constructor(izquierdaSuperior, cuadrosPorSegundo) {
+    super(izquierdaSuperior);
+    this.cuadrosPorSegundo = cuadrosPorSegundo;
+    this.intervaloEntreCuadros = 1000 / this.cuadrosPorSegundo;
+    this.elemento = window.document.getElementById("canvas");
+    this.contexto = this.elemento.getContext("2d");
+    this.relacionAspecto();
+    window.addEventListener("resize", () => this.relacionAspecto());
+    this.eventosToques = new EventosToques(this);
+    this.siguienteCuadro(0);
+  }
+  empezar(escena2) {
+    this.escena = escena2;
+  }
+  objetoEnLienzo(objeto10) {
+    const objetoEnCamara = this.objetoEnCamara(objeto10);
+    if (objetoEnCamara === false)
+      return false;
+    return new Objeto(new Coordenadas(this.anchoEnPixeles(objetoEnCamara.izquierdaSuperior.x), this.alturaEnPixeles(objetoEnCamara.izquierdaSuperior.y)), new Medidas(this.anchoEnPorcentaje(objetoEnCamara.medidas.ancho), this.alturaEnPorcentaje(objetoEnCamara.medidas.alto)));
+  }
+  anchoEnPorcentajeAltura(porcentajeAltura) {
+    const pixeles = this.alturaEnPixeles(porcentajeAltura);
+    return this.anchoEnPorcentaje(pixeles);
+  }
+  alturaEnPorcentajeAncho(porcentajeAncho) {
+    const pixeles = this.anchoEnPixeles(porcentajeAncho);
+    return this.alturaEnPorcentaje(pixeles);
+  }
+}
+
+// typescript/index.ts
 window.addEventListener("load", () => {
-  const canvas2 = new Canvas_ENGINE(new Coordinate_ENGINE(0, 0), 24);
-  const game2 = new Game_ENGINE(canvas2);
-  game2.start();
+  const canvas = new Lienzo(new Coordenadas(0, 0), 24);
+  const game = new Juego(canvas);
+  game.start();
 });

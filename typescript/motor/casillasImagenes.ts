@@ -1,8 +1,8 @@
 import { Casillas, type CasillasOcupadas } from "./casillas";
+import type { Coordenadas } from "./coordenadas";
 import { Imagen, type RutaImagen } from "./imagen";
 import type { Lienzo } from "./lienzo";
 import type { Medidas } from "./medidas";
-import type { Plano } from "./plano";
 
 export class CasillasImagenes extends Casillas {
     imagines: Imagen[] = [];
@@ -12,8 +12,9 @@ export class CasillasImagenes extends Casillas {
     constructor(
         x: number,
         y: number,
+        z: number,
         medidasCasillas: Medidas,
-        longitudCasillasOcupadas: Plano,
+        longitudCasillasOcupadas: Coordenadas,
         casillasOcupadas: CasillasOcupadas,
         lienzo: Lienzo,
         ruta: RutaImagen | false,
@@ -21,6 +22,7 @@ export class CasillasImagenes extends Casillas {
         super(
             x,
             y,
+            z,
             medidasCasillas,
             longitudCasillasOcupadas,
             casillasOcupadas,
@@ -29,7 +31,7 @@ export class CasillasImagenes extends Casillas {
         this.ruta = ruta;
     }
 
-    agregarImagen(indicesCasilla: Plano) {
+    agregarImagen(indicesCasilla: Coordenadas) {
         const objeto = this.nuevoObjeto(indicesCasilla);
         const imagen = new Imagen(
             objeto.izquierdaSuperior,

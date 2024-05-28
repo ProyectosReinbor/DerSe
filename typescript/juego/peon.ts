@@ -1,11 +1,8 @@
 import { Animacion } from "../motor/animacion";
-import { Coordenadas } from "../motor/coordenadas";
 import { Elemento } from "../motor/elemento";
 import type { Lienzo } from "../motor/lienzo";
-import { Medidas } from "../motor/medidas";
 import { Personaje } from "../motor/personaje";
 import { Direccion } from "../motor/personaje/direccion";
-import { Plano } from "../motor/plano";
 import { BarraUsuario } from "./barraUsuario";
 import type { Mapa } from "./mapa";
 

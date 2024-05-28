@@ -1,10 +1,10 @@
 import { Casillas, type CasillasOcupadas } from "./casillas";
+import { Coordenadas } from "./coordenadas";
 import { Elemento } from "./elemento";
 import { Elementos } from "./elementos";
 import type { RutaImagen } from "./imagen";
 import type { Lienzo } from "./lienzo";
 import { Medidas } from "./medidas";
-import { Plano } from "./plano";
 
 export class CasillasElementos extends Casillas {
 
@@ -16,8 +16,9 @@ export class CasillasElementos extends Casillas {
     constructor(
         x: number,
         y: number,
+        z: number,
         medidasCasilla: Medidas,
-        longitudCasillasOcupadas: Plano,
+        longitudCasillasOcupadas: Coordenadas,
         casillasOcupadas: CasillasOcupadas,
         lienzo: Lienzo,
         ruta: RutaImagen | false,
@@ -26,6 +27,7 @@ export class CasillasElementos extends Casillas {
         super(
             x,
             y,
+            z,
             medidasCasilla,
             longitudCasillasOcupadas,
             casillasOcupadas
@@ -35,16 +37,18 @@ export class CasillasElementos extends Casillas {
         this.elemento = elemento;
     }
 
-    agregarElementos(indicesCasilla: Plano) {
+    agregarElementos(indicesCasilla: Coordenadas) {
         const objeto = this.nuevoObjeto(indicesCasilla);
         const elemento = new Elemento(
             new Medidas(
                 this.elemento.medidas.ancho,
-                this.elemento.medidas.alto
+                this.elemento.medidas.alto,
+                this.elemento.medidas.profundidad
             ),
-            new Plano(
+            new Coordenadas(
                 this.elemento.indices.horizontal,
-                this.elemento.indices.vertical
+                this.elemento.indices.vertical,
+                0
             )
         )
         const elementos = new Elementos(

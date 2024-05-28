@@ -1,4 +1,4 @@
-import type { Coordenadas } from "../coordenadas";
+import type { Coordenadas2 } from "../coordenadas2";
 import type { Lienzo } from "../lienzo";
 import { Lineas } from "../lineas";
 import { Medidas } from "../medidas";
@@ -19,10 +19,10 @@ export class Borrar extends Objeto {
   ) {
     super(
       teclado.izquierdaSuperiorMasPorcentajeMedidas(
-        new Medidas(63, 0)
+        new Medidas(63, 0, 100)
       ),
       teclado.medidas.porcentaje(
-        new Medidas(15, 20)
+        new Medidas(15, 20, 100)
       ),
     );
     this.lineas = new Lineas(
@@ -34,23 +34,23 @@ export class Borrar extends Objeto {
       0.5
     );
     this.lineas.agregarLineaConPorcentajes(
-      new Medidas(10, 50),
-      new Medidas(30, 20)
+      new Medidas(10, 50, 100),
+      new Medidas(30, 20, 100)
     );
     this.lineas.agregarLineaConPorcentajes(
-      new Medidas(90, 20),
-      new Medidas(90, 80)
+      new Medidas(90, 20, 100),
+      new Medidas(90, 80, 100)
     );
     this.lineas.agregarLineaConPorcentajes(
-      new Medidas(30, 80),
-      new Medidas(10, 50)
+      new Medidas(30, 80, 100),
+      new Medidas(10, 50, 100)
     );
     this.caracter = new Texto(
       this.izquierdaSuperiorMasPorcentajeMedidas(
-        new Medidas(50, 15)
+        new Medidas(50, 15, 100)
       ),
       this.medidas.porcentaje(
-        new Medidas(15, 100)
+        new Medidas(15, 100, 100)
       ),
       lienzo,
       "X",
@@ -61,7 +61,7 @@ export class Borrar extends Objeto {
     this.teclado = teclado;
   }
 
-  toqueEmpezado(toque: Coordenadas) {
+  toqueEmpezado(toque: Coordenadas2) {
     const adentro = this.coordenadasAdentro(toque);
     if (adentro === false)
       return;
@@ -77,7 +77,7 @@ export class Borrar extends Objeto {
     this.teclado.entrada.borrarUltimoCaracter();
   }
 
-  toqueMovido(toque: Coordenadas) {
+  toqueMovido(toque: Coordenadas2) {
     if (this.coordenadasAdentro(toque) === true)
       return;
 

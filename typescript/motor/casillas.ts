@@ -2,7 +2,6 @@ import { Casilla } from "./casilla";
 import { Coordenadas } from "./coordenadas";
 import { Medidas } from "./medidas";
 import { Objeto } from "./objeto";
-import { Plano } from "./plano";
 
 export type CasillasOcupadas = true | boolean[][];
 
@@ -10,17 +9,18 @@ export class Casillas extends Coordenadas {
 
     casillas: Casilla[][] = [];
     medidasCasilla: Medidas;
-    longitudCasillasOcupadas: Plano;
+    longitudCasillasOcupadas: Coordenadas;
     casillasOcupadas: CasillasOcupadas;
 
     constructor(
         x: number,
         y: number,
+        z: number,
         medidasCasilla: Medidas,
-        longitudCasillasOcupadas: Plano,
+        longitudCasillasOcupadas: Coordenadas,
         casillasOcupadas: CasillasOcupadas,
     ) {
-        super(x, y);
+        super(x, y, z);
         this.medidasCasilla = medidasCasilla;
         this.longitudCasillasOcupadas = longitudCasillasOcupadas;
         this.casillasOcupadas = casillasOcupadas;
@@ -31,35 +31,39 @@ export class Casillas extends Coordenadas {
             coordenada,
             new Medidas(
                 this.medidasCasilla.ancho,
-                this.medidasCasilla.alto
+                this.medidasCasilla.alto,
+                this.medidasCasilla.profundidad
             )
         );
 
         const indicesCasillaIzquierdaSuperior = this.obtenerIndicesCasilla(
             new Coordenadas(
                 objeto.izquierdaSuperior.x,
-                objeto.izquierdaSuperior.y
+                objeto.izquierdaSuperior.y,
+                objeto.izquierdaSuperior.z
             )
         );
 
         const indicesCasillaDerechaInferior = this.obtenerIndicesCasilla(
             new Coordenadas(
                 objeto.derechaInferior.x,
-                objeto.derechaInferior.y
+                objeto.derechaInferior.y,
+                objeto.derechaInferior.z
             )
         );
 
-        const indicesCasilla = new Plano(
-            indicesCasillaIzquierdaSuperior.vertical,
-            indicesCasillaIzquierdaSuperior.horizontal
+        const indicesCasilla = new Coordenadas(
+            indicesCasillaIzquierdaSuperior.x,
+            indicesCasillaIzquierdaSuperior.y,
+            indicesCasillaIzquierdaSuperior.z
         );
         for (;
-            indicesCasilla.vertical <= indicesCasillaDerechaInferior.vertical;
-            indicesCasilla.vertical++
+            indicesCasilla.y <= indicesCasillaDerechaInferior.y;
+            indicesCasilla.y++
         ) {
             for (;
-                indicesCasilla.horizontal <= indicesCasillaDerechaInferior.horizontal;
-                indicesCasilla.horizontal++
+                indicesCasilla.x <= indicesCasillaDerechaInferior.x;
+                indicesCasilla.x++
             ) {
                 const casilla = this.obtenerCasilla(indicesCasilla);
                 if (casilla === undefined)
@@ -74,59 +78,64 @@ export class Casillas extends Coordenadas {
         return false;
     }
 
-    nuevoObjeto(indicesCasilla: Plano): Objeto {
-        const x = indicesCasilla.horizontal * this.medidasCasilla.ancho;
-        const y = indicesCasilla.vertical * this.medidasCasilla.alto;
-        const ancho = this.medidasCasilla.ancho * this.longitudCasillasOcupadas.horizontal;
-        const alto = this.medidasCasilla.alto * this.longitudCasillasOcupadas.vertical;
+    nuevoObjeto(indicesCasilla: Coordenadas): Objeto {
         return new Objeto(
-            new Coordenadas(x, y),
+            new Coordenadas(
+                indicesCasilla.x * this.medidasCasilla.ancho,
+                indicesCasilla.y * this.medidasCasilla.alto,
+                indicesCasilla.z * this.medidasCasilla.profundidad,
+            ),
             new Medidas(
-                ancho,
-                alto
+                this.medidasCasilla.ancho * this.longitudCasillasOcupadas.x,
+                this.medidasCasilla.alto * this.longitudCasillasOcupadas.y,
+                this.medidasCasilla.profundidad * this.longitudCasillasOcupadas.z
             )
         );
     }
 
-    obtenerCasilla(indicesCasilla: Plano): Casilla | undefined {
-        const columnaCasillas = this.casillas[indicesCasilla.vertical];
+    obtenerCasilla(indicesCasilla: Coordenadas) {
+        const columnaCasillas = this.casillas[indicesCasilla.y];
         if (columnaCasillas === undefined)
             return undefined;
 
-        return columnaCasillas[indicesCasilla.horizontal];
+        return columnaCasillas[indicesCasilla.x];
     }
 
-    obtenerIndicesCasilla(coordenada: Coordenadas): Plano {
-        const horizontal = Math.floor(coordenada.x / this.medidasCasilla.ancho);
-        const vertical = Math.floor(coordenada.y / this.medidasCasilla.alto);
-        return new Plano(horizontal, vertical);
+    obtenerIndicesCasilla(coordenada: Coordenadas) {
+        const x = Math.floor(coordenada.x / this.medidasCasilla.ancho);
+        const y = Math.floor(coordenada.y / this.medidasCasilla.alto);
+        const z = Math.floor(coordenada.z / this.medidasCasilla.profundidad);
+        return new Coordenadas(x, y, z);
     }
 
     asignarCasillaIndices(
-        casillaIndices: Plano,
+        casillaIndices: Coordenadas,
         casilla: Casilla,
     ) {
-        let fila = this.casillas[casillaIndices.vertical];
+        let fila = this.casillas[casillaIndices.y];
         if (fila === undefined)
             fila = [];
 
-        fila[casillaIndices.horizontal] = casilla;
-        this.casillas[casillaIndices.vertical] = fila;
+        fila[casillaIndices.x] = casilla;
+        this.casillas[casillaIndices.y] = fila;
     }
 
     asignarCasilla(
-        indicesCasilla: Plano,
+        indicesCasilla: Coordenadas,
         indiceObjeto: number,
     ) {
         const medidas = new Medidas(
             this.medidasCasilla.ancho,
-            this.medidasCasilla.alto
+            this.medidasCasilla.alto,
+            this.medidasCasilla.profundidad
         );
-        const distanceX = indicesCasilla.horizontal * medidas.ancho;
-        const distanceY = indicesCasilla.vertical * medidas.alto;
+        const xCasilla = indicesCasilla.x * medidas.ancho;
+        const yCasilla = indicesCasilla.y * medidas.alto;
+        const zCasilla = indicesCasilla.z * medidas.profundidad;
         const superiorIzquierda = new Coordenadas(
-            this.x + distanceX,
-            this.y + distanceY,
+            this.x + xCasilla,
+            this.y + yCasilla,
+            this.z + zCasilla,
         );
         const casilla = new Casilla(
             superiorIzquierda,
@@ -140,14 +149,16 @@ export class Casillas extends Coordenadas {
     }
 
     asignarCasillasOcupadas(
-        indicesInicialesObjeto: Plano,
-        indicesCasillasOcupadas: Plano,
+        indicesInicialesObjeto: Coordenadas,
+        indicesCasillaOcupada: Coordenadas,
         indiceObjeto: number,
     ) {
-        const horizontal = indicesInicialesObjeto.horizontal + indicesCasillasOcupadas.vertical;
-        const vertical = indicesInicialesObjeto.vertical + indicesCasillasOcupadas.horizontal;
-        const indicesCasilla = new Plano(horizontal, vertical);
-        let filaCasillas = this.casillas[indicesCasilla.vertical];
+        const indicesCasilla = new Coordenadas(
+            indicesInicialesObjeto.x + indicesCasillaOcupada.x,
+            indicesInicialesObjeto.y + indicesCasillaOcupada.y,
+            indicesInicialesObjeto.z + indicesCasillaOcupada.z
+        );
+        let filaCasillas = this.casillas[indicesCasilla.y];
         if (filaCasillas === undefined)
             filaCasillas = [];
 
@@ -162,7 +173,7 @@ export class Casillas extends Coordenadas {
     }
 
     agregarObjeto(
-        indicesCasilla: Plano,
+        indicesCasilla: Coordenadas,
         indiceObjeto: number,
     ) {
         const casilla = this.obtenerCasilla(indicesCasilla);
@@ -170,40 +181,37 @@ export class Casillas extends Coordenadas {
             return "ya esta agregado";
 
         if (this.casillasOcupadas === true) {
-            for (
-                let vertical = 0;
-                vertical < this.longitudCasillasOcupadas.vertical;
-                vertical++
+            const indices = new Coordenadas(0, 0, 0);
+            for (;
+                indices.y < this.longitudCasillasOcupadas.y;
+                indices.y++
             ) {
-                for (
-                    let horizontal = 0;
-                    horizontal < this.longitudCasillasOcupadas.horizontal;
-                    horizontal++
+                for (;
+                    indices.x < this.longitudCasillasOcupadas.x;
+                    indices.x++
                 ) {
-                    const indicesCasillasOcupadas = new Plano(
-                        horizontal,
-                        vertical
+                    const indicesCasillaOcupada = new Coordenadas(
+                        indices.x,
+                        indices.y,
+                        indices.z,
                     );
                     this.asignarCasillasOcupadas(
                         indicesCasilla,
-                        indicesCasillasOcupadas,
+                        indicesCasillaOcupada,
                         indiceObjeto
                     );
                 }
             }
         } else {
-            this.casillasOcupadas.forEach((fila, vertical) => {
-                fila.forEach((ocupar, horizontal) => {
+            this.casillasOcupadas.forEach((fila, y) => {
+                fila.forEach((ocupar, x) => {
                     if (ocupar === false)
                         return;
 
-                    const indexesBoxOccupy = new Plano(
-                        horizontal,
-                        vertical
-                    );
+                    const indicesCasillaOcupada = new Coordenadas(y, x, 0);
                     this.asignarCasillasOcupadas(
                         indicesCasilla,
-                        indexesBoxOccupy,
+                        indicesCasillaOcupada,
                         indiceObjeto,
                     );
                 });

@@ -16,10 +16,10 @@ export class Terminar extends Cuadrado {
   ) {
     super(
       teclado.izquierdaSuperiorMasPorcentajeMedidas(
-        new Medidas(88, 3)
+        new Medidas(88, 3, 100)
       ),
       teclado.medidas.porcentaje(
-        new Medidas(1, 14)
+        new Medidas(1, 14, 100)
       ),
       lienzo,
       "#21618C",
@@ -35,12 +35,12 @@ export class Terminar extends Cuadrado {
       0.5,
     );
     this.visto.agregarLineaConPorcentajes(
-      new Medidas(30, 50),
-      new Medidas(50, 80)
+      new Medidas(30, 50, 100),
+      new Medidas(50, 80, 100)
     );
     this.visto.agregarLineaConPorcentajes(
-      new Medidas(70, 20),
-      new Medidas(0, 0)
+      new Medidas(70, 20, 100),
+      new Medidas(0, 0, 100)
     );
     this.teclado = teclado;
   }

@@ -2,8 +2,6 @@ import type { FillStyle, StrokeStyle } from "../contexto";
 import { Coordenadas } from "../coordenadas";
 import type { Lienzo } from "../lienzo";
 import { Medidas } from "../medidas";
-import { Plano } from "../plano";
-import { Texto } from "../texto";
 import { Tecla, type PresionarTecla } from "./tecla";
 
 type ParametrosTecla = {
@@ -23,11 +21,12 @@ export class Teclas extends Coordenadas {
   constructor(
     x: number,
     y: number,
+    z: number,
     lienzo: Lienzo,
     caracteres: string,
     parametrosTecla: ParametrosTecla,
   ) {
-    super(x, y);
+    super(x, y, z);
     this.lienzo = lienzo;
     this.parametrosTecla = parametrosTecla;
     this.parametrosTecla.medidas.ancho /= caracteres.length;
@@ -41,7 +40,7 @@ export class Teclas extends Coordenadas {
         continue;
 
       this.agregarTecla(
-        new Plano(indice, 0),
+        new Coordenadas(indice, 0, 0),
         {
           fillStyle: "#0F6097",
           strokeStyle: "#fff",
@@ -64,7 +63,7 @@ export class Teclas extends Coordenadas {
   }
 
   agregarTecla(
-    casillas: Plano,
+    casillas: Coordenadas,
     nuevaTecla: {
       fillStyle: FillStyle;
       strokeStyle: StrokeStyle;
@@ -79,29 +78,26 @@ export class Teclas extends Coordenadas {
   ) {
     const medidas = new Medidas(
       this.parametrosTecla.medidas.ancho,
-      this.parametrosTecla.medidas.alto
+      this.parametrosTecla.medidas.alto,
+      this.parametrosTecla.medidas.profundidad
     );
-    const superior = medidas.ancho * casillas.horizontal;
-    const izquierda = medidas.alto * casillas.vertical;
+    const izquierda = medidas.ancho * casillas.x;
+    const superior = medidas.alto * casillas.y;
     const tecla = new Tecla(
       new Coordenadas(
-        this.x + superior,
-        this.y + izquierda
+        this.x + izquierda,
+        this.y + superior,
+        this.z,
       ),
       medidas,
       this.lienzo,
       nuevaTecla.fillStyle,
       nuevaTecla.strokeStyle,
       nuevaTecla.lineWidth,
-      new Texto(
-        new Coordenadas(0, 0),
-        new Medidas(0, this.parametrosTecla.medidas.alto),
-        this.lienzo,
-        nuevaTecla.texto.valor,
-        nuevaTecla.texto.fillStyle,
-        nuevaTecla.texto.strokeStyle,
-        nuevaTecla.texto.dungeonFont
-      ),
+      {
+        medidas: new Medidas(0, this.parametrosTecla.medidas.alto, 1),
+        ...nuevaTecla.texto,
+      },
       this.parametrosTecla.presionarTecla
     );
     this.teclas.push(tecla);

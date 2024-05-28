@@ -3,7 +3,6 @@ import { Coordenadas } from "../coordenadas";
 import type { Lienzo } from "../lienzo";
 import { Medidas } from "../medidas";
 import type { Teclado } from "../teclado";
-import { Texto } from "../texto";
 
 export class Espacio extends Boton {
 
@@ -15,24 +14,22 @@ export class Espacio extends Boton {
   ) {
     super(
       teclado.izquierdaSuperiorMasPorcentajeMedidas(
-        new Medidas(27, 3)
+        new Medidas(27, 3, 100)
       ),
       teclado.medidas.porcentaje(
-        new Medidas(36, 14)
+        new Medidas(36, 14, 100)
       ),
       lienzo,
       "#21618C",
       "#fff",
       0.5,
-      new Texto(
-        new Coordenadas(0, 0),
-        new Medidas(0, 8),
-        lienzo,
-        "Space",
-        "#fff",
-        false,
-        false
-      )
+      {
+        medidas: new Medidas(0, 8, 1),
+        valor: "Space",
+        fillStyle: "#fff",
+        strokeStyle: false,
+        dungeonFont: false
+      }
     );
     this.teclado = teclado;
   }

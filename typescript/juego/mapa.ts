@@ -29,6 +29,7 @@ export class Mapa extends Objeto {
                 this,
                 this.lienzo,
             );
+            console.log(matrizPiso);
             piso.agregarPiso(matrizPiso);
             return piso;
         });

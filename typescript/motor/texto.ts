@@ -1,8 +1,8 @@
 import type { Lienzo } from "./lienzo";
 import type { FillStyle, StrokeStyle } from "./contexto";
-import type { Coordenadas } from "./coordenadas";
 import type { Medidas } from "./medidas";
 import { Objeto } from "./objeto";
+import type { Coordenadas3 } from "./coordenadas3";
 
 export class Texto extends Objeto {
 
@@ -21,7 +21,7 @@ export class Texto extends Objeto {
     }
 
     constructor(
-        izquierdaSuperior: Coordenadas,
+        izquierdaSuperior: Coordenadas3,
         medidas: Medidas,
         lienzo: Lienzo,
         valor: string,
