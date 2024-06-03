@@ -1,32 +1,34 @@
+import { CoordenadaTridimensional } from "./coordenadaTridimensional";
+import { MedidaTridimensional } from "./medidaTridimensional";
+import { PosicionCajaTridimensional } from "./posicionCajaTridimensional";
+import { VerticesCajaTridimensional } from "./verticesCajaTridimensional";
 
-export class Camara extends Posicion {
-    constructor(izquierdaSuperior: Coordenadas) {
+export class Camara extends PosicionCajaTridimensional {
+    constructor(centro: CoordenadaTridimensional) {
         super(
-            izquierdaSuperior,
-            new Medidas(100, 100, 100)
+            centro,
+            new MedidaTridimensional(100, 100, 100)
         );
     }
 
-    objetoAdentroDeCamara(objeto: Objeto) {
-        const dobleDeMedidas = new Medidas(
-            objeto.medidas.ancho * 2,
-            objeto.medidas.alto * 2,
-            objeto.medidas.profundidad * 2
+    cajaVisible(objetivo: PosicionCajaTridimensional) {
+        const objetivoMedidasDoble = objetivo.medidas.multiplicar(2);
+        const izquierdaSuperiorAtras = this.obtenerVertice(
+            new VerticesCajaTridimensional("izquierda", "superior", "atras")
         );
-
-        const vision = new Objeto(
-            new Coordenadas(
-                this.izquierdaSuperior.x - objeto.medidas.ancho,
-                this.izquierdaSuperior.y - objeto.medidas.alto,
-                this.izquierdaSuperior.z - objeto.medidas.profundidad,
+        const vision = new PosicionCajaTridimensional(
+            new CoordenadaTridimensional(
+                izquierdaSuperiorAtras.x - objetivo.medidas.ancho,
+                izquierdaSuperiorAtras.y - objetivo.medidas.alto,
+                izquierdaSuperiorAtras.z - objetivo.medidas.profundidad,
             ),
-            new Medidas(
-                this.medidas.ancho + dobleDeMedidas.ancho,
-                this.medidas.alto + dobleDeMedidas.alto,
-                this.medidas.profundidad + dobleDeMedidas.profundidad
+            new MedidaTridimensional(
+                this.medidas.ancho + objetivoMedidasDoble.ancho,
+                this.medidas.alto + objetivoMedidasDoble.alto,
+                this.medidas.profundidad + objetivoMedidasDoble.profundidad
             )
         );
-        return vision.objetoAdentro(objeto);
+        return vision.posicionCajaAdentro(objetivo);
     }
 
     objetoEnCamara(objeto: Objeto) {

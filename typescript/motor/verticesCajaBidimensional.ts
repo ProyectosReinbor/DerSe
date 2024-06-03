@@ -19,8 +19,8 @@ export class VerticesCajaBidimensional {
             "inferior": 1
         }
 
-    private nombreX: NombresXVerticesCaja;
-    private nombreY: NombresYVerticesCaja;
+    readonly nombreX: NombresXVerticesCaja;
+    readonly nombreY: NombresYVerticesCaja;
 
     constructor(
         nombreX: NombresXVerticesCaja,

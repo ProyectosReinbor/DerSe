@@ -11,24 +11,25 @@ export class MedidaBidimensional {
         this.alto = alto;
     }
 
-    get unPorciento() {
-        return new MedidaBidimensional(
-            this.ancho / 100,
-            this.alto / 100,
-        );
-    }
-
     porcentaje(numerador: MedidaBidimensional) {
+        const unPorciento = this.dividir(100);
         return new MedidaBidimensional(
-            this.unPorciento.ancho * numerador.ancho,
-            this.unPorciento.alto * numerador.alto,
+            unPorciento.ancho * numerador.ancho,
+            unPorciento.alto * numerador.alto,
         );
     }
 
-    get mitad() {
+    dividir(divisor: number) {
         return new MedidaBidimensional(
-            this.ancho / 2,
-            this.alto / 2,
+            this.ancho / divisor,
+            this.alto / divisor,
+        );
+    }
+
+    multiplicar(multiplicador: number) {
+        return new MedidaBidimensional(
+            this.ancho * multiplicador,
+            this.alto * multiplicador
         );
     }
 }

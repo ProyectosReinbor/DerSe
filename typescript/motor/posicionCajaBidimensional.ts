@@ -1,6 +1,6 @@
 import { CoordenadaBidimensional } from "./coordenadaBidimensional";
 import { MedidaBidimensional } from "./medidaBidimensional";
-import { VerticesCajaBidimensional } from "./verticesCajaBidimensional";
+import { VerticesCajaBidimensional, type NombresXVerticesCaja, type NombresYVerticesCaja } from "./verticesCajaBidimensional";
 
 export class PosicionCajaBidimensional {
 
@@ -8,18 +8,30 @@ export class PosicionCajaBidimensional {
     medidas: MedidaBidimensional;
 
     constructor(
-        x: number,
-        y: number,
-        ancho: number,
-        alto: number
+        centro: CoordenadaBidimensional | [number, number],
+        medidas: MedidaBidimensional | [number, number]
     ) {
-        this.centro = new CoordenadaBidimensional(x, y);
-        this.medidas = new MedidaBidimensional(ancho, alto);
+        if (centro instanceof CoordenadaBidimensional)
+            this.centro = centro;
+        else
+            this.centro = new CoordenadaBidimensional(...centro);
+
+        if (medidas instanceof MedidaBidimensional)
+            this.medidas = medidas;
+        else
+            this.medidas = new MedidaBidimensional(...medidas);
     }
 
-    obtenerVertice(verticesCaja: VerticesCajaBidimensional) {
-        const desplazamientoX = this.medidas.mitad.ancho * verticesCaja.xNumero;
-        const desplazamientoY = this.medidas.mitad.alto * verticesCaja.yNumero;
+    obtenerVertice(nombresVertices: VerticesCajaBidimensional | [NombresXVerticesCaja, NombresYVerticesCaja]) {
+        let verticesCaja: VerticesCajaBidimensional;
+        if (nombresVertices instanceof VerticesCajaBidimensional)
+            verticesCaja = nombresVertices;
+        else
+            verticesCaja = new VerticesCajaBidimensional(...nombresVertices);
+
+        const medidasMitad = this.medidas.dividir(2);
+        const desplazamientoX = medidasMitad.ancho * verticesCaja.xNumero;
+        const desplazamientoY = medidasMitad.alto * verticesCaja.yNumero;
         const x = this.centro.x + desplazamientoX;
         const y = this.centro.y + desplazamientoY;
         return new CoordenadaBidimensional(x, y);

@@ -1,5 +1,6 @@
 import { CoordenadaBidimensional } from "./coordenadaBidimensional";
 
+export type CoordenadaTridimensionalArgumentos = [number, number, number];
 export class CoordenadaTridimensional extends CoordenadaBidimensional {
     z: number;
 
@@ -12,7 +13,11 @@ export class CoordenadaTridimensional extends CoordenadaBidimensional {
         this.z = z;
     }
 
-    igualACoordenadaTridimensional(objetivo: CoordenadaTridimensional) {
+    igualACoordenadaTridimensional(objetivoArgumentos: CoordenadaTridimensional | CoordenadaTridimensionalArgumentos) {
+        const objetivo = (objetivoArgumentos instanceof CoordenadaTridimensional)
+            ? objetivoArgumentos
+            : new CoordenadaTridimensional(...objetivoArgumentos);
+
         return this.igualACoordenadaBidimensional(objetivo)
             && this.z === objetivo.z;
     }

@@ -1,3 +1,5 @@
+export type CoordenadaBidimensionalArgumentos = [number, number];
+
 export class CoordenadaBidimensional {
 
     x: number;
@@ -11,7 +13,11 @@ export class CoordenadaBidimensional {
         this.y = y;
     }
 
-    igualACoordenadaBidimensional(objetivo: CoordenadaBidimensional) {
+    igualACoordenadaBidimensional(objetivoArgumentos: CoordenadaBidimensional | CoordenadaBidimensionalArgumentos) {
+        const objetivo: CoordenadaBidimensional = (objetivoArgumentos instanceof CoordenadaBidimensional)
+            ? objetivoArgumentos
+            : new CoordenadaBidimensional(...objetivoArgumentos);
+
         return this.x === objetivo.x &&
             this.y === objetivo.y;
     }

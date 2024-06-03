@@ -5,7 +5,7 @@ import {
     type ValoresVerticesCaja
 } from "./verticesCajaBidimensional";
 
-type NombresZVerticesCaja = "atras" | "mitad" | "adelante";
+export type NombresZVerticesCaja = "atras" | "mitad" | "adelante";
 
 export class VerticesCajaTridimensional extends VerticesCajaBidimensional {
     private static valoresZ: {
@@ -16,7 +16,7 @@ export class VerticesCajaTridimensional extends VerticesCajaBidimensional {
             "adelante": 1
         };
 
-    private nombreZ: NombresZVerticesCaja;
+    readonly nombreZ: NombresZVerticesCaja;
 
     constructor(
         nombreX: NombresXVerticesCaja,

@@ -1,7 +1,8 @@
 import { CoordenadaTridimensional } from "./coordenadaTridimensional";
 import { MedidaTridimensional } from "./medidaTridimensional";
 import { PosicionCajaBidimensional } from "./posicionCajaBidimensional";
-import { VerticesCajaTridimensional } from "./verticesCajaTridimensional";
+import type { NombresXVerticesCaja, NombresYVerticesCaja } from "./verticesCajaBidimensional";
+import { VerticesCajaTridimensional, type NombresZVerticesCaja } from "./verticesCajaTridimensional";
 
 export class PosicionCajaTridimensional extends PosicionCajaBidimensional {
 
@@ -9,21 +10,20 @@ export class PosicionCajaTridimensional extends PosicionCajaBidimensional {
   override medidas: MedidaTridimensional;
 
   constructor(
-    x: number,
-    y: number,
-    z: number,
-    ancho: number,
-    alto: number,
-    profundidad: number,
+    centro: CoordenadaTridimensional,
+    medidas: MedidaTridimensional
   ) {
-    super(x, y, ancho, alto);
-    this.centro = new CoordenadaTridimensional(x, y, z);
-    this.medidas = new MedidaTridimensional(ancho, alto, profundidad);
+    super(centro, medidas);
+    this.centro = centro;
+    this.medidas = medidas;
   }
 
-  override obtenerVertice(verticesCaja: VerticesCajaTridimensional) {
-    const verticeBidimensional = super.obtenerVertice(verticesCaja);
-    const desplazamientoZ = this.medidas.mitad.profundidad * verticesCaja.zNumero;
+  override obtenerVertice(
+    verticesCaja?: VerticesCajaTridimensional,
+    parametrosVerticesCaja?: [NombresXVerticesCaja, NombresYVerticesCaja, NombresZVerticesCaja],
+    ) {
+    const verticeBidimensional = super.obtenerVertice(verticesCaja, parametrosVerticesCaja);
+    const desplazamientoZ = this.medidas.dividir(2).profundidad * verticesCaja.zNumero;
     const z = this.centro.z + desplazamientoZ;
     return new CoordenadaTridimensional(
       verticeBidimensional.x,
@@ -48,50 +48,60 @@ export class PosicionCajaTridimensional extends PosicionCajaBidimensional {
   }
 
   override coordenadaAdentro(objetivo: CoordenadaTridimensional) {
-    const izquierdaSuperiorAtras = this.obtenerVertice("izquierda", "superior", "atras");
-    const derechaInferiorAdelante = this.obtenerVertice("derecha", "inferior", "adelante");
+    const izquierdaSuperiorAtras = this.obtenerVertice(
+      new VerticesCajaTridimensional("izquierda", "superior", "atras")
+    );
+    const derechaInferiorAdelante = this.obtenerVertice(
+      new VerticesCajaTridimensional("derecha", "inferior", "adelante")
+    );
     const coordenadaAdentroBidimensional = super.coordenadaAdentro(objetivo);
     return coordenadaAdentroBidimensional &&
       izquierdaSuperiorAtras.z <= objetivo.z &&
       objetivo.z <= derechaInferiorAdelante.z;
   }
 
-  posicionCajaAdentro(objetivo: PosicionCajaTridimensional) {
+  override posicionCajaAdentro(objetivo: PosicionCajaTridimensional) {
     const posicionCajaAdentroBidimensional = super.posicionCajaAdentro(objetivo);
-    const izquierdaSuperiorAtras = this.obtenerVertice("izquierda", "superior", "atras");
-    const derechaInferiorAdelante = this.obtenerVertice("derecha", "inferior", "adelante");
-    const objetivoIzquierdaSuperiorAtras = objetivo.obtenerVertice("izquierda", "superior", "atras");
-    const objetivoDerechaInferiorAdelante = objetivo.obtenerVertice("derecha", "inferior", "adelante");
+    const izquierdaSuperiorAtras = this.obtenerVertice(
+      new VerticesCajaTridimensional("izquierda", "superior", "atras")
+    );
+    const derechaInferiorAdelante = this.obtenerVertice(
+      new VerticesCajaTridimensional("derecha", "inferior", "adelante")
+    );
+    const objetivoIzquierdaSuperiorAtras = objetivo.obtenerVertice(
+      new VerticesCajaTridimensional("izquierda", "superior", "atras")
+    );
+    const objetivoDerechaInferiorAdelante = objetivo.obtenerVertice(
+      new VerticesCajaTridimensional("derecha", "inferior", "adelante")
+    );
     return posicionCajaAdentroBidimensional &&
       izquierdaSuperiorAtras.z <= objetivoIzquierdaSuperiorAtras.z &&
       objetivoDerechaInferiorAdelante.z <= derechaInferiorAdelante.z;
   }
 
-  override algunVerticeAdentro(objetivo: PosicionCajaTridimensional): [
-    VerticeXPosicionCaja,
-    VerticeYPosicionCaja,
-    VerticeZPosicionCaja
-  ] | false {
-    const izquierdaSuperior = objetivo.obtenerVertice("izquierda", "superior");
-    const izquierdaSuperiorAdentro = this.coordenadaAdentro(izquierdaSuperior);
-    if (izquierdaSuperiorAdentro)
-      return ["izquierda", "superior"];
+  override algunVerticeAdentro(objetivo: PosicionCajaTridimensional) {
+    const verticesCaja = super.algunVerticeAdentro(objetivo);
+    if (verticesCaja !== false) {
+      const verticesAtras = new VerticesCajaTridimensional(
+        verticesCaja.nombreX,
+        verticesCaja.nombreY,
+        "atras"
+      );
+      const atras = objetivo.obtenerVertice(verticesAtras);
+      const atrasAdentro = this.coordenadaAdentro(atras);
+      if (atrasAdentro)
+        return verticesAtras;
 
-    const izquierdaInferior = objetivo.obtenerVertice("izquierda", "inferior");
-    const izquierdaInferiorAdentro = this.coordenadaAdentro(izquierdaInferior);
-    if (izquierdaInferiorAdentro)
-      return ["izquierda", "inferior"];
-
-    const derechaSuperior = objetivo.obtenerVertice("derecha", "superior");
-    const derechaSuperiorAdentro = this.coordenadaAdentro(derechaSuperior);
-    if (derechaSuperiorAdentro)
-      return ["derecha", "superior"];
-
-    const derechaInferior = objetivo.obtenerVertice("derecha", "inferior");
-    const derechaInferiorAdentro = this.coordenadaAdentro(derechaInferior);
-    if (derechaInferiorAdentro)
-      return ["derecha", "inferior"];
-
+      const verticesAdelante = new VerticesCajaTridimensional(
+        verticesCaja.nombreX,
+        verticesCaja.nombreY,
+        "adelante"
+      );
+      const adelante = objetivo.obtenerVertice(verticesAdelante);
+      const adelanteAdentro = this.coordenadaAdentro(adelante);
+      if (adelanteAdentro)
+        return verticesAdelante;
+    }
     return false;
   }
 }
