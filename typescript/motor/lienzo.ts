@@ -1,10 +1,7 @@
 import { Camara } from "./camara";
-import { Coordenadas } from "./coordenadas";
 import type { Escena } from "./escena";
 import { EventosToques } from "./eventosToques";
 import { Imagines } from "./imagines";
-import { Medidas } from "./medidas";
-import { Objeto } from "./objeto";
 
 export class Lienzo extends Camara {
 

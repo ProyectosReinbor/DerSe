@@ -1,5 +1,4 @@
 import { Circulo } from "../circulo";
-import type { Coordenadas2 } from "../coordenadas2";
 import { Cuadrado } from "../cuadrado";
 import { Curvas } from "../curvas";
 import type { EntradaTexto } from "../entradaTexto";

@@ -1,5 +1,4 @@
 import { Juego } from "./juego/juego";
-import { Coordenadas } from "./motor/coordenadas";
 import { Lienzo } from "./motor/lienzo";
 
 window.addEventListener("load", () => {

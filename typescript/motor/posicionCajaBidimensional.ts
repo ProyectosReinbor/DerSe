@@ -1,29 +1,11 @@
-import { Medidas2D } from "./medidas2D";
-
-type ValoresVertices = -1 | 0 | 1;
-type VerticeX = "izquierda" | "mitad" | "derecha";
-type VerticeY = "superior" | "mitad" | "inferior";
-
-const VerticesX: {
-    [key in VerticeX]: ValoresVertices;
-} = {
-    "izquierda": -1,
-    "mitad": 0,
-    "derecha": 1
-};
-
-const VerticesY: {
-    [key in VerticeY]: ValoresVertices;
-} = {
-    "superior": -1,
-    "mitad": 0,
-    "inferior": 1
-}
+import { CoordenadaBidimensional } from "./coordenadaBidimensional";
+import { MedidaBidimensional } from "./medidaBidimensional";
+import { VerticesCajaBidimensional } from "./verticesCajaBidimensional";
 
 export class PosicionCajaBidimensional {
 
-    centro: Coordenadas2D;
-    medidas: Medidas2D;
+    centro: CoordenadaBidimensional;
+    medidas: MedidaBidimensional;
 
     constructor(
         x: number,
@@ -31,70 +13,84 @@ export class PosicionCajaBidimensional {
         ancho: number,
         alto: number
     ) {
-        this.centro = new Coordenadas2D(x, y);
-        this.medidas = new Medidas2D(ancho, alto);
+        this.centro = new CoordenadaBidimensional(x, y);
+        this.medidas = new MedidaBidimensional(ancho, alto);
     }
 
-    obtenerVertice2D(
-        nombreX: VerticeX,
-        nombreY: VerticeY,
-    ) {
-        const verticeX = VerticesX[nombreX];
-        const verticeY = VerticesY[nombreY];
-        const desplazamientoX = this.medidas.mitad.ancho * verticeX;
-        const desplazamientoY = this.medidas.mitad.alto * verticeY;
+    obtenerVertice(verticesCaja: VerticesCajaBidimensional) {
+        const desplazamientoX = this.medidas.mitad.ancho * verticesCaja.xNumero;
+        const desplazamientoY = this.medidas.mitad.alto * verticesCaja.yNumero;
         const x = this.centro.x + desplazamientoX;
         const y = this.centro.y + desplazamientoY;
-        return new Coordenadas2D(x, y);
+        return new CoordenadaBidimensional(x, y);
     }
 
-    posicion2DRelativa(porcentajes: Medidas2D) {
-        const porcentaje = this.medidas.porcentaje(porcentajes);
-        const izquierdaSuperior = this.obtenerVertice("izquierda", "superior");
+    posicionRelativa(partesPorcentaje: MedidaBidimensional) {
+        const izquierdaSuperior = this.obtenerVertice(
+            new VerticesCajaBidimensional("izquierda", "superior")
+        );
+        const porcentaje = this.medidas.porcentaje(partesPorcentaje);
         const x = izquierdaSuperior.x + porcentaje.ancho;
         const y = izquierdaSuperior.y + porcentaje.alto;
-        return new Coordenadas2D(x, y);
+        return new CoordenadaBidimensional(x, y);
     }
 
-    coordenadas2DAdentro(objetivo: Coordenadas2D) {
-        const IzquierdaSuperior = this.obtenerVertice("izquierda", "superior");
-        const DerechaInferior = this.obtenerVertice("derecha", "inferior");
+    coordenadaAdentro(objetivo: CoordenadaBidimensional) {
+        const IzquierdaSuperior = this.obtenerVertice(
+            new VerticesCajaBidimensional("izquierda", "superior")
+        );
+        const DerechaInferior = this.obtenerVertice(
+            new VerticesCajaBidimensional("derecha", "inferior")
+        );
         return IzquierdaSuperior.x <= objetivo.x &&
             IzquierdaSuperior.y <= objetivo.y &&
             objetivo.x <= DerechaInferior.x &&
             objetivo.y <= DerechaInferior.y;
     }
 
-    posicionCaja2DAdentro(objetivo: PosicionCaja2D) {
-        const izquierdaSuperior = this.obtenerVertice("izquierda", "superior");
-        const derechaInferior = this.obtenerVertice("derecha", "inferior");
-        const objetivoIzquierdaSuperior = objetivo.obtenerVertice("izquierda", "superior");
-        const objetivoDerechaInferior = objetivo.obtenerVertice("derecha", "inferior");
+    posicionCajaAdentro(objetivo: PosicionCajaBidimensional) {
+        const izquierdaSuperior = this.obtenerVertice(
+            new VerticesCajaBidimensional("izquierda", "superior")
+        );
+        const derechaInferior = this.obtenerVertice(
+            new VerticesCajaBidimensional("derecha", "inferior")
+        );
+        const objetivoIzquierdaSuperior = objetivo.obtenerVertice(
+            new VerticesCajaBidimensional("izquierda", "superior")
+        );
+        const objetivoDerechaInferior = objetivo.obtenerVertice(
+            new VerticesCajaBidimensional("derecha", "inferior")
+        );
         return izquierdaSuperior.x <= objetivoIzquierdaSuperior.x &&
             izquierdaSuperior.y <= objetivoIzquierdaSuperior.y &&
             objetivoDerechaInferior.x <= derechaInferior.x &&
             objetivoDerechaInferior.y <= derechaInferior.y;
     }
 
-    algunVerticeAdentro(objetivo: PosicionCaja2D): [
-        VerticeX,
-        VerticeY
-    ] | false {
-        const izquierdaSuperior = objetivo.obtenerVertice("izquierda", "superior");
-        const izquierdaSuperiorAdentro = this.coordenadasAdentro(izquierdaSuperior);
-        if (izquierdaSuperiorAdentro) return ["izquierda", "superior"];
+    algunVerticeAdentro(objetivo: PosicionCajaBidimensional) {
+        const verticesIzquierdaSuperior = new VerticesCajaBidimensional("izquierda", "superior");
+        const izquierdaSuperior = objetivo.obtenerVertice(verticesIzquierdaSuperior);
+        const izquierdaSuperiorAdentro = this.coordenadaAdentro(izquierdaSuperior);
+        if (izquierdaSuperiorAdentro)
+            return verticesIzquierdaSuperior;
 
-        const izquierdaInferior = objetivo.obtenerVertice("izquierda", "inferior");
-        const izquierdaInferiorAdentro = this.coordenadasAdentro(izquierdaInferior);
-        if (izquierdaInferiorAdentro) return ["izquierda", "inferior"];
+        const verticesIzquierdaInferior = new VerticesCajaBidimensional("izquierda", "inferior");
+        const izquierdaInferior = objetivo.obtenerVertice(verticesIzquierdaInferior);
+        const izquierdaInferiorAdentro = this.coordenadaAdentro(izquierdaInferior);
+        if (izquierdaInferiorAdentro)
+            return verticesIzquierdaInferior;
 
-        const derechaSuperior = objetivo.obtenerVertice("derecha", "superior");
-        const derechaSuperiorAdentro = this.coordenadasAdentro(derechaSuperior);
-        if (derechaSuperiorAdentro) return ["derecha", "superior"];
+        const verticesDerechaSuperior = new VerticesCajaBidimensional("derecha", "superior");
+        const derechaSuperior = objetivo.obtenerVertice(verticesDerechaSuperior);
+        const derechaSuperiorAdentro = this.coordenadaAdentro(derechaSuperior);
+        if (derechaSuperiorAdentro)
+            return verticesDerechaSuperior;
 
-        const derechaInferior = objetivo.obtenerVertice("derecha", "inferior");
-        const derechaInferiorAdentro = this.coordenadasAdentro(derechaInferior);
-        if (derechaInferiorAdentro) return ["derecha", "inferior"];
+        const verticesDerechaInferior = new VerticesCajaBidimensional("derecha", "inferior");
+        const derechaInferior = objetivo.obtenerVertice(verticesDerechaInferior);
+        const derechaInferiorAdentro = this.coordenadaAdentro(derechaInferior);
+        if (derechaInferiorAdentro)
+            return verticesDerechaInferior;
 
         return false;
     }

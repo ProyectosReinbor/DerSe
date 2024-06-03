@@ -1,8 +1,5 @@
-import { Coordenadas } from "./coordenadas";
-import { Medidas } from "./medidas";
-import { Objeto } from "./objeto";
 
-export class Camara extends Objeto {
+export class Camara extends Posicion {
     constructor(izquierdaSuperior: Coordenadas) {
         super(
             izquierdaSuperior,

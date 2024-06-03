@@ -13,26 +13,27 @@ export class MedidaTridimensional extends MedidaBidimensional {
         this.profundidad = profundidad;
     }
 
-    get unPorcientoTridimensional() {
+    override get unPorciento() {
         return new MedidaTridimensional(
-            this.unPorcientoBidimensional.ancho,
-            this.unPorcientoBidimensional.alto,
+            super.unPorciento.ancho,
+            super.unPorciento.alto,
             this.profundidad / 100,
         )
     }
 
-    porcentajeTridimensional(porcentajes: MedidaTridimensional) {
+    override porcentaje(porcentajes: MedidaTridimensional) {
+        const porcentajeBidimensional = super.porcentaje(porcentajes);
         return new MedidaTridimensional(
-            this.unPorcientoTridimensional.ancho * porcentajes.ancho,
-            this.unPorcientoTridimensional.alto * porcentajes.alto,
-            this.unPorcientoTridimensional.profundidad * porcentajes.profundidad,
+            porcentajeBidimensional.ancho,
+            porcentajeBidimensional.alto,
+            this.unPorciento.profundidad * porcentajes.profundidad,
         );
     }
 
-    get mitadTridimensional() {
+    override get mitad() {
         return new MedidaTridimensional(
-            this.mitadBidimensional.ancho,
-            this.mitadBidimensional.alto,
+            super.mitad.ancho,
+            super.mitad.alto,
             this.profundidad / 2,
         );
     }

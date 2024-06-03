@@ -11,21 +11,21 @@ export class MedidaBidimensional {
         this.alto = alto;
     }
 
-    get unPorcientoBidimensional() {
+    get unPorciento() {
         return new MedidaBidimensional(
             this.ancho / 100,
             this.alto / 100,
         );
     }
 
-    porcentajeBidimensional(porcentajes: MedidaBidimensional) {
+    porcentaje(numerador: MedidaBidimensional) {
         return new MedidaBidimensional(
-            this.unPorcientoBidimensional.ancho * porcentajes.ancho,
-            this.unPorcientoBidimensional.alto * porcentajes.alto,
+            this.unPorciento.ancho * numerador.ancho,
+            this.unPorciento.alto * numerador.alto,
         );
     }
 
-    get mitadBidimensional() {
+    get mitad() {
         return new MedidaBidimensional(
             this.ancho / 2,
             this.alto / 2,
