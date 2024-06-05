@@ -1,6 +1,5 @@
 import { CoordenadaBidimensional } from "./coordenadaBidimensional";
 
-export type CoordenadaTridimensionalArgumentos = [number, number, number];
 export class CoordenadaTridimensional extends CoordenadaBidimensional {
     z: number;
 
@@ -13,12 +12,19 @@ export class CoordenadaTridimensional extends CoordenadaBidimensional {
         this.z = z;
     }
 
-    igualACoordenadaTridimensional(objetivoArgumentos: CoordenadaTridimensional | CoordenadaTridimensionalArgumentos) {
-        const objetivo = (objetivoArgumentos instanceof CoordenadaTridimensional)
-            ? objetivoArgumentos
-            : new CoordenadaTridimensional(...objetivoArgumentos);
+    override igualA(
+        objetivo?: CoordenadaTridimensional,
+        x?: number,
+        y?: number,
+        z?: number
+    ) {
+        if (objetivo === undefined) {
+            if (x === undefined || y === undefined || z === undefined)
+                throw new Error("x, y o z no estan definidas");
 
-        return this.igualACoordenadaBidimensional(objetivo)
+            objetivo = new CoordenadaTridimensional(x, y, z);
+        }
+        return super.igualA(objetivo)
             && this.z === objetivo.z;
     }
 }

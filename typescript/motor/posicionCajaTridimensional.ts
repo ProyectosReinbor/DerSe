@@ -7,19 +7,32 @@ import { VerticesCajaTridimensional, type NombresZVerticesCaja } from "./vertice
 export class PosicionCajaTridimensional extends PosicionCajaBidimensional {
 
   override centro: CoordenadaTridimensional;
-  override medidas: MedidaTridimensional;
+  override medida: MedidaTridimensional;
 
   constructor(
-    x: number | CoordenadaTridimensional,
-    ancho: number | MedidaTridimensional,
+    centro?: CoordenadaTridimensional,
+    medida?: MedidaTridimensional,
+    x?: number,
     y?: number,
-    alto?: number,
     z?: number,
+    ancho?: number,
+    alto?: number,
     profundidad?: number
   ) {
-    super(x, y, ancho, alto);
-    this.centro = new CoordenadaTridimensional(x, y, z);
-    this.medidas = new MedidaTridimensional(ancho, alto, profundidad);
+    super(centro, medida, x, y, ancho, alto);
+    if (centro instanceof CoordenadaTridimensional)
+      this.centro = centro;
+    else if (x === undefined || y === undefined || z === undefined)
+      throw new Error("centro is undefined");
+    else
+      this.centro = new CoordenadaTridimensional(x, y, z);
+
+    if (medida instanceof MedidaTridimensional)
+      this.medida = medida;
+    else if (ancho === undefined || alto === undefined || profundidad === undefined)
+      throw new Error("medida is undefined");
+    else
+      this.medida = new MedidaTridimensional(ancho, alto, profundidad);
   }
 
   override obtenerVertice(
@@ -37,7 +50,7 @@ export class PosicionCajaTridimensional extends PosicionCajaBidimensional {
       verticesCaja = new VerticesCajaTridimensional(nombreX, nombreY, nombreZ);
     }
     const verticeBidimensional = super.obtenerVertice(verticesCaja);
-    const desplazamientoZ = this.medidas.dividir(2).profundidad * verticesCaja.numeroZ;
+    const desplazamientoZ = this.medida.dividir(2).profundidad * verticesCaja.numeroZ;
     const z = this.centro.z + desplazamientoZ;
     return new CoordenadaTridimensional(
       verticeBidimensional.x,
@@ -49,7 +62,7 @@ export class PosicionCajaTridimensional extends PosicionCajaBidimensional {
 
   override posicionRelativa(partesPorcentaje: MedidaTridimensional) {
     const izquierdaSuperiorAtras = this.obtenerVertice("izquierda", "superior", "atras");
-    const porcentaje = this.medidas.porcentaje(partesPorcentaje);
+    const porcentaje = this.medida.porcentaje(partesPorcentaje);
     const posicionRelativaBidimensional = super.posicionRelativa(partesPorcentaje);
     const z = izquierdaSuperiorAtras.z + porcentaje.profundidad;
     return new CoordenadaTridimensional(

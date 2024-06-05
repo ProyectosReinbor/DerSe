@@ -1,5 +1,3 @@
-export type CoordenadaBidimensionalArgumentos = [number, number];
-
 export class CoordenadaBidimensional {
 
     x: number;
@@ -13,11 +11,17 @@ export class CoordenadaBidimensional {
         this.y = y;
     }
 
-    igualACoordenadaBidimensional(objetivoArgumentos: CoordenadaBidimensional | CoordenadaBidimensionalArgumentos) {
-        const objetivo: CoordenadaBidimensional = (objetivoArgumentos instanceof CoordenadaBidimensional)
-            ? objetivoArgumentos
-            : new CoordenadaBidimensional(...objetivoArgumentos);
+    igualA(
+        objetivo?: CoordenadaBidimensional,
+        x?: number,
+        y?: number
+    ) {
+        if (objetivo === undefined) {
+            if (x === undefined || y === undefined)
+                throw new Error("x o y no definido");
 
+            objetivo = new CoordenadaBidimensional(x, y);
+        }
         return this.x === objetivo.x &&
             this.y === objetivo.y;
     }

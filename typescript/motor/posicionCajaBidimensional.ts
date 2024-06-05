@@ -5,16 +5,29 @@ import { VerticesCajaBidimensional, type NombresXVerticesCaja, type NombresYVert
 export class PosicionCajaBidimensional {
 
     centro: CoordenadaBidimensional;
-    medidas: MedidaBidimensional;
+    medida: MedidaBidimensional;
 
     constructor(
-        x: number | CoordenadaBidimensional,
-        ancho: number | MedidaBidimensional,
-        alto?: number,
+        centro?: CoordenadaBidimensional,
+        medida?: MedidaBidimensional,
+        x?: number,
         y?: number,
+        ancho?: number,
+        alto?: number,
     ) {
-        this.centro = new CoordenadaBidimensional(x, y);
-        this.medidas = new MedidaBidimensional(ancho, alto);
+        if (centro instanceof CoordenadaBidimensional)
+            this.centro = centro;
+        else if (x === undefined || y === undefined)
+            throw new Error("centro es undefined");
+        else
+            this.centro = new CoordenadaBidimensional(x, y);
+
+        if (medida instanceof MedidaBidimensional)
+            this.medida = medida;
+        else if (ancho === undefined || alto === undefined)
+            throw new Error("medida es undefined");
+        else
+            this.medida = new MedidaBidimensional(ancho, alto)
     }
 
     obtenerVertice(
@@ -22,15 +35,14 @@ export class PosicionCajaBidimensional {
         nombreY?: NombresYVerticesCaja
     ) {
         let verticesCaja: VerticesCajaBidimensional;
-        if (nombreX instanceof VerticesCajaBidimensional) {
+        if (nombreX instanceof VerticesCajaBidimensional)
             verticesCaja = nombreX;
-        } else {
-            if (nombreY === undefined)
-                throw new Error("nombreY is undefined");
-
+        else if (nombreY === undefined)
+            throw new Error("nombreY is undefined");
+        else
             verticesCaja = new VerticesCajaBidimensional(nombreX, nombreY);
-        }
-        const medidasMitad = this.medidas.dividir(2);
+
+        const medidasMitad = this.medida.dividir(2);
         const desplazamientoX = medidasMitad.ancho * verticesCaja.numeroX;
         const desplazamientoY = medidasMitad.alto * verticesCaja.numeroY;
         const x = this.centro.x + desplazamientoX;
@@ -40,7 +52,7 @@ export class PosicionCajaBidimensional {
 
     posicionRelativa(partesPorcentaje: MedidaBidimensional) {
         const izquierdaSuperior = this.obtenerVertice("izquierda", "superior");
-        const porcentaje = this.medidas.porcentaje(partesPorcentaje);
+        const porcentaje = this.medida.porcentaje(partesPorcentaje);
         const x = izquierdaSuperior.x + porcentaje.ancho;
         const y = izquierdaSuperior.y + porcentaje.alto;
         return new CoordenadaBidimensional(x, y);

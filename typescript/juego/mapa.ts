@@ -1,12 +1,10 @@
-import { Coordenadas } from "../motor/coordenadas";
 import type { Lienzo } from "../motor/lienzo";
-import { Medidas } from "../motor/medidas";
-import { Objeto } from "../motor/objeto";
 import { Direccion } from "../motor/personaje/direccion";
+import { PosicionCajaTridimensional } from "../motor/posicionCajaTridimensional";
 import { Piso } from "./mapa/piso";
 import { MatrizMapa, type MatrizPiso } from "./matrixMapa";
 
-export class Mapa extends Objeto {
+export class Mapa extends PosicionCajaTridimensional {
 
     matriz: MatrizPiso[] = MatrizMapa.obtener;
     pisos: Piso[];

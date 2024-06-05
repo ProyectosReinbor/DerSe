@@ -1,19 +1,19 @@
+import type { CoordenadaBidimensional } from "./coordenadaBidimensional";
 import type { Lienzo } from "./lienzo";
-import type { Coordenadas } from "./coordenadas";
 
 export class Escena {
 
     lienzo: Lienzo;
     draw: () => void = () => { }
-    touchstart: (touch: Coordenadas) => void = () => { }
-    touchmove: (touch: Coordenadas) => void = () => { }
-    touchend: (touch: Coordenadas) => void = () => { }
+    touchstart: (touch: CoordenadaBidimensional) => void = () => { }
+    touchmove: (touch: CoordenadaBidimensional) => void = () => { }
+    touchend: (touch: CoordenadaBidimensional) => void = () => { }
 
     constructor(lienzo: Lienzo) {
         this.lienzo = lienzo;
     }
 
-    start(): void {
+    start() {
         this.lienzo.empezar(this);
     }
 }

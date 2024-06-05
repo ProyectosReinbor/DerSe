@@ -4,57 +4,66 @@ import { PosicionCajaTridimensional } from "./posicionCajaTridimensional";
 import { VerticesCajaTridimensional } from "./verticesCajaTridimensional";
 
 export class Camara extends PosicionCajaTridimensional {
-    constructor(centro: CoordenadaTridimensional) {
+    constructor(
+        centro?: CoordenadaTridimensional,
+        x?: number,
+        y?: number,
+        z?: number
+    ) {
         super(
             centro,
-            new MedidaTridimensional(100, 100, 100)
+            new MedidaTridimensional(100, 100, 100),
+            x,
+            y,
+            z
         );
     }
 
-    cajaVisible(objetivo: PosicionCajaTridimensional) {
-        const objetivoMedidasDoble = objetivo.medidas.multiplicar(2);
+    esVisible(objetivo: PosicionCajaTridimensional) {
+        const objetivoMedidasDoble = objetivo.medida.multiplicar(2);
         const izquierdaSuperiorAtras = this.obtenerVertice(
             new VerticesCajaTridimensional("izquierda", "superior", "atras")
         );
-        const vision = new PosicionCajaTridimensional(
+        const visor = new PosicionCajaTridimensional(
             new CoordenadaTridimensional(
-                izquierdaSuperiorAtras.x - objetivo.medidas.ancho,
-                izquierdaSuperiorAtras.y - objetivo.medidas.alto,
-                izquierdaSuperiorAtras.z - objetivo.medidas.profundidad,
+                izquierdaSuperiorAtras.x - objetivo.medida.ancho,
+                izquierdaSuperiorAtras.y - objetivo.medida.alto,
+                izquierdaSuperiorAtras.z - objetivo.medida.profundidad,
             ),
             new MedidaTridimensional(
-                this.medidas.ancho + objetivoMedidasDoble.ancho,
-                this.medidas.alto + objetivoMedidasDoble.alto,
-                this.medidas.profundidad + objetivoMedidasDoble.profundidad
+                this.medida.ancho + objetivoMedidasDoble.ancho,
+                this.medida.alto + objetivoMedidasDoble.alto,
+                this.medida.profundidad + objetivoMedidasDoble.profundidad
             )
         );
-        return vision.posicionCajaAdentro(objetivo);
+        return visor.posicionCajaAdentro(objetivo);
     }
 
-    objetoEnCamara(objeto: Objeto) {
-        if (this.objetoAdentroDeCamara(objeto) === false)
+    posicionCajaEnVisor(posicionCaja: PosicionCajaTridimensional) {
+        if (!this.esVisible(posicionCaja))
             return false;
 
-        return new Objeto(
-            new Coordenadas(
-                objeto.izquierdaSuperior.x - this.izquierdaSuperior.x,
-                objeto.izquierdaSuperior.y - this.izquierdaSuperior.y,
-                objeto.izquierdaSuperior.z - this.izquierdaSuperior.z,
-            ),
-            new Medidas(
-                objeto.medidas.ancho,
-                objeto.medidas.alto,
-                objeto.medidas.profundidad
-            )
+        return new PosicionCajaTridimensional(
+            undefined,
+            undefined,
+            posicionCaja.centro.x - this.centro.x,
+            posicionCaja.centro.y - this.centro.y,
+            posicionCaja.centro.z - this.centro.z,
+            posicionCaja.medida.ancho,
+            posicionCaja.medida.alto,
+            posicionCaja.medida.profundidad
         );
     }
 
-    enfocar(objeto: Objeto): void {
-        this.izquierdaSuperior.x = objeto.izquierdaSuperior.x - this.medidas.mitad.ancho
-            + objeto.medidas.mitad.ancho;
+    enfocar(posicionCaja: PosicionCajaTridimensional) {
+        const medidaMitad = this.medida.dividir(2);
+        const posicionCajaMedidaMitad = posicionCaja.medida.dividir(2);
 
-        this.izquierdaSuperior.y = objeto.izquierdaSuperior.y - this.medidas.mitad.alto
-            + objeto.medidas.mitad.alto;
+        this.centro.x = posicionCaja.centro.x - medidaMitad.ancho
+            + posicionCajaMedidaMitad.ancho;
+
+        this.centro.y = posicionCaja.centro.y - medidaMitad.alto
+            + posicionCajaMedidaMitad.alto;
     }
 
 }

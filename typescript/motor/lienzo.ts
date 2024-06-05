@@ -1,15 +1,19 @@
 import { Camara } from "./camara";
+import type { CoordenadaTridimensional } from "./coordenadaTridimensional";
 import type { Escena } from "./escena";
 import { EventosToques } from "./eventosToques";
 import { Imagines } from "./imagines";
+import { MedidaBidimensional } from "./medidaBidimensional";
+import { PosicionCajaBidimensional } from "./posicionCajaBidimensional";
+import { PosicionCajaTridimensional } from "./posicionCajaTridimensional";
 
 export class Lienzo extends Camara {
 
-  unPorciento: Medidas = new Medidas(0, 0);
+  unPorciento: MedidaBidimensional = new MedidaBidimensional(0, 0);
   cuadrosPorSegundo: number;
   intervaloEntreCuadros: number;
   tiempo: number = 0;
-  margen: Medidas = new Medidas(0, 0);
+  margen: MedidaBidimensional = new MedidaBidimensional(0, 0);
   elemento: HTMLCanvasElement;
   imagines: Imagines = new Imagines;
   tiempoEntreCuadros: number = 0;
@@ -47,7 +51,7 @@ export class Lienzo extends Camara {
   }
 
   relacionAspecto() {
-    const medidasPantalla = new Medidas(1280, 720);
+    const medidasPantalla = new MedidaBidimensional(1280, 720);
     this.elemento.width = medidasPantalla.ancho;
     this.elemento.height = medidasPantalla.alto;
 
@@ -61,10 +65,13 @@ export class Lienzo extends Camara {
   alturaEnPixeles = (porcentaje: number) => porcentaje * this.unPorciento.alto;
 
   constructor(
-    izquierdaSuperior: Coordenadas,
     cuadrosPorSegundo: number,
+    centro?: CoordenadaTridimensional,
+    x?: number,
+    y?: number,
+    z?: number,
   ) {
-    super(izquierdaSuperior);
+    super(centro, x, y, z);
     this.cuadrosPorSegundo = cuadrosPorSegundo;
     this.intervaloEntreCuadros = 1000 / this.cuadrosPorSegundo;
     this.elemento = window.document.getElementById("canvas") as HTMLCanvasElement;
@@ -82,20 +89,18 @@ export class Lienzo extends Camara {
     this.escena = escena;
   }
 
-  objetoEnLienzo(objeto: Objeto): Objeto | false {
-    const objetoEnCamara = this.objetoEnCamara(objeto);
-    if (objetoEnCamara === false)
+  posicionCajaEnLienzo(posicionCaja: PosicionCajaTridimensional) {
+    const posicionCajaEnVisor = this.posicionCajaEnVisor(posicionCaja);
+    if (posicionCajaEnVisor === false)
       return false;
 
-    return new Objeto(
-      new Coordenadas(
-        this.anchoEnPixeles(objetoEnCamara.izquierdaSuperior.x),
-        this.alturaEnPixeles(objetoEnCamara.izquierdaSuperior.y),
-      ),
-      new Medidas(
-        this.anchoEnPorcentaje(objetoEnCamara.medidas.ancho),
-        this.alturaEnPorcentaje(objetoEnCamara.medidas.alto)
-      )
+    return new PosicionCajaBidimensional(
+      undefined,
+      undefined,
+      this.anchoEnPixeles(posicionCajaEnVisor.centro.x),
+      this.alturaEnPixeles(posicionCajaEnVisor.centro.y),
+      this.anchoEnPorcentaje(posicionCajaEnVisor.medida.ancho),
+      this.alturaEnPorcentaje(posicionCajaEnVisor.medida.alto)
     );
   }
 

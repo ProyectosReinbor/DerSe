@@ -1,4 +1,4 @@
-import { Plano } from "../motor/plano";
+import { CoordenadaTridimensional } from "../motor/coordenadaTridimensional";
 import type { EstadoArbol } from "./mapa/arboles";
 import type { ColorCastillo, EstadoCastillo } from "./mapa/castillo";
 import type { EstadoManchaElevacion } from "./mapa/manchasElevaciones";
@@ -42,12 +42,12 @@ type Casilla = {
     arbol: false | Arbol;
 };
 
-type ObtenerPisoCasillas = (indicesCasilla: Plano) => Casilla;
+type ObtenerPisoCasillas = (indicesCasilla: CoordenadaTridimensional) => Casilla;
 
-export type MatrizPiso = Casilla[][];
+export type MatrizCasillas = Casilla[][][];
 
 export class MatrizMapa {
-    static longitudes = new Plano(37, 21);
+    static longitudes = new CoordenadaTridimensional(37, 21, 3);
 
     static obtenerCasillaVacia(): Casilla {
         return {
@@ -61,7 +61,7 @@ export class MatrizMapa {
         };
     }
 
-    static obtenerCasillaPiso0(indicesCasilla: Plano) {
+    static obtenerCasillaPiso0(indicesCasilla: CoordenadaTridimensional) {
         const casilla = MatrizMapa.obtenerCasillaVacia();
         casilla.agua = true;
         if (
@@ -224,34 +224,31 @@ export class MatrizMapa {
         MatrizMapa.obtenerCasillaPiso2,
     ];
 
-    static get obtener(): MatrizPiso[] {
-        const mapa: MatrizPiso[] = [];
-        for (
-            let piso = 0;
-            piso < MatrizMapa.obtenerPisosCasillas.length;
-            piso++
+    static get obtener() {
+        const mapa: MatrizCasillas = [];
+        const indicesCasilla = new CoordenadaTridimensional(0, 0, 0);
+        for (;
+            indicesCasilla.z < MatrizMapa.longitudes.z;
+            indicesCasilla.z++
         ) {
-            mapa[piso] = [];
-            const matrizPiso = mapa[piso];
-            if (matrizPiso === undefined)
+            mapa[indicesCasilla.z] = [];
+            const mapaZ = mapa[indicesCasilla.z];
+            if (mapaZ === undefined)
                 continue;
 
-            const indicesCasilla = new Plano(0, 0);
 
-            for (
-                indicesCasilla.vertical = 0;
-                indicesCasilla.vertical < MatrizMapa.longitudes.vertical;
-                indicesCasilla.vertical++
+            for (;
+                indicesCasilla.y < MatrizMapa.longitudes.y;
+                indicesCasilla.y++
             ) {
-                matrizPiso[indicesCasilla.vertical] = [];
-                const fila = matrizPiso[indicesCasilla.vertical];
-                if (fila === undefined)
+                mapaZ[indicesCasilla.y] = [];
+                const mapaZY = mapaZ[indicesCasilla.y];
+                if (mapaZY === undefined)
                     continue;
 
-                for (
-                    indicesCasilla.horizontal = 0;
-                    indicesCasilla.horizontal < MatrizMapa.longitudes.horizontal;
-                    indicesCasilla.horizontal++
+                for (;
+                    indicesCasilla.x < MatrizMapa.longitudes.x;
+                    indicesCasilla.x++
                 ) {
                     const obtenerPisoCasillas = MatrizMapa.obtenerPisosCasillas[piso];
                     if (obtenerPisoCasillas === undefined)
