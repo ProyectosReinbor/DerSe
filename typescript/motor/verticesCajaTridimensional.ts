@@ -6,7 +6,6 @@ import {
 } from "./verticesCajaBidimensional";
 
 export type NombresZVerticesCaja = "atras" | "mitad" | "adelante";
-
 export class VerticesCajaTridimensional extends VerticesCajaBidimensional {
     private static valoresZ: {
         [nombre in NombresZVerticesCaja]: ValoresVerticesCaja;
@@ -27,7 +26,7 @@ export class VerticesCajaTridimensional extends VerticesCajaBidimensional {
         this.nombreZ = nombreZ;
     }
 
-    get zNumero() {
+    get numeroZ() {
         return VerticesCajaTridimensional.valoresZ[this.nombreZ];
     }
 }

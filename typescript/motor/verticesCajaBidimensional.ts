@@ -1,7 +1,6 @@
 export type ValoresVerticesCaja = -1 | 0 | 1;
 export type NombresXVerticesCaja = "izquierda" | "mitad" | "derecha";
 export type NombresYVerticesCaja = "superior" | "mitad" | "inferior";
-
 export class VerticesCajaBidimensional {
     private static valoresX: {
         [nombre in NombresXVerticesCaja]: ValoresVerticesCaja;
@@ -30,11 +29,11 @@ export class VerticesCajaBidimensional {
         this.nombreY = nombreY;
     }
 
-    get xNumero() {
+    get numeroX() {
         return VerticesCajaBidimensional.valoresX[this.nombreX];
     }
 
-    get yNumero() {
+    get numeroY() {
         return VerticesCajaBidimensional.valoresY[this.nombreY];
     }
 }

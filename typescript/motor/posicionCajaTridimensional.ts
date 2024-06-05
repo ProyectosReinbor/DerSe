@@ -10,20 +10,34 @@ export class PosicionCajaTridimensional extends PosicionCajaBidimensional {
   override medidas: MedidaTridimensional;
 
   constructor(
-    centro: CoordenadaTridimensional,
-    medidas: MedidaTridimensional
+    x: number | CoordenadaTridimensional,
+    ancho: number | MedidaTridimensional,
+    y?: number,
+    alto?: number,
+    z?: number,
+    profundidad?: number
   ) {
-    super(centro, medidas);
-    this.centro = centro;
-    this.medidas = medidas;
+    super(x, y, ancho, alto);
+    this.centro = new CoordenadaTridimensional(x, y, z);
+    this.medidas = new MedidaTridimensional(ancho, alto, profundidad);
   }
 
   override obtenerVertice(
-    verticesCaja?: VerticesCajaTridimensional,
-    parametrosVerticesCaja?: [NombresXVerticesCaja, NombresYVerticesCaja, NombresZVerticesCaja],
-    ) {
-    const verticeBidimensional = super.obtenerVertice(verticesCaja, parametrosVerticesCaja);
-    const desplazamientoZ = this.medidas.dividir(2).profundidad * verticesCaja.zNumero;
+    nombreX: VerticesCajaTridimensional | NombresXVerticesCaja,
+    nombreY?: NombresYVerticesCaja,
+    nombreZ?: NombresZVerticesCaja
+  ) {
+    let verticesCaja: VerticesCajaTridimensional;
+    if (nombreX instanceof VerticesCajaTridimensional) {
+      verticesCaja = nombreX;
+    } else {
+      if (nombreY === undefined || nombreZ === undefined) {
+        throw new Error("nombreY or nombreZ is undefined");
+      }
+      verticesCaja = new VerticesCajaTridimensional(nombreX, nombreY, nombreZ);
+    }
+    const verticeBidimensional = super.obtenerVertice(verticesCaja);
+    const desplazamientoZ = this.medidas.dividir(2).profundidad * verticesCaja.numeroZ;
     const z = this.centro.z + desplazamientoZ;
     return new CoordenadaTridimensional(
       verticeBidimensional.x,
@@ -34,9 +48,7 @@ export class PosicionCajaTridimensional extends PosicionCajaBidimensional {
 
 
   override posicionRelativa(partesPorcentaje: MedidaTridimensional) {
-    const izquierdaSuperiorAtras = this.obtenerVertice(
-      new VerticesCajaTridimensional("izquierda", "superior", "atras")
-    );
+    const izquierdaSuperiorAtras = this.obtenerVertice("izquierda", "superior", "atras");
     const porcentaje = this.medidas.porcentaje(partesPorcentaje);
     const posicionRelativaBidimensional = super.posicionRelativa(partesPorcentaje);
     const z = izquierdaSuperiorAtras.z + porcentaje.profundidad;
@@ -48,12 +60,8 @@ export class PosicionCajaTridimensional extends PosicionCajaBidimensional {
   }
 
   override coordenadaAdentro(objetivo: CoordenadaTridimensional) {
-    const izquierdaSuperiorAtras = this.obtenerVertice(
-      new VerticesCajaTridimensional("izquierda", "superior", "atras")
-    );
-    const derechaInferiorAdelante = this.obtenerVertice(
-      new VerticesCajaTridimensional("derecha", "inferior", "adelante")
-    );
+    const izquierdaSuperiorAtras = this.obtenerVertice("izquierda", "superior", "atras");
+    const derechaInferiorAdelante = this.obtenerVertice("derecha", "inferior", "adelante");
     const coordenadaAdentroBidimensional = super.coordenadaAdentro(objetivo);
     return coordenadaAdentroBidimensional &&
       izquierdaSuperiorAtras.z <= objetivo.z &&
@@ -62,18 +70,10 @@ export class PosicionCajaTridimensional extends PosicionCajaBidimensional {
 
   override posicionCajaAdentro(objetivo: PosicionCajaTridimensional) {
     const posicionCajaAdentroBidimensional = super.posicionCajaAdentro(objetivo);
-    const izquierdaSuperiorAtras = this.obtenerVertice(
-      new VerticesCajaTridimensional("izquierda", "superior", "atras")
-    );
-    const derechaInferiorAdelante = this.obtenerVertice(
-      new VerticesCajaTridimensional("derecha", "inferior", "adelante")
-    );
-    const objetivoIzquierdaSuperiorAtras = objetivo.obtenerVertice(
-      new VerticesCajaTridimensional("izquierda", "superior", "atras")
-    );
-    const objetivoDerechaInferiorAdelante = objetivo.obtenerVertice(
-      new VerticesCajaTridimensional("derecha", "inferior", "adelante")
-    );
+    const izquierdaSuperiorAtras = this.obtenerVertice("izquierda", "superior", "atras");
+    const derechaInferiorAdelante = this.obtenerVertice("derecha", "inferior", "adelante");
+    const objetivoIzquierdaSuperiorAtras = objetivo.obtenerVertice("izquierda", "superior", "atras");
+    const objetivoDerechaInferiorAdelante = objetivo.obtenerVertice("derecha", "inferior", "adelante");
     return posicionCajaAdentroBidimensional &&
       izquierdaSuperiorAtras.z <= objetivoIzquierdaSuperiorAtras.z &&
       objetivoDerechaInferiorAdelante.z <= derechaInferiorAdelante.z;
