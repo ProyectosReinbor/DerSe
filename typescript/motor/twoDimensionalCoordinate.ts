@@ -1,4 +1,4 @@
-export class CoordenadaBidimensional {
+export class TwoDimensionalCoordinate {
 
     x: number;
     y: number;
@@ -11,18 +11,18 @@ export class CoordenadaBidimensional {
         this.y = y;
     }
 
-    igualA(
-        objetivo?: CoordenadaBidimensional,
+    equalTo(
+        target?: TwoDimensionalCoordinate,
         x?: number,
         y?: number
     ) {
-        if (objetivo === undefined) {
+        if (target === undefined) {
             if (x === undefined || y === undefined)
                 throw new Error("x o y no definido");
 
-            objetivo = new CoordenadaBidimensional(x, y);
+            target = new TwoDimensionalCoordinate(x, y);
         }
-        return this.x === objetivo.x &&
-            this.y === objetivo.y;
+        return this.x === target.x &&
+            this.y === target.y;
     }
 }

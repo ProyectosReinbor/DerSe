@@ -1,4 +1,4 @@
-export type ValoresVerticesCaja = -1 | 0 | 1;
+export type BoxVertexValues = -1 | 0 | 1;
 export type NombresXVerticesCaja = "izquierda" | "mitad" | "derecha";
 export type NombresYVerticesCaja = "superior" | "mitad" | "inferior";
 export class VerticesCajaBidimensional {

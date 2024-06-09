@@ -1,5 +1,3 @@
-import { CoordenadaBidimensional } from "./coordenadaBidimensional";
-import { MedidaBidimensional } from "./medidaBidimensional";
 import { VerticesCajaBidimensional, type NombresXVerticesCaja, type NombresYVerticesCaja } from "./verticesCajaBidimensional";
 
 export class PosicionCajaBidimensional {

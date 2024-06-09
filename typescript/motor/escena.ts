@@ -4,16 +4,16 @@ import type { Lienzo } from "./lienzo";
 export class Escena {
 
     lienzo: Lienzo;
-    draw: () => void = () => { }
-    touchstart: (touch: CoordenadaBidimensional) => void = () => { }
-    touchmove: (touch: CoordenadaBidimensional) => void = () => { }
-    touchend: (touch: CoordenadaBidimensional) => void = () => { }
+    dibujar?: () => void;
+    touchstart?: (toque: CoordenadaBidimensional) => void;
+    touchmove?: (toque: CoordenadaBidimensional) => void;
+    touchend?: (toque: CoordenadaBidimensional) => void;
 
     constructor(lienzo: Lienzo) {
         this.lienzo = lienzo;
     }
 
-    start() {
+    empezar() {
         this.lienzo.empezar(this);
     }
 }
