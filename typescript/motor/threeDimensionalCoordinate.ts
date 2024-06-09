@@ -20,7 +20,7 @@ export class ThreeDimensionalCoordinate extends TwoDimensionalCoordinate {
     ) {
         if (target === undefined) {
             if (x === undefined || y === undefined || z === undefined)
-                throw new Error("x, y o z no estan definidas");
+                throw new Error("x, y or z are undefined");
 
             target = new ThreeDimensionalCoordinate(x, y, z);
         }

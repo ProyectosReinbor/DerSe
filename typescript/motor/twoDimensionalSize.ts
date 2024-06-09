@@ -1,4 +1,4 @@
-export class TwoDimensionalMeasurement {
+export class TwoDimensionalSize {
 
     width: number;
     height: number;
@@ -11,23 +11,23 @@ export class TwoDimensionalMeasurement {
         this.height = height;
     }
 
-    percentage(numerator: TwoDimensionalMeasurement) {
+    percentage(numerator: TwoDimensionalSize) {
         const aPercent = this.split(100);
-        return new TwoDimensionalMeasurement(
+        return new TwoDimensionalSize(
             aPercent.width * numerator.width,
             aPercent.height * numerator.height,
         );
     }
 
     split(divider: number) {
-        return new TwoDimensionalMeasurement(
+        return new TwoDimensionalSize(
             this.width / divider,
             this.height / divider,
         );
     }
 
     multiply(multiplier: number) {
-        return new TwoDimensionalMeasurement(
+        return new TwoDimensionalSize(
             this.width * multiplier,
             this.height * multiplier
         );

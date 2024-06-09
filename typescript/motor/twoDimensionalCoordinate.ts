@@ -18,7 +18,7 @@ export class TwoDimensionalCoordinate {
     ) {
         if (target === undefined) {
             if (x === undefined || y === undefined)
-                throw new Error("x o y no definido");
+                throw new Error("x or y undefined");
 
             target = new TwoDimensionalCoordinate(x, y);
         }

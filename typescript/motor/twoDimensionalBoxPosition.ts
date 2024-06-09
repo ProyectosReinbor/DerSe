@@ -1,51 +1,44 @@
-import { VerticesCajaBidimensional, type NombresXVerticesCaja, type NombresYVerticesCaja } from "./verticesCajaBidimensional";
+import { TwoDimensionalBoxVertices, type NamesXBoxVertices, type NamesYBoxVertices } from "./twoDimensionalBoxVertices";
+import { TwoDimensionalCoordinate } from "./twoDimensionalCoordinate";
+import { TwoDimensionalSize } from "./twoDimensionalSize";
 
-export class PosicionCajaBidimensional {
+export class TwoDimensionalBoxPosition {
 
-    centro: CoordenadaBidimensional;
-    medida: MedidaBidimensional;
+    center: TwoDimensionalCoordinate;
+    size: TwoDimensionalSize;
 
     constructor(
-        centro?: CoordenadaBidimensional,
-        medida?: MedidaBidimensional,
+        center?: TwoDimensionalCoordinate,
+        size?: TwoDimensionalSize,
         x?: number,
         y?: number,
-        ancho?: number,
-        alto?: number,
+        width?: number,
+        height?: number,
     ) {
-        if (centro instanceof CoordenadaBidimensional)
-            this.centro = centro;
-        else if (x === undefined || y === undefined)
-            throw new Error("centro es undefined");
-        else
-            this.centro = new CoordenadaBidimensional(x, y);
+        if (center instanceof TwoDimensionalCoordinate) this.center = center;
+        else if (x === undefined || y === undefined) throw new Error("center is undefined");
+        else this.center = new TwoDimensionalCoordinate(x, y);
 
-        if (medida instanceof MedidaBidimensional)
-            this.medida = medida;
-        else if (ancho === undefined || alto === undefined)
-            throw new Error("medida es undefined");
-        else
-            this.medida = new MedidaBidimensional(ancho, alto)
+        if (size instanceof TwoDimensionalSize) this.size = size;
+        else if (width === undefined || height === undefined) throw new Error("size is undefined");
+        else this.size = new TwoDimensionalSize(width, height)
     }
 
-    obtenerVertice(
-        nombreX: VerticesCajaBidimensional | NombresXVerticesCaja,
-        nombreY?: NombresYVerticesCaja
+    getVertex(
+        boxVertices?: TwoDimensionalBoxVertices,
+        nameX?: NamesXBoxVertices,
+        nameY?: NamesYBoxVertices
     ) {
-        let verticesCaja: VerticesCajaBidimensional;
-        if (nombreX instanceof VerticesCajaBidimensional)
-            verticesCaja = nombreX;
-        else if (nombreY === undefined)
-            throw new Error("nombreY is undefined");
-        else
-            verticesCaja = new VerticesCajaBidimensional(nombreX, nombreY);
-
-        const medidasMitad = this.medida.dividir(2);
-        const desplazamientoX = medidasMitad.ancho * verticesCaja.numeroX;
-        const desplazamientoY = medidasMitad.alto * verticesCaja.numeroY;
-        const x = this.centro.x + desplazamientoX;
-        const y = this.centro.y + desplazamientoY;
-        return new CoordenadaBidimensional(x, y);
+        if (boxVertices === undefined) {
+            if (nameX === undefined || nameY === undefined) throw new Error("boxVertices is undefined");
+            boxVertices = new TwoDimensionalBoxVertices(nameX, nameY);
+        }
+        const halfSize = this.size.split(2);
+        const xDisplacement = halfSize.width * boxVertices.numberX;
+        const yDisplacement = halfSize.height * boxVertices.numberY;
+        const x = this.center.x + xDisplacement;
+        const y = this.center.y + yDisplacement;
+        return new TwoDimensionalCoordinate(x, y);
     }
 
     posicionRelativa(partesPorcentaje: MedidaBidimensional) {

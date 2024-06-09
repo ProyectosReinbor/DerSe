@@ -1,6 +1,6 @@
-import { TwoDimensionalMeasurement } from "./twoDimensionalMeasurement";
+import { TwoDimensionalSize } from "./twoDimensionalSize";
 
-export class ThreeDimensionalMeasurement extends TwoDimensionalMeasurement {
+export class ThreeDimensionalSize extends TwoDimensionalSize {
 
     depth: number;
 
@@ -13,10 +13,10 @@ export class ThreeDimensionalMeasurement extends TwoDimensionalMeasurement {
         this.depth = depth;
     }
 
-    override percentage(numerator: ThreeDimensionalMeasurement) {
+    override percentage(numerator: ThreeDimensionalSize) {
         const amount = super.percentage(numerator);
         const aPercent = this.split(100);
-        return new ThreeDimensionalMeasurement(
+        return new ThreeDimensionalSize(
             amount.width,
             amount.height,
             aPercent.depth * numerator.depth,
@@ -25,7 +25,7 @@ export class ThreeDimensionalMeasurement extends TwoDimensionalMeasurement {
 
     override split(divider: number) {
         const quotient = super.split(divider);
-        return new ThreeDimensionalMeasurement(
+        return new ThreeDimensionalSize(
             quotient.width,
             quotient.height,
             this.depth / divider
@@ -34,7 +34,7 @@ export class ThreeDimensionalMeasurement extends TwoDimensionalMeasurement {
 
     override multiply(multiplier: number) {
         const product = super.multiply(multiplier);
-        return new ThreeDimensionalMeasurement(
+        return new ThreeDimensionalSize(
             product.width,
             product.height,
             this.depth * multiplier
